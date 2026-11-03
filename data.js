@@ -11,10 +11,10 @@ const WORDS = {
   ryeowon: '려원', eomma: '엄마', appa: '아빠', halmeoni: '할머니', harabeoji: '할아버지',
   geomi: '거미', yeou: '여우', kokkiri: '코끼리', uyu: '우유', i_tooth: '이', goguma: '고구마', nuna: '누나', dubu: '두부',
   meori: '머리', bada: '바다', so: '소', juseu: '주스', heori: '허리',
-  dari: '다리', radio: '라디오', jadu: '자두', hama: '하마', eobu: '어부', ubi: '우비', ima: '이마', eureureong: '으르렁', lion: '사자'
+  dari: '다리', radio: '라디오', jadu: '자두', hama: '하마', eobu: '어부', ubi: '우비', ima: '이마', eureureong: '으르렁', lion: '사자', sobangcha: '소방차'
 };
 /* 그림 없을 때 자리표시(이모지). 피자 그림이 들어오면 tools/import_pics.py → art.js 목록에 id가 생기고 그림으로 바뀜 */
-const PH_EMOJI = { ryeowon: '👧', eomma: '👩', appa: '👨', halmeoni: '👵', harabeoji: '👴', geomi: '🕷️', yeou: '🦊', kokkiri: '🐘', uyu: '🥛', i_tooth: '🦷',
+const PH_EMOJI = { sobangcha: '🚒', ryeowon: '👧', eomma: '👩', appa: '👨', halmeoni: '👵', harabeoji: '👴', geomi: '🕷️', yeou: '🦊', kokkiri: '🐘', uyu: '🥛', i_tooth: '🦷',
   goguma: '🍠', nuna: '👧', dubu: '🧈', meori: '💆', bada: '🌊', so: '🐄', juseu: '🧃', heori: '🙆', eureureong: '🦁', lion: '🦁', hama: '🦛' };
 const WORD_IDS = Object.keys(WORDS);
 /* 그림 경로: 피자 그림이 tools/import_art.py로 들어오면(assets/art.js의 ART 목록) WebP, 없으면 자리표시 SVG */
@@ -68,6 +68,8 @@ function splitSyllable(s) {
   return { cho: CHO[Math.floor(n / 588)], jung: JUNG[Math.floor((n % 588) / 28)] };
 }
 const VERTICAL_VOWELS = 'ㅏㅑㅓㅕㅣ';   // 옆 짜임(나머지 ㅗㅛㅜㅠㅡ는 위아래 짜임)
+/* 숨은 글자 놀이: 글자마다 꼭 섞고 싶은 닮은 가짜 글자(받침 글자처럼 자동으로 못 만드는 것) */
+const LOOK = { '방': ['바', '봉', '박'], '소': ['수', '사'], '차': ['자', '초'] };
 const hex = c => c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
 const VOICE = {
   jamo: j => 'j_' + hex(j),
@@ -79,7 +81,9 @@ const VOICE = {
   first: w => 'f_' + w,         // v3 첫 글자 "나, 나비 할 때 나!"
   story: i => 'st_' + (i + 1),  // v3 몽글이 이야기
   hw: w => 'hw_' + w,            // 그림 속 글자 찾기 "소 글씨를 찾아볼까?"
-  hy: w => 'hy_' + w             // "그건 하마야!"
+  hy: w => 'hy_' + w,            // "그건 하마야!"
+  fy: c => 'fy_' + hex(c),       // 음절 찾기 "모를 찾아볼까?"
+  dy: c => 'dy_' + hex(c)        // 가짜 글자 "그건 마야."
 };
 /* 자모 설명 한 줄(FIX4-A3, 니혼 답): ② 글자 놀이에서 이 자모가 문제로 나오면 그림과 함께 화면에 보이고 jx_ 음성으로 읽어 줌 */
 const JAMO_NOTE = { 'ㅇ': { text: '동그라미 모양이에요. 맨 앞에 오면 소리가 나지 않아요.', pic: 'oi' } };
@@ -173,24 +177,29 @@ const TOPICS = [
 ];
 /* 그림 속 글자 찾기(hidden): 숨길 자리·색은 hidden_spots.js(HSPOT). lv 1 = 크고 잘 보임·가짜 없음, 2 = 조금 작고 숨음·가짜 1, 3 = 작고 더 숨음·가짜 2.
    힌트: hint ms 뒤 반짝, reveal ms 뒤 알려 줌(벌점 없음) */
-const HIDDEN = { hint: 15000, reveal: 30000, lv: { 1: { size: 1, delta: 0.42, rot: 6, decoys: 0 }, 2: { size: 0.85, delta: 0.27, rot: 10, decoys: 1 }, 3: { size: 0.72, delta: 0.17, rot: 14, decoys: 2 } } };
+/* 그림 속 글자 찾기(11/03 음절판): 낱말의 글자(음절)를 하나씩 그림 속 다른 자리(HSPOT.q)에 숨김. 단계는 아이마다(S.hid) 올라가고 내려감, 주는 범위(lvMin~lvMax)만 정함.
+   lv1 = 정답 글자만, 크고 조금만 숨김 / lv2 = 비슷한 글자 가짜(같은 자음 다른 모음·같은 모음 다른 자음, 모양 차이 큰 것) 글자마다 1개쯤 / lv3 = 가짜 3~4개, 작고 더 숨김, 모양이 가까운 것(ㅏ↔ㅓ, ㅗ↔ㅜ, ㅁ↔ㅂ, ㅅ↔ㅈ…)
+   올라가기: 한 판에서 첫 누름 정확도 80% 이상·알려 주기 없음이 2판 연속. 내려가기: 정확도 50% 미만이거나 알려 주기 2번 이상. hint ms 뒤 반짝, reveal ms 뒤 남은 글자 알려 줌(벌점 없음) */
+const HIDDEN = { hint: 15000, reveal: 30000, up: { acc: 0.8, need: 2 }, down: { acc: 0.5, reveals: 2 },
+  lv: { 1: { size: 1, delta: 0.38, rot: 6 }, 2: { size: 0.86, delta: 0.26, rot: 10 }, 3: { size: 0.74, delta: 0.16, rot: 14 } } };
 /* 그림 보고 글자 고르기(picword): cards = 카드 수, hint = 색 힌트(2 같은 색 진하게, 1 옅게, 0 없음). 같은 낱말 2번 연속 바로 맞히면 그 낱말은 힌트 한 단계 옅게 */
 const WCAT = { animal: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri', 'so'], food: ['banana', 'podo', 'oi', 'goguma', 'dubu', 'jadu', 'juseu', 'uyu'],
-  people: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'nuna', 'ryeowon', 'eobu'], body: ['meori', 'heori', 'ima', 'dari'], thing: ['moja', 'gicha', 'gudu', 'radio', 'ubi', 'bada', 'namu'] };
+  people: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'nuna', 'ryeowon', 'eobu'], body: ['meori', 'heori', 'ima', 'dari'], thing: ['moja', 'gicha', 'gudu', 'radio', 'ubi', 'bada', 'namu', 'sobangcha'] };
 const PW_WORDS = Object.values(WCAT).flat();
-const HID_WORDS = PW_WORDS.filter(w => w !== 'nuna');   // 누나 그림은 사람이 작아 숨길 자리가 없음
+const HID_OK = w => !!(HSPOT[w] && HSPOT[w].q.length >= WORDS[w].length);   // 글자 수만큼 숨길 자리가 있는 그림만(누나·할아버지는 자리가 모자람)
+const HID_WORDS = PW_WORDS.filter(HID_OK);
 const CARD_COLORS = ['#F27BA6', '#5FA8E8', '#F2C230', '#4FC08D', '#A68BEB', '#F28A4B', '#3FBFBF', '#B98B5E', '#E85D5D', '#8FBF3F'];
 /* 이번 주 놀이에 끼워 넣기(주제별 낱말) */
 const _add = (n, ...ps) => TOPICS[n - 1].plays.push(...ps);
-_add(1, { id: 'hid-1', kind: 'hidden', items: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'ryeowon'], lv: 1 }, { id: 'pw-1', kind: 'picword', items: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'ryeowon'], cards: 2, hint: 2 });
-_add(2, { id: 'hid-2', kind: 'hidden', items: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri', 'so'], lv: 1 }, { id: 'pw-2', kind: 'picword', items: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri', 'so'], cards: 2, hint: 2 });
-_add(3, { id: 'hid-3', kind: 'hidden', items: ['agi', 'oi', 'uyu', 'ori', 'ubi', 'ima'], lv: 2 });
+_add(1, { id: 'hid-1', kind: 'hidden', items: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'ryeowon'].filter(HID_OK), lvMin: 1, lvMax: 2 }, { id: 'pw-1', kind: 'picword', items: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'ryeowon'], cards: 2, hint: 2 });
+_add(2, { id: 'hid-2', kind: 'hidden', items: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri', 'so'].filter(HID_OK), lvMin: 1, lvMax: 2 }, { id: 'pw-2', kind: 'picword', items: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri', 'so'], cards: 2, hint: 2 });
+_add(3, { id: 'hid-3', kind: 'hidden', items: ['agi', 'oi', 'uyu', 'ori', 'ubi', 'ima'].filter(HID_OK), lvMin: 1, lvMax: 2 });
 _add(4, { id: 'pw-4', kind: 'picword', items: ['eobu', 'ubi', 'ima', 'yeou', 'uyu', 'oi', 'agi', 'ori'], cards: 3, hint: 2 });
-_add(5, { id: 'hid-5', kind: 'hidden', items: ['gicha', 'goguma', 'geomi', 'nabi', 'namu'], lv: 2 }, { id: 'pw-5', kind: 'picword', items: ['gicha', 'goguma', 'geomi', 'nabi', 'namu', 'nuna'], cards: 3, hint: 2 });
-_add(6, { id: 'hid-6', kind: 'hidden', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'], lv: 3 }, { id: 'pw-6', kind: 'picword', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'], cards: 4, hint: 2 });
-_add(7, { id: 'hid-7', kind: 'hidden', items: ['lion', 'so', 'jadu', 'juseu', 'hama', 'heori', 'radio'], lv: 3 }, { id: 'pw-7', kind: 'picword', items: ['lion', 'so', 'jadu', 'juseu', 'hama', 'heori', 'radio'], cards: 4, hint: 1 });
+_add(5, { id: 'hid-5', kind: 'hidden', items: ['gicha', 'goguma', 'geomi', 'nabi', 'namu', 'nuna'].filter(HID_OK), lvMin: 1, lvMax: 3 }, { id: 'pw-5', kind: 'picword', items: ['gicha', 'goguma', 'geomi', 'nabi', 'namu', 'nuna'], cards: 3, hint: 2 });
+_add(6, { id: 'hid-6', kind: 'hidden', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'].filter(HID_OK), lvMin: 1, lvMax: 3 }, { id: 'pw-6', kind: 'picword', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'], cards: 4, hint: 2 });
+_add(7, { id: 'hid-7', kind: 'hidden', items: ['lion', 'so', 'jadu', 'juseu', 'hama', 'heori', 'radio', 'sobangcha'].filter(HID_OK), lvMin: 2, lvMax: 3 }, { id: 'pw-7', kind: 'picword', items: ['lion', 'so', 'jadu', 'juseu', 'hama', 'heori', 'radio', 'sobangcha'], cards: 4, hint: 1 });
 _add(8, { id: 'pw-8', kind: 'picword', items: PW_WORDS, cards: 5, hint: 1 });
-_add(9, { id: 'hid-9', kind: 'hidden', items: HID_WORDS, lv: 3 });
+_add(9, { id: 'hid-9', kind: 'hidden', items: HID_WORDS, lvMin: 2, lvMax: 3 });
 _add(10, { id: 'pw-10', kind: 'picword', items: PW_WORDS, cards: 5, hint: 0 });
 const PLAYS = [];
 TOPICS.forEach(t => t.plays.forEach(p => { p.topic = t.id; p.row = t.id; p.name = p.nm || KINDS[p.kind].kid; PLAYS.push(p); }));

@@ -504,3 +504,11 @@ body.night .time .knob { border-color: #B9AEEA; }
 .confetti.big i { font-size: 34px; animation-duration: 1.8s; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 .s-round-picword, .s-round-hidden { position: relative; }
+/* 음절 찾기 칸(11/03) */
+.hwslots { display: flex; gap: 10px; }
+.hwslots .slot { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; font: 700 38px/1 'Pretendard', sans-serif; color: #D9CBBE; border: 3px dashed #E6D9CC; border-radius: 16px; background: #FFFCF8; }
+.hwslots .slot.on { color: #fff; background: #F27BA6; border: 3px solid #F27BA6; }
+.hwslots .slot.pop { animation: hwpop2 .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes hwpop2 { 0% { transform: scale(.6); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.hwfly { position: fixed; z-index: 70; font-family: 'Pretendard', sans-serif; font-weight: 700; color: #F27BA6; text-shadow: 0 0 8px #fff; transform: translate(-50%,-50%); transition: transform .55s cubic-bezier(.5,-0.2,.4,1.2); pointer-events: none; line-height: 1; }
+@media (min-width: 900px) { .hwslots .slot { width: 70px; height: 70px; font-size: 46px; } }

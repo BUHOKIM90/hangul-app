@@ -21,7 +21,7 @@ const compose = (c, v) => String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JU
 
 /* ---------- 저장 (v3 새 키. v2·v1 기록은 읽기만 하고 지우지 않음) ---------- */
 const KEY = 'hangul-play-v3', KEY_V2 = 'hangul-play-v2', KEY_V1 = 'hangul-play-v1';
-const fresh = () => ({ v: 3, topic: 't1', suggestOff: '', settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, words: {}, pw: { stars: 0, jars: 0, streak: {} }, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null, moved: false } });
+const fresh = () => ({ v: 3, topic: 't1', suggestOff: '', settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, words: {}, pw: { stars: 0, jars: 0, streak: {} }, hid: {}, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null, moved: false } });
 let S;
 function v1toV2(o) {   // v2 앱의 v1 → v2 옮기기와 같음
   const r = { stickers: (o.stickers || []).slice(), settings: {}, plays: {}, review: {}, met: {}, log: [] };
@@ -400,6 +400,7 @@ function nextRound() {
 }
 function finishPlay(cut) {
   const r = run; run = null; ticking = false;
+  if (r.p.kind === 'hidden' && r.hs) hidUpdate(r.p, r.hs);
   if (r.isReview) reviewDone(r.pid, r.first ? r.ok / r.first : 1);
   if (!S.session.done.includes(r.pid)) S.session.done.push(r.pid);
   if (r.src === 'garden' && !S.session.done.includes('@pick') && (S.session.list || []).some(x => x.id === '@pick')) S.session.done.push('@pick');
@@ -444,58 +445,111 @@ async function surprise(s, big) {   // 가끔 깜짝: 몽글이 점프 + 별·�
   for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', '', ['★', '✿', '♥', '●'][i % 4]); c.style.left = (Math.random() * 100) + '%'; c.style.color = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
   document.body.append(box); setChar('jump'); bounce(); await wait(big ? 1600 : 1100); box.remove();
 }
+/* 비슷한 가짜 글자(11/03): 같은 자음+다른 모음, 같은 모음+다른 자음(소리 파일 있는 10자음×6모음 안에서). lv2 = 모양 차이 큰 것, lv3 = 모양이 가까운 것 */
+const hasBatchim = c => (c.charCodeAt(0) - 0xAC00) % 28 !== 0;
+const BASE_C = { 'ㅋ': 'ㄱ', 'ㄲ': 'ㄱ', 'ㅃ': 'ㅂ', 'ㅊ': 'ㅈ', 'ㅌ': 'ㄷ', 'ㅍ': 'ㅂ', 'ㄸ': 'ㄷ', 'ㅆ': 'ㅅ', 'ㅉ': 'ㅈ' }, BASE_V = { 'ㅕ': 'ㅓ', 'ㅑ': 'ㅏ', 'ㅛ': 'ㅗ', 'ㅠ': 'ㅜ', 'ㅝ': 'ㅜ' };
+const SIM = { 'ㅏㅓ': 3, 'ㅗㅜ': 3, 'ㅜㅡ': 2, 'ㅗㅡ': 2, 'ㅏㅣ': 2, 'ㅓㅣ': 2, 'ㅁㅂ': 3, 'ㅅㅈ': 3, 'ㄷㄹ': 2, 'ㄱㄴ': 2, 'ㄴㄷ': 2, 'ㅇㅎ': 2, 'ㄱㅈ': 1, 'ㄴㄹ': 1 };
+const sim = (a, b) => SIM[a + b] || SIM[b + a] || 0;
+function lookAlikes(syl, lv, want) {
+  if (!want) return [];
+  const per = syl.map(t => { const { cho, jung } = splitSyllable(t), c = BASE_C[cho] || cho, v = BASE_V[jung] || jung, out = [];
+    if (C.includes(c)) V.forEach(v2 => { if (v2 !== jung) out.push({ c: compose(c, v2), src: t, sc: sim(v, v2) + (v2 === v ? 3 : 0) }); });
+    if (V.includes(v)) C.forEach(c2 => { if (c2 !== cho) out.push({ c: compose(c2, v), src: t, sc: sim(c, c2) + (c2 === c ? 3 : 0) }); });
+    (LOOK[t] || []).forEach(c2 => out.push({ c: c2, src: t, sc: 4 }));
+    return out.filter(d => !syl.includes(d.c)).map(d => ({ ...d, r: (lv >= 3 ? d.sc : -d.sc) + Math.random() * 1.6 })).sort((a, b) => b.r - a.r); });
+  const got = [], seen = new Set();
+  for (let round = 0; got.length < want && round < 6; round++) per.forEach(list => { while (list.length && got.length < want) { const d = list.shift(); if (!seen.has(d.c)) { seen.add(d.c); got.push(d); break; } } });
+  return got;
+}
+/* 아이마다 단계(그 놀이 낱말 묶음 기준). 주는 lvMin~lvMax 범위만 */
+const hidLevel = p => { const r = S.hid[p.id]; return Math.max(p.lvMin || 1, Math.min(p.lvMax || 3, r ? r.lv : (p.lvMin || 1))); };
+function hidUpdate(p, hs) {   // 한 판 끝: 올라가기·내려가기
+  const r = S.hid[p.id] || (S.hid[p.id] = { lv: p.lvMin || 1, good: 0, hist: [] });
+  r.lv = hidLevel(p); const tries = hs.finds + hs.decoys, acc = tries ? hs.finds / tries : 0;
+  const good = tries > 0 && acc >= HIDDEN.up.acc && hs.reveals === 0, bad = (tries > 0 && acc < HIDDEN.down.acc) || hs.reveals >= HIDDEN.down.reveals;
+  r.hist.push({ d: today(), lv: r.lv, acc: Math.round(acc * 100) / 100, rv: hs.reveals }); r.hist = r.hist.slice(-10);
+  if (good) { r.good++; if (r.good >= HIDDEN.up.need && r.lv < (p.lvMax || 3)) { r.lv++; r.good = 0; } }
+  else { r.good = 0; if (bad && r.lv > (p.lvMin || 1)) r.lv--; }
+  return r.lv;
+}
 const RUN = {
-  /* 그림 속 글자 찾기(11/03): 그림 속 몸 위 평평한 자리에 낱말을 그 자리 색과 비슷하게 숨김. 찾으면 톡 튀어나오며 "찾았다! ○○!" */
+  /* 그림 속 글자 찾기(11/03 음절판): 낱말 글자를 하나씩 그림 속 여러 자리에 숨김(모자 → 모, 자). 위 카드의 빈칸을 채우며 찾음(순서 상관없이, 맞는 칸으로).
+     단계(아이마다 S.hid): 1 정답 글자만 / 2 비슷한 가짜 글자 / 3 가짜 더 많고 작고 모양이 더 비슷함. 찾으면 글자가 칸으로 날아가며 "모!", 다 찾으면 "찾았다! 모자!" */
   hidden(w, id, s, done) {
-    const L = HIDDEN.lv[run.p.lv || 1], H = HSPOT[w] || { s: [] }, spots = H.s.slice();
-    if (!spots.length) return done(null);
-    const ti = (run.p.lv || 1) === 1 ? 0 : rand(spots.length);
-    const pool = HID_WORDS.filter(x => x !== w && WORDS[x][0] !== WORDS[w][0]);
-    const near = HID_WORDS.filter(x => x !== w && (WORDS[x][0] === WORDS[w][0] || (WCAT_OF[x] === WCAT_OF[w])));
-    const dpool = (run.p.lv || 1) >= 3 && near.length ? shuffle(near).concat(shuffle(pool)) : shuffle(pool);
-    const others = spots.map((_, k) => k).filter(k => k !== ti).slice(0, L.decoys);
-    const marks = [{ w, k: ti, target: true }].concat(others.map((k, q) => ({ w: dpool[q], k })));
-    let first = true, found = false, missed = 0;
-    const prompt = () => pointSay(VOICE.hw(w));
-    const pr = el('div', 'hwcard', '<span class="hwword">' + WORDS[w] + '</span>'); pr.append(speakerBtn(prompt));
+    const lv = hidLevel(run.p), L = HIDDEN.lv[lv], H = HSPOT[w] || { q: [] }, syl = [...WORDS[w]], n = syl.length;
+    if (!H.q || H.q.length < n) return done(null);
+    const order = H.q.map((_, k) => k);   // 큰 자리부터
+    const tk = lv === 1 ? order.slice(0, n) : lv === 2 ? shuffle(order.slice(0, Math.min(order.length, n + 2))).slice(0, n) : shuffle(order).slice(0, n);
+    const free = shuffle(order.filter(k => !tk.includes(k)));
+    const want = lv === 1 ? 0 : lv === 2 ? Math.min(3, n + (Math.random() < 0.5 ? 1 : 0)) : Math.min(4, Math.max(3, 2 * n));
+    const dec = lookAlikes(syl, lv, Math.min(want, free.length));
+    const marks = syl.map((c, i) => ({ c, slot: i, target: true, k: tk[i] })).concat(dec.map((d, q) => ({ c: d.c, src: d.src, k: free[q] })));
+    const hs = run.hs || (run.hs = { finds: 0, decoys: 0, reveals: 0, hints: 0 });
+    let first = true, finished = false, busy = false, hintT = 0, revT = 0, revealedHere = false;
+    const filled = new Array(n).fill(false);
+    const card = el('div', 'hwcard'), slots = el('div', 'hwslots');
+    syl.forEach((c, i) => { const sl = el('span', 'slot', c); sl.dataset.i = i; slots.append(sl); });
+    card.append(slots, speakerBtn(() => pointSay(VOICE.hw(w))));
     const box = el('div', 'hwbox'), img = el('img'); img.alt = ''; img.src = PIC(w); img.draggable = false; box.append(img);
     const ring = el('div', 'hwring'); box.append(ring);
     const mix = (c, d) => { const lum = c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114; return 'rgb(' + c.map(v => Math.round(lum < 110 ? v + (255 - v) * d : v * (1 - d))).join(',') + ')'; };
     marks.forEach(m => {
-      const [cx, cy, sw, sh, col] = spots[m.k];
-      const sp = el('span', 'hw' + (m.target ? ' tgt' : ' decoy'), WORDS[m.w]); sp.dataset.w = m.w;
+      const [cx, cy, sw, , col] = H.q[m.k];
+      const sp = el('span', 'hw' + (m.target ? ' tgt' : ' decoy'), m.c); sp.dataset.c = m.c;
       sp.style.left = cx + '%'; sp.style.top = cy + '%'; sp.style.color = mix(col, L.delta);
-      m.rot = (Math.random() * 2 - 1) * L.rot; m.box = [sw, sh]; m.el = sp; box.append(sp);
+      m.rot = (Math.random() * 2 - 1) * L.rot; m.sw = sw; m.el = sp; box.append(sp);
     });
-    const fit = () => { const W = box.getBoundingClientRect().width; if (!W) return;
-      marks.forEach(m => { const n = WORDS[m.w].length, fs = Math.min(m.box[1] * 0.8, m.box[0] * 0.9 / n) * L.size * W / 100; m.el.style.fontSize = Math.max(14, fs).toFixed(1) + 'px'; m.el.style.transform = 'translate(-50%,-50%) rotate(' + m.rot.toFixed(1) + 'deg)'; });
-      const R = marks.map(m => m.el.getBoundingClientRect()), hitR = (a, c) => a.left < c.right + 6 && c.left < a.right + 6 && a.top < c.bottom + 6 && c.top < a.bottom + 6;
-      for (let q = marks.length - 1; q >= 1; q--) if (R.some((r, k) => k !== q && hitR(R[q], r))) { marks[q].el.remove(); marks.splice(q, 1); R.splice(q, 1); }   // 작은 화면에서 겹치면 가짜 글자를 뺌
-      const t = marks[0].el.getBoundingClientRect(), b = box.getBoundingClientRect(), pad = 26;
+    const nextIdx = () => filled.indexOf(false);
+    const placeRing = () => { const k = nextIdx(); const m = marks.find(x => x.target && x.slot === k); if (!m) return; const t = m.el.getBoundingClientRect(), b = box.getBoundingClientRect(), pad = 22;
       ring.style.left = (t.left - b.left - pad) + 'px'; ring.style.top = (t.top - b.top - pad) + 'px'; ring.style.width = (t.width + 2 * pad) + 'px'; ring.style.height = (t.height + 2 * pad) + 'px'; };
-    s.append(guide('think', '<b>' + WORDS[w] + '</b> 글씨를 찾아봐!'), pr, box);
+    const fit = () => { const W = box.getBoundingClientRect().width; if (!W) return;
+      marks.forEach(m => { m.el.style.fontSize = Math.max(16, m.sw * 0.78 * L.size * W / 100).toFixed(1) + 'px'; m.el.style.transform = 'translate(-50%,-50%) rotate(' + m.rot.toFixed(1) + 'deg)'; });
+      const R = marks.map(m => m.el.getBoundingClientRect()), hit = (a, c) => a.left < c.right + 4 && c.left < a.right + 4 && a.top < c.bottom + 4 && c.top < a.bottom + 4;
+      for (let q = marks.length - 1; q >= n; q--) if (R.some((r, k) => k !== q && hit(R[q], r))) { marks[q].el.remove(); marks.splice(q, 1); R.splice(q, 1); }   // 작은 화면에서 겹치면 가짜를 뺌
+      placeRing(); };
+    s.append(guide('think', '<b>' + WORDS[w] + '</b> 글자를 찾아봐!'), card, box);
     fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
-    const t0 = Date.now();
-    const hintT = setTimeout(() => { if (!alive(id) || found) return; ring.classList.add('on'); setBubble('반짝이는 데를 봐!'); say('ui_hwhint'); first = false; }, HIDDEN.hint);
-    const revT = setTimeout(() => { if (!alive(id) || found) return; got(true); }, HIDDEN.reveal);
-    async function got(revealed) {
-      found = true; clearTimeout(hintT); clearTimeout(revT); ring.classList.remove('on');
-      const t = marks[0].el; t.classList.add('found'); sparkAt(t); ding(); setChar(revealed ? 'point' : 'clap'); bounce();
-      setBubble(revealed ? '여기 있었어! <b>' + WORDS[w] + '</b>' : '찾았다! <b>' + WORDS[w] + '</b>!');
-      await say(['ui_found', VOICE.word(w)]); await wait(500); if (alive(id)) done(revealed ? null : first);
+    const arm = () => { clearTimeout(hintT); clearTimeout(revT); ring.classList.remove('on');
+      hintT = setTimeout(() => { if (!alive(id) || finished) return; placeRing(); ring.classList.add('on'); hs.hints++; first = false; setBubble('반짝이는 데를 봐!'); say('ui_hwhint'); }, HIDDEN.hint);
+      revT = setTimeout(() => { if (!alive(id) || finished) return; revealAll(); }, HIDDEN.reveal); };
+    async function fly(m) {   // 찾은 글자가 위 칸으로 날아감
+      const a = m.el.getBoundingClientRect(), sl = slots.children[m.slot], b = sl.getBoundingClientRect();
+      const f = el('span', 'hwfly', m.c); f.style.left = (a.left + a.width / 2) + 'px'; f.style.top = (a.top + a.height / 2) + 'px'; f.style.fontSize = Math.max(28, a.height) + 'px'; document.body.append(f);
+      requestAnimationFrame(() => { f.style.transform = 'translate(-50%,-50%) translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(.9)'; });
+      await wait(560); f.remove(); sl.classList.add('on'); sl.classList.remove('pop'); void sl.offsetWidth; sl.classList.add('pop');
+    }
+    async function take(m, revealed) {
+      // 같은 글자가 두 번(바나나의 '나')이면 비어 있는 맞는 칸 아무거나
+      if (filled[m.slot]) { const alt = syl.findIndex((c, i) => c === m.c && !filled[i]); if (alt < 0) return; m.slot = alt; }
+      filled[m.slot] = true; m.found = true; if (revealed) hs.reveals++; else hs.finds++;
+      m.el.classList.add('found'); sparkAt(m.el); ding(1 + 0.1 * filled.filter(Boolean).length);
+      const fl = fly(m); setChar('clap'); bounce();
+      if (filled.every(Boolean)) {
+        finished = true; clearTimeout(hintT); clearTimeout(revT); ring.classList.remove('on'); await fl;
+        setBubble((revealed ? '여기 있었어! ' : '찾았다! ') + '<b>' + WORDS[w] + '</b>!'); await say(VOICE.syl(m.c)); if (!alive(id)) return;
+        await say(['ui_found', VOICE.word(w)]); await wait(450); if (alive(id)) done(revealed || revealedHere ? null : first);
+        return;
+      }
+      setBubble('<b>' + m.c + '</b>! 또 찾아볼까?'); await say(VOICE.syl(m.c)); await fl; if (!alive(id)) return; arm(); placeRing();
+    }
+    async function revealAll() {   // 30초: 남은 글자를 하나씩 보여 줌
+      revealedHere = true; first = false; busy = true;
+      for (const m of marks.filter(x => x.target && !x.found)) { if (!alive(id)) return; await take(m, true); }
     }
     box.addEventListener('pointerdown', async e => {
-      if (found || !alive(id)) return;
-      const hit = marks.map(m => { const r = m.el.getBoundingClientRect(), g = Math.max(28, r.height * 0.6); const inside = e.clientX >= r.left - g && e.clientX <= r.right + g && e.clientY >= r.top - g && e.clientY <= r.bottom + g;
+      if (finished || busy || !alive(id)) return;
+      const hit = marks.filter(m => !m.found && m.el.isConnected).map(m => { const r = m.el.getBoundingClientRect(), g = Math.max(22, r.height * 0.5); const inside = e.clientX >= r.left - g && e.clientX <= r.right + g && e.clientY >= r.top - g && e.clientY <= r.bottom + g;
         return { m, inside, d: Math.hypot(e.clientX - (r.left + r.right) / 2, e.clientY - (r.top + r.bottom) / 2) }; }).filter(x => x.inside).sort((a, b) => a.d - b.d)[0];
       if (!hit) return;
-      if (hit.m.target) return got(false);
-      if (hit.m.el.classList.contains('seen')) return;
-      first = false; missed++; hit.m.el.classList.add('seen'); setChar('think');
-      setBubble('그건 <b>' + WORDS[hit.m.w] + '</b>야! <b>' + WORDS[w] + '</b>를 찾아볼까?'); await say([VOICE.hy(hit.m.w), VOICE.hw(w)]);
+      if (hit.m.target) { busy = true; await take(hit.m, false); busy = false; return; }
+      first = false; hs.decoys++; busy = true; hit.m.el.classList.remove('seen'); void hit.m.el.offsetWidth; hit.m.el.classList.add('seen'); setChar('think');
+      const want1 = filled[syl.indexOf(hit.m.src)] === false ? hit.m.src : syl[nextIdx()];
+      setBubble('그건 <b>' + hit.m.c + '</b>야. <b>' + want1 + '</b>' + (hasBatchim(want1) ? '을' : '를') + ' 찾아볼까?');
+      await say([VOICE.dy(hit.m.c), VOICE.fy(want1)]); busy = false;
     });
-    if (window.HP) HP.hidden = { target: w, lv: run.p.lv || 1, marks: marks.map(m => ({ w: m.w, target: !!m.target })), rect: k => { const r = marks[k || 0].el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, t0, get found() { return found; }, ring: () => ring.classList.contains('on') };
-    prompt();
+    if (window.HP) HP.hidden = { target: w, syl, lv, get marks() { return marks.map(m => ({ c: m.c, target: !!m.target, slot: m.slot, found: !!m.found, on: m.el.isConnected })); },
+      rect: k => { const r = marks[k].el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, get filled() { return filled.slice(); }, get found() { return finished; }, get busy() { return busy; }, ring: () => ring.classList.contains('on'), stats: hs };
+    arm(); pointSay(VOICE.hw(w));
   },
   /* 그림 보고 글자 고르기(11/03): 큰 그림 + 낱말 카드 2~5장. 색 힌트 = 그림 테두리와 정답 카드 색이 같음(주가 갈수록·잘 맞히면 옅어짐). 맞으면 카드가 그림으로 쏙 + 별 병 */
   picword(w, id, s, done) {
@@ -1077,6 +1131,6 @@ function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML
 /* ---------- 시작 ---------- */
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { save(); stopAudio(); } });
 if ('speechSynthesis' in window) speechSynthesis.getVoices();
-window.HP = { testRound: (kind, item, p) => { run = { pid: 'test', p: Object.assign({ kind, items: [item] }, p || {}), queue: [item], i: 0, ok: 0, first: 0 }; const [id, s] = screen('round-' + kind, { home: true }); HP.lastDone = undefined; RUN[kind](item, id, s, ok => { HP.lastDone = ok; }); }, testTrace: (j, copy) => { const [id, s] = screen('round-trace', { home: true }); HP.lastDone = undefined; traceRound(j, id, s, ok => { HP.lastDone = ok; }, !!copy); }, get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, strokesOf, judgeStroke, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
+window.HP = { hidLevel, hidUpdate, lookAlikes, testRound: (kind, item, p) => { run = { pid: 'test', p: Object.assign({ kind, items: [item] }, p || {}), queue: [item], i: 0, ok: 0, first: 0 }; const [id, s] = screen('round-' + kind, { home: true }); HP.lastDone = undefined; RUN[kind](item, id, s, ok => { HP.lastDone = ok; }); }, testTrace: (j, copy) => { const [id, s] = screen('round-trace', { home: true }); HP.lastDone = undefined; traceRound(j, id, s, ok => { HP.lastDone = ok; }, !!copy); }, get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, strokesOf, judgeStroke, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 showHome();
