@@ -205,6 +205,10 @@ body.night .time .knob { border-color: #B9AEEA; }
 .trace { position: relative; flex: 1; min-height: 260px; margin: 10px 20px 0; background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow); touch-action: none; overflow: hidden; }
 .trace svg, .trace canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .trace .model { position: absolute; left: 14px; top: 10px; font-size: 54px; color: var(--lav-ink); z-index: 2; pointer-events: none; }
+.trace .sdots { position: absolute; right: 14px; top: 12px; display: flex; gap: 8px; z-index: 2; pointer-events: none; }
+.trace .sdots i { width: 14px; height: 14px; border-radius: 50%; background: #EFE6DA; transition: transform .2s, background .2s; }
+.trace .sdots i.now { background: #F9C6D8; transform: scale(1.25); }
+.trace .sdots i.on { background: #F27BA6; }
 .tools { display: flex; gap: 12px; padding: 12px 20px 0; flex: none; }
 .tools .kid-btn { flex: 1; min-height: 72px; }
 

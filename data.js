@@ -25,7 +25,9 @@ const STICKER = n => { const id = 'st_' + String(n).padStart(2, '0'); return 'as
 
 const MASTERY = { window: 5, need: 4, days: 2 }; // 최근 5번 중 4번(첫 시도 정답) + 그 5번이 서로 다른 날짜 2개 이상(기기 로컬 날짜, FIX2)
 const REVIEW_DAYS = [1, 3, 7, 14];               // 복습 상자 간격
-const TRACE = { tol: 18, cover: 0.65, stray: 25, strayMax: 0.5, maxTries: 3 };
+/* 따라 쓰기 판정(획 하나씩, 4세용 너그럽게): tol=안내선에서 이만큼(100칸 기준) 안이면 덮은 것, cover=획을 이만큼 덮으면 통과,
+   stray·strayMax=선에서 멀리 벗어난 잉크 비율 한도, minLen=이보다 짧은 터치는 조용히 무시(잘못 닿은 것), maxTries=같은 획 3번 안 되면 같이 써 줌. 방향은 보지 않음. */
+const TRACE = { tol: 21, cover: 0.6, stray: 27, strayMax: 0.45, minLen: 0.22, maxTries: 3 };
 /* 스티커 번호 목록: 피자 WebP가 들어오면 그 번호들(24장), 없으면 자리표시 st_01..12.svg */
 const STICKER_IDS = (ARTS.sticker.length ? ARTS.sticker.map(x => +x.slice(3)) : Array.from({ length: 12 }, (_, i) => i + 1));
 
@@ -41,10 +43,19 @@ const STROKES = {
   'ㅇ': [{ c: [50, 50, 34] }],
   'ㅈ': [[[20, 18], [78, 18], [18, 86]], [[50, 48], [84, 86]]],
   'ㅎ': [[[38, 10], [62, 10]], [[18, 28], [82, 28]], { c: [50, 64, 22] }],
+  /* 11주 이후 글자(10주 '새 글자 써 보기'에서 미리 만나요) */
+  'ㅊ': [[[46, 6], [54, 20]], [[20, 30], [78, 30], [18, 90]], [[50, 58], [84, 90]]],
+  'ㅋ': [[[18, 20], [78, 20], [78, 88]], [[20, 52], [78, 52]]],
+  'ㅌ': [[[20, 16], [80, 16]], [[20, 50], [76, 50]], [[20, 16], [20, 84], [82, 84]]],
+  'ㅍ': [[[14, 16], [86, 16]], [[34, 16], [38, 82]], [[66, 16], [62, 82]], [[12, 84], [88, 84]]],
   'ㅏ': [[[38, 8], [38, 92]], [[38, 50], [72, 50]]],
+  'ㅑ': [[[36, 8], [36, 92]], [[36, 36], [70, 36]], [[36, 64], [70, 64]]],
   'ㅓ': [[[28, 50], [62, 50]], [[62, 8], [62, 92]]],
+  'ㅕ': [[[26, 36], [60, 36]], [[26, 64], [60, 64]], [[60, 8], [60, 92]]],
   'ㅗ': [[[50, 32], [50, 66]], [[10, 66], [90, 66]]],
+  'ㅛ': [[[36, 34], [36, 66]], [[64, 34], [64, 66]], [[10, 66], [90, 66]]],
   'ㅜ': [[[10, 36], [90, 36]], [[50, 36], [50, 82]]],
+  'ㅠ': [[[10, 36], [90, 36]], [[36, 36], [36, 82]], [[64, 36], [64, 82]]],
   'ㅡ': [[[10, 50], [90, 50]]],
   'ㅣ': [[[50, 8], [50, 92]]]
 };
@@ -56,7 +67,7 @@ function splitSyllable(s) {
   const n = s.charCodeAt(0) - 0xAC00;
   return { cho: CHO[Math.floor(n / 588)], jung: JUNG[Math.floor((n % 588) / 28)] };
 }
-const VERTICAL_VOWELS = 'ㅏㅓㅣ';   // 옆 짜임(나머지 ㅗㅜㅡ는 위아래 짜임)
+const VERTICAL_VOWELS = 'ㅏㅑㅓㅕㅣ';   // 옆 짜임(나머지 ㅗㅛㅜㅠㅡ는 위아래 짜임)
 const hex = c => c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
 const VOICE = {
   jamo: j => 'j_' + hex(j),
@@ -122,38 +133,42 @@ const V = [...'ㅏㅓㅗㅜㅡㅣ'], C = [...'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅎ'];
 const TOPICS = [
   { n: 1, id: 't1', short: '내 이름', title: '내 이름, 우리 가족', pic: 'ryeowon', color: 'peach', home: '현관과 방문에 이름표를 붙이고, 가족 이름을 짝짝 손뼉으로 세어 보세요.', move: 'ㅇ',
     plays: [{ id: 'name-1', kind: 'name', items: FAMILY }, { id: 'listen-fam', kind: 'listen', items: ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'ryeowon'] },
-      { id: 'clap-1', kind: 'clap', items: ['eomma', 'appa', 'ryeowon', 'halmeoni', 'harabeoji', 'so'] }, { id: 'trace-ng', kind: 'trace', items: ['ㅇ'] }] },
+      { id: 'clap-1', kind: 'clap', items: ['eomma', 'appa', 'ryeowon', 'halmeoni', 'harabeoji', 'so'] }, { id: 'trace-ng', kind: 'trace', items: ['ㅇ', 'ㅣ', 'ㅏ', '이', '아'] }] },
   { n: 2, id: 't2', short: '동물 소리', title: '동물 소리 놀이', pic: 'hama', color: 'butter', home: '동물 흉내를 내면서 이름을 끊어 말해 보세요("하-마").', move: 'ㅣ',
     plays: [{ id: 'listen-ani', kind: 'listen', items: ['ori', 'hama', 'lion', 'nabi', 'geomi', 'yeou', 'kokkiri'] }, { id: 'clap-2', kind: 'clap', items: ['so', 'nabi', 'hama', 'ori', 'kokkiri'] },
-      { id: 'blend-1', kind: 'blend', items: ['hama', 'nabi', 'ori', 'lion', 'geomi'] }, { id: 'same-1', kind: 'same', items: ['nabi', 'namu', 'oi', 'ori', 'banana', 'bada'] }] },
+      { id: 'blend-1', kind: 'blend', items: ['hama', 'nabi', 'ori', 'lion', 'geomi'] }, { id: 'same-1', kind: 'same', items: ['nabi', 'namu', 'oi', 'ori', 'banana', 'bada'] },
+      { id: 'trace-2', kind: 'trace', items: ['ㅗ', 'ㅜ', '오', '우'], review: ['ㅇ', 'ㅣ', 'ㅏ', '이', '아'] }] },
   { n: 3, id: 't3', short: '아 이 오 우', title: '모음 친구 ①: 아 이 오 우', pic: 'oi', color: 'mint', home: '팔을 뻗어 몸으로 ㅏ·ㅣ·ㅗ·ㅜ를 만들어 보세요.', move: 'ㅏ',
     plays: [{ id: 'letter-v1', kind: 'letter', items: ['ㅏ', 'ㅣ', 'ㅗ', 'ㅜ'] }, { id: 'pick-v1', kind: 'pick', items: ['ㅏ', 'ㅣ', 'ㅗ', 'ㅜ'] },
-      { id: 'trace-v1', kind: 'trace', items: ['ㅣ', 'ㅏ', 'ㅗ', 'ㅜ'] }, { id: 'read-v1', kind: 'readword', items: ['agi', 'oi', 'uyu', 'ori', 'i_tooth'] }] },
+      { id: 'trace-v1', kind: 'trace', items: ['ㅏ', 'ㅣ', 'ㅗ', 'ㅜ', '아', '이', '오', '우'], review: ['ㅇ'] }, { id: 'read-v1', kind: 'readword', items: ['agi', 'oi', 'uyu', 'ori', 'i_tooth'] }] },
   { n: 4, id: 't4', short: '어 으', title: '모음 친구 ②: 어 으 + 다시 보기', pic: 'eobu', color: 'lav', home: '그림책에서 ㅏ·ㅓ를 찾아 손가락으로 짚어 보세요.', move: 'ㅣ',
     plays: [{ id: 'letter-v2', kind: 'letter', items: ['ㅓ', 'ㅡ', 'ㅏ', 'ㅗ', 'ㅜ', 'ㅣ'] }, { id: 'pick-v2', kind: 'pick', items: ['ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'] },
-      { id: 'clap-4', kind: 'clap', items: CLAP_WORDS }, { id: 'trace-v2', kind: 'trace', items: ['ㅓ', 'ㅡ', 'ㅏ', 'ㅗ', 'ㅜ', 'ㅣ'] }] },
+      { id: 'clap-4', kind: 'clap', items: CLAP_WORDS }, { id: 'trace-v2', kind: 'trace', items: ['ㅓ', 'ㅡ', '어', '으'], review: ['ㅏ', 'ㅣ', 'ㅗ', 'ㅜ', 'ㅇ', '아', '이', '오', '우'] }] },
   { n: 5, id: 't5', short: 'ㄱ ㄴ', title: '자음 친구 ①: ㄱ ㄴ', pic: 'gicha', color: 'peach', home: '집 안에서 \u2018기\u2019·\u2018나\u2019로 시작하는 물건을 찾아보세요.', move: 'ㄱ',
     plays: [{ id: 'letter-gn', kind: 'letter', items: ['ㄱ', 'ㄴ'] }, { id: 'same-2', kind: 'same', items: ['nabi', 'namu', 'agi', 'appa', 'uyu', 'ubi'] },
-      { id: 'merge-gn', kind: 'merge', items: [...'가나고노거너구누기니'] }, { id: 'trace-gn', kind: 'trace', items: ['ㄱ', 'ㄴ'] }] },
+      { id: 'merge-gn', kind: 'merge', items: [...'가나고노거너구누기니'] }, { id: 'trace-gn', kind: 'trace', items: [...'ㄱㄴ가나고노거너구누기니그느'], review: [...'ㅏㅓㅗㅜㅡㅣ'] }] },
   { n: 6, id: 't6', short: 'ㄷ ㅁ ㅂ', title: '자음 친구 ②: ㄷ ㅁ ㅂ', pic: 'moja', color: 'butter', home: '클레이로 ㄷ·ㅁ·ㅂ을 만들어 보세요.', move: 'ㅇ',
     plays: [{ id: 'letter-dmb', kind: 'letter', items: ['ㄷ', 'ㅁ', 'ㅂ'] }, { id: 'pick-dmb', kind: 'pick', items: ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ', 'ㅂ'] },
-      { id: 'merge-dmb', kind: 'merge', items: [...'다마바도모보두무부미비'] }, { id: 'read-dmb', kind: 'readword', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'] }] },
+      { id: 'merge-dmb', kind: 'merge', items: [...'다마바도모보두무부미비'] }, { id: 'read-dmb', kind: 'readword', items: ['dari', 'dubu', 'moja', 'meori', 'banana', 'bada'] },
+      { id: 'trace-dmb', kind: 'trace', items: [...'ㄷㅁㅂ다마바도모보두무부더머버디미비'], review: [...'ㄱㄴ가나고노'] }] },
   { n: 7, id: 't7', short: 'ㅅ ㅈ ㅎ ㄹ', title: '자음 친구 ③: ㅅ ㅈ ㅎ ㄹ', pic: 'lion', color: 'mint', home: '엄마 아빠 등에 손가락으로 글자를 쓰고 맞혀 보세요.', move: 'ㄱ',
     plays: [{ id: 'letter-sjhr', kind: 'letter', items: ['ㅅ', 'ㅈ', 'ㅎ', 'ㄹ'] }, { id: 'same-3', kind: 'same', items: Object.keys(SAME) },
-      { id: 'merge-sjhr', kind: 'merge', items: [...'사자하라소조호로수주후루시지히리'] }, { id: 'trace-sjhr', kind: 'trace', items: ['ㅅ', 'ㅈ', 'ㅎ', 'ㄹ', 'ㄷ', 'ㅁ', 'ㅂ'] }] },
+      { id: 'merge-sjhr', kind: 'merge', items: [...'사자하라소조호로수주후루시지히리'] }, { id: 'trace-sjhr', kind: 'trace', items: [...'ㅅㅈㅎㄹ사자하라소조호로수주후루시지히리'], review: [...'ㄷㅁㅂ다마바'] }] },
   { n: 8, id: 't8', short: '가나다 기차', title: '가나다 기차', pic: 'gicha', color: 'lav', home: '큰 종이에 가나다 표를 같이 그리고 스티커를 붙여 보세요.', move: 'ㅏ',
     plays: [{ id: 'train', kind: 'train', items: TRAIN_C }, { id: 'merge-all', kind: 'merge', items: [...'가나다라마바사아자하고노도모보소'] },
-      { id: 'pick-syl', kind: 'pick', items: [...'가나다라마바사아자하'] }, { id: 'clap-8', kind: 'clap', items: CLAP_WORDS }] },
+      { id: 'pick-syl', kind: 'pick', items: [...'가나다라마바사아자하'] }, { id: 'clap-8', kind: 'clap', items: CLAP_WORDS },
+      { id: 'trace-gnd', kind: 'trace', items: [...'가나다라마바사아자하'], review: [...C, ...V] }] },
   { n: 9, id: 't9', short: '읽을 수 있어', title: '읽을 수 있어요! 낱말', pic: 'nabi', color: 'peach', home: '장보기 목록을 그림+글자로 써 주고 아이가 \u2018읽게\u2019 해 보세요.', move: 'ㅇ',
     plays: [{ id: 'read-all', kind: 'readword', items: ['nabi', 'ori', 'moja', 'bada', 'hama', 'geomi', 'dubu', 'ubi', 'jadu', 'goguma', 'meori', 'lion'] },
       { id: 'match-all', kind: 'match', items: ['nabi', 'ori', 'moja', 'bada', 'hama', 'geomi', 'dubu', 'ubi', 'jadu', 'goguma', 'meori', 'lion'] },
-      { id: 'blend-2', kind: 'blend', items: BLEND_WORDS, showText: true }, { id: 'copy-all', kind: 'copy', items: ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅣ'] }] },
+      { id: 'blend-2', kind: 'blend', items: BLEND_WORDS, showText: true }, { id: 'copy-all', kind: 'copy', items: [...'나비오리모자바다하마거미두부'], review: [...C, ...V] }] },
   { n: 10, id: 't10', short: '내 책', title: '몽글이 이야기, 내 책', pic: 'story_3', color: 'butter', home: '4쪽짜리 \u2018려원이 책\u2019을 만들어 보세요(아이가 그리고 어른이 받침 없는 말로 받아 적기).', move: 'ㅣ',
     plays: [{ id: 'story', kind: 'story', items: [0, 1, 2, 3] }, { id: 'name-2', kind: 'name', items: FAMILY, inSentence: true },
-      { id: 'read-10', kind: 'readword', items: ['nabi', 'namu', 'hama', 'moja', 'ori', 'ryeowon', 'eomma', 'appa'] }, { id: 'trace-all', kind: 'trace', items: [...C, ...V] }] }
+      { id: 'read-10', kind: 'readword', items: ['nabi', 'namu', 'hama', 'moja', 'ori', 'ryeowon', 'eomma', 'appa'] }, { id: 'trace-all', kind: 'trace', items: [...C, ...V] },
+      { id: 'trace-more', kind: 'trace', nm: '새 글자 써 보기', items: [...'ㅊㅋㅌㅍㅑㅕㅛㅠ'] }] }
 ];
 const PLAYS = [];
-TOPICS.forEach(t => t.plays.forEach(p => { p.topic = t.id; p.row = t.id; p.name = KINDS[p.kind].kid; PLAYS.push(p); }));
+TOPICS.forEach(t => t.plays.forEach(p => { p.topic = t.id; p.row = t.id; p.name = p.nm || KINDS[p.kind].kid; PLAYS.push(p); }));
 const topicById = id => TOPICS.find(t => t.id === id);
 const FLOWERS_TO_SUGGEST = 2;   // 이번 주제에서 꽃이 2개 이상이면 다음 주제를 추천(잠금 아님)
 const WEEKEND_DAY = 6;          // 토요일 = '모아 놀기'(새 내용 없음)

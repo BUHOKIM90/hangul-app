@@ -12,7 +12,7 @@ const today = (plus = 0) => { const d = new Date(); d.setDate(d.getDate() + plus
 const params = new URLSearchParams(location.search);
 const ICON = n => 'assets/icons/' + n + '.svg';
 const isSyl = c => c >= '가' && c <= '힣';
-const JNAME = { 'ㄱ': '기역', 'ㄴ': '니은', 'ㄷ': '디귿', 'ㄹ': '리을', 'ㅁ': '미음', 'ㅂ': '비읍', 'ㅅ': '시옷', 'ㅇ': '이응', 'ㅈ': '지읒', 'ㅎ': '히읗', 'ㅏ': '아', 'ㅓ': '어', 'ㅗ': '오', 'ㅜ': '우', 'ㅡ': '으', 'ㅣ': '이' };
+const JNAME = { 'ㄱ': '기역', 'ㄴ': '니은', 'ㄷ': '디귿', 'ㄹ': '리을', 'ㅁ': '미음', 'ㅂ': '비읍', 'ㅅ': '시옷', 'ㅇ': '이응', 'ㅈ': '지읒', 'ㅎ': '히읗', 'ㅏ': '아', 'ㅓ': '어', 'ㅗ': '오', 'ㅜ': '우', 'ㅡ': '으', 'ㅣ': '이', 'ㅊ': '치읓', 'ㅋ': '키읔', 'ㅌ': '티읕', 'ㅍ': '피읖', 'ㅑ': '야', 'ㅕ': '여', 'ㅛ': '요', 'ㅠ': '유' };
 const playById = id => PLAYS.find(p => p.id === id);
 const rowOf = p => topicById(p.topic) || TOPICS[0];
 const curTopic = () => topicById(S.topic) || TOPICS[0];
@@ -366,10 +366,15 @@ function startPlay(pid, src) {
   if (S.session.ended) return showRest();
   if (timeUp()) return showEnd();
   const p = playById(pid);
-  const n = { letter: Math.min(3, p.items.length), train: 3, story: 4, trace: 3, copy: 3, name: 4, clap: 4 }[p.kind] || ROUNDS;
+  const n = { letter: Math.min(3, p.items.length), train: 3, story: 4, trace: 4, copy: 3, name: 4, clap: 4 }[p.kind] || ROUNDS;
   let queue;
   if (p.kind === 'letter') { const st0 = (P(pid).count * 3) % p.items.length; queue = Array.from({ length: n }, (_, k) => p.items[(st0 + k) % p.items.length]); }
   else if (p.kind === 'story') queue = p.items.slice();
+  else if (p.kind === 'trace' || p.kind === 'copy') {   // 이번 주 글자를 차례로 돌아가며(한 번에 3개, 짧게) + 지난 글자 다시 쓰기 1개
+    const it = p.items, rv = (p.review || []).filter(x => !it.includes(x)), m = rv.length ? n - 1 : n, st0 = (P(pid).count * m) % it.length;
+    queue = Array.from({ length: Math.min(m, it.length) }, (_, k) => it[(st0 + k) % it.length]);
+    if (rv.length) queue.push(rv[rand(rv.length)]);
+  }
   else if (p.kind === 'name') queue = ['ryeowon'].concat(shuffle(p.items.filter(x => x !== 'ryeowon'))).slice(0, n);
   else { queue = []; while (queue.length < n) queue.push(...shuffle(p.items)); queue = queue.slice(0, n); for (let k = 1; k < queue.length; k++) if (queue[k] === queue[k - 1]) queue.push(queue.splice(k, 1)[0]); }
   run = { pid, p, src, queue, i: 0, ok: 0, first: 0, newlyMastered: false, t0: Date.now(), isReview: !!(S.review[pid] && S.review[pid].due <= today()) };
@@ -463,7 +468,7 @@ const RUN = {
   /* 글자 고르기 */
   pick(j, id, s, done) {
     const same = run.p.items.filter(x => isSyl(x) === isSyl(j));
-    const opts = shuffle([j, ...others(same.length >= 3 ? same : Object.keys(STROKES), j, 2)]);
+    const opts = shuffle([j, ...others(same.length >= 3 ? same : [...C, ...V], j, 2)]);
     const note = !isSyl(j) && JAMO_NOTE[j];
     const prompt = () => pointSay([isSyl(j) ? VOICE.syl(j) : VOICE.jamo(j)].concat(note ? [VOICE.jamoX(j)] : [], 'ui_find'));
     const pr = el('div', 'prompt', '<div class="body">' + (isSyl(j) ? '<span class="eye">어떤 글자일까?</span>' : exPic(j).replace('<img ', '<img class="hero-pic" ').replace('class="" ', '') + '<span class="eye">' + JAMO_EX[j].word + ' 할 때 ' + JNAME[j] + '</span>') + '</div>');
@@ -671,19 +676,47 @@ function draggable(n, { onTap, onDrop }) {
   });
 }
 
-/* ---------- 따라 쓰기 / 보고 쓰기 (v1 판정 그대로) ---------- */
+/* ---------- 따라 쓰기 / 보고 쓰기 (11/03 고침: 획 하나씩 판정) ----------
+   예전: 손을 뗄 때마다 글자 전체를 한꺼번에 판정 + '잉크 점 개수'로 너무 많이 그렸는지 봄 → 천천히 그은 첫 획(ㅏ의 ㅣ)도 점이 많아 "다시 해 볼까?"가 뜸.
+   지금: 손을 뗄 때 그 획 하나만 봄. 맞으면 반짝 + 다음 획 분홍 점, 다 쓰면 칭찬. 틀린 획만 지우고 그 획만 다시 보여 줌. 같은 획 3번 안 되면 같이 써 줌.
+   방향·순서는 너그럽게(거꾸로 그어도, 남은 다른 획을 먼저 그어도, 두 획을 한 번에 이어 그어도 인정). 아주 짧은 터치는 조용히 무시. */
 const TRACE_PX = { guide: 30, dash: 8, ink: 20, trail: 20, dot: 13, pad: 6 };
 function strokePoints(st) { if (Array.isArray(st)) return st; const [cx, cy, r] = st.c, pts = []; for (let k = 0; k <= 48; k++) { const a = -Math.PI / 2 - k * (2 * Math.PI / 48); pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return pts; }
-function densify(lines, step = 2) { const out = []; lines.forEach(pts => { for (let i = 0; i < pts.length; i++) { if (i === 0) { out.push(pts[0]); continue; } const [ax, ay] = pts[i - 1], [bx, by] = pts[i]; const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / step)); for (let k = 1; k <= n; k++) out.push([ax + (bx - ax) * k / n, ay + (by - ay) * k / n]); } }); return out; }
-function minDist(p, pts) { let m = 1e9; for (const q of pts) { const d = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2; if (d < m) m = d; } return Math.sqrt(m); }
-function judgeTrace(guide, ink, loose) {
-  const tol = TRACE.tol * (loose ? 1.4 : 1), stray = TRACE.stray * (loose ? 1.4 : 1);
-  const inkPts = densify(ink); if (inkPts.length < 4) return false;
-  for (const g of guide) { const sm = densify([g], 2.5); if (sm.filter(p => minDist(p, inkPts) <= tol).length / sm.length < TRACE.cover) return false; }
-  const gAll = densify(guide, 2.5); return inkPts.filter(p => minDist(p, gAll) > stray).length / inkPts.length <= TRACE.strayMax;
+/* 글자 → 획 목록(100칸 좌표) + 획마다 크기(sc, 판정 너비용). 받침 없는 음절은 자음+모음을 옆 짜임(ㅏㅑㅓㅕㅣ)·위아래 짜임(ㅗㅛㅜㅠㅡ)으로 배치 */
+function strokesOf(ch) {
+  const jp = j => STROKES[j].map(strokePoints);
+  if (!isSyl(ch)) return { pts: jp(ch), sc: STROKES[ch].map(() => 1) };
+  const { cho, jung } = splitSyllable(ch);
+  const tf = (list, ax, bx, ay, by) => list.map(st => st.map(([x, y]) => [ax + x * bx, ay + y * by]));
+  const side = VERTICAL_VOWELS.includes(jung);
+  const L = side ? [[4, 0.5, 14, 0.72], [38, 0.62, 2, 0.96]] : [[20, 0.6, 0, 0.52], [4, 0.92, 26, 0.7]];
+  const a = tf(jp(cho), ...L[0]), b = tf(jp(jung), ...L[1]);
+  const sc = l => Math.sqrt(l[1] * l[3]);
+  return { pts: a.concat(b), sc: a.map(() => sc(L[0])).concat(b.map(() => sc(L[1]))) };
 }
+function densify(lines, step = 2) { const out = []; lines.forEach(pts => { for (let i = 0; i < pts.length; i++) { if (i === 0) { out.push(pts[0]); continue; } const [ax, ay] = pts[i - 1], [bx, by] = pts[i]; const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / step)); for (let k = 1; k <= n; k++) out.push([ax + (bx - ax) * k / n, ay + (by - ay) * k / n]); } }); return out; }
+/* 점 개수가 아니라 실제 길이(같은 자리 점이 많아도 늘지 않음) */
+const pathLen = pts => { let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L; };
+function minDist(p, pts) { let m = 1e9; for (const q of pts) { const d = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2; if (d < m) m = d; } return Math.sqrt(m); }
+/* 획 묶음(set) 하나를 이 잉크 한 줄이 그렸는지: 묶음의 획마다 cover 이상 덮고, 획의 시작·끝 근처까지 갔고, 잉크 길이가 묶음 길이의 절반쯤은 되고,
+   잉크가 묶음에서 크게 벗어난 비율이 strayMax 이하. 짧은 획은 판정 너비를 획 길이의 0.7배까지만(ㅏ의 ㅣ만 그었는데 옆 짧은 획까지 '덮은' 걸로 치지 않게) */
+function judgeStroke(guides, scs, inkSt, loose, strict) {   // strict = 두 획 한 번에·순서 바뀐 획(덤으로 인정할 때만 꼼꼼히)
+  const k = loose ? 1.4 : 1, sc = Math.max(0.5, Math.min(...scs)), tol = TRACE.tol * k * sc, stray = TRACE.stray * k * sc;
+  const inkPts = densify([inkSt], 1.5); if (inkPts.length < 3) return false;
+  let need = 0;
+  for (const g of guides) {
+    const len = pathLen(g), t = strict ? Math.min(tol, Math.max(8, 0.45 * len)) : Math.min(tol, Math.max(11, 0.7 * len)), sm = densify([g], 2); need += len;
+    if (sm.filter(p => minDist(p, inkPts) <= t).length / sm.length < TRACE.cover) return false;
+    const a = g[0], b = g[g.length - 1];
+    if (Math.hypot(a[0] - b[0], a[1] - b[1]) > 5 && (minDist(a, inkPts) > t * 1.15 || minDist(b, inkPts) > t * 1.15)) return false;   // 끝까지 갔는지(원은 제외)
+  }
+  if (pathLen(inkSt) < (guides.length > 1 ? 0.9 : 0.45) * need) return false;   // 두 획을 한 번에: 잉크가 두 획 길이만큼은 돼야
+  const gAll = densify(guides, 2); return inkPts.filter(p => minDist(p, gAll) > stray).length / inkPts.length <= TRACE.strayMax;
+}
+/* 글자 전체 판정(시험·옛 호환용): 획마다 하나씩 judgeStroke */
+function judgeTrace(guide, ink, loose) { return guide.every((g, i) => ink[i] && judgeStroke([g], [1], ink[i], loose)); }
 function traceRound(j, id, s, done, copyMode) {
-  const guideP = STROKES[j].map(strokePoints);
+  const SO = strokesOf(j), guideP = SO.pts, N = guideP.length;
   const xs = guideP.flat().map(p => p[0]), ys = guideP.flat().map(p => p[1]);
   const bb = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
   s.append(guide('think', copyMode ? '<b>' + j + '</b> 보고 써 봐' : '점을 따라 <b>' + j + '</b> 써 봐'));
@@ -691,65 +724,95 @@ function traceRound(j, id, s, done, copyMode) {
   box.innerHTML = '<svg><path class="g1" fill="none" stroke="' + (copyMode ? '#F4EFE9' : '#EFE6DA') + '" stroke-width="' + TRACE_PX.guide + '" stroke-linecap="round" stroke-linejoin="round"/>' +
     '<path class="g2" fill="none" stroke="#F27BA6" stroke-width="' + TRACE_PX.dash + '" stroke-dasharray="0.1 14" stroke-linecap="round"' + (copyMode ? ' opacity="0"' : '') + '/>' +
     guideP.map((_, k) => '<path class="tr" data-k="' + k + '" d="" fill="none" stroke="#F27BA6" stroke-opacity=".5" stroke-width="' + TRACE_PX.trail + '" stroke-linecap="round" stroke-linejoin="round"/>').join('') +
-    '<circle class="mover" r="' + TRACE_PX.dot + '" fill="#F27BA6" stroke="#fff" stroke-width="4" cx="-50" cy="-50"/></svg><canvas></canvas>' + (copyMode ? '<div class="model">' + j + '</div>' : '');
+    '<circle class="mover" r="' + TRACE_PX.dot + '" fill="#F27BA6" stroke="#fff" stroke-width="4" cx="-50" cy="-50"/></svg><canvas></canvas>' +
+    (N > 1 ? '<div class="sdots">' + guideP.map((_, k) => '<i data-k="' + k + '"></i>').join('') + '</div>' : '') + (copyMode ? '<div class="model">' + j + '</div>' : '');
   const svg = box.querySelector('svg'), cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), mover = box.querySelector('.mover');
   const trails = [...box.querySelectorAll('.tr')], T = { s: 1, ox: 0, oy: 0 };
   const toPx = ([x, y]) => [T.ox + x * T.s, T.oy + y * T.s], toU = ([x, y]) => [(x - T.ox) / T.s, (y - T.oy) / T.s];
   const dPx = pts => 'M' + pts.map(p => toPx(p).map(v => v.toFixed(1)).join(' ')).join(' L');
-  let ink = [], cur = null, tries = 0, busy = false, demoTok = 0, parked = guideP[0][0];
+  const doneK = new Array(N).fill(false), helped = new Array(N).fill(false), badK = new Array(N).fill(0);
+  let ink = [], cur = null, bad = 0, busy = false, finished = false, demoTok = 0;
+  const nextK = () => doneK.indexOf(false);
+  let parked = guideP[0][0];
   const placeMover = p => { const [x, y] = toPx(p); mover.setAttribute('cx', x); mover.setAttribute('cy', y); };
+  const drawGuide = () => {   // 연한 길 = 글자 전체, 분홍 점 = 지금 쓸 획 하나
+    svg.querySelector('.g1').setAttribute('d', guideP.map(dPx).join(' '));
+    const k = nextK(); svg.querySelector('.g2').setAttribute('d', k < 0 ? '' : dPx(guideP[k]));
+    box.querySelectorAll('.sdots i').forEach((d, q) => { d.className = doneK[q] ? 'on' : q === k ? 'now' : ''; });
+  };
   const fit = () => {
     const r = box.getBoundingClientRect(); if (!r.width) return;
     const W = r.width, Hh = r.height, pad = TRACE_PX.guide / 2 + TRACE_PX.pad;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + Hh);
     T.s = Math.min((W - 2 * pad) / Math.max(bb.x1 - bb.x0, 1), (Hh - 2 * pad) / Math.max(bb.y1 - bb.y0, 1)) * 0.92;
     T.ox = W / 2 - T.s * (bb.x0 + bb.x1) / 2; T.oy = Hh / 2 - T.s * (bb.y0 + bb.y1) / 2;
-    const all = guideP.map(dPx).join(' '); svg.querySelector('.g1').setAttribute('d', all); svg.querySelector('.g2').setAttribute('d', all);
+    drawGuide();
     trails.forEach(t => { const u = t.dataset.u ? JSON.parse(t.dataset.u) : []; t.setAttribute('d', u.length ? dPx(u) : ''); });
     placeMover(parked); const d = window.devicePixelRatio || 1; cv.width = W * d; cv.height = Hh * d; redraw();
   };
   const redraw = () => {
     const d = window.devicePixelRatio || 1; ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
-    ctx.lineCap = ctx.lineJoin = 'round'; ctx.strokeStyle = '#F47B58'; ctx.lineWidth = TRACE_PX.ink;
-    ink.forEach(st => { ctx.beginPath(); st.forEach((p, i) => { const [x, y] = toPx(p); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); if (st.length === 1) { const [x, y] = toPx(st[0]); ctx.lineTo(x + 0.1, y); } ctx.stroke(); });
+    ctx.lineCap = ctx.lineJoin = 'round'; ctx.lineWidth = TRACE_PX.ink;
+    const line = (st, color) => { ctx.strokeStyle = color; ctx.beginPath(); st.forEach((p, i) => { const [x, y] = toPx(p); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); if (st.length === 1) { const [x, y] = toPx(st[0]); ctx.lineTo(x + 0.1, y); } ctx.stroke(); };
+    ink.forEach(st => line(st, '#F47B58'));
+    guideP.forEach((g, k) => helped[k] && line(g, '#F7A98F'));   // 같이 써 준 획
+    if (cur && !ink.includes(cur)) line(cur, '#F47B58');
   };
   const setTrail = (k, pts) => { trails[k].dataset.u = JSON.stringify(pts); trails[k].setAttribute('d', pts.length ? dPx(pts) : ''); };
   const clearTrails = () => trails.forEach((t, k) => setTrail(k, []));
   const toLocal = e => { const r = box.getBoundingClientRect(); return toU([e.clientX - r.left, e.clientY - r.top]); };
-  async function demo() {
+  const park = () => { const k = nextK(); if (k < 0) return; parked = guideP[k][0]; placeMover(parked); mover.style.display = copyMode ? 'none' : ''; drawGuide(); };
+  async function demo(only) {   // only = 이 획만 다시 보여 주기(없으면 남은 획 전부, 처음엔 글자 전체)
     const tok = ++demoTok; clearTrails(); mover.style.display = ''; if (window.HP && HP.trace) HP.trace.demoDone = false;
-    for (let k = 0; k < guideP.length; k++) {
+    const ks = only != null ? [only] : guideP.map((_, k) => k).filter(k => !doneK[k]);
+    for (const k of ks) {
       const dd = densify([guideP[k]], 1), got = [];
       for (const p of dd) { if (tok !== demoTok || !alive(id)) return; parked = p; placeMover(p); got.push(p); setTrail(k, got); await wait(22); }
       await wait(380);
     }
     if (window.HP && HP.trace) HP.trace.demoDone = true;
-    await wait(1200);
-    if (tok === demoTok && alive(id)) { clearTrails(); parked = guideP[0][0]; placeMover(parked); if (copyMode) mover.style.display = 'none'; }
+    await wait(900);
+    if (tok === demoTok && alive(id)) { clearTrails(); park(); }
   }
-  const clear = () => { ink = []; redraw(); };
-  const check = async () => {
-    if (judgeTrace(guideP, ink, copyMode)) { busy = true; demoTok++; if (await success(id)) done(tries === 0); return; }
-    const inkLen = densify(ink).length * 2, gLen = densify(guideP).length * 2;
-    if (ink.length >= guideP.length + 2 || inkLen > gLen * 2.5) {
-      tries++; busy = true;
-      if (tries >= TRACE.maxTries) { setChar('cheer'); await say('ui_together'); clear(); await demo(); if (alive(id)) done(null); return; }   // 숙달 계산 제외, 벌점 없음
-      await retryFx(id, null); clear(); busy = false; demo();
+  /* 손을 뗀 획 하나 판정 → { ok, took:[획 번호], retry, ignored } */
+  const onStroke = async st => {
+    const k0 = nextK(); if (k0 < 0 || finished) return { ok: false, ignored: true };
+    const rem = guideP.map((_, k) => k).filter(k => !doneK[k]);
+    const L = pathLen(st), need = pathLen(guideP[k0]) * SO.sc[k0];
+    if (L < Math.max(4, TRACE.minLen * need) && st.length < 40) { ink = ink.filter(x => x !== st); redraw(); return { ok: false, ignored: true }; }   // 살짝 닿은 것
+    let took = null;
+    for (let m = rem.length; m >= 1 && !took; m--) { const set = rem.slice(0, m); if (judgeStroke(set.map(k => guideP[k]), set.map(k => SO.sc[k]), st, copyMode, m > 1)) took = set; }   // 지금 획(+이어 그은 다음 획들)
+    if (!took) for (const k of rem.slice(1)) if (judgeStroke([guideP[k]], [SO.sc[k]], st, copyMode, true)) { took = [k]; break; }   // 순서가 바뀐 획도 인정
+    if (took) {
+      took.forEach(k => { doneK[k] = true; }); demoTok++; clearTrails();
+      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; const ok = helped.some(Boolean) ? null : bad === 0; if (await success(id)) done(ok); return { ok: true, took, finished: true }; }
+      ding(1.15 + 0.1 * took.length); sparkPop(); setBubble('좋아! 다음 획도 써 볼까?'); park(); return { ok: true, took };
     }
+    // 틀린 획: 이 획만 지우고 이 획만 다시 보여 줌
+    bad++; badK[k0]++; busy = true; ink = ink.filter(x => x !== st); redraw();
+    if (badK[k0] >= TRACE.maxTries) {   // 같이 써 주고 다음 획으로(벌점 없음, 숙달 계산 제외)
+      setChar('cheer'); await say('ui_together'); if (!alive(id)) return { ok: false, retry: true }; await demo(k0); if (!alive(id)) return { ok: false, retry: true };
+      helped[k0] = true; doneK[k0] = true; redraw(); busy = false;
+      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; if (await success(id)) done(null); return { ok: false, helped: k0, finished: true }; }
+      park(); return { ok: false, helped: k0 };
+    }
+    await retryFx(id, null); busy = false; if (alive(id)) { setBubble(copyMode ? '<b>' + j + '</b> 보고 써 봐' : '분홍 점을 따라 써 봐'); demo(k0); }
+    return { ok: false, retry: true, stroke: k0 };
   };
-  cv.addEventListener('pointerdown', e => { if (busy) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); demoTok++; clearTrails(); if (copyMode) mover.style.display = 'none'; cur = [toLocal(e)]; ink.push(cur); redraw(); });
+  cv.addEventListener('pointerdown', e => { if (busy || finished) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); demoTok++; clearTrails(); if (copyMode) mover.style.display = 'none'; cur = [toLocal(e)]; ink.push(cur); redraw(); });
   cv.addEventListener('pointermove', e => { if (!cur) return; cur.push(toLocal(e)); redraw(); });
-  const end = () => { if (!cur) return; cur = null; check(); };
+  const end = () => { if (!cur) return; const st = cur; cur = null; onStroke(st); };
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
-  const prompt = () => { setChar('think'); say([VOICE.jamo(j), 'ui_trace']); demo(); };
+  const prompt = () => { setChar('think'); say([isSyl(j) ? VOICE.syl(j) : VOICE.jamo(j), 'ui_trace']); demo(); };
   const tools = el('div', 'tools');
   const hb = el('button', 'kid-btn', '<img alt="" src="' + ICON('speaker') + '">' + (copyMode ? '보여 줘' : '다시 보기')); hb.addEventListener('click', prompt);
-  const eb = el('button', 'kid-btn', '지우기'); eb.addEventListener('click', () => { if (!busy) clear(); });
+  const eb = el('button', 'kid-btn', '지우기'); eb.addEventListener('click', () => { if (busy || finished) return; ink = []; doneK.fill(false); helped.fill(false); badK.fill(0); demoTok++; clearTrails(); redraw(); park(); });
   tools.append(hb, eb);
   s.append(box, tools, el('div', '', '<div style="height:20px"></div>'));
   fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
-  if (window.HP) HP.trace = { letter: j, guide: guideP, demoDone: false, inject: pts => { ink.push(pts); redraw(); return check(); } };
-  if (copyMode) { say([VOICE.jamo(j), 'ui_trace']); mover.style.display = 'none'; } else prompt();
+  if (window.HP) HP.trace = { letter: j, guide: guideP, sc: SO.sc, demoDone: false, toPx: p => { const r = box.getBoundingClientRect(), q = toPx(p); return [r.left + q[0], r.top + q[1]]; }, get state() { return { done: doneK.slice(), helped: helped.slice(), bad, badK: badK.slice(), next: nextK(), finished, busy, ink: ink.length }; },
+    inject: pts => { ink.push(pts); redraw(); return onStroke(pts); } };
+  if (copyMode) { say([isSyl(j) ? VOICE.syl(j) : VOICE.jamo(j), 'ui_trace']); mover.style.display = 'none'; drawGuide(); } else prompt();
 }
 
 /* ---------- 스티커 받기 ---------- */
@@ -893,6 +956,6 @@ function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML
 /* ---------- 시작 ---------- */
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { save(); stopAudio(); } });
 if ('speechSynthesis' in window) speechSynthesis.getVoices();
-window.HP = { get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
+window.HP = { testTrace: (j, copy) => { const [id, s] = screen('round-trace', { home: true }); HP.lastDone = undefined; traceRound(j, id, s, ok => { HP.lastDone = ok; }, !!copy); }, get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, strokesOf, judgeStroke, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 showHome();
