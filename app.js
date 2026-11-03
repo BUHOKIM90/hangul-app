@@ -497,8 +497,8 @@ function traceRound(j, id, s, done, copyMode) {
   const box = el('div', 'trace');
   box.innerHTML = '<svg><path class="g1" fill="none" stroke="' + (copyMode ? '#F4EFE9' : '#EFE6DA') + '" stroke-width="' + TRACE_PX.guide + '" stroke-linecap="round" stroke-linejoin="round"/>' +
     '<path class="g2" fill="none" stroke="#C9BDF2" stroke-width="' + TRACE_PX.dash + '" stroke-dasharray="9 11" stroke-linecap="round"' + (copyMode ? ' opacity="0"' : '') + '/>' +
-    guideP.map((_, k) => '<path class="tr" data-k="' + k + '" d="" fill="none" stroke="#9D8DE6" stroke-opacity=".5" stroke-width="' + TRACE_PX.trail + '" stroke-linecap="round" stroke-linejoin="round"/>').join('') +
-    '<circle class="mover" r="' + TRACE_PX.dot + '" fill="#9D8DE6" stroke="#fff" stroke-width="4" cx="-50" cy="-50"/></svg><canvas></canvas>' + (copyMode ? '<div class="model">' + j + '</div>' : '');
+    guideP.map((_, k) => '<path class="tr" data-k="' + k + '" d="" fill="none" stroke="#F27BA6" stroke-opacity=".5" stroke-width="' + TRACE_PX.trail + '" stroke-linecap="round" stroke-linejoin="round"/>').join('') +
+    '<circle class="mover" r="' + TRACE_PX.dot + '" fill="#F27BA6" stroke="#fff" stroke-width="4" cx="-50" cy="-50"/></svg><canvas></canvas>' + (copyMode ? '<div class="model">' + j + '</div>' : '');
   const svg = box.querySelector('svg'), cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), mover = box.querySelector('.mover');
   const trails = [...box.querySelectorAll('.tr')], T = { s: 1, ox: 0, oy: 0 };
   const toPx = ([x, y]) => [T.ox + x * T.s, T.oy + y * T.s], toU = ([x, y]) => [(x - T.ox) / T.s, (y - T.oy) / T.s];
