@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#FBF6EE">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="한글 놀이">
+<title>한글 놀이</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <button id="homeBtn" class="icon-btn" aria-label="처음 화면" hidden><img src="assets/icons/home.svg" alt=""></button>
+    <div class="time" aria-hidden="true"><img src="assets/icons/sun.svg" alt=""><div class="track"><div class="fill"></div><div class="knob"></div></div><img src="assets/icons/moon.svg" alt=""></div>
+    <button id="adultBtn" class="adult" aria-label="어른 메뉴">어른</button>
+  </header>
+  <main id="main"></main>
+</div>
+<div id="gate" hidden></div>
+<div id="parent" hidden></div>
+<script src="audio/lines.js"></script>
+<script src="assets/art.js"></script>
+<script src="hidden_spots.js"></script>
+<script src="data.js"></script>
+<script src="clap_times.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

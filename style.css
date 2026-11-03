@@ -504,11 +504,200 @@ body.night .time .knob { border-color: #B9AEEA; }
 .confetti.big i { font-size: 34px; animation-duration: 1.8s; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 .s-round-picword, .s-round-hidden { position: relative; }
-/* 음절 찾기 칸(11/03) */
-.hwslots { display: flex; gap: 10px; }
-.hwslots .slot { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; font: 700 38px/1 'Pretendard', sans-serif; color: #D9CBBE; border: 3px dashed #E6D9CC; border-radius: 16px; background: #FFFCF8; }
-.hwslots .slot.on { color: #fff; background: #F27BA6; border: 3px solid #F27BA6; }
-.hwslots .slot.pop { animation: hwpop2 .5s cubic-bezier(.3,1.6,.5,1); }
-@keyframes hwpop2 { 0% { transform: scale(.6); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
-.hwfly { position: fixed; z-index: 70; font-family: 'Pretendard', sans-serif; font-weight: 700; color: #F27BA6; text-shadow: 0 0 8px #fff; transform: translate(-50%,-50%); transition: transform .55s cubic-bezier(.5,-0.2,.4,1.2); pointer-events: none; line-height: 1; }
-@media (min-width: 900px) { .hwslots .slot { width: 70px; height: 70px; font-size: 46px; } }
+
+/* ================= v4: 몽글이 마을 길(지도) · 하루 놀이 · 새 놀이 ================= */
+.s-home { max-width: 900px; }
+.maphead { padding: 4px 20px 6px; }
+.maphead .mg { width: 64px; height: 64px; }
+.maphead .bubble { font-size: var(--t-m); }
+.mapwrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; margin: 0 10px; border-radius: 28px; box-shadow: inset 0 0 0 3px #fff; }
+.map { position: relative; width: 100%; }
+.map .path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.map .path polyline { fill: none; stroke: #fff; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2 22; opacity: .95; }
+.world { position: absolute; left: 0; right: 0; }
+.world .wban { position: sticky; top: 0; display: flex; gap: 8px; align-items: center; padding: 10px 16px; font-size: var(--t-m); }
+.world .wn { background: rgba(255,255,255,.85); padding: 6px 14px; border-radius: 18px; box-shadow: var(--shadow); }
+.world .soonTag { background: var(--lav); color: #fff; padding: 4px 12px; border-radius: 14px; font-size: var(--t-s); }
+.world .town { font-size: 26px; letter-spacing: 2px; }
+.world .deco { position: absolute; font-style: normal; font-size: 34px; opacity: .55; pointer-events: none; }
+/* 세계 배경(그림이 오면 background-image로 바꾸기만 하면 됨: assets/pic/map_w1.webp 등) */
+.w1 { background: linear-gradient(180deg, #DDF3E4, #C9EBD6); }
+.w2 { background: linear-gradient(180deg, #FFE9D6, #FFDCC4); }
+.w3 { background: linear-gradient(180deg, #FFF4C9, #FFE9A6); }
+.w4 { background: linear-gradient(180deg, #E8E3FA, #D9D1F6); }
+.w5 { background: linear-gradient(180deg, #D8EEF8, #C2E3F4); }
+.w6 { background: linear-gradient(180deg, #F9E1EA, #F3CFDD); }
+.world.later { filter: saturate(.55); }
+.utag { position: absolute; left: 8px; font-size: var(--t-xs); color: var(--ink-2); background: rgba(255,255,255,.75); padding: 2px 10px; border-radius: 10px; z-index: 2; }
+.utag.r { left: auto; right: 8px; }
+.stone { position: absolute; width: 60px; height: 60px; margin-left: -30px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.08); z-index: 3; font-size: 26px; }
+.stone img { width: 46px; height: 46px; border-radius: 50%; }
+.stone.past { background: #FFF8EC; box-shadow: 0 4px 0 #E9D9BF; }
+.stone.past .fl { color: var(--mint); }
+.stone.today { width: 84px; height: 84px; margin-left: -42px; margin-top: -12px; background: var(--peach-strong); color: #fff; font-size: 36px; animation: glow 1.6s ease-in-out infinite; }
+.stone.tomorrow, .stone.future, .stone.soon { background: rgba(255,255,255,.7); }
+.stone .cloud { position: absolute; font-size: 34px; opacity: .92; filter: drop-shadow(0 2px 2px rgba(0,0,0,.08)); }
+.stone.sp { border-radius: 18px; }
+.stone.sp-big { border-radius: 50% 50% 46% 46%; }
+.stone.sp .fl { font-size: 30px; position: relative; z-index: 1; }
+.stone.sp .cloud { opacity: .6; font-size: 38px; top: -6px; }
+@keyframes glow { 0%,100% { box-shadow: 0 0 0 0 rgba(244,123,88,.45); } 50% { box-shadow: 0 0 0 16px rgba(244,123,88,0); } }
+.mapme { position: absolute; width: 72px; margin-left: -36px; z-index: 4; pointer-events: none; transition: top .8s, left .8s; }
+.mapme img { width: 72px; height: 72px; }
+.mapme .acc { position: absolute; right: -4px; top: -4px; font-size: 24px; }
+.map.season::after { content: '❄️ 🍂 ✨'; position: absolute; right: 12px; top: 6px; font-size: 20px; opacity: .6; }
+.seaTag { position: absolute; right: 12px; top: 34px; font-size: var(--t-xs); background: #fff; padding: 2px 10px; border-radius: 10px; color: var(--ink-2); z-index: 5; }
+.mapdock { padding-bottom: 8px; }
+.kid-btn.todaygo { min-height: 96px; font-size: var(--t-l); }
+.dock2 { display: flex; gap: 8px; padding: 0 16px 18px; padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+.dock2 .kid-btn { flex: 1; min-height: 64px; font-size: var(--t-s); padding: 0 6px; gap: 4px; flex-direction: column; border-radius: 24px; }
+.dock2 .kid-btn img { width: 24px; height: 24px; }
+.dock2 .dexic { font-size: 22px; }
+.pnote { margin: 0 16px 8px; padding: 10px 14px; border-radius: 16px; background: var(--butter-soft); color: var(--butter-ink); font-size: var(--t-xs); }
+
+/* 하루 시작·칸 사이 */
+.scene { position: relative; margin: 10px 20px; border-radius: 28px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 18px; text-align: center; overflow: hidden; }
+.scene.u0 { background: linear-gradient(160deg, #FDE7EF, #FAD2E1); } .scene.u1 { background: linear-gradient(160deg, #E3F4EA, #CBEBD8); } .scene.u2 { background: linear-gradient(160deg, #FFF2D2, #FFE6A8); }
+.scene.u3 { background: linear-gradient(160deg, #E7E3FA, #D6CFF5); } .scene.u4 { background: linear-gradient(160deg, #FFE7DA, #FFD3BE); } .scene.u5 { background: linear-gradient(160deg, #DDEFF8, #C6E4F4); }
+.scene .place { font-size: var(--t-s); color: var(--ink-2); background: rgba(255,255,255,.8); padding: 4px 12px; border-radius: 12px; }
+.scene .ptitle { font-size: var(--t-xl); line-height: 1.3; }
+.scene.tall { min-height: 220px; }
+.steps { display: flex; justify-content: center; gap: 10px; padding: 14px; flex-wrap: wrap; }
+.steps span { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: #fff; font-size: 26px; box-shadow: var(--shadow); opacity: .55; }
+.steps span.on { opacity: 1; background: var(--mint-soft); }
+.steps span.now { opacity: 1; background: var(--peach-soft); transform: scale(1.18); box-shadow: 0 0 0 4px var(--peach); }
+.steps.lg span { width: 64px; height: 64px; font-size: 30px; }
+.segcard { margin: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 50px; border-radius: 40px; background: #fff; box-shadow: var(--shadow); animation: popIn .4s; }
+.segcard .emo { font-size: 84px; }
+.segcard b { font-size: var(--t-xl); }
+@keyframes popIn { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.segdots { display: flex; justify-content: center; gap: 6px; padding: 2px 0 4px; }
+.segdots i { width: 10px; height: 10px; border-radius: 50%; background: #EADFD2; }
+.segdots i.on { background: var(--mint); } .segdots i.now { background: var(--peach-strong); }
+
+/* 섞어 묻기 */
+.quiz { display: flex; flex-direction: column; gap: 10px; padding: 0 20px; }
+.qhead { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.qword { font-size: 46px; background: #fff; padding: 10px 22px; border-radius: 22px; box-shadow: var(--shadow); }
+.qbuild { display: flex; gap: 8px; align-items: center; font-size: 40px; }
+.qbuild span { min-width: 64px; height: 72px; display: grid; place-items: center; background: #fff; border-radius: 18px; box-shadow: var(--shadow); }
+.qbuild .q { color: var(--ink-3); }
+.ch.picked { opacity: .5; transform: scale(.95); }
+.choices.four .ch { min-width: 0; }
+
+/* 🎵 몽글이 노래 */
+.chant { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px; }
+.ctile { height: 110px; border-radius: 28px; background: #fff; box-shadow: var(--shadow); font-size: 48px; transition: transform .15s, background .15s; }
+.ctile.today { font-size: 58px; color: var(--peach-ink); }
+.ctile.lit { background: var(--butter); transform: scale(1.1); }
+.ctile.hit { background: var(--mint); color: #fff; }
+.cdots { display: flex; justify-content: center; gap: 8px; } .cdots i { width: 12px; height: 12px; border-radius: 50%; background: #EADFD2; } .cdots i.on { background: var(--butter); }
+
+/* 🃏 어제 친구 */
+.flip { perspective: 600px; display: flex; justify-content: center; padding: 6px; }
+.flip .fc { min-width: 150px; min-height: 110px; padding: 10px 18px; display: grid; place-items: center; border-radius: 26px; background: var(--lav-soft); box-shadow: var(--shadow); transform: rotateY(180deg); transition: transform .5s; }
+.flip.on .fc { transform: none; background: #fff; }
+.flip .g { font-size: 60px; color: var(--lav-ink); }
+
+/* 🎈 풍선 */
+.sky { position: relative; flex: 1; min-height: 300px; margin: 0 20px; border-radius: 30px; background: linear-gradient(180deg, #DDF0FF, #FFF6EA); overflow: hidden; }
+.bal { position: absolute; bottom: -130px; width: 96px; height: 120px; display: flex; flex-direction: column; align-items: center; animation: rise 6s linear forwards; }
+.bal .sk { font-size: 76px; line-height: 1; }
+.bal .g { position: absolute; top: 18px; font-size: 34px; color: var(--ink); background: rgba(255,255,255,.85); border-radius: 14px; padding: 0 8px; }
+.bal.pop { animation: popOut .35s forwards; }
+.bal.wob { filter: saturate(.4); }
+@keyframes rise { from { transform: translateY(0); } to { transform: translateY(-560px); } }
+@keyframes popOut { to { transform: scale(1.6); opacity: 0; } }
+
+/* 🧺 바구니 */
+.baskets { display: flex; gap: 14px; padding: 8px 20px; }
+.basket { flex: 1; min-height: 150px; border-radius: 30px; background: #fff; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; padding: 8px; }
+.basket .sk { font-size: 40px; } .basket .g { font-size: 44px; color: var(--peach-ink); }
+.basket .in { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.basket .in span { width: 42px; height: 42px; } .basket .in img, .basket .in .ph { width: 42px; height: 42px; font-size: 26px; }
+.scards { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px 20px; }
+.scard { width: 96px; min-height: 100px; border-radius: 22px; background: #fff; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; touch-action: none; }
+.scard img, .scard .ph { width: 70px; height: 70px; font-size: 44px; }
+.scard b { font-size: var(--t-s); }
+.scard.sel { box-shadow: 0 0 0 4px var(--peach); }
+.scard.used { visibility: hidden; }
+.scard.drag { z-index: 9; }
+
+/* 📖 스티커 이야기 */
+.scene .stk-slot { min-height: 90px; display: grid; place-items: center; }
+.scene .stk-pic { width: 110px; height: 110px; font-size: 70px; animation: popIn .4s; }
+.scene.got { box-shadow: 0 0 0 4px var(--butter); }
+.sline.sent { justify-content: center; font-size: var(--t-xl); gap: 6px; padding: 8px 20px; flex-wrap: wrap; display: flex; align-items: center; }
+.sline.sent .blank { min-width: 90px; padding: 4px 12px; border-radius: 14px; border: 3px dashed var(--peach); color: var(--ink-3); text-align: center; }
+.sline.sent .blank.ok { border-style: solid; color: var(--peach-ink); background: var(--peach-soft); }
+.wcards { display: flex; gap: 12px; justify-content: center; padding: 8px 20px; flex-wrap: wrap; }
+.wcard.big { font-size: 30px; padding: 16px 22px; touch-action: none; }
+.wcard.used { visibility: hidden; }
+.spic.scene { min-height: 160px; }
+.spic.scene img, .spic.scene .ph { width: 150px; height: 150px; font-size: 90px; }
+
+/* 🧱 블록 */
+.sboxes { display: flex; gap: 10px; justify-content: center; padding: 10px; }
+.sbx { width: 84px; height: 84px; border-radius: 20px; border: 4px dashed var(--lav); display: grid; place-items: center; font-size: 46px; background: #fff; }
+.sbx.filled { border-style: solid; background: var(--lav-soft); }
+.sboxes.done .sbx { background: var(--mint-soft); border-color: var(--mint); }
+.pieces.blocks { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 8px; }
+.prompt.blockw .hero-pic { width: 120px; height: 120px; }
+
+/* 🗺️ 보물 지도 */
+.tmap { position: relative; margin: 4px 20px; height: 120px; border-radius: 26px; background: linear-gradient(90deg, #D9F0DF, #FFF1D0); }
+.tmap.sk1 { background: linear-gradient(90deg, #D6ECFA, #E7F7FF); } .tmap.sk2 { background: linear-gradient(90deg, #EEE9FB, #FFF0F6); }
+.tmap .trail { position: absolute; left: 4%; right: 4%; top: 64px; display: flex; justify-content: space-between; align-items: center; }
+.tmap .trail i { width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); }
+.tmap .trail i.on { background: var(--mint); }
+.tmap .chest { font-size: 40px; transition: transform .3s; } .tmap .chest.open { transform: scale(1.4) rotate(-8deg); }
+.tmap .mgwalk { position: absolute; top: 2px; left: 0; width: 60px; height: 60px; transition: left .7s; }
+.qhost { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+/* ☁️ 심술 구름 */
+.cloudsky { position: relative; margin: 4px 20px; height: 190px; border-radius: 30px; background: linear-gradient(180deg, #CFD8E6, #EEF2F7); overflow: hidden; transition: background 1s; }
+.cloudsky.happy { background: linear-gradient(180deg, #CDE9FF, #FFF7E6); }
+.cloudsky .grump { position: absolute; left: 50%; top: 18px; margin-left: -90px; width: 180px; height: 100px; border-radius: 60px; background: #9AA5B8; display: grid; place-items: center; transition: transform .6s; box-shadow: -40px 10px 0 -10px #9AA5B8, 40px 12px 0 -14px #9AA5B8; }
+.cloudsky.happy .grump { background: #fff; box-shadow: -40px 10px 0 -10px #fff, 40px 12px 0 -14px #fff; }
+.cloudsky .cf { font-size: 48px; }
+.cloudsky .rainbow { position: absolute; left: 50%; bottom: -120px; margin-left: -160px; width: 320px; height: 240px; border-radius: 50%; border: 18px solid transparent; box-shadow: inset 0 0 0 12px #F27B7B, inset 0 0 0 24px #F2C230, inset 0 0 0 36px #4FC08D, inset 0 0 0 48px #5FA8E8; opacity: 0; transition: opacity .8s; }
+.cloudsky .town { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 30px; }
+
+/* 🎁 보물 상자 */
+.chests { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 6px 20px; }
+.chests .chest { height: 54px; border-radius: 16px; background: #fff; box-shadow: var(--shadow); font-size: 30px; opacity: .7; }
+.chests .chest.now { opacity: 1; box-shadow: 0 0 0 4px var(--butter); transform: scale(1.06); }
+.chests .chest.open { background: var(--butter-soft); opacity: 1; }
+
+/* 🎲 내가 고르기 · 놀이터 */
+.pick3, .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 16px 20px; }
+.pcard3 { min-height: 140px; border-radius: 30px; background: #fff; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: var(--t-m); padding: 8px; }
+.pcard3 .emo { font-size: 54px; }
+
+/* 책장 · 스티커 60칸 · 어른 메뉴 표 */
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; padding: 16px 20px; }
+.shelf .bk { height: 120px; border-radius: 12px 22px 22px 12px; box-shadow: var(--shadow); font-size: var(--t-s); padding: 8px; opacity: .45; }
+.shelf .bk.on { opacity: 1; }
+.book.b60 { grid-template-columns: repeat(6, 1fr); }
+.ktab { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.ktab span { min-width: 36px; height: 36px; padding: 0 8px; border-radius: 10px; display: grid; place-items: center; background: #F1ECE6; color: var(--ink-3); font-size: var(--t-s); }
+.ktab span.l { background: var(--butter-soft); color: var(--butter-ink); } .ktab span.k { background: var(--mint-soft); color: var(--mint-ink); }
+.cal { display: flex; flex-wrap: wrap; gap: 6px; } .cal i { width: 16px; height: 16px; border-radius: 50%; background: var(--mint); }
+.pm .r.col { flex-direction: column; align-items: stretch; gap: 8px; }
+.pm .seg.wrap { flex-wrap: wrap; } .pm .seg button[disabled] { opacity: .4; }
+.pm .mini { height: 36px; padding: 0 12px; border-radius: 12px; background: var(--lav-soft); color: var(--lav-ink); font-size: var(--t-xs); display: inline-grid; place-items: center; margin-left: 6px; cursor: pointer; }
+.pm input[type=text] { width: 80px; height: 36px; border-radius: 10px; border: 2px solid var(--line); padding: 0 8px; font: inherit; }
+.paper small { display: block; margin-top: 6px; color: var(--ink-2); font-size: var(--t-xs); }
+.endhero .stk { width: 120px; height: 120px; margin: 6px auto; } .endhero .stk img { width: 100%; height: 100%; }
+.endhero .grow { margin-top: 6px; font-size: var(--t-m); }
+@media (min-width: 900px) { .stone { width: 70px; height: 70px; margin-left: -35px; } .stone.today { width: 96px; height: 96px; margin-left: -48px; } .ctile { height: 140px; font-size: 60px; } }
+@media (max-height: 700px) { .scene.tall { min-height: 150px; } .sky { min-height: 240px; } }
+.scene.hasbg .place, .scene.hasbg .ptitle { background: rgba(255,255,255,.85); border-radius: 14px; padding: 4px 12px; }
+.bal .sk img, .basket .sk img { width: 80px; height: 80px; } .basket .sk img { width: 56px; height: 56px; }
+.cloudsky .cf img { width: 150px; height: 90px; object-fit: contain; } .chests .chest img { width: 40px; height: 40px; margin: auto; } .tmap .chest img { width: 48px; height: 48px; }
+.world .town .tw { display: inline-block; width: 34px; height: 34px; }
+.world .wban { z-index: 4; pointer-events: none; }
+.hwslots { display: flex; gap: 8px; }
+.hwslots .slot { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; border: 3px dashed #E6D9CC; font-size: 38px; font-weight: 700; color: #E9DFD5; transition: all .3s; }
+.hwslots .slot.on { border: 3px solid #F27BA6; background: #FFE9F1; color: var(--ink); animation: hwpop .6s cubic-bezier(.3,1.6,.5,1); }
+.hwbox .hw1 { letter-spacing: 0; }
