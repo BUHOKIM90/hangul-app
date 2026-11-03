@@ -21,7 +21,7 @@ const compose = (c, v) => String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JU
 
 /* ---------- 저장 (v3 새 키. v2·v1 기록은 읽기만 하고 지우지 않음) ---------- */
 const KEY = 'hangul-play-v3', KEY_V2 = 'hangul-play-v2', KEY_V1 = 'hangul-play-v1';
-const fresh = () => ({ v: 3, topic: 't1', suggestOff: '', settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, words: {}, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null, moved: false } });
+const fresh = () => ({ v: 3, topic: 't1', suggestOff: '', settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, words: {}, pw: { stars: 0, jars: 0, streak: {} }, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null, moved: false } });
 let S;
 function v1toV2(o) {   // v2 앱의 v1 → v2 옮기기와 같음
   const r = { stickers: (o.stickers || []).slice(), settings: {}, plays: {}, review: {}, met: {}, log: [] };
@@ -35,7 +35,7 @@ function v1toV2(o) {   // v2 앱의 v1 → v2 옮기기와 같음
 }
 function load() {
   let raw = null; try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { raw = null; }
-  if (raw) { S = Object.assign(fresh(), raw); S.settings = Object.assign(fresh().settings, raw.settings); S.session = Object.assign(fresh().session, raw.session); return; }
+  if (raw) { S = Object.assign(fresh(), raw); S.pw = Object.assign(fresh().pw, raw.pw); S.settings = Object.assign(fresh().settings, raw.settings); S.session = Object.assign(fresh().session, raw.session); return; }
   S = fresh();
   try {   // v2(또는 v1) → v3 옮기기: 스티커·설정·만난 글자·놀이 기록(숙달)·다시 보기
     let o = JSON.parse(localStorage.getItem(KEY_V2) || 'null'), from = 'v2';
@@ -366,7 +366,7 @@ function startPlay(pid, src) {
   if (S.session.ended) return showRest();
   if (timeUp()) return showEnd();
   const p = playById(pid);
-  const n = { letter: Math.min(3, p.items.length), train: 3, story: 4, trace: 4, copy: 3, name: 4, clap: 4 }[p.kind] || ROUNDS;
+  const n = { letter: Math.min(3, p.items.length), train: 3, story: 4, trace: 4, copy: 3, name: 4, clap: 4, hidden: 4, picword: 5 }[p.kind] || ROUNDS;
   let queue;
   if (p.kind === 'letter') { const st0 = (P(pid).count * 3) % p.items.length; queue = Array.from({ length: n }, (_, k) => p.items[(st0 + k) % p.items.length]); }
   else if (p.kind === 'story') queue = p.items.slice();
@@ -394,7 +394,7 @@ function nextRound() {
     if (ok != null) { run.first++; if (ok) run.ok++; if (record(run.pid, ok)) run.newlyMastered = true; }
     if (run.p.kind === 'letter') S.met[item] = today();
     if (['pick', 'trace', 'copy'].includes(run.p.kind) && !isSyl(item)) S.met[item] = today();
-    if (ok && ['readword', 'match', 'name', 'listen', 'blend'].includes(run.p.kind) && WORDS[item]) S.words[item] = today();
+    if (ok && ['readword', 'match', 'name', 'listen', 'blend', 'hidden', 'picword'].includes(run.p.kind) && WORDS[item]) S.words[item] = today();
     run.i++; save(); nextRound();
   });
 }
@@ -431,7 +431,128 @@ const picCard = w => { const c = el('button', 'ch', picHTML(w, WORDS[w])); c.dat
 const glyphCard = g => { const c = el('button', 'ch', '<span class="glyph">' + g + '</span>'); c.dataset.k = g; c.setAttribute('aria-label', g); return c; };
 const picSlot = p => typeof p === 'string' ? picHTML(p) : '<div class="combo">' + picHTML(p.base) + '<img alt="" src="' + PIC(p.top) + '" style="left:' + p.at[0] + '%;top:' + p.at[1] + '%;width:' + p.at[2] + '%">' + '</div>';
 
+/* ---------- 그림 놀이 도우미(11/03): 별 병·깜짝 축하·반짝 ---------- */
+const WCAT_OF = {}; Object.entries(WCAT).forEach(([k, ws]) => ws.forEach(x => { WCAT_OF[x] = k; }));
+function sparkAt(node) { const r = node.getBoundingClientRect(); spark.style.left = (r.left + r.width / 2) + 'px'; spark.style.top = (r.top + r.height / 2) + 'px'; sparkPop(); setTimeout(() => { spark.style.left = ''; spark.style.top = ''; }, 900); }
+function starJar() {   // 별 10개 = 별 병 하나(이 기기에만 저장)
+  const j = el('div', 'jar', '<div class="glass"><div class="fill"></div><span class="cnt"></span></div><span class="jars"></span>'); drawJar(j); return j;
+}
+function drawJar(j) { const n = S.pw.stars % 10; j.querySelector('.fill').style.height = (n * 10) + '%'; j.querySelector('.cnt').textContent = '★' + n; j.querySelector('.jars').textContent = S.pw.jars ? '🫙×' + S.pw.jars : ''; }
+function addStar(j) { S.pw.stars++; const full = S.pw.stars % 10 === 0; if (full) S.pw.jars++; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); if (full) { j.querySelector('.fill').style.height = '100%'; j.querySelector('.cnt').textContent = '★10'; setTimeout(() => drawJar(j), 2600); } else drawJar(j); return full; }
+async function surprise(s, big) {   // 가끔 깜짝: 몽글이 점프 + 별·꽃 비
+  const box = el('div', 'confetti' + (big ? ' big' : ''));
+  for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', '', ['★', '✿', '♥', '●'][i % 4]); c.style.left = (Math.random() * 100) + '%'; c.style.color = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
+  document.body.append(box); setChar('jump'); bounce(); await wait(big ? 1600 : 1100); box.remove();
+}
 const RUN = {
+  /* 그림 속 글자 찾기(11/03): 그림 속 몸 위 평평한 자리에 낱말을 그 자리 색과 비슷하게 숨김. 찾으면 톡 튀어나오며 "찾았다! ○○!" */
+  hidden(w, id, s, done) {
+    const L = HIDDEN.lv[run.p.lv || 1], H = HSPOT[w] || { s: [] }, spots = H.s.slice();
+    if (!spots.length) return done(null);
+    const ti = (run.p.lv || 1) === 1 ? 0 : rand(spots.length);
+    const pool = HID_WORDS.filter(x => x !== w && WORDS[x][0] !== WORDS[w][0]);
+    const near = HID_WORDS.filter(x => x !== w && (WORDS[x][0] === WORDS[w][0] || (WCAT_OF[x] === WCAT_OF[w])));
+    const dpool = (run.p.lv || 1) >= 3 && near.length ? shuffle(near).concat(shuffle(pool)) : shuffle(pool);
+    const others = spots.map((_, k) => k).filter(k => k !== ti).slice(0, L.decoys);
+    const marks = [{ w, k: ti, target: true }].concat(others.map((k, q) => ({ w: dpool[q], k })));
+    let first = true, found = false, missed = 0;
+    const prompt = () => pointSay(VOICE.hw(w));
+    const pr = el('div', 'hwcard', '<span class="hwword">' + WORDS[w] + '</span>'); pr.append(speakerBtn(prompt));
+    const box = el('div', 'hwbox'), img = el('img'); img.alt = ''; img.src = PIC(w); img.draggable = false; box.append(img);
+    const ring = el('div', 'hwring'); box.append(ring);
+    const mix = (c, d) => { const lum = c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114; return 'rgb(' + c.map(v => Math.round(lum < 110 ? v + (255 - v) * d : v * (1 - d))).join(',') + ')'; };
+    marks.forEach(m => {
+      const [cx, cy, sw, sh, col] = spots[m.k];
+      const sp = el('span', 'hw' + (m.target ? ' tgt' : ' decoy'), WORDS[m.w]); sp.dataset.w = m.w;
+      sp.style.left = cx + '%'; sp.style.top = cy + '%'; sp.style.color = mix(col, L.delta);
+      m.rot = (Math.random() * 2 - 1) * L.rot; m.box = [sw, sh]; m.el = sp; box.append(sp);
+    });
+    const fit = () => { const W = box.getBoundingClientRect().width; if (!W) return;
+      marks.forEach(m => { const n = WORDS[m.w].length, fs = Math.min(m.box[1] * 0.8, m.box[0] * 0.9 / n) * L.size * W / 100; m.el.style.fontSize = Math.max(14, fs).toFixed(1) + 'px'; m.el.style.transform = 'translate(-50%,-50%) rotate(' + m.rot.toFixed(1) + 'deg)'; });
+      const R = marks.map(m => m.el.getBoundingClientRect()), hitR = (a, c) => a.left < c.right + 6 && c.left < a.right + 6 && a.top < c.bottom + 6 && c.top < a.bottom + 6;
+      for (let q = marks.length - 1; q >= 1; q--) if (R.some((r, k) => k !== q && hitR(R[q], r))) { marks[q].el.remove(); marks.splice(q, 1); R.splice(q, 1); }   // 작은 화면에서 겹치면 가짜 글자를 뺌
+      const t = marks[0].el.getBoundingClientRect(), b = box.getBoundingClientRect(), pad = 26;
+      ring.style.left = (t.left - b.left - pad) + 'px'; ring.style.top = (t.top - b.top - pad) + 'px'; ring.style.width = (t.width + 2 * pad) + 'px'; ring.style.height = (t.height + 2 * pad) + 'px'; };
+    s.append(guide('think', '<b>' + WORDS[w] + '</b> 글씨를 찾아봐!'), pr, box);
+    fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
+    const t0 = Date.now();
+    const hintT = setTimeout(() => { if (!alive(id) || found) return; ring.classList.add('on'); setBubble('반짝이는 데를 봐!'); say('ui_hwhint'); first = false; }, HIDDEN.hint);
+    const revT = setTimeout(() => { if (!alive(id) || found) return; got(true); }, HIDDEN.reveal);
+    async function got(revealed) {
+      found = true; clearTimeout(hintT); clearTimeout(revT); ring.classList.remove('on');
+      const t = marks[0].el; t.classList.add('found'); sparkAt(t); ding(); setChar(revealed ? 'point' : 'clap'); bounce();
+      setBubble(revealed ? '여기 있었어! <b>' + WORDS[w] + '</b>' : '찾았다! <b>' + WORDS[w] + '</b>!');
+      await say(['ui_found', VOICE.word(w)]); await wait(500); if (alive(id)) done(revealed ? null : first);
+    }
+    box.addEventListener('pointerdown', async e => {
+      if (found || !alive(id)) return;
+      const hit = marks.map(m => { const r = m.el.getBoundingClientRect(), g = Math.max(28, r.height * 0.6); const inside = e.clientX >= r.left - g && e.clientX <= r.right + g && e.clientY >= r.top - g && e.clientY <= r.bottom + g;
+        return { m, inside, d: Math.hypot(e.clientX - (r.left + r.right) / 2, e.clientY - (r.top + r.bottom) / 2) }; }).filter(x => x.inside).sort((a, b) => a.d - b.d)[0];
+      if (!hit) return;
+      if (hit.m.target) return got(false);
+      if (hit.m.el.classList.contains('seen')) return;
+      first = false; missed++; hit.m.el.classList.add('seen'); setChar('think');
+      setBubble('그건 <b>' + WORDS[hit.m.w] + '</b>야! <b>' + WORDS[w] + '</b>를 찾아볼까?'); await say([VOICE.hy(hit.m.w), VOICE.hw(w)]);
+    });
+    if (window.HP) HP.hidden = { target: w, lv: run.p.lv || 1, marks: marks.map(m => ({ w: m.w, target: !!m.target })), rect: k => { const r = marks[k || 0].el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, t0, get found() { return found; }, ring: () => ring.classList.contains('on') };
+    prompt();
+  },
+  /* 그림 보고 글자 고르기(11/03): 큰 그림 + 낱말 카드 2~5장. 색 힌트 = 그림 테두리와 정답 카드 색이 같음(주가 갈수록·잘 맞히면 옅어짐). 맞으면 카드가 그림으로 쏙 + 별 병 */
+  picword(w, id, s, done) {
+    const p = run.p, n = Math.min(p.cards || 2, PW_WORDS.length), st = S.pw.streak[w] || 0;
+    const hint = Math.max(0, (p.hint == null ? 2 : p.hint) - (st >= 2 ? 1 : 0));
+    const easy = n <= 3;
+    const score = x => (WORDS[x][0] === WORDS[w][0] ? 3 : 0) + (WCAT_OF[x] === WCAT_OF[w] ? 2 : 0) + ([...WORDS[x]].some(c => WORDS[w].includes(c)) ? 1 : 0) + Math.random() * 1.5;
+    const cand = PW_WORDS.filter(x => x !== w && WORDS[x] !== WORDS[w]);
+    const dis = easy ? shuffle(cand.filter(x => WCAT_OF[x] !== WCAT_OF[w] && WORDS[x][0] !== WORDS[w][0])).slice(0, n - 1)
+      : cand.sort((a, b) => score(b) - score(a)).slice(0, n - 1);
+    const opts = shuffle([w, ...dis]);
+    const base = (HSPOT[w] && HSPOT[w].c) || [242, 123, 166];
+    const hexC = c => '#' + c.map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+    const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+    const strong = c => {   // 그림 대표 색을 카드·테두리용으로: 채도 높이고 밝기는 중간(파스텔 그림도 색이 또렷하게)
+      const [r, g, b] = c.map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, l = (mx + mn) / 2, d = mx - mn;
+      if (d) h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      const S2 = Math.max(0.6, d ? d / (1 - Math.abs(2 * l - 1)) : 0), L2 = Math.min(0.66, Math.max(0.52, l)), C = (1 - Math.abs(2 * L2 - 1)) * S2, X = C * (1 - Math.abs(h % 2 - 1)), m = L2 - C / 2;
+      const t = [[C, X, 0], [X, C, 0], [0, C, X], [0, X, C], [X, 0, C], [C, 0, X]][Math.floor(h) % 6]; return t.map(v => (v + m) * 255); };   // 그림 색을 카드용으로 조금 진하게
+    const tc = strong(base), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+    const pal = shuffle(CARD_COLORS.map(rgb).filter(c => dist(c, tc) > 170));
+    const tint = (c, k) => hexC(c.map(v => v + (255 - v) * k));
+    const colOf = x => x === w ? tc : pal[(dis.indexOf(x)) % Math.max(1, pal.length)] || [200, 200, 200];
+    const frame = el('div', 'pwframe' + (hint ? ' h' + hint : ''));
+    frame.style.borderColor = hint === 2 ? hexC(tc) : hint === 1 ? tint(tc, 0.55) : '#EFE6DA';
+    frame.innerHTML = picHTML(w);
+    const jar = starJar();
+    const row = el('div', 'pwcards n' + n);
+    let first = true, locked = false;
+    opts.forEach(x => {
+      const c = el('button', 'pwcard', '<span>' + WORDS[x] + '</span>'); c.dataset.k = x; c.setAttribute('aria-label', WORDS[x]);
+      const cc = colOf(x);
+      if (hint === 2) { c.style.background = tint(cc, x === w ? 0.35 : 0.6); c.style.borderColor = hexC(cc); }
+      else if (hint === 1) { c.style.background = tint(cc, 0.82); c.style.borderColor = tint(cc, 0.55); }
+      c.addEventListener('click', async () => {
+        if (locked || !alive(id)) return;
+        if (x === w) {
+          locked = true; S.pw.streak[w] = first ? st + 1 : 0;
+          const a = c.getBoundingClientRect(), b = frame.getBoundingClientRect();
+          c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top + b.height * 0.62 - a.top - a.height / 2) + 'px');
+          c.classList.add('fly'); frame.classList.add('got'); sparkAt(frame); ding(); setChar('clap'); bounce(); setBubble('맞아! <b>' + WORDS[w] + '</b>!');
+          const full = addStar(jar); save();
+          await say(VOICE.word(w)); if (!alive(id)) return;
+          if (full) { await surprise(s, true); if (!alive(id)) return; await say('ui_jarfull'); }
+          else if (Math.random() < 0.2) await surprise(s, false);
+          if (!alive(id)) return; await say('ui_good' + (1 + rand(3))); await wait(250); if (alive(id)) done(first);
+        } else {
+          first = false; locked = true; S.pw.streak[w] = 0; c.classList.remove('retry'); void c.offsetWidth; c.classList.add("retry", "pwno"); setChar('cheer');
+          setBubble('그건 <b>' + WORDS[x] + '</b>야!'); await say(VOICE.hy(x)); locked = false; if (alive(id)) { setChar('think'); setBubble('이건 뭘까?'); }
+        }
+      });
+      row.append(c);
+    });
+    s.append(guide('think', '이건 뭘까?'), jar, frame, row);
+    if (window.HP) HP.pw = { target: w, opts, hint, cards: n, colors: opts.map(x => [...row.querySelectorAll('.pwcard')].find(c => c.dataset.k === x).style.background) };
+    pointSay('ui_pw');
+  },
   /* 글자 친구: 큰 글자 + 이름 + 예시 낱말(첫 글자 강조) + 음성 "기역, 기차 할 때 기역." */
   letter(j, id, s, done) {
     const e = JAMO_EX[j], word = e.word, k = run.i;
@@ -956,6 +1077,6 @@ function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML
 /* ---------- 시작 ---------- */
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { save(); stopAudio(); } });
 if ('speechSynthesis' in window) speechSynthesis.getVoices();
-window.HP = { testTrace: (j, copy) => { const [id, s] = screen('round-trace', { home: true }); HP.lastDone = undefined; traceRound(j, id, s, ok => { HP.lastDone = ok; }, !!copy); }, get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, strokesOf, judgeStroke, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
+window.HP = { testRound: (kind, item, p) => { run = { pid: 'test', p: Object.assign({ kind, items: [item] }, p || {}), queue: [item], i: 0, ok: 0, first: 0 }; const [id, s] = screen('round-' + kind, { home: true }); HP.lastDone = undefined; RUN[kind](item, id, s, ok => { HP.lastDone = ok; }); }, testTrace: (j, copy) => { const [id, s] = screen('round-trace', { home: true }); HP.lastDone = undefined; traceRound(j, id, s, ok => { HP.lastDone = ok; }, !!copy); }, get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, strokesOf, judgeStroke, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 showHome();
