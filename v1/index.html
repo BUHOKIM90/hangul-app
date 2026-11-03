@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#FFF8EE">
+<meta name="referrer" content="no-referrer">
+<title>한글 놀이</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div id="dots" aria-hidden="true"></div>
+    <div id="greet"></div>
+    <button id="lock" aria-label="부모 메뉴(3초 길게 누르기)"><svg viewBox="0 0 40 40"><circle id="lockRing" cx="20" cy="20" r="17" fill="none" stroke="#FF8FAB" stroke-width="4" stroke-dasharray="107" stroke-dashoffset="107" transform="rotate(-90 20 20)"/><rect x="12" y="18" width="16" height="12" rx="3" fill="#c9b8b0"/><path d="M15 18v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#c9b8b0" stroke-width="3"/></svg></button>
+  </header>
+  <main id="main"></main>
+  <nav id="bar"></nav>
+</div>
+<div id="star" aria-hidden="true"><svg viewBox="0 0 200 200"><polygon points="100,18 122,74 182,76 134,112 152,172 100,138 48,172 66,112 18,76 78,74" fill="#FFE27A" stroke="#5A3E36" stroke-width="6" stroke-linejoin="round"/></svg></div>
+<div id="parent" hidden></div>
+<script src="audio/lines.js"></script>
+<script src="assets/art.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
