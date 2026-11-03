@@ -1,5 +1,5 @@
 'use strict';
-/* 한글 놀이 v2 — 잠금 없는 열린 길 + 오늘의 놀이 + 놀이 정원. 네트워크 호출 없음. 기록은 이 기기의 localStorage에만.
+/* 한글 놀이 v3 — 10주 주제 화단(잠금 없음) + 하루 흐름(인사→다시 보기→이번 주 놀이→몸으로 글자→고르기→잘 자) + 글자 친구 도감. v2 기반. 네트워크 호출 없음. 기록은 이 기기의 localStorage에만.
    v1(app/app.js)의 소리·문제 엔진·따라 쓰기 판정을 그대로 가져와 새 화면에 맞춤. */
 const $ = (s, r = document) => r.querySelector(s);
 const main = $('#main');
@@ -14,29 +14,45 @@ const ICON = n => 'assets/icons/' + n + '.svg';
 const isSyl = c => c >= '가' && c <= '힣';
 const JNAME = { 'ㄱ': '기역', 'ㄴ': '니은', 'ㄷ': '디귿', 'ㄹ': '리을', 'ㅁ': '미음', 'ㅂ': '비읍', 'ㅅ': '시옷', 'ㅇ': '이응', 'ㅈ': '지읒', 'ㅎ': '히읗', 'ㅏ': '아', 'ㅓ': '어', 'ㅗ': '오', 'ㅜ': '우', 'ㅡ': '으', 'ㅣ': '이' };
 const playById = id => PLAYS.find(p => p.id === id);
-const rowOf = p => ROWS.find(r => r.id === p.row);
+const rowOf = p => topicById(p.topic) || TOPICS[0];
+const curTopic = () => topicById(S.topic) || TOPICS[0];
+const realIds = a => a.filter(x => x[0] !== '@');
+const compose = (c, v) => String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JUNG.indexOf(v) * 28);
 
-/* ---------- 저장 (v2 새 키, v1 기록은 읽기만 하고 지우지 않음) ---------- */
-const KEY = 'hangul-play-v2', KEY_V1 = 'hangul-play-v1';
-const fresh = () => ({ v: 2, settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null } });
+/* ---------- 저장 (v3 새 키. v2·v1 기록은 읽기만 하고 지우지 않음) ---------- */
+const KEY = 'hangul-play-v3', KEY_V2 = 'hangul-play-v2', KEY_V1 = 'hangul-play-v1';
+const fresh = () => ({ v: 3, topic: 't1', suggestOff: '', settings: { timerMin: 10, sound: true, volume: 0.9, autoPick: true, manual: [] }, plays: {}, review: {}, stickers: [], log: [], met: {}, words: {}, session: { date: '', usedMs: 0, ended: false, done: [], stickers: [], list: null, moved: false } });
 let S;
+function v1toV2(o) {   // v2 앱의 v1 → v2 옮기기와 같음
+  const r = { stickers: (o.stickers || []).slice(), settings: {}, plays: {}, review: {}, met: {}, log: [] };
+  if (o.settings) { r.settings.timerMin = [10, 12, 15].includes(o.settings.timerMin) ? o.settings.timerMin : (o.settings.timerMin > 12 ? 15 : 10); r.settings.sound = o.settings.sound !== false; }
+  Object.entries(o.units || {}).forEach(([u, rec]) => (V1_MAP[u] || []).forEach(pid => {
+    const hist = (rec.hist || []).map(x => (typeof x === 'number' ? { ok: x, d: '' } : x));
+    r.plays[pid] = { hist: hist.slice(-MASTERY.window), mastered: !!rec.mastered, count: hist.length };
+    if (o.review && o.review[u]) r.review[pid] = Object.assign({}, o.review[u]);
+  }));
+  return r;
+}
 function load() {
   let raw = null; try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { raw = null; }
   if (raw) { S = Object.assign(fresh(), raw); S.settings = Object.assign(fresh().settings, raw.settings); S.session = Object.assign(fresh().session, raw.session); return; }
   S = fresh();
-  try {   // v1 → v2 옮기기: 스티커·설정·단원 기록(숙달)·복습 상자
-    const o = JSON.parse(localStorage.getItem(KEY_V1) || 'null');
+  try {   // v2(또는 v1) → v3 옮기기: 스티커·설정·만난 글자·놀이 기록(숙달)·다시 보기
+    let o = JSON.parse(localStorage.getItem(KEY_V2) || 'null'), from = 'v2';
+    if (!o) { const o1 = JSON.parse(localStorage.getItem(KEY_V1) || 'null'); if (o1) { o = v1toV2(o1); from = 'v1'; } }
     if (o) {
-      S.stickers = (o.stickers || []).slice(); S.migratedFrom = 'v1';
-      if (o.settings) { S.settings.timerMin = [10, 12, 15].includes(o.settings.timerMin) ? o.settings.timerMin : (o.settings.timerMin > 12 ? 15 : 10); S.settings.sound = o.settings.sound !== false; }
-      Object.entries(o.units || {}).forEach(([u, rec]) => (V1_MAP[u] || []).forEach(pid => {
-        const hist = (rec.hist || []).map(x => (typeof x === 'number' ? { ok: x, d: '' } : x));
-        S.plays[pid] = { hist: hist.slice(-MASTERY.window), mastered: !!rec.mastered, count: hist.length };
-        if (o.review && o.review[u]) S.review[pid] = Object.assign({}, o.review[u]);
+      S.migratedFrom = from; S.stickers = (o.stickers || []).slice(); S.met = Object.assign({}, o.met || {});
+      const st = o.settings || {}; ['timerMin', 'sound', 'volume', 'autoPick'].forEach(k => { if (st[k] != null) S.settings[k] = st[k]; });
+      S.settings.manual = (st.manual || []).map(id => (V2_MAP[id] || [])[0]).filter(Boolean).slice(0, 3);
+      Object.entries(o.plays || {}).forEach(([pid, rec]) => (V2_MAP[pid] || []).forEach(nid => {
+        if (!playById(nid)) return; S.plays[nid] = { hist: (rec.hist || []).slice(), mastered: !!rec.mastered, count: rec.count || 0 };
+        if (o.review && o.review[pid]) S.review[nid] = Object.assign({}, o.review[pid]);
       }));
+      S.log = (o.log || []).map(x => Object.assign({}, x, { play: (V2_MAP[x.play] || [])[0] })).filter(x => x.play);
     }
-  } catch (e) { /* v1 기록이 깨졌으면 새로 시작 */ }
+  } catch (e) { /* 옛 기록이 깨졌으면 새로 시작 */ }
 }
+load();
 load();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* 저장 불가: 계속 */ } };
 function ensureSession() { if (S.session.date !== today()) { S.session = Object.assign(fresh().session, { date: today() }); save(); } }
@@ -62,13 +78,29 @@ function playOne(key, onProgress) {
     player.onerror = () => { player.onerror = null; if (window.HP) HP.audioErr.push(key); speakFallback(key).then(finish); };
     player.ontimeupdate = onProgress ? () => player.duration && onProgress(player.currentTime / player.duration) : null;
     player.volume = S.settings.volume; player.src = 'audio/' + key + '.mp3'; if (window.HP) HP.audioLog.push(key);
-    player.play().catch(err => { if (err && err.name === 'NotAllowedError') finish(); else if (player.onerror) player.onerror(); });
+    player.play().catch(err => { if (playSeq !== my || (err && (err.name === 'NotAllowedError' || err.name === 'AbortError'))) finish(); else if (player.onerror) player.onerror(); });   // v3: 새 소리로 끊긴 것(AbortError)은 오류가 아님
   });
 }
 function stopAudio() { sayToken++; player.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (pending) pending(); }
 function say(keys, each) {
   stopAudio(); const t = sayToken;
   return [].concat(keys).reduce((p, k, i) => p.then(() => { if (t !== sayToken) return; if (each) each(i, true); return playOne(k).then(() => each && t === sayToken && each(i, false)); }), Promise.resolve()).then(() => t === sayToken);
+}
+async function sayGap(keys, gap, each) {   // 낱말 사이에 쉼(뚝딱 소리 붙이기 "하… 마")
+  stopAudio(); const t = sayToken;
+  for (let i = 0; i < keys.length; i++) { if (t !== sayToken) return false; if (each) each(i); await playOne(keys[i]); if (t !== sayToken) return false; if (i < keys.length - 1) await wait(gap); }
+  return t === sayToken;
+}
+function clapFx() {   // 손뼉 소리(짧은 잡음, 기기 안에서 만듦)
+  if (!S.settings.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const len = Math.floor(actx.sampleRate * 0.09), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1500; f.Q.value = 0.8; g.gain.value = 0.9 * S.settings.volume;
+    src.connect(f).connect(g).connect(actx.destination); src.start();
+  } catch (e) { /* 소리 없이 */ }
 }
 function ding(high = 1) {
   if (!S.settings.sound) return;
@@ -95,7 +127,7 @@ function pointSay(keys, each) { setChar('point'); return say(keys, each).then(ok
 
 /* ---------- 그림 (없으면 첫 글자 자리표시: 그림 파일만 넣으면 바로 바뀜) ---------- */
 const hasPic = w => ARTS.pic.includes(w);
-const picHTML = (w, label, cls = '') => hasPic(w) ? '<img class="' + cls + '" alt="' + (label || '') + '" src="' + PIC(w) + '">' : '<div class="ph ' + cls + '" aria-label="' + (label || '') + '">' + ((label || WORDS[w] || '?')[0]) + '</div>';
+const picHTML = (w, label, cls = '') => hasPic(w) ? '<img class="' + cls + '" alt="' + (label || '') + '" src="' + PIC(w) + '">' : '<div class="ph ' + (PH_EMOJI[w] ? 'emo ' : '') + cls + '" aria-label="' + (label || WORDS[w] || '') + '">' + (PH_EMOJI[w] || (label || WORDS[w] || '?')[0]) + '</div>';
 const exPic = j => { const e = JAMO_EX[j]; return e ? picHTML(e.pic, e.word) : ''; };
 
 /* ---------- 진도·복습 ---------- */
@@ -108,38 +140,53 @@ function isMastered(hist) {
 function record(pid, ok) {   // ok: true/false(첫 시도), null = 계산 제외
   if (ok == null) return false;
   const u = P(pid); u.hist.push({ ok: ok ? 1 : 0, d: today() }); u.hist = u.hist.slice(-MASTERY.window);
-  if (!u.mastered && isMastered(u.hist)) { u.mastered = true; S.review[pid] = { box: 0, due: today(REVIEW_DAYS[0]) }; return true; }
+  if (!u.mastered && isMastered(u.hist)) { u.mastered = true; if (!S.review[pid]) S.review[pid] = { box: 0, due: today(REVIEW_DAYS[0]) }; return true; }
   return false;
 }
 function reviewDone(pid, okRate) { const r = S.review[pid]; if (!r) return; r.box = okRate >= 0.8 ? Math.min(r.box + 1, REVIEW_DAYS.length - 1) : 0; r.due = today(REVIEW_DAYS[r.box]); }
 const stage = pid => { const u = P(pid); return u.count >= FRUIT_AT ? 'fruit' : u.mastered ? 'flower' : 'sprout'; };
 const STAGE_ICON = { sprout: 'sprout', flower: 'flower', fruit: 'fruit' };
 
-/* ---------- 오늘의 놀이: 복습 1 + 새 놀이 1~2 + 좋아하는 놀이 1, 쓰기는 이틀에 한 번 ---------- */
+/* ---------- 오늘의 놀이(하루 흐름): 다시 보기 1 → 이번 주 놀이 2(12·15분이면 3) → [몸으로 글자] → 내가 고르기 → 잘 자
+   쓰기는 이틀에 한 번. 토요일은 '모아 놀기'(이번 주 놀이를 하나씩, 새 내용 없음). ---------- */
+const isWeekend = () => new Date().getDay() === WEEKEND_DAY;
 function computeToday() {
-  const out = [], has = id => out.some(x => x.id === id), push = (p, tag) => { if (p && !has(p.id) && out.length < 4) out.push({ id: p.id, tag }); };
-  if (!S.settings.autoPick && S.settings.manual.length) { S.settings.manual.map(playById).filter(Boolean).forEach(p => push(p, 'pick')); return out; }
-  const t = today();
-  const due = PLAYS.filter(p => S.review[p.id] && S.review[p.id].due <= t).sort((a, b) => (S.review[a.id].due < S.review[b.id].due ? -1 : 1));
+  const out = [], has = id => out.some(x => x.id === id), push = (p, tag) => { if (p && !has(p.id)) out.push({ id: p.id, tag }); };
+  if (!S.settings.autoPick && S.settings.manual.length) { S.settings.manual.map(playById).filter(Boolean).forEach(p => push(p, 'pick')); out.push({ id: '@pick', tag: 'choose' }); return out; }
+  const t = today(), T = curTopic(), tp = T.plays;
+  const isW = p => p.kind === 'trace' || p.kind === 'copy';
+  const wroteRecently = S.log.some(x => x.d >= today(-1) && playById(x.play) && isW(playById(x.play)));
+  // 1. 다시 보기: 날짜가 된 것 중 가장 오래된 것(다른 주제 먼저), 없으면 지난 주제에서 해 본 놀이 하나
+  const due = PLAYS.filter(p => S.review[p.id] && S.review[p.id].due <= t && !(isW(p) && wroteRecently))
+    .sort((a, b) => ((a.topic === T.id) - (b.topic === T.id)) || (S.review[a.id].due < S.review[b.id].due ? -1 : 1));
   if (due.length) push(due[0], 'again');
-  const fresh1 = PLAYS.filter(p => !P(p.id).mastered && p.row !== 'write');
-  push(fresh1[0], P((fresh1[0] || {}).id || '').count ? 'again' : 'new');
-  if (S.settings.timerMin >= 12 && fresh1[1] && fresh1[1].row === (fresh1[0] || {}).row) push(fresh1[1], P(fresh1[1].id).count ? 'again' : 'new');
-  const cnt = {}; S.log.filter(x => x.d >= today(-7) && x.src === 'garden').forEach(x => (cnt[x.play] = (cnt[x.play] || 0) + 1));
-  const fav = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(playById).find(p => p && !has(p.id));
-  if (fav) push(fav, 'fav');
-  const wroteRecently = S.log.some(x => x.d >= today(-1) && playById(x.play) && playById(x.play).row === 'write');
-  if (!wroteRecently && out.length < 4) push(PLAYS.filter(p => p.row === 'write').find(p => !P(p.id).mastered) || playById('trace-v'), 'write');
-  PLAYS.filter(p => !has(p.id) && !P(p.id).mastered).forEach(p => out.length < 3 && push(p, P(p.id).count ? 'again' : 'new'));
-  PLAYS.filter(p => !has(p.id)).forEach(p => out.length < 3 && push(p, 'again'));
+  else { const prev = TOPICS[T.n - 2]; if (prev) push(prev.plays.filter(p => P(p.id).count && !isW(p)).sort((a, b) => P(a.id).count - P(b.id).count)[0], 'again'); }
+  if (isWeekend()) {   // 모아 놀기
+    tp.filter(p => P(p.id).count && !(isW(p) && wroteRecently)).forEach(p => out.length < 4 && push(p, 'gather'));
+    tp.forEach(p => out.length < 3 && !(isW(p) && wroteRecently) && push(p, 'gather'));
+  } else {
+    const n = S.settings.timerMin >= 12 ? 3 : 2;
+    let cand = tp.filter(p => !has(p.id) && !(isW(p) && wroteRecently));
+    cand = cand.filter(p => !P(p.id).mastered).concat(cand.filter(p => P(p.id).mastered));
+    const w = !wroteRecently && cand.find(isW);
+    const pick = cand.filter(p => !isW(p)).slice(0, w ? n - 1 : n); if (w) pick.splice(1, 0, w);
+    pick.forEach(p => push(p, P(p.id).count ? 'week' : 'new'));
+  }
+  out.push({ id: '@pick', tag: 'choose' });
   return out;
 }
 function todayList() {
   ensureSession();
   if (!S.session.list) { S.session.list = computeToday(); save(); }
-  return S.session.list.filter(x => playById(x.id));
+  return S.session.list.filter(x => x.id === '@pick' || playById(x.id));
 }
-const TAG = { new: ['sprout', '처음'], again: ['', '또 놀기'], fav: ['', '좋아해요'], write: ['pencil', '쓰기'], pick: ['', '오늘 할 것'] };
+const TAG = { new: ['sprout', '처음'], again: ['', '다시 보기'], week: ['', '이번 주'], gather: ['', '모아 놀기'], write: ['pencil', '쓰기'], pick: ['', '오늘 할 것'], choose: ['', '내가 고르기'], fav: ['', '좋아해요'] };
+const flowersIn = T => T.plays.filter(p => stage(p.id) !== 'sprout').length;
+function suggestion() {   // 꽃 2개 이상 → 다음 주제 추천(잠금 아님)
+  const T = curTopic(), nx = TOPICS[T.n];
+  return nx && flowersIn(T) >= FLOWERS_TO_SUGGEST && S.suggestOff !== T.id ? nx : null;
+}
+function setTopic(id) { S.topic = id; S.session.list = null; save(); }
 
 /* ---------- 타이머 ---------- */
 const limitMs = () => (params.get('t') ? +params.get('t') : S.settings.timerMin * 60) * 1000;   // ?t=초 는 시험용
@@ -173,19 +220,30 @@ async function retryFx(id, node) {
 $('#homeBtn').addEventListener('click', () => showHome());
 
 /* ---------- 놀이 카드 그림 ---------- */
+const EMO = k => '<span class="emo">' + KINDS[k].icon + '</span>';
 function playArt(p, big) {
   const it = p.items;
   if (p.kind === 'letter') { const j = it[(P(p.id).count * 3) % it.length]; return '<span class="glyph">' + j + '</span>' + exPic(j); }
   if (p.kind === 'pick') return '<span class="glyph' + (big ? '' : ' s') + '">' + it.slice(0, 3).join(' ') + '</span>';
   if (p.kind === 'merge') return '<span class="glyph">' + it[0] + '</span>';
   if (p.kind === 'trace' || p.kind === 'copy') return '<span class="glyph">' + it[0] + '</span><img alt="" src="' + ICON('pencil') + '" style="width:40px;height:40px">';
-  if (p.kind === 'clap') return picHTML(p.pic, WORDS[p.pic]);
-  if (p.kind === 'listen') return picHTML('podo') + picHTML('ori');
-  return picHTML(p.pic, WORDS[p.pic]);
+  if (p.kind === 'name') return '<span class="glyph s namegl">' + WORDS.ryeowon + '</span>';
+  if (p.kind === 'clap') return picHTML(it[0], WORDS[it[0]]) + '<img alt="" src="' + ICON('clap') + '" style="width:44px;height:44px">';
+  if (p.kind === 'train') return (hasPic('train_engine') ? picHTML('train_engine') : EMO('train')) + '<span class="glyph s">가나다</span>';
+  if (p.kind === 'story') return hasPic('story_1') ? picHTML('story_1') : EMO('story');
+  if (p.kind === 'same') return EMO('same') + picHTML(SAME[it[0]]);
+  if (p.kind === 'listen') return picHTML(it[0]) + picHTML(it[1]);
+  return picHTML(it[0], WORDS[it[0]]);
 }
 function playName(p) {
-  if (p.kind === 'letter') { const j = p.items[(P(p.id).count * 3) % p.items.length], e = JAMO_EX[j]; return JNAME[j] + ' <span class="muted">· ' + e.word + '</span>'; }
+  if (p.kind === 'letter') { const j = p.items[(P(p.id).count * 3) % p.items.length]; return KINDS.letter.kid + ' <span class="muted">· ' + JNAME[j] + '</span>'; }
   return p.name;
+}
+function smallInner(p) {   // 정원 버튼 안
+  if (['letter', 'pick', 'merge', 'trace', 'copy'].includes(p.kind)) return '<span class="glyph' + (p.kind === 'pick' ? ' s' : '') + '">' + (p.kind === 'pick' ? p.items.slice(0, 3).join('') : p.items[0]) + '</span>';
+  if (p.kind === 'clap') return '<img class="p" alt="" src="' + ICON('clap') + '" style="width:40px;height:40px">';
+  if (p.kind === 'name') return '<span class="glyph s">' + WORDS.ryeowon + '</span>';
+  return EMO(p.kind);
 }
 
 /* ---------- 홈 ---------- */
@@ -193,55 +251,66 @@ function showHome() {
   ensureSession();
   if (S.session.ended) return showRest();
   const [, s] = screen('home');
+  const T = curTopic();
   let list = todayList(); const left = list.filter(x => !S.session.done.includes(x.id));
   const allDone = !left.length;
-  const hero = el('div', 'hero'); hero.append(charEl(allDone ? 'laugh' : 'wave'), el('div', 'bubble', allDone ? '오늘 놀이 다 했어!<br>정원에서 더 놀까?' : '안녕! 오늘은<br>이렇게 놀아 볼까?'));
+  const hero = el('div', 'hero'); hero.append(charEl(allDone ? 'laugh' : 'wave'), el('div', 'bubble', allDone ? '오늘 놀이 다 했어!<br>이제 잘 자러 갈까?' : '려원아, 안녕!<small>이번 주: ' + T.title + '</small>'));
   const R = el('div', 'homeR');
-  R.append(el('div', 'label', '<span>오늘의 놀이</span><span class="faint">' + list.length + '개</span>'));
+  const sug = suggestion();
+  if (sug) {
+    const sg = el('div', 'suggest', '<span class="ic">' + picHTML(sug.pic) + '</span><span class="tx">꽃이 피었어! <b>' + sug.short + '</b> 화단도 가 볼까?</span>');
+    const yes = el('button', 'yes', '가 볼래'); yes.id = 'sugYes'; yes.addEventListener('click', () => { setTopic(sug.id); showHome(); });
+    const no = el('button', 'no', '나중에'); no.addEventListener('click', () => { S.suggestOff = T.id; save(); showHome(); });
+    sg.append(yes, no); R.append(sg);
+  }
+  R.append(el('div', 'label', '<span>오늘의 놀이' + (isWeekend() && S.settings.autoPick ? ' · 모아 놀기 날' : '') + '</span><span class="faint">' + realIds(list.map(x => x.id)).length + '개 + 내가 고르기</span>'));
   const grid = el('div', 'plays');
   const order = left.concat(list.filter(x => S.session.done.includes(x.id)));
-  order.forEach((x, i) => {
-    const p = playById(x.id), col = rowOf(p).color, done = S.session.done.includes(x.id), big = i === 0 && !done;
-    const [ic, tx] = TAG[x.tag] || TAG.again;
+  let bigUsed = false;
+  order.forEach(x => {
+    const done = S.session.done.includes(x.id), [ic, tx] = TAG[x.tag] || TAG.again;
+    if (x.id === '@pick') {
+      const c = el('button', 'pcard small c-mint choose' + (done ? ' done' : ''), '<span class="tag choose">' + tx + '</span><div class="art"><img alt="" src="' + ICON('garden') + '" style="width:76px;height:76px"></div><div class="name">정원에서 골라요</div><span class="play"><img alt="" src="' + ICON('play') + '"></span>' + (done ? '<span class="chk"><img alt="" src="' + ICON('check') + '"></span>' : ''));
+      c.dataset.play = '@pick'; c.addEventListener('click', showGarden); grid.appendChild(c); return;
+    }
+    const p = playById(x.id), col = rowOf(p).color, big = !bigUsed && !done; if (big) bigUsed = true;
     const c = el('button', 'pcard ' + (big ? 'big' : 'small') + ' c-' + col + (done ? ' done' : ''));
     c.dataset.play = p.id;
     c.innerHTML = '<span class="tag ' + x.tag + '">' + (ic ? '<img alt="" src="' + ICON(ic) + '">' : '') + tx + '</span>' +
-      '<div class="art' + (p.kind === 'listen' ? ' pair' : '') + '">' + playArt(p, big) + '</div><div class="name">' + playName(p) + '</div>' +
+      '<div class="art' + (['listen', 'clap', 'same', 'train'].includes(p.kind) ? ' pair' : '') + '">' + playArt(p, big) + '</div><div class="name">' + playName(p) + '</div>' +
       (big ? '<span class="go"><img alt="" src="' + ICON('play') + '"></span>' : '<span class="play"><img alt="" src="' + ICON('play') + '"></span>') +
       (done ? '<span class="chk"><img alt="" src="' + ICON('check') + '"></span>' : '');
     c.setAttribute('aria-label', p.name + ' 시작');
     c.addEventListener('click', () => startPlay(p.id, 'today'));
     grid.appendChild(c);
   });
-  if (allDone) grid.appendChild(el('div', 'allDone', '오늘의 놀이를 다 했어요. 놀이 정원에서 아무거나 골라도 돼요.'));
+  if (allDone || realIds(S.session.done).length >= 3) { const nb = el('button', 'kid-btn lav sleepBtn', '<img alt="" src="' + ICON('moon') + '">잘 자, 몽글아'); nb.id = 'toEnd'; nb.addEventListener('click', showEnd); grid.appendChild(nb); }
   R.append(grid);
   const dock = el('div', 'dock');
-  const gb = el('button', 'kid-btn', '<img alt="" src="' + ICON('garden') + '">놀이 정원'); gb.id = 'gardenBtn'; gb.addEventListener('click', showGarden);
+  const gb = el('button', 'kid-btn', '<img alt="" src="' + ICON('garden') + '">정원'); gb.id = 'gardenBtn'; gb.addEventListener('click', showGarden);
+  const db = el('button', 'kid-btn', '<span class="dexic">가</span>글자 친구'); db.id = 'dexBtn'; db.addEventListener('click', showDex);
   const sb = el('button', 'kid-btn', '<img alt="" src="' + ICON('sticker') + '">스티커'); sb.id = 'bookBtn'; sb.addEventListener('click', showBook);
-  dock.append(gb, sb);
+  dock.append(gb, db, sb);
   s.append(hero, R, dock);
-  if (!showHome.greeted) { showHome.greeted = true; say('ui_hello'); }
+  if (!showHome.greeted) { showHome.greeted = true; say(['ui_hiname', 'ui_topic']); }
 }
 
-/* ---------- 놀이 정원 ---------- */
+/* ---------- 놀이 정원: 주제 10개 화단(새싹 → 꽃 → 열매), 잠금 없음 ---------- */
 function showGarden() {
   const [, s] = screen('garden', { scroll: true });
-  const st = PLAYS.map(p => stage(p.id));
+  const st = PLAYS.map(p => stage(p.id)), T = curTopic();
   const head = el('div', 'ghead');
   const back = el('button', 'icon-btn', '<img alt="뒤로" src="' + ICON('back') + '">'); back.style.cssText = 'width:56px;height:56px'; back.addEventListener('click', showHome);
   head.append(back, el('h1', '', '놀이 정원'), el('div', 'count', '<span><img alt="꽃" src="' + ICON('flower') + '">' + st.filter(x => x !== 'sprout').length + '</span><span><img alt="열매" src="' + ICON('fruit') + '">' + st.filter(x => x === 'fruit').length + '</span>'));
   const g = el('div', 'garden', '<div class="ground"></div>'); g.append(mg('laugh'));
-  const plants = el('div', 'plants'); st.slice(0, 14).forEach(x => plants.insertAdjacentHTML('beforeend', '<img alt="" class="' + (x === 'sprout' ? 's' : '') + '" src="' + ICON(STAGE_ICON[x]) + '">')); g.append(plants);
+  const plants = el('div', 'plants'); TOPICS.forEach(t => { const f = flowersIn(t), fr = t.plays.some(p => stage(p.id) === 'fruit'); plants.insertAdjacentHTML('beforeend', '<img alt="" class="' + (f ? '' : 's') + '" src="' + ICON(fr ? 'fruit' : f ? 'flower' : 'sprout') + '">'); }); g.append(plants);
   const legend = el('div', 'legend', '<span><img alt="" src="' + ICON('sprout') + '">처음</span><span><img alt="" src="' + ICON('flower') + '">해 봤어요</span><span><img alt="" src="' + ICON('fruit') + '">자주 놀아요</span><span><i></i>오늘</span>');
   const rows = el('div', 'rows'); const todays = todayList().map(x => x.id);
-  ROWS.forEach(r => {
-    const row = el('div', 'row', '<div class="nm"><i style="background:var(--' + r.color + ')"></i>' + r.name + '</div>'); const items = el('div', 'items');
-    PLAYS.filter(p => p.row === r.id).forEach(p => {
-      let inner;
-      if (['letter', 'pick', 'merge', 'trace', 'copy'].includes(p.kind)) inner = '<span class="glyph' + (p.kind === 'pick' ? ' s' : '') + '">' + (p.kind === 'pick' ? p.items.slice(0, 3).join('') : p.items[0]) + '</span>';
-      else if (p.kind === 'clap') inner = '<img class="p" alt="" src="' + ICON('clap') + '" style="width:40px;height:40px">';
-      else inner = hasPic(p.pic) ? '<img class="p" alt="" src="' + PIC(p.pic) + '">' : '<span class="glyph">' + (WORDS[p.pic] || '?')[0] + '</span>';
-      const b = el('button', 'b t-' + r.color + (todays.includes(p.id) ? ' is-today' : ''), inner + '<span class="st"><img alt="" src="' + ICON(STAGE_ICON[stage(p.id)]) + '"></span>');
+  TOPICS.forEach(t => {
+    const row = el('div', 'row bed' + (t.id === T.id ? ' cur' : ''), '<div class="nm"><span class="no t-' + t.color + '">' + t.n + '</span>' + t.short + (t.id === T.id ? '<em>이번 주</em>' : '') + '</div>');
+    row.dataset.topic = t.id; const items = el('div', 'items');
+    t.plays.forEach(p => {
+      const b = el('button', 'b t-' + t.color + (todays.includes(p.id) ? ' is-today' : ''), smallInner(p) + '<span class="st"><img alt="" src="' + ICON(STAGE_ICON[stage(p.id)]) + '"></span><span class="kn">' + p.name + '</span>');
       b.dataset.play = p.id; b.setAttribute('aria-label', p.name);
       b.addEventListener('click', () => startPlay(p.id, 'garden'));
       items.appendChild(b);
@@ -249,7 +318,37 @@ function showGarden() {
     row.appendChild(items); rows.appendChild(row);
   });
   s.append(head, g, legend, rows);
+  const cur = rows.querySelector('.bed.cur'); if (cur && T.n > 3) requestAnimationFrame(() => cur.scrollIntoView({ block: 'center' }));
 }
+
+/* ---------- 글자 친구 도감: 만난 글자가 그림과 함께 채워져요 ---------- */
+function showDex() {
+  const [, s] = screen('dex', { scroll: true, home: true });
+  const all = [...V, ...C], met = all.filter(j => S.met[j]);
+  s.append(guide(met.length ? 'laugh' : 'basic', met.length ? '글자 친구 <b>' + met.length + '</b>명 만났어!' : '놀이를 하면 글자 친구가 생겨!'));
+  const g = el('div', 'dex');
+  all.forEach(j => {
+    const on = !!S.met[j], e = JAMO_EX[j];
+    const c = el('button', 'dx' + (on ? ' on' : ''), on ? (hasPic(e.lp) ? picHTML(e.lp, e.word) : exPic(j)) + '<span class="g">' + j + '</span><span class="n">' + JNAME[j] + '</span>' : '<span class="g">' + j + '</span><span class="n">?</span>');
+    c.dataset.j = j; c.addEventListener('click', () => { if (on) say(VOICE.jamo(j)); });
+    g.appendChild(c);
+  });
+  s.append(g);
+}
+
+/* ---------- 몸으로 글자 만들기(쉬어 가기, 하루 한 번) ---------- */
+function showMove(next) {
+  S.session.moved = true; save();
+  const [id, s] = screen('move', { home: true });
+  const T = curTopic(), pose = POSES.find(x => x.j === T.move) || POSES[0];
+  s.append(guide('jump', '일어나서 몸으로 <b>' + pose.j + '</b> 만들어 볼까?'));
+  const box = el('div', 'movebox', (hasPic(pose.pic) ? picHTML(pose.pic) : '<img class="mgbig" alt="몽글이" src="' + CHAR_DIR + 'jump' + CHAR_EXT + '">') + '<div class="g">' + pose.j + '</div><p>' + pose.how + '</p>');
+  s.append(box);
+  const dock = el('div', 'dock'); const b = el('button', 'kid-btn next', '다 했어!<img alt="" src="' + ICON('arrow') + '">'); b.id = 'moveDone';
+  b.addEventListener('click', () => { ding(1.3); (next || showHome)(); }); dock.append(b); s.append(dock);
+  (async () => { await say(['ui_move', VOICE.jamo(pose.j)]); if (alive(id)) setChar('cheer'); })();
+}
+const needMove = () => !S.session.moved && realIds(S.session.done).length >= 2;
 
 /* ---------- 스티커 책 ---------- */
 function showBook() {
@@ -267,9 +366,11 @@ function startPlay(pid, src) {
   if (S.session.ended) return showRest();
   if (timeUp()) return showEnd();
   const p = playById(pid);
-  const n = p.kind === 'letter' ? 3 : ROUNDS;
+  const n = { letter: Math.min(3, p.items.length), train: 3, story: 4, trace: 3, copy: 3, name: 4, clap: 4 }[p.kind] || ROUNDS;
   let queue;
-  if (p.kind === 'letter') { const st0 = (P(pid).count * 3) % p.items.length; queue = [0, 1, 2].map(k => p.items[(st0 + k) % p.items.length]); }
+  if (p.kind === 'letter') { const st0 = (P(pid).count * 3) % p.items.length; queue = Array.from({ length: n }, (_, k) => p.items[(st0 + k) % p.items.length]); }
+  else if (p.kind === 'story') queue = p.items.slice();
+  else if (p.kind === 'name') queue = ['ryeowon'].concat(shuffle(p.items.filter(x => x !== 'ryeowon'))).slice(0, n);
   else { queue = []; while (queue.length < n) queue.push(...shuffle(p.items)); queue = queue.slice(0, n); for (let k = 1; k < queue.length; k++) if (queue[k] === queue[k - 1]) queue.push(queue.splice(k, 1)[0]); }
   run = { pid, p, src, queue, i: 0, ok: 0, first: 0, newlyMastered: false, t0: Date.now(), isReview: !!(S.review[pid] && S.review[pid].due <= today()) };
   P(pid).count++; save();
@@ -288,6 +389,7 @@ function nextRound() {
     if (ok != null) { run.first++; if (ok) run.ok++; if (record(run.pid, ok)) run.newlyMastered = true; }
     if (run.p.kind === 'letter') S.met[item] = today();
     if (['pick', 'trace', 'copy'].includes(run.p.kind) && !isSyl(item)) S.met[item] = today();
+    if (ok && ['readword', 'match', 'name', 'listen', 'blend'].includes(run.p.kind) && WORDS[item]) S.words[item] = today();
     run.i++; save(); nextRound();
   });
 }
@@ -295,6 +397,8 @@ function finishPlay(cut) {
   const r = run; run = null; ticking = false;
   if (r.isReview) reviewDone(r.pid, r.first ? r.ok / r.first : 1);
   if (!S.session.done.includes(r.pid)) S.session.done.push(r.pid);
+  if (r.src === 'garden' && !S.session.done.includes('@pick') && (S.session.list || []).some(x => x.id === '@pick')) S.session.done.push('@pick');
+  if (REVIEW_AFTER_FIRST && !S.review[r.pid] && r.i > 0) S.review[r.pid] = { box: 0, due: today(REVIEW_DAYS[0]) };
   S.log.push({ d: today(), play: r.pid, src: r.src, ms: Date.now() - r.t0, n: r.i }); S.log = S.log.slice(-120);
   if (r.i === 0) { save(); return showEnd(); }
   showSticker(r, cut || timeUp());
@@ -302,6 +406,7 @@ function finishPlay(cut) {
 
 /* ---------- 문제 엔진 ---------- */
 const others = (pool, x, n) => shuffle(pool.filter(p => p !== x)).slice(0, n);
+const pool3 = () => (run && run.p.items.length >= 3 ? run.p.items : WORD_IDS);
 function speakerBtn(fn, cls = 'spk', label = '다시 듣기') { const b = el('button', cls, '<img alt="' + label + '" src="' + ICON('speaker') + '">'); b.addEventListener('click', fn); return b; }
 function choiceRound(id, cards, correct, done) {
   let first = true, locked = false;
@@ -330,7 +435,9 @@ const RUN = {
     const note = JAMO_NOTE[j];
     s.append(guide('point', '이건 <b>' + JNAME[j] + '</b>' + (isSyl(j) || JNAME[j].length > 1 ? '이야!' : '야!')));
     const wrap = el('div', 'lt');
-    const L = el('div', 'letter', '<div class="hint">' + run.queue.map((_, q) => '<i class="' + (q === k ? 'on' : '') + '"></i>').join('') + '</div><div class="g">' + j + '</div><div class="nm">' + JNAME[j] + '</div>' + (note ? '<div class="note">' + note.text + '</div>' : ''));
+    const lp = hasPic(e.lp) ? '<div class="lpic">' + picHTML(e.lp, e.word) + '</div>' : '';   // 그림 속 글자 → 글자만 남기
+    const L = el('div', 'letter' + (lp ? ' haslp' : ''), lp + '<div class="hint">' + run.queue.map((_, q) => '<i class="' + (q === k ? 'on' : '') + '"></i>').join('') + '</div><div class="g">' + j + '</div><div class="nm">' + JNAME[j] + '</div>' + (note ? '<div class="note">' + note.text + '</div>' : ''));
+    if (lp) setTimeout(() => alive(id) && L.classList.add('lpdone'), 2200);
     L.append(speakerBtn(voice));
     const W = el('div', 'word', exPic(j) + '<div class="w' + (word.length > 2 ? ' long' : '') + '"><b>' + word[0] + '</b><span>' + word.slice(1) + '</span></div>');
     W.append(speakerBtn(wordVoice, 'spk', word + ' 듣기'));
@@ -345,27 +452,12 @@ const RUN = {
   },
   /* 소리 듣고 그림 찾기 */
   listen(w, id, s, done) {
-    const opts = shuffle([w, ...others(WORD_IDS, w, 2)]);
+    const opts = shuffle([w, ...others(pool3(), w, 2)]);
     const prompt = () => pointSay(['ui_listen', VOICE.word(w)]);
     const pr = el('div', 'prompt', '<div class="body syl">' + [...WORDS[w]].map(() => '<span class="q">?</span>').join('') + '</div>'); pr.append(speakerBtn(prompt));
     s.append(pr, el('div', 'ask', '어느 그림일까?'), choiceRound(id, opts.map(picCard), opts.indexOf(w), done), guide('think', '잘 듣고 골라 봐', true));
     // 소리 놀이: 글자는 맞힌 뒤에 보여 줌(그 전엔 글자 수만큼 ? 칸)
     s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { pr.querySelectorAll('.syl span').forEach((x, k) => { x.textContent = WORDS[w][k]; x.classList.remove('q'); }); pr.querySelectorAll('.syl span')[0].classList.add('on'); setBubble(WORDS[w] + ' 찾았네!<small>' + [...WORDS[w]].join('·') + ', ' + WORDS[w].length + '글자야</small>'); } }));
-    prompt();
-  },
-  /* 박수 세기 */
-  clap(w, id, s, done) {
-    const n = WORDS[w].length;
-    const pr = el('div', 'prompt', '<div class="body">' + picHTML(w, WORDS[w], 'hero-pic') + '<span class="eye">몇 번 손뼉 칠까?</span></div>');
-    const prompt = async () => {
-      setChar('point'); if (!(await say(VOICE.word(w)))) return;
-      const img = pr.querySelector('.hero-pic');
-      if (!(await say([...WORDS[w]].map(VOICE.syl), (i, start) => { if (img) img.classList.toggle('hop', start); if (start) { ding(1.5 + i * 0.12); setChar(i % 2 ? 'clap2' : 'clap'); } }))) return;
-      pointSay('ui_clapq');
-    };
-    pr.append(speakerBtn(prompt));
-    const cards = [1, 2, 3].map(k => { const c = el('button', 'ch', '<div class="dots">' + '<i></i>'.repeat(k) + '</div>'); c.dataset.k = k; c.setAttribute('aria-label', k + '번'); return c; });
-    s.append(pr, el('div', 'ask', '박수 몇 번?'), choiceRound(id, cards, n - 1, done), guide('think', '짝짝! 같이 세어 봐', true));
     prompt();
   },
   /* 글자 고르기 */
@@ -405,7 +497,7 @@ const RUN = {
   },
   /* 낱말 읽기: 글자 보고 그림 고르기 */
   readword(w, id, s, done) {
-    const opts = shuffle([w, ...others(WORD_IDS, w, 2)]);
+    const opts = shuffle([w, ...others(pool3(), w, 2)]);
     const prompt = () => pointSay('ui_which');
     const pr = el('div', 'prompt', '<div class="body syl">' + [...WORDS[w]].map(c => '<span>' + c + '</span>').join('') + '</div>');
     pr.append(speakerBtn(() => say(VOICE.word(w)), 'spk', '낱말 듣기'));
@@ -415,7 +507,7 @@ const RUN = {
   },
   /* 낱말 짝 */
   match(w, id, s, done) {
-    const pair = [w, others(WORD_IDS, w, 1)[0]], pics = shuffle(pair), words = shuffle(pair);
+    const pair = [w, others(pool3(), w, 1)[0]], pics = shuffle(pair), words = shuffle(pair);
     let first = true, got = 0, sel = null, busy = false;
     const top = el('div', 'r'), low = el('div', 'r');
     const pcs = pics.map(p => { const c = el('button', 'mpic', picHTML(p, WORDS[p]) + '<div class="got"></div>'); c.dataset.k = p; top.appendChild(c); return c; });
@@ -438,24 +530,125 @@ const RUN = {
     const m = el('div', 'match'); m.append(top, low);
     s.append(m, guide('think', '낱말을 그림에 짝지어 봐', true)); pointSay('ui_match');
   },
-  /* 같이 읽기 */
-  sentence(i, id, s, done) {
-    const sen = SENTENCES[i], opts = shuffle([i, ...others(SENTENCES.map((_, k) => k), i, 2)]);
-    const cards = opts.map(k => { const c = el('button', 'ch', PHRASE(k) ? '<img alt="" src="' + PHRASE(k) + '">' : '<div class="pair">' + SENTENCES[k].pics.map(picSlot).join('') + '</div>'); c.dataset.k = k; return c; });
-    const words = sen.text.split(' ');
-    const pr = el('div', 'prompt', '<div class="body sent">' + words.map(w => '<span>' + w + '</span>').join(' ') + '</div>');
-    const spans = [...pr.querySelectorAll('.sent span')];
-    const total = sen.text.length, ends = []; let acc = 0; words.forEach(w => { acc += w.length + 1; ends.push(acc / (total + 1)); });
-    const prompt = async () => {
-      stopAudio(); setChar('point'); const t = sayToken; spans.forEach(x => x.classList.remove('lit'));
-      await playOne(VOICE.sentence(i), p => { if (t === sayToken) spans.forEach((x, k) => x.classList.toggle('lit', k === 0 || p >= (ends[k - 1] - 0.04))); });
-      if (t !== sayToken) return; spans.forEach(x => x.classList.add('lit')); pointSay('ui_which');
-    };
-    pr.append(speakerBtn(prompt));
-    s.append(pr, el('div', 'ask', '어떤 그림일까?'), choiceRound(id, cards, opts.indexOf(i), done), guide('think', '같이 읽어 보자', true));
+  trace(j, id, s, done) { traceRound(j, id, s, done, false); },
+  /* ★ 내 이름 찾기: 낱말 카드 3장 중 이름(가족 낱말) 찾기. 10주차는 문장 카드("려원이도 모자") */
+  name(w, id, s, done) {
+    const opts = shuffle([w, ...others(FAMILY, w, 2)]), inS = run.p.inSentence;
+    const label = x => inS ? (x === 'ryeowon' ? '려원이도' : WORDS[x] + '도') + ' 모자' : WORDS[x];
+    const prompt = () => pointSay(w === 'ryeowon' ? 'ui_name' : [VOICE.word(w), 'ui_find']);
+    const pr = el('div', 'prompt', '<div class="body"><span class="eye">' + (w === 'ryeowon' ? WORDS.ryeowon + '이 이름은 어디 있을까?' : '‘' + WORDS[w] + '’는 어디 있을까?') + '</span></div>'); pr.append(speakerBtn(prompt));
+    const cards = opts.map(x => { const c = el('button', 'ch namecard' + (inS ? ' sent' : ''), '<span class="nmw">' + label(x) + '</span><span class="nmpic">' + picHTML(x, WORDS[x]) + '</span>'); c.dataset.k = x; c.setAttribute('aria-label', label(x)); return c; });
+    s.append(pr, el('div', 'ask', '낱말 카드를 눌러 봐'), choiceRound(id, cards, opts.indexOf(w), done), guide('think', '어디 있을까?', true));
+    cards.forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { c.classList.add('reveal'); setBubble('<b>' + label(w) + '</b>!'); } }));
     prompt();
   },
-  trace(j, id, s, done) { traceRound(j, id, s, done, false); },
+  /* ◎ 짝짝 글자 세기: ① 몽글이 시범(글자 칸이 하나씩 빛나며 짝, 짝 "두 번!") ② 아이가 따라 짝짝 ③ 몇 번 쳤지? */
+  clap(w, id, s, done) {
+    const syl = [...WORDS[w]], n = syl.length, ct = CLAP_T[w];
+    const pr = el('div', 'prompt clapP', '<div class="body">' + picHTML(w, WORDS[w], 'hero-pic') + '<div class="claprow">' + syl.map(c => '<span>' + c + '</span>').join('') + '</div></div>');
+    const boxes = [...pr.querySelectorAll('.claprow span')];
+    const pad = el('button', 'clappad off', '<img alt="" src="' + ICON('clap') + '"><b>짝!</b>'); pad.id = 'clapPad';
+    const ask = el('div', 'ask', '몽글이를 잘 봐');
+    const cards = [1, 2, 3, 4].map(k => { const c = el('button', 'ch', '<div class="dots">' + '<i></i>'.repeat(k) + '</div>'); c.dataset.k = k; c.setAttribute('aria-label', k + '번'); return c; });
+    const choice = choiceRound(id, cards, n - 1, done); choice.classList.add('four'); choice.hidden = true;
+    let phase = 0, taps = 0;
+    const light = (k, cls) => { boxes.forEach((b, i) => b.classList.toggle(cls, i <= k)); };
+    const demo = async () => {
+      phase = 0; pad.classList.add('off'); choice.hidden = true; boxes.forEach(b => b.classList.remove('on', 'tap'));
+      setChar('point'); setBubble('몽글이가 먼저 해 볼게!'); if (!(await say('ui_clapdemo'))) return;
+      stopAudio(); const t = sayToken; let lit = -1; setChar('clap');
+      const dur = (ct && ct.d) || 2, on = (ct && ct.t) || syl.map((_, k) => k * 0.5);
+      await playOne(VOICE.clap(w), p => { if (t !== sayToken) return; const now = p * dur; while (lit < n - 1 && now >= on[lit + 1] - 0.03) { lit++; light(lit, 'on'); clapFx(); setChar(lit % 2 ? 'clap2' : 'clap'); } });
+      if (t !== sayToken || !alive(id)) return;
+      light(n - 1, 'on'); setBubble('<b>' + n + '번!</b><small>' + syl.join(' · ') + '</small>'); await wait(500); if (!alive(id)) return;
+      phase = 1; boxes.forEach(b => b.classList.remove('on')); taps = 0; pad.classList.remove('off'); ask.textContent = '같이 짝짝 쳐 봐';
+      setChar('wave'); setBubble('이제 ' + WORDS.ryeowon + '이 차례!'); say('ui_clapyou');
+    };
+    pad.addEventListener('click', async () => {
+      if (phase !== 1 || !alive(id)) return;
+      boxes[taps].classList.add('tap'); clapFx(); setChar(taps % 2 ? 'clap2' : 'clap'); bounce(); taps++;
+      if (taps >= n) { phase = 2; pad.classList.add('off'); await wait(500); if (!alive(id)) return; ask.textContent = '몇 번 쳤지?'; choice.hidden = false; setChar('think'); setBubble('몇 번 쳤지?'); say('ui_clapcount'); }
+    });
+    pr.append(speakerBtn(demo, 'spk', '다시 보여 줘'));
+    s.append(pr, pad, ask, choice, guide('point', '몽글이가 먼저 해 볼게!', true));
+    demo();
+  },
+  /* ★ 뚝딱 소리 붙이기: "하… 마!" 나눠 듣고 그림 고르기(9주차는 글자도 보여 줌) */
+  blend(w, id, s, done) {
+    const syl = [...WORDS[w]], txt = run.p.showText, opts = shuffle([w, ...others(run.p.items.length >= 3 ? run.p.items : BLEND_WORDS, w, 2)]);
+    const pr = el('div', 'prompt', '<div class="body syl">' + syl.map(c => '<span class="' + (txt ? '' : 'q') + '">' + (txt ? c : '?') + '</span>').join('') + '</div>');
+    const spans = [...pr.querySelectorAll('.syl span')];
+    const prompt = async () => {
+      setChar('point'); if (run && run.i === 0 && !(await say('ui_blend'))) return;
+      const ok = await sayGap(syl.map(VOICE.syl), 650, k => spans.forEach((x, i) => x.classList.toggle('on', i === k)));
+      if (ok && alive(id)) { spans.forEach(x => x.classList.remove('on')); setChar('think'); }
+    };
+    pr.append(speakerBtn(prompt));
+    s.append(pr, el('div', 'ask', '무슨 낱말일까?'), choiceRound(id, opts.map(picCard), opts.indexOf(w), done), guide('think', '소리를 붙여 봐', true));
+    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { spans.forEach((x, k) => { x.textContent = syl[k]; x.classList.remove('q'); x.classList.add('on'); }); setBubble('<b>' + WORDS[w] + '</b>!'); say(VOICE.word(w)); } }));
+    prompt();
+  },
+  /* ★ 누구랑 같은 소리? "나, 나비 할 때 나!" → 같은 첫 글자 그림 고르기 */
+  same(f, id, s, done) {
+    const ans = SAME[f], a0 = WORDS[f][0];
+    const pool = ['moja', 'gicha', 'hama', 'lion', 'dubu', 'podo', 'gudu', 'eobu', 'radio', 'dari', 'jadu', 'kokkiri', 'geomi', 'so', 'meori', 'goguma'].filter(x => WORDS[x][0] !== a0);
+    const opts = shuffle([ans, ...others(pool, ans, 2)]);
+    const prompt = () => pointSay([VOICE.first(f), 'ui_same']);
+    const pr = el('div', 'prompt', '<div class="body syl"><span class="q">' + a0 + '</span></div><span class="eye">' + a0 + ' 소리로 시작하는 건?</span>'); pr.append(speakerBtn(prompt));
+    s.append(pr, el('div', 'ask', '같은 소리를 골라 봐'), choiceRound(id, opts.map(picCard), opts.indexOf(ans), done), guide('think', '잘 듣고 골라 봐', true));
+    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === ans) { pr.querySelector('.syl span').classList.replace('q', 'on'); setBubble('<b>' + a0 + '</b>' + WORDS[f].slice(1) + ', <b>' + a0 + '</b>' + WORDS[ans].slice(1) + '!'); say(VOICE.word(ans)); } }));
+    prompt();
+  },
+  /* ★ 가나다 기차: 기관차 = 자음, 칸 = ㅏㅓㅗㅜㅡㅣ. 칸을 눌러 듣고 → "고! 어디 있을까?" */
+  train(c, id, s, done) {
+    const sy = TRAIN_V.map(v => compose(c, v)), heard = new Set();
+    let phase = 0, target = null, first = true, busy = false;
+    const tr = el('div', 'train');
+    const eng = el('button', 'engine' + (hasPic('train_engine') ? ' pic' : ''), (hasPic('train_engine') ? picHTML('train_engine') : '<span class="emo">🚂</span>') + '<span class="g">' + c + '</span>');
+    eng.addEventListener('click', () => { if (phase === 0 && !busy) sayGap(sy.map(VOICE.syl), 120, k => cars.forEach((x, i) => x.classList.toggle('lit', i === k))).then(() => cars.forEach(x => x.classList.remove('lit'))); });
+    const cars = sy.map((x, k) => { const b = el('button', 'car' + (hasPic('train_car') ? ' pic' : ''), (hasPic('train_car') ? picHTML('train_car') : '') + '<span class="g">' + x + '</span><span class="v">' + TRAIN_V[k] + '</span>'); b.dataset.k = x; return b; });
+    tr.append(eng, ...cars);
+    const ask = el('div', 'ask', '기차 칸을 눌러 봐');
+    const dock = el('div', 'dock'); const fb = el('button', 'kid-btn next', '찾기 놀이<img alt="" src="' + ICON('arrow') + '">'); fb.id = 'trainFind'; fb.hidden = true; dock.append(fb);
+    const startFind = async () => {
+      phase = 1; fb.hidden = true; cars.forEach(x => x.classList.remove('heard')); target = sy[rand(sy.length)];
+      ask.textContent = '‘' + target + '’ 칸은 어디 있을까?'; setBubble('<b>' + target + '</b>는 어디 있지?'); await pointSay([VOICE.syl(target), 'ui_find']);
+    };
+    fb.addEventListener('click', startFind);
+    cars.forEach(b => b.addEventListener('click', async () => {
+      if (busy || !alive(id)) return;
+      if (phase === 0) { cars.forEach(x => x.classList.remove('lit')); b.classList.add('lit', 'heard'); heard.add(b.dataset.k); await say(VOICE.syl(b.dataset.k)); b.classList.remove('lit'); if (heard.size >= 3) fb.hidden = false; if (heard.size === sy.length) startFind(); return; }
+      if (b.dataset.k === target) { busy = true; b.classList.add('ok'); await say(VOICE.syl(target)); if (await success(id)) done(first); }
+      else { first = false; busy = true; await retryFx(id, b); busy = false; }
+    }));
+    const pr = el('div', 'prompt', '<div class="body"><span class="eye"><b style="color:var(--peach-ink);font-size:30px">' + c + '</b> 기차에 모음 친구들이 탔어요</span></div>');
+    pr.append(speakerBtn(() => { if (phase === 1) pointSay([VOICE.syl(target), 'ui_find']); else eng.click(); }));
+    s.append(pr, tr, ask, guide('think', '칸을 눌러 봐', true), dock);
+    if (run.i === 0) say('ui_train');
+  },
+  /* ◎ 몽글이 이야기: 4쪽 그림책. 읽는 낱말이 빛나고, 쪽마다 "어디 있는지 짚어 볼까?" */
+  story(i, id, s, done) {
+    const st = STORY[i], words = st.text.split(' ');
+    const pg = el('div', 'storypg', '<div class="dotsP">' + STORY.map((_, k) => '<i class="' + (k === i ? 'on' : '') + '"></i>').join('') + '</div><div class="spic">' + (hasPic(st.pic) ? picHTML(st.pic) : '<div class="pair">' + st.pics.map(picSlot).join('') + '</div>') + '</div>');
+    const line = el('div', 'sline'); const spans = words.map((w, k) => { const b = el('button', 'sw', w); b.dataset.k = k; line.appendChild(b); return b; });
+    pg.append(line);
+    const total = st.text.length, ends = []; let acc = 0; words.forEach(w => { acc += w.length + 1; ends.push(acc / (total + 1)); });
+    let asking = false, first = true, busy = false;
+    const prompt = async () => {
+      stopAudio(); setChar('point'); asking = false; const t = sayToken; spans.forEach(x => x.classList.remove('lit'));
+      await playOne(VOICE.story(i), p => { if (t === sayToken) spans.forEach((x, k) => x.classList.toggle('lit', k === 0 || p >= (ends[k - 1] - 0.04))); });
+      if (t !== sayToken || !alive(id)) return; spans.forEach(x => x.classList.add('lit'));
+      asking = true; setBubble('‘' + WORDS[st.target] + '’ 어디 있지?'); await say(['ui_storyq', VOICE.word(st.target)]); if (alive(id)) setChar('think');
+    };
+    spans.forEach((b, k) => b.addEventListener('click', async () => {
+      if (!asking || busy || !alive(id)) return;
+      if (k === st.at) { busy = true; b.classList.add('ok'); S.words[st.target] = today(); if (await success(id)) done(first); }
+      else { first = false; busy = true; await retryFx(id, b); busy = false; }
+    }));
+    const tools = el('div', 'tools'); const hb = el('button', 'kid-btn', '<img alt="" src="' + ICON('speaker') + '">다시 읽기'); hb.addEventListener('click', prompt); tools.append(hb);
+    s.append(pg, tools, guide('think', '같이 읽어 보자', true));
+    prompt();
+  },
   copy(j, id, s, done) { traceRound(j, id, s, done, true); }
 };
 
@@ -576,7 +769,7 @@ function showSticker(r, thenEnd) {
     await say('ui_sticker'); if (!alive(id)) return;
     setChar('clap'); bounce(); await say('ui_good' + (1 + rand(3))); if (!alive(id)) return;
     const b = el('button', 'kid-btn next', thenEnd ? '다음<img alt="" src="' + ICON('arrow') + '">' : '<img alt="" src="' + ICON('home') + '" style="filter:brightness(10)">처음으로'); b.id = 'afterReward';
-    b.addEventListener('click', () => (thenEnd ? showEnd() : showHome())); dock.append(b);
+    b.addEventListener('click', () => (thenEnd ? showEnd() : needMove() ? showMove(showHome) : showHome())); dock.append(b);
   })();
 }
 
@@ -584,7 +777,8 @@ function showSticker(r, thenEnd) {
 function paperTip() {
   const met = Object.keys(S.met).filter(j => S.met[j] === today());
   const j = met[met.length - 1] || 'ㄱ', e = JAMO_EX[j];
-  return '종이에 ' + j + '을(를) 크게 써 주고 따라 그려 보게 해 주세요. 집에서 ‘' + e.word[0] + '’로 시작하는 물건이나 ' + e.word + ' 그림을 함께 찾아봐도 좋아요.';
+  const T = curTopic();
+  return T.home + (met.length ? ' 오늘 만난 글자 ' + j + '을(를) 종이에 크게 써 주고 따라 그려 보게 해도 좋아요(' + e.word + ' 할 때 ' + JNAME[j] + ').' : '');
 }
 function showEnd() {
   const [id, s] = screen('end', { night: true }); S.session.ended = true; save(); drawTime();
@@ -593,8 +787,8 @@ function showEnd() {
   const done = S.session.done.map(playById).filter(Boolean);
   const card = el('div', 'today', '<div class="st">' + (last ? '<img alt="오늘 스티커" src="' + STICKER(last) + '">' : '<img alt="" src="' + ICON('sticker') + '" style="width:48px;height:48px">') + '</div>' +
     '<div class="txt"><b>' + (sts.length ? '오늘 스티커 ' + sts.length + '장 받았어' : '오늘도 잘 놀았어') + '</b><div class="played">' +
-    done.slice(0, 5).map(p => { const col = rowOf(p).color; const inner = ['letter', 'pick', 'merge', 'trace', 'copy'].includes(p.kind) ? '<span class="s">' + p.items[0] + '</span>' : (hasPic(p.pic) ? '<img alt="" src="' + PIC(p.pic) + '">' : '<img alt="" src="' + ICON('clap') + '">'); return '<span class="t-' + col + '">' + inner + '</span>'; }).join('') +
-    '</div><div class="note">정원: 꽃 ' + PLAYS.filter(p => stage(p.id) !== 'sprout').length + ' · 열매 ' + PLAYS.filter(p => stage(p.id) === 'fruit').length + '</div></div>');
+    done.slice(0, 5).map(p => { const col = rowOf(p).color; const inner = smallInner(p); return '<span class="t-' + col + '">' + inner + '</span>'; }).join('') +
+    '</div><div class="note">' + (Object.keys(S.met).filter(j => S.met[j] === today()).length ? '오늘 만난 글자: ' + Object.keys(S.met).filter(j => S.met[j] === today()).join(' ') + ' · ' : '') + '정원: 꽃 ' + PLAYS.filter(p => stage(p.id) !== 'sprout').length + ' · 열매 ' + PLAYS.filter(p => stage(p.id) === 'fruit').length + '</div></div>');
   const paper = el('div', 'paper', '<div class="h"><img alt="" src="' + ICON('pencil') + '">보호자께 · 종이 놀이 한 가지</div><p>' + paperTip() + '</p>');
   const dock = el('div', 'dock'); const b = el('button', 'kid-btn lav', '잘 자, 몽글아'); b.id = 'nightBtn'; b.addEventListener('click', showRest); dock.append(b);
   s.append(hero, card, paper, dock);
@@ -639,7 +833,7 @@ function weekStats() {
   const wk = S.log.filter(x => x.d >= today(-6));
   const ms = wk.reduce((t, x) => t + (x.ms || 0), 0);
   const met = Object.keys(S.met).filter(j => S.met[j] >= today(-6));
-  const words = [...new Set(wk.map(x => playById(x.play)).filter(p => p && p.row === 'word').map(() => null))];
+  const words = Object.keys(S.words || {}).filter(w => S.words[w] >= today(-6)).map(w => WORDS[w]);
   const firsts = [...new Set(wk.map(x => x.play))].filter(pid => !S.log.some(y => y.play === pid && y.d < today(-6))).map(pid => playById(pid)).filter(Boolean).map(p => p.name);
   return { n: wk.length, min: Math.round(ms / 60000), met, firsts, words };
 }
@@ -652,11 +846,16 @@ function openParent() {
     '<div class="cap">이번 주에 해 본 것</div><div class="sec sum"><div class="big">' + w.n + '번 놀았어요 <span class="muted">· 모두 ' + w.min + '분</span></div>' +
     '<div class="met">' + (w.met.length ? w.met.map(j => '<span>' + j + '</span>').join('') : '<span class="w">아직 없어요</span>') + '</div>' +
     '<div class="tip">' + (w.firsts.length ? '처음 해 본 놀이: ' + w.firsts.slice(0, 4).join(', ') : '오늘의 놀이부터 시작해 보세요.') + '<br>오늘 남은 시간: 약 ' + left + '분' + (S.session.ended ? ' (끝 화면)' : '') + ' · 스티커 ' + S.stickers.length + '장 · 꽃 ' + PLAYS.filter(p => stage(p.id) !== 'sprout').length + '/' + PLAYS.length + '</div></div>' +
+    '<div class="cap">읽은 낱말(이번 주)</div><div class="sec sum"><div class="met">' + (w.words.length ? w.words.map(x => '<span class="w">' + x + '</span>').join('') : '<span class="w">아직 없어요</span>') + '</div></div>' +
+    '<div class="cap">이번 주 주제 · 10주 커리큘럼(잠금 없음, 언제든 바꿀 수 있어요)</div><div class="sec"><div class="topics" id="pmTopics">' + TOPICS.map(t => '<button data-t="' + t.id + '" class="' + (t.id === S.topic ? 'on' : '') + '"><b>' + t.n + '</b> ' + t.short + '<i>꽃 ' + flowersIn(t) + '/' + t.plays.length + '</i></button>').join('') + '</div>' +
+    '<div class="tinfo"><b>' + curTopic().n + '주 · ' + curTopic().title + '</b>' + curTopic().plays.map(p => '<div class="pw"><span>' + p.name + (p.kind === 'letter' || p.kind === 'pick' || p.kind === 'trace' || p.kind === 'merge' ? ' (' + p.items.slice(0, 4).join(' ') + ')' : '') + '</span><small>이 놀이는 ' + KINDS[p.kind].why + '</small></div>').join('') +
+    '<div class="pw"><span>집에서</span><small>' + curTopic().home + '</small></div></div>' +
+    '<small class="flow">하루 흐름: 인사 → 다시 보기 1(1·3·7·14일 간격) → 이번 주 놀이 2(12·15분이면 3) → 몸으로 글자 → 아이가 고르기 → 잘 자. 쓰기는 이틀에 한 번, 토요일은 모아 놀기(새 내용 없음). 이번 주제에서 꽃이 2개 피면 다음 주제를 추천만 해요. 점수·순위 없음.</small></div>' +
     '<div class="cap">놀이</div><div class="sec">' +
     '<div class="r"><div class="l">한 번 놀이 시간</div>' + seg('timerMin', [[10, '10분'], [12, '12분'], [15, '15분']], S.settings.timerMin) + '</div>' +
-    '<div class="r"><div class="l">오늘의 놀이 자동 추천<small>복습 1 + 새 놀이 1~2 + 좋아하는 놀이 1</small></div><button class="tg' + (S.settings.autoPick ? ' on' : '') + '" id="tgAuto" aria-label="자동 추천"></button></div>' +
+    '<div class="r"><div class="l">오늘의 놀이 자동 추천<small>다시 보기 1 + 이번 주 놀이 2~3 + 아이가 고르기</small></div><button class="tg' + (S.settings.autoPick ? ' on' : '') + '" id="tgAuto" aria-label="자동 추천"></button></div>' +
     '<button class="r" id="rManual"><div class="l">직접 고르기<small>오늘 할 놀이 최대 3개 · 자동 추천을 끄면 이것만 나와요</small></div><div class="v"><img alt="" src="' + ICON('back') + '"></div></button>' +
-    '<div class="more" id="mManual" hidden><div class="chips">' + PLAYS.map(p => '<button data-p="' + p.id + '" class="' + (S.settings.manual.includes(p.id) ? 'on' : '') + '">' + rowOf(p).name + ' · ' + p.name + '</button>').join('') + '</div><small>고른 놀이는 지금 바로 오늘의 놀이에 반영돼요.</small></div>' +
+    '<div class="more" id="mManual" hidden><div class="chips">' + PLAYS.map(p => '<button data-p="' + p.id + '" class="' + (S.settings.manual.includes(p.id) ? 'on' : '') + '">' + rowOf(p).n + '주 · ' + p.name + '</button>').join('') + '</div><small>고른 놀이는 지금 바로 오늘의 놀이에 반영돼요.</small></div>' +
     '</div><div class="cap">소리</div><div class="sec">' +
     '<div class="r"><div class="l">소리 켜기</div><button class="tg' + (S.settings.sound ? ' on' : '') + '" id="tgSound" aria-label="소리"></button></div>' +
     '<div class="r"><div class="l">소리 크기</div><input type="range" id="vol" min="0.2" max="1" step="0.1" value="' + S.settings.volume + '" aria-label="소리 크기"></div>' +
@@ -686,6 +885,7 @@ function openParent() {
     if (!armed) { armed = true; e.currentTarget.textContent = '정말 지울까요? 한 번 더'; return; }
     const keep = S.settings; S = fresh(); S.settings = keep; S.session.date = today(); save(); closeParent();
   });
+  $('#pmTopics').addEventListener('click', e => { const b = e.target.closest('button[data-t]'); if (!b) return; setTopic(b.dataset.t); openParent(); });
   $('#pmClose').addEventListener('click', closeParent);
 }
 function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML = ''; run = null; showHome(); }
@@ -693,6 +893,6 @@ function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML
 /* ---------- 시작 ---------- */
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { save(); stopAudio(); } });
 if ('speechSynthesis' in window) speechSynthesis.getVoices();
-window.HP = { get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, audioLog: [], audioErr: [] };
+window.HP = { get S() { return S; }, get run() { return run; }, save, limitMs, screen: '', round: null, trace: null, judgeTrace, STROKES, strokePoints, record, isMastered, today, startPlay, showHome, showGarden, showEnd, showBook, openGate, computeToday, showDex, showMove, setTopic, todayList, audioLog: [], audioErr: [] };
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 showHome();
