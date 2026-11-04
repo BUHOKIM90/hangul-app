@@ -701,3 +701,81 @@ body.night .time .knob { border-color: #B9AEEA; }
 .hwslots .slot { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 16px; border: 3px dashed #E6D9CC; font-size: 38px; font-weight: 700; color: #E9DFD5; transition: all .3s; }
 .hwslots .slot.on { border: 3px solid #F27BA6; background: #FFE9F1; color: var(--ink); animation: hwpop .6s cubic-bezier(.3,1.6,.5,1); }
 .hwbox .hw1 { letter-spacing: 0; }
+/* 11/04 놀이마다 스티커 */
+.stkrow { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 420px; }
+.stkrow img { width: 54px; height: 54px; }
+.stkrow img.new { animation: popIn .5s; }
+.stkrow.end { margin: 6px auto; } .stkrow.end img { width: 64px; height: 64px; }
+.s-sticker .reward h1 { color: var(--mint-ink); }
+/* 11/04 글자 보고 그림 찾기(listen) */
+.lw .body.syl { justify-content: center; }
+.lw .syl span { transition: background .2s, transform .2s; }
+.lw .syl span.on { transform: scale(1.08); }
+.lw .syl span.hint { background: var(--butter-soft); box-shadow: inset 0 0 0 4px #F5C04A; }
+.lw .helpbtn { flex: none; }
+.lw.long .body.syl { flex-wrap: nowrap; gap: 6px; } .lw.long .syl span { flex: none; width: 60px; height: 72px; font-size: 44px; border-radius: 18px; }
+@media (min-width: 700px) { .lw.long .syl span { width: 92px; height: 92px; font-size: 60px; } }
+.ch.no { opacity: .45; }
+.ch .wname { position: absolute; left: 0; right: 0; bottom: 8px; font: 700 24px/1 'Pretendard', sans-serif; color: var(--ink-2); }
+/* 11/04 스티커 모음(그림자 칸) */
+.stkbook { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 8px 16px 24px; }
+@media (min-width: 700px) { .stkbook { grid-template-columns: repeat(8, 1fr); padding: 8px 40px 24px; } }
+.stkbook .slot { aspect-ratio: 1; border-radius: 22px; background: #FFF8EC; display: grid; place-items: center; box-shadow: var(--shadow); }
+.stkbook .slot img { width: 82%; height: 82%; object-fit: contain; }
+.stkbook .slot.off { background: #F3EEE6; box-shadow: none; }
+.stkbook .slot.off img { filter: brightness(0); opacity: .12; }
+.stkbook .slot.last { box-shadow: inset 0 0 0 4px #F5C04A, var(--shadow); }
+.stkbook .slot.wig { animation: popIn .4s; }
+img.pstk { border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px #fff, 0 3px 8px rgba(0,0,0,.15); object-fit: contain; padding: 4%; }
+.stkbook .slot.off img.pstk { box-shadow: none; background: transparent; }
+.reward .stk.pic img { width: 150px; height: 150px; }
+.stone img.pstk { padding: 2px; }
+/* 11/04 지도 방향 표시 */
+.map .parrow { position: absolute; z-index: 2; font-style: normal; font-size: 22px; line-height: 1; color: #F27B4A; text-shadow: 0 0 4px #fff, 0 0 2px #fff; transform: translate(-50%,-50%); pointer-events: none; }
+.map .parrow.near { font-size: 28px; animation: arrowNudge 1.2s ease-in-out infinite; }
+.map .parrow.gone { color: #C9B9A2; opacity: .55; font-size: 18px; }
+.map .parrow.later { color: #fff; opacity: .7; }
+.map .ntag { position: absolute; z-index: 5; transform: translate(-50%, -100%); padding: 4px 10px; border-radius: 14px; font: 800 17px/1.2 'Pretendard', sans-serif; white-space: nowrap; pointer-events: none; box-shadow: 0 2px 0 rgba(0,0,0,.1); }
+.map .ntag.start { background: #fff; color: var(--mint-ink); }
+.map .ntag.goal { background: #fff; color: #E0567A; }
+.map .ntag.next { background: #F27B4A; color: #fff; animation: arrowNudge 1.2s ease-in-out infinite; }
+.map .mghead { position: absolute; z-index: 5; font-style: normal; font-size: 30px; color: #F27B4A; text-shadow: 0 0 5px #fff, 0 0 2px #fff; pointer-events: none; }
+@keyframes arrowNudge { 0%,100% { filter: none; margin-top: 0; } 50% { margin-top: -4px; filter: brightness(1.1); } }
+.moredock { padding-top: 0; }
+.moreBtn { min-width: 220px; }
+/* 11/04 정답 순간 공통 '크게 보여 주기'(engine.js reveal, 시간은 FB) */
+.rvwrap { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; background: rgba(255,248,236,.0); transition: background .25s; }
+.rvwrap.in { background: rgba(255,248,236,.78); }
+.rvwrap.out { opacity: 0; transition: opacity .22s; }
+.rvcard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 22px 26px; border-radius: 36px; background: #fff; box-shadow: 0 10px 30px rgba(120,90,40,.18); transform: scale(.5); opacity: 0; transition: transform .35s cubic-bezier(.3,1.6,.5,1), opacity .2s; max-width: 94vw; box-sizing: border-box; }
+.rvwrap.in .rvcard { transform: none; opacity: 1; }
+.rvpic img, .rvpic .ph { width: 150px; height: 150px; object-fit: contain; font-size: 100px; display: grid; place-items: center; }
+.rvsyl { display: flex; gap: 10px; justify-content: center; }
+.rvsyl span { width: 104px; height: 116px; border-radius: 26px; display: grid; place-items: center; font: 800 78px/1 'Pretendard', sans-serif; color: var(--ink); background: #F6F1EA; transition: background .18s, color .18s, transform .18s; }
+.rvwrap.rv-long .rvsyl { gap: 6px; } .rvwrap.rv-long .rvsyl span { width: 72px; height: 90px; font-size: 56px; border-radius: 20px; }
+.rvwrap.rv-glyph .rvsyl span { width: 150px; height: 160px; font-size: 118px; }
+.rvsyl span.on { background: var(--mint-soft); color: var(--mint-ink); }
+.rvsyl span.now { background: var(--mint); color: #fff; transform: translateY(-8px) scale(1.12); }
+.rvsyl span.all { background: var(--mint); color: #fff; animation: rvPulse .5s ease-out; }
+@keyframes rvPulse { 0% { transform: scale(1); } 45% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.rvgo { position: absolute; right: 14px; bottom: 8px; font-style: normal; font-size: 26px; color: #F27B4A; opacity: 0; transition: opacity .3s; }
+.rvwrap.cango .rvgo { opacity: .9; animation: arrowNudge 1s ease-in-out infinite; }
+@media (min-width: 700px) { .rvpic img, .rvpic .ph { width: 220px; height: 220px; } .rvsyl span { width: 140px; height: 150px; font-size: 104px; } .rvwrap.rv-long .rvsyl span { width: 120px; height: 136px; font-size: 90px; } }
+/* 11/04 다음 칸 안내(tapHint) */
+.gonext:not(.stone):not(.steps span) { position: relative; }
+.kid-btn.gonext { animation: goPulse 1.3s ease-in-out infinite; }
+.stone.gonext { animation: goBounce 1.1s ease-in-out infinite; box-shadow: 0 0 0 6px rgba(255,255,255,.9), 0 0 18px 6px rgba(242,123,74,.55); z-index: 4; }
+.stone.tomorrow.gonext { background: var(--peach-strong); color: #fff; }
+.steps span.gonext { animation: goBounce 1.1s ease-in-out infinite; }
+.taphand { position: absolute; right: -10px; bottom: -22px; font-style: normal; font-size: 40px; line-height: 1; pointer-events: none; z-index: 6; filter: drop-shadow(0 2px 2px rgba(0,0,0,.2)); animation: tapTap 1s ease-in-out infinite; }
+.stone .taphand { right: -18px; bottom: -26px; }
+@keyframes goPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(242,123,74,.18), var(--shadow); } }
+@keyframes goBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes tapTap { 0%,100% { transform: translate(0,0) scale(1); } 45% { transform: translate(-6px,-8px) scale(1.05); } 60% { transform: translate(-3px,-3px) scale(.92); } }
+.mapme.walk { transition: top 1.2s ease-in-out, left 1.2s ease-in-out; }
+.steps { position: relative; }
+.steps .stepme { position: absolute; top: -46px; width: 48px; height: 48px; margin-left: -24px; left: 0; pointer-events: none; }
+.steps .stepme.go { transition: left .9s ease-in-out; }
+.s-step .steps { margin-top: 50px; }
+.map .ntag.below { transform: translate(-50%, 0); }
+.map .ntag.below::before { content: ''; position: absolute; left: 50%; top: -8px; margin-left: -8px; border: 8px solid transparent; border-top: 0; border-bottom-color: #F27B4A; }

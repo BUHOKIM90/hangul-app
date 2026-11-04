@@ -101,7 +101,46 @@ const alive = id => id === screenId;
 const spark = el('img'); spark.id = 'spark'; spark.alt = ''; spark.src = ICON('flower'); document.body.appendChild(spark);
 function sparkPop() { spark.classList.remove('go'); void spark.offsetWidth; spark.classList.add('go'); }
 let praiseFlip = 0;
-async function success(id) { sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say('ui_good' + (1 + rand(3))); await wait(300); return alive(id); }
+/* ---------- 정답 순간 공통(11/04 대표님): 맞힌 낱말·글자를 크게 + 몽글이가 한 글자씩 읽을 때 칸이 켜짐 + 칭찬 → 잠깐 머묾(톡 하면 바로 다음) ----------
+   FB(모든 놀이 공통 시간, ms): sylGap 글자 사이 쉼 / beat 소리 끝난 뒤 머무는 시간 / min 화면에 최소로 떠 있는 시간 / skip 이만큼 지나면 톡해서 넘길 수 있음 / plain 낱말·글자가 아닌 정답(박자 수 등) 칭찬 뒤 쉼 */
+const FB = { sylGap: 380, beat: 900, min: 2400, skip: 700, plain: 700, quickBeat: 450, quickMin: 1600 };   // quick = 한 판에 여러 번 나오는 작은 정답(바구니 나누기 카드)
+function revealOf(x) {
+  if (typeof x !== 'string' || !x) return null;
+  if (WORDS[x]) return { text: WORDS[x], word: x, syl: [...WORDS[x]], voice: VOICE.word(x) };
+  if (x.length === 1 && isSyl(x)) return { text: x, syl: [x], voice: VOICE.syl(x) };
+  if (x.length === 1 && /[ㄱ-ㅣ]/.test(x)) return { text: x, syl: [x], voice: VOICE.jamo(x), jamo: true };
+  return null;
+}
+async function reveal(id, target, opt = {}) {   // 공통 '크게 보여 주기'. opt.praise=false면 칭찬 생략, opt.say=false면 낱말 소리 생략(이미 읽음)
+  const R = revealOf(target); if (!R || !alive(id)) return alive(id);
+  const t0 = Date.now(), long = R.syl.length >= 4;
+  const ov = el('div', 'rvwrap' + (long ? ' rv-long' : '') + (R.word ? ' rv-word' : ' rv-glyph'));
+  const card = el('div', 'rvcard', (R.word && (hasPic(R.word) || PH_EMOJI[R.word]) ? '<div class="rvpic">' + picHTML(R.word, R.text) + '</div>' : '') + '<div class="rvsyl">' + R.syl.map(c => '<span>' + c + '</span>').join('') + '</div><i class="rvgo">➜</i>');
+  ov.append(card); document.body.append(ov); if (window.HP) HP.reveal = { text: R.text, t0 };
+  const tiles = [...card.querySelectorAll('.rvsyl span')];
+  let skip = false, resolveSkip; const skipP = new Promise(r => { resolveSkip = r; });
+  ov.addEventListener('pointerdown', () => { if (Date.now() - t0 < FB.skip) return; skip = true; stopAudio(); resolveSkip(); });
+  requestAnimationFrame(() => ov.classList.add('in')); setChar('clap'); bounce(); sparkPop(); ding();
+  const run1 = (async () => {
+    if (opt.say !== false && R.syl.length > 1 && R.syl.every(c => hasA(VOICE.syl(c)))) await sayGap(R.syl.map(VOICE.syl), FB.sylGap, k => tiles.forEach((t, i) => { t.classList.toggle('on', i <= k); t.classList.toggle('now', i === k); }));
+    if (skip || !alive(id)) return; tiles.forEach(t => { t.classList.remove('now'); t.classList.add('on', 'all'); });
+    if (opt.say !== false) await say(R.voice);
+    if (skip || !alive(id)) return; if (opt.praise !== false) { setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); await say('ui_good' + (1 + rand(3))); }
+    if (skip || !alive(id)) return; ov.classList.add('cango'); await wait(opt.quick ? Math.max(FB.quickBeat, FB.quickMin - (Date.now() - t0)) : Math.max(FB.beat, FB.min - (Date.now() - t0)));
+  })();
+  await Promise.race([run1, skipP]);
+  ov.classList.add('out'); setTimeout(() => ov.remove(), 260); if (window.HP) HP.reveal = null;
+  return alive(id);
+}
+/* 11/04 다음 칸 안내: 누를 곳이 반짝·통통 + 잠시 뒤 손가락(👆)이 톡톡. 소리는 부르는 쪽에서 가끔만 */
+function tapHint(node, delay = 1400) {
+  if (!node) return; node.classList.add('gonext');
+  const id = screenId; setTimeout(() => { if (!alive(id) || !node.isConnected || node.querySelector('.taphand')) return; node.append(el('i', 'taphand', '👆')); }, delay);
+}
+async function success(id, target) {
+  if (revealOf(target)) return reveal(id, target);
+  sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say('ui_good' + (1 + rand(3))); await wait(FB.plain); return alive(id);
+}
 async function retryFx(id, node) {
   if (node) { node.classList.remove('retry'); void node.offsetWidth; node.classList.add('retry'); setTimeout(() => node.classList.remove('retry'), 1100); }
   setChar('cheer'); await say('ui_retry'); if (alive(id)) setChar('think');
@@ -111,14 +150,14 @@ async function retryFx(id, node) {
 const others = (pool, x, n) => { const out = []; for (const p of shuffle(pool.filter(p => p !== x && !PIC_CLASH(p, x)))) if (out.length < n && !out.some(o => PIC_CLASH(o, p))) out.push(p); return out; };   // 개·강아지처럼 닮은 그림은 한 판에 같이 안 냄
 const pool3 = () => (run && run.p.items.length >= 3 ? run.p.items : WORD_IDS);
 function speakerBtn(fn, cls = 'spk', label = '다시 듣기') { const b = el('button', cls, '<img alt="' + label + '" src="' + ICON('speaker') + '">'); b.addEventListener('click', fn); return b; }
-function choiceRound(id, cards, correct, done) {
+function choiceRound(id, cards, correct, done, target) {
   let first = true, locked = false;
   const row = el('div', 'choices');
   cards.forEach((c, i) => {
     c.insertAdjacentHTML('beforeend', '<span class="badge"><img alt="" src="' + ICON('check') + '"></span>');
     c.addEventListener('click', async () => {
       if (locked || !alive(id)) return;
-      if (i === correct) { locked = true; c.classList.add('ok'); if (await success(id)) done(first); }
+      if (i === correct) { locked = true; c.classList.add('ok'); if (await success(id, target === undefined ? cards[correct].dataset.k : target)) done(first); }
       else { first = false; locked = true; await retryFx(id, c); locked = false; }
     });
     row.appendChild(c);
@@ -180,7 +219,7 @@ const RUN = {
       found = true; clearTimeout(hintT); clearTimeout(revT); ring.classList.remove('on');
       const t = marks[0].el; t.classList.add('found'); sparkAt(t); ding(); setChar(revealed ? 'point' : 'clap'); bounce();
       setBubble(revealed ? '여기 있었어! <b>' + WORDS[w] + '</b>' : '찾았다! <b>' + WORDS[w] + '</b>!');
-      await say(['ui_found', VOICE.word(w)]); await wait(500); if (alive(id)) done(revealed ? null : first);
+      await say('ui_found'); if (await reveal(id, w)) done(revealed ? null : first);
     }
     box.addEventListener('pointerdown', async e => {
       if (found || !alive(id)) return;
@@ -237,10 +276,9 @@ const RUN = {
           c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top + b.height * 0.62 - a.top - a.height / 2) + 'px');
           c.classList.add('fly'); frame.classList.add('got'); sparkAt(frame); ding(); setChar('clap'); bounce(); setBubble('맞아! <b>' + WORDS[w] + '</b>!');
           const full = addStar(jar); save();
-          await say(VOICE.word(w)); if (!alive(id)) return;
           if (full) { await surprise(s, true); if (!alive(id)) return; await say('ui_jarfull'); }
           else if (Math.random() < 0.2) await surprise(s, false);
-          if (!alive(id)) return; await say('ui_good' + (1 + rand(3))); await wait(250); if (alive(id)) done(first);
+          if (!alive(id)) return; if (await reveal(id, w)) done(first);
         } else {
           first = false; locked = true; S.pw.streak[w] = 0; c.classList.remove('retry'); void c.offsetWidth; c.classList.add("retry", "pwno"); setChar('cheer');
           setBubble('그건 <b>' + WORDS[x] + '</b>야!'); await say(VOICE.hy(x)); locked = false; if (alive(id)) { setChar('think'); setBubble('이건 뭘까?'); }
@@ -311,7 +349,7 @@ const RUN = {
       if (!ok) { first = false; busy = true; node.style.transform = ''; await retryFx(id, node); busy = false; return false; }
       const slot = p.t === 'c' ? slotC : slotV; slot.textContent = p.g; slot.classList.add('filled'); node.classList.add('used'); node.style.transform = '';
       ding(1.2); filled++;
-      if (filled === 2) { busy = true; await wait(300); frame.classList.add('done'); setBubble('<b>' + sy + '</b>가 됐어!'); await say(VOICE.syl(sy)); if (alive(id) && await success(id)) done(first); }
+      if (filled === 2) { busy = true; await wait(300); frame.classList.add('done'); setBubble('<b>' + sy + '</b>가 됐어!'); if (alive(id) && await success(id, sy)) done(first); }
       return true;
     };
     pieces.forEach(p => { const n = el('div', 'piece ' + p.t, p.g); n.dataset.k = p.t + p.g; draggable(n, { onTap: () => tryPlace(p, n), onDrop: (x, y) => { if (!inside(frame, x, y)) return false; tryPlace(p, n); return true; } }); col.appendChild(n); });
@@ -327,7 +365,7 @@ const RUN = {
     const pr = el('div', 'prompt', '<div class="body syl">' + [...WORDS[w]].map(c => '<span>' + c + '</span>').join('') + '</div>');
     pr.append(speakerBtn(() => say(VOICE.word(w)), 'spk', '낱말 듣기'));
     s.append(pr, el('div', 'ask', '어떤 그림일까?'), choiceRound(id, opts.map(picCard), opts.indexOf(w), done), guide('think', '글자를 읽어 봐', true));
-    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { pr.querySelectorAll('.syl span').forEach(x => x.classList.add('on')); say(VOICE.word(w)); } }));
+    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { pr.querySelectorAll('.syl span').forEach(x => x.classList.add('on')); } }));
     prompt();
   },
   /* 낱말 짝 */
@@ -342,7 +380,7 @@ const RUN = {
       if (pc.dataset.k !== wd) { first = false; busy = true; node.style.transform = ''; await retryFx(id, node); busy = false; return; }
       node.classList.add('used'); node.style.transform = ''; pc.classList.add('ok'); pc.querySelector('.got').textContent = WORDS[wd]; ding(1.2); got++;
       await say(VOICE.word(wd));
-      if (got === 2 && alive(id) && await success(id)) done(first);
+      if (got === 2 && alive(id) && await success(id, w)) done(first);
     };
     words.forEach(wd => {
       const n = el('div', 'wcard', WORDS[wd]); n.dataset.k = wd; low.appendChild(n);
@@ -375,7 +413,7 @@ const RUN = {
     const pad = el('button', 'clappad off', '<img alt="" src="' + ICON('clap') + '"><b>짝!</b>'); pad.id = 'clapPad';
     const ask = el('div', 'ask', '몽글이를 잘 봐');
     const cards = [1, 2, 3, 4].map(k => { const c = el('button', 'ch', '<div class="dots">' + '<i></i>'.repeat(k) + '</div>'); c.dataset.k = k; c.setAttribute('aria-label', k + '번'); return c; });
-    const choice = choiceRound(id, cards, n - 1, done); choice.classList.add('four'); choice.hidden = true;
+    const choice = choiceRound(id, cards, n - 1, done, w); choice.classList.add('four'); choice.hidden = true;
     let phase = 0, taps = 0;
     const light = (k, cls) => { boxes.forEach((b, i) => b.classList.toggle(cls, i <= k)); };
     const demo = async () => {
@@ -410,7 +448,7 @@ const RUN = {
     };
     pr.append(speakerBtn(prompt));
     s.append(pr, el('div', 'ask', '무슨 낱말일까?'), choiceRound(id, opts.map(picCard), opts.indexOf(w), done), guide('think', '소리를 붙여 봐', true));
-    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { spans.forEach((x, k) => { x.textContent = syl[k]; x.classList.remove('q'); x.classList.add('on'); }); setBubble('<b>' + WORDS[w] + '</b>!'); say(VOICE.word(w)); } }));
+    s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === w) { spans.forEach((x, k) => { x.textContent = syl[k]; x.classList.remove('q'); x.classList.add('on'); }); setBubble('<b>' + WORDS[w] + '</b>!'); } }));
     prompt();
   },
   /* ★ 누구랑 같은 소리? "나, 나비 할 때 나!" → 같은 첫 글자 그림 고르기 */
@@ -443,7 +481,7 @@ const RUN = {
     cars.forEach(b => b.addEventListener('click', async () => {
       if (busy || !alive(id)) return;
       if (phase === 0) { cars.forEach(x => x.classList.remove('lit')); b.classList.add('lit', 'heard'); heard.add(b.dataset.k); await say(VOICE.syl(b.dataset.k)); b.classList.remove('lit'); if (heard.size >= 3) fb.hidden = false; if (heard.size === sy.length) startFind(); return; }
-      if (b.dataset.k === target) { busy = true; b.classList.add('ok'); await say(VOICE.syl(target)); if (await success(id)) done(first); }
+      if (b.dataset.k === target) { busy = true; b.classList.add('ok'); if (await success(id, target)) done(first); }
       else { first = false; busy = true; await retryFx(id, b); busy = false; }
     }));
     const pr = el('div', 'prompt', '<div class="body"><span class="eye"><b style="color:var(--peach-ink);font-size:30px">' + c + '</b> 기차에 모음 친구들이 탔어요</span></div>');
@@ -467,7 +505,7 @@ const RUN = {
     };
     spans.forEach((b, k) => b.addEventListener('click', async () => {
       if (!asking || busy || !alive(id)) return;
-      if (k === st.at) { busy = true; b.classList.add('ok'); S.words[st.target] = today(); if (await success(id)) done(first); }
+      if (k === st.at) { busy = true; b.classList.add('ok'); S.words[st.target] = today(); if (await success(id, st.target)) done(first); }
       else { first = false; busy = true; await retryFx(id, b); busy = false; }
     }));
     const tools = el('div', 'tools'); const hb = el('button', 'kid-btn', '<img alt="" src="' + ICON('speaker') + '">다시 읽기'); hb.addEventListener('click', prompt); tools.append(hb);
@@ -605,7 +643,7 @@ function traceRound(j, id, s, done, copyMode) {
     if (!took) for (const k of rem.slice(1)) if (judgeStroke([guideP[k]], [SO.sc[k]], st, copyMode, true)) { took = [k]; break; }   // 순서가 바뀐 획도 인정
     if (took) {
       took.forEach(k => { doneK[k] = true; }); demoTok++; clearTrails();
-      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; const ok = helped.some(Boolean) ? null : bad === 0; if (await success(id)) done(ok); return { ok: true, took, finished: true }; }
+      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; const ok = helped.some(Boolean) ? null : bad === 0; if (await success(id, j)) done(ok); return { ok: true, took, finished: true }; }
       ding(1.15 + 0.1 * took.length); sparkPop(); setBubble('좋아! 다음 획도 써 볼까?'); park(); return { ok: true, took };
     }
     // 틀린 획: 이 획만 지우고 이 획만 다시 보여 줌
@@ -613,7 +651,7 @@ function traceRound(j, id, s, done, copyMode) {
     if (badK[k0] >= TRACE.maxTries) {   // 같이 써 주고 다음 획으로(벌점 없음, 숙달 계산 제외)
       setChar('cheer'); await say('ui_together'); if (!alive(id)) return { ok: false, retry: true }; await demo(k0); if (!alive(id)) return { ok: false, retry: true };
       helped[k0] = true; doneK[k0] = true; redraw(); busy = false;
-      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; if (await success(id)) done(null); return { ok: false, helped: k0, finished: true }; }
+      if (nextK() < 0) { finished = true; busy = true; drawGuide(); mover.style.display = 'none'; if (await success(id, j)) done(null); return { ok: false, helped: k0, finished: true }; }
       park(); return { ok: false, helped: k0 };
     }
     await retryFx(id, null); busy = false; if (alive(id)) { setBubble(copyMode ? '<b>' + j + '</b> 보고 써 봐' : '분홍 점을 따라 써 봐'); demo(k0); }

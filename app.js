@@ -7,11 +7,25 @@ let ticking = false;
 const limitMs = () => (params.get('t') ? +params.get('t') : S.settings.timerMin * 60) * 1000;   // ?t=초 는 시험용
 const usedMs = () => S.todayMs[today()] || 0;
 const timeUp = () => usedMs() >= limitMs();
+const timed = () => DR && DR.mode !== 'replay' && !DR.more;   // 11/04 '더 놀까?'로 연 날·다시 하기는 타이머로 줄이지 않음
 setInterval(() => { if (ticking && document.visibilityState === 'visible') { const t = today(); S.todayMs[t] = (S.todayMs[t] || 0) + 1000; if (S.todayMs[t] % 5000 === 0) save(); drawTime(); } }, 1000);
 function drawTime() { const p = Math.min(1, usedMs() / limitMs()) * 100; $('#top .fill').style.width = p + '%'; $('#top .knob').style.left = Math.min(p, 96) + '%'; }
 $('#homeBtn').addEventListener('click', () => { run = null; DR = null; showHome(); });
 function pruneMs() { const keep = Object.keys(S.todayMs).sort().slice(-40); S.todayMs = Object.fromEntries(keep.map(k => [k, S.todayMs[k]])); }
 
+/* 11/04 대표님: '더 놀까?' = 오늘 날을 끝낸 뒤 다음 새 날을 바로 엶. 하루(달력)에 새 날은 최대 MORE_MAX개(S.moreDays, 날마다 0으로).
+   다 쓰면 '더 놀까?'는 지난 날 다시 하기(스티커는 그대로 받음) + "내일 또 새 놀이가 기다려!". 다음 날 아침엔 가장 멀리 간 날 다음 칸이 보통처럼 열림. */
+const MORE_MAX = 5;
+const moreUsed = () => (S.moreDays && S.moreDays.date === today() ? S.moreDays.n : 0);
+const canPlayMore = () => S.cur <= READY_DAYS && S.cur <= 170 && todayState() === 'done' && moreUsed() < MORE_MAX;
+const canReplayMore = () => todayState() === 'done' && Object.keys(S.done).some(d => +d <= READY_DAYS);
+const playMore = () => {
+  ding(1.2);
+  if (canPlayMore()) return startDay(S.cur, S.pendingExtra ? 'extra' : 'today', true);
+  const past = Object.keys(S.done).map(Number).filter(d => d <= READY_DAYS && d < S.cur); if (!past.length) return showHome();
+  const recent = past.sort((a, b) => b - a).slice(0, 10), dn = recent[Math.floor(Math.random() * recent.length)];
+  startDay(dn, 'replay'); setBubble('내일 또 새 놀이가 기다려!<small>오늘은 좋아하는 놀이를 한 번 더!</small>'); say(['ui4_newtmr', 'ui4_again']);
+};
 /* ---------- 지도(홈): 6세계 · 34단원 · 170돌 ---------- */
 const ROW_H = 118, BAN_H = 96;
 function nodeLayout() {
@@ -59,20 +73,37 @@ function showHome() {
     const d = DAYS[n.dn - 1], ns = nodeState(n.dn), b = el('button', 'stone ' + ns + (d.special ? ' sp sp-' + d.special : ''));
     b.style.left = n.x + '%'; b.style.top = n.y + 'px'; b.dataset.day = n.dn;
     const dn = S.done[n.dn];
-    b.innerHTML = ns === 'past' ? (dn && dn.sticker ? '<img alt="" src="' + STICKER(dn.sticker) + '">' : '<span class="fl">' + (d.special ? SP_ICON[d.special] : '✿') + '</span>')
+    b.innerHTML = ns === 'past' ? (dn && dn.sticker ? stkImg(dn.sticker) : '<span class="fl">' + (d.special ? SP_ICON[d.special] : '✿') + '</span>')
       : ns === 'today' ? '<span class="fl">' + (d.special ? SP_ICON[d.special] : '★') + '</span>'
       : '<span class="fl">' + (d.special ? SP_ICON[d.special] : '') + '</span><span class="cloud">☁️</span>';
     b.setAttribute('aria-label', ns === 'today' ? '오늘의 놀이' : ns === 'past' ? '지난 날 다시 하기' : '앞날');
     b.addEventListener('click', () => {
       if (ns === 'today') return startDay(S.cur, S.pendingExtra ? 'extra' : 'today');
       if (ns === 'past' && n.dn <= READY_DAYS) return startDay(n.dn, 'replay');
+      if (ns === 'tomorrow' && canPlayMore()) return playMore();
+      if (ns === 'tomorrow' && canReplayMore()) { setChar('laugh'); bounce(); setBubble('내일 또 새 놀이가 기다려!'); return say('ui4_newtmr'); }
       setChar('laugh'); bounce(); setBubble(ns === 'soon' ? '이 길은 곧 열려요!' : '내일 만나요!'); ding(0.8);
     });
     M.append(b); if (n.dn === Math.min(S.cur, 170)) todayEl = b;
   });
+  // 11/04 길 방향: 돌 사이 화살표(지난 길은 흐리게, 앞길은 진하게), 출발·도착 깃발, '다음' 표시, 몽글이가 갈 쪽 화살표
+  const nextDn = st === 'done' || st === 'soon' || st === 'all' ? S.cur : S.cur + 1, here = Math.min(S.cur, 170);
+  const arrows = [];
+  for (let k = 0; k < L.nodes.length - 1; k++) { const a = L.nodes[k], b2 = L.nodes[k + 1]; const ar = el('i', 'parrow' + (b2.dn <= here ? ' gone' : b2.dn > READY_DAYS ? ' later' : b2.dn <= here + 3 ? ' near' : '')); ar.textContent = '➜'; ar.style.left = ((a.x + b2.x) / 2) + '%'; ar.style.top = ((a.y + b2.y) / 2 + 30) + 'px'; arrows.push([ar, a, b2]); M.append(ar); }
+  const tagAt = (n, cls, txt) => { const t = el('div', 'ntag ' + cls, txt); t.style.left = n.x + '%'; t.style.top = (n.y - 30) + 'px'; M.append(t); };
+  tagAt(L.nodes[0], 'start', '🚩 출발'); tagAt(L.nodes[169], 'goal', '🏁 도착');
+  if (nextDn <= 170 && nextDn !== 1) { const nn = L.nodes[nextDn - 1], t = el('div', 'ntag next below', '다음'); t.style.left = nn.x + '%'; t.style.top = (nn.y + (nextDn === S.cur ? 84 : 70)) + 'px'; M.append(t); }
+  const fixArrows = () => { const W = M.clientWidth; if (!W) return; arrows.forEach(([ar, a, b2]) => { ar.style.transform = 'translate(-50%,-50%) rotate(' + (Math.atan2((b2.y - a.y), (b2.x - a.x) * W / 100) * 180 / Math.PI).toFixed(1) + 'deg)'; }); };
   // 몽글이(오늘 돌 위)
   const me = L.nodes[Math.min(S.cur, 170) - 1], mgEl = el('div', 'mapme', '<img alt="몽글이" src="' + CHAR_DIR + (st === 'done' ? 'sleep' : 'wave') + CHAR_EXT + '"><span class="acc">' + WORLDS[DAYS[me.dn - 1].stage - 1].acc + '</span>');
-  mgEl.style.left = me.x + '%'; mgEl.style.top = (me.y - 64) + 'px'; M.append(mgEl);
+  const wf = showHome.walkFrom && L.nodes[showHome.walkFrom - 1]; showHome.walkFrom = 0;
+  mgEl.style.left = (wf || me).x + '%'; mgEl.style.top = ((wf || me).y - 64) + 'px'; M.append(mgEl);
+  if (wf && wf !== me) requestAnimationFrame(() => requestAnimationFrame(() => { mgEl.classList.add('walk'); mgEl.style.left = me.x + '%'; mgEl.style.top = (me.y - 64) + 'px'; }));
+  const nextStone = (st === 'new' || st === 'going' || canPlayMore()) && todayEl && +todayEl.dataset.day === S.cur ? todayEl : null;
+  if (nextStone) { const c = nextStone.querySelector('.cloud'); if (c && canPlayMore()) c.remove(); tapHint(nextStone, wf ? 1800 : 2500); if (wf) setTimeout(() => { if (alive(id)) { ding(1.2); say('ui4_tapnext'); setBubble('여기 눌러 볼까?'); } }, 1500); }
+  if (window.HP) HP.mapHint = { next: nextStone ? +nextStone.dataset.day : 0, walked: !!wf };
+  const toN = L.nodes[Math.min(me.dn, 169)], hd = el('i', 'mghead', '➜'); hd.style.left = me.x + '%'; hd.style.top = (me.y - 20) + 'px'; M.append(hd);
+  const fixHead = () => { const W = M.clientWidth; if (!W || toN === me) { hd.hidden = true; return; } const ang = Math.atan2(toN.y - me.y, (toN.x - me.x) * W / 100); hd.style.transform = 'translate(-50%,-50%) translate(' + (Math.cos(ang) * 58).toFixed(0) + 'px,' + (Math.sin(ang) * 58).toFixed(0) + 'px) rotate(' + (ang * 180 / Math.PI).toFixed(1) + 'deg)'; };
   if (sea) M.insertAdjacentHTML('beforeend', '<div class="seaTag">' + sea[1] + '</div>');
   wrap.append(M);
   // 위 인사 + 아래 단추
@@ -80,6 +111,7 @@ function showHome() {
   head.classList.add('maphead');
   const dock = el('div', 'dock mapdock');
   if (st === 'new' || st === 'going') { const b = el('button', 'kid-btn next todaygo', '<img alt="" src="' + ICON('play') + '" style="filter:brightness(10)">오늘의 놀이'); b.id = 'todayBtn'; b.addEventListener('click', () => startDay(S.pendingExtra && st === 'new' ? S.cur : (S.session.mode === 'extra' && st === 'going' ? S.cur : S.cur), S.pendingExtra || (st === 'going' && S.session.mode === 'extra') ? 'extra' : 'today')); dock.append(b); }
+  else if (canPlayMore() || canReplayMore()) { const b = el('button', 'kid-btn next todaygo', '<span class="dexic">▶</span>더 놀까?'); b.id = 'moreBtn'; b.addEventListener('click', playMore); dock.append(b); }
   else { const b = el('button', 'kid-btn lav', '<img alt="" src="' + ICON('moon') + '">내일 또 만나!'); b.id = 'tomorrowBtn'; b.addEventListener('click', () => { setChar('sleep'); say('ui4_bye'); }); dock.append(b); }
   const pb = el('button', 'kid-btn', '<span class="dexic">🛝</span>놀이터'); pb.id = 'playBtn'; pb.addEventListener('click', showPlayground);
   const db = el('button', 'kid-btn', '<span class="dexic">가</span>글자 친구'); db.id = 'dexBtn'; db.addEventListener('click', showDex);
@@ -88,24 +120,26 @@ function showHome() {
   const row2 = el('div', 'dock2'); row2.append(pb, db, sb, kb);
   s.append(head, wrap, dock, row2);
   if (S.migratedFrom && !S.start) s.insertBefore(el('div', 'pnote', '보호자께: v3 기록을 옮겼어요. 어른 메뉴 → 시작 날에서 6일(ㅣㅏ)이나 11일(ㅗㅜ)부터 시작하는 걸 추천해요.'), wrap);
+  requestAnimationFrame(() => { fixArrows(); fixHead(); }); new ResizeObserver(() => { fixArrows(); fixHead(); }).observe(M);
   requestAnimationFrame(() => { if (todayEl && alive(id)) wrap.scrollTop = Math.max(0, todayEl.offsetTop - wrap.clientHeight / 2); });
-  if (!showHome.greeted) { showHome.greeted = true; say(st === 'done' ? 'ui4_bye' : 'ui_hiname'); }
+  if (!showHome.greeted) { showHome.greeted = true; if (!wf) say(st === 'done' ? 'ui4_bye' : 'ui_hiname'); }
 }
 
 /* ---------- 하루 놀이 ---------- */
 let DR = null;   // 지금 하는 날 {dn, mode, plan, segIdx, segsDone}
-function startDay(dn, mode) {
+function startDay(dn, mode, more) {   // more = '더 놀까?'(오늘 날을 끝낸 뒤 다음 날을 바로 엶. 달력 하루 하나 규칙 예외, 끝나면 보통 날처럼 기록)
   if (mode !== 'replay' && dn > READY_DAYS) return showHome();
   const t = today(), ses = S.session;
   if (mode === 'replay') DR = { dn, mode, plan: planFor(dn, 'today'), segIdx: 0, segsDone: 0, newStat: [0, 0] };
   else {
     if (!(ses.date === t && ses.day === dn && ses.mode === mode && !ses.finished && ses.plan)) {
-      if (!canStartNew() || (mode === 'extra' && !S.pendingExtra)) return showHome();
+      if ((!canStartNew() && !(more && canPlayMore())) || (mode === 'extra' && !S.pendingExtra)) return showHome();
+      if (more && !canStartNew()) S.moreDays = { date: t, n: moreUsed() + 1 };
       if (!S.start) S.start = { day: dn, date: t };
       const plan = planFor(mode === 'extra' ? S.pendingExtra.base : dn, mode);
       const c = ctxOf(plan.day);
       S.lastNewDate = t;
-      S.session = Object.assign(fresh4().session, { date: t, day: dn, mode, plan, segIdx: 0, segsDone: 0, newStat: [0, 0], newKeys: c.newJ.map(j => 'j:' + j).concat(c.newW.map(w => 'w:' + w)) });
+      S.session = Object.assign(fresh4().session, { date: t, day: dn, mode, plan, segIdx: 0, segsDone: 0, newStat: [0, 0], newKeys: c.newJ.map(j => 'j:' + j).concat(c.newW.map(w => 'w:' + w)), more: !!more });
       save();
     }
     DR = S.session;
@@ -119,7 +153,7 @@ function showDayIntro() {
   const steps = el('div', 'steps', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + (PLAY_ICON[g.type] || '⭐') + '</span>').join(''));
   s.append(guide('wave', DR.segIdx ? '이어서 놀자!' : (d.special === 'big' ? '오늘은 잔치 날이야!' : d.special ? '오늘은 특별한 날!' : '려원아, 오늘의 놀이 시작!')), sc, steps);
   const dock = el('div', 'dock'), go = el('button', 'kid-btn next', '출발!<img alt="" src="' + ICON('arrow') + '">'); go.id = 'goBtn';
-  go.addEventListener('click', () => runSeg(DR.segIdx)); dock.append(go); s.append(dock);
+  go.addEventListener('click', () => runSeg(DR.segIdx)); dock.append(go); s.append(dock); tapHint(go, 2200);
   const v = DR.segIdx ? [] : [d.k === 1 || P.extra ? VOICE.unit(d.unit) : 'ui4_today'].concat(d.special === 'big' ? ['ui4_bigday'] : P.extra ? ['ui4_again'] : []);
   (async () => { if (v.length) await say(v.filter(hasA)); })();
   if (window.HP) HP.solve = async () => go.click();
@@ -128,7 +162,7 @@ function runSeg(i) {
   const P = DR.plan;
   if (i >= P.segs.length) return endDay();
   const seg = P.segs[i], ctx = ctxOf(P.day);
-  if (timeUp() && i < P.segs.length - 1 && DR.mode !== 'replay') return runSeg(P.segs.length - 1);   // 시간이 다 되면 이야기로 바로
+  if (timeUp() && i < P.segs.length - 1 && timed()) return runSeg(P.segs.length - 1);   // 시간이 다 되면 이야기로 바로
   let items = [];
   try { items = addShowcase(seg.type, (QB[seg.type] || (() => []))(ctx, seg.n || 4), ctx, false); } catch (e) { items = []; if (window.HP) HP.errs.push(seg.type + ': ' + e.message); }
   if (!items.length || !RUN[segRunP(seg, ctx, items).kind]) { DR.segIdx = i + 1; return runSeg(i + 1); }
@@ -147,7 +181,7 @@ const NO_REC = ['letter', 'chant', 'body', 'sort', 'map', 'cloud', 'treasure', '
 function nextItem() {
   if (!run) return showHome();
   if (run.i >= run.queue.length) return segDone();
-  if (timeUp() && !run.z && DR.mode !== 'replay' && !DR.play) return segDone(true);
+  if (timeUp() && !run.z && timed() && !DR.play) return segDone(true);
   const item = run.queue[run.i], kind = run.p.kind;
   const [id, s] = screen('round-' + run.p.type, { home: true });
   ticking = true; run.curKey = null;
@@ -168,21 +202,57 @@ function segDone(cut) {
   const r = run; run = null; ticking = false;
   if (!S.played.includes(r.p.type)) S.played.push(r.p.type);
   if (r.p.kind === 'hidden') hidAdapt(r.hid, r.p.lv || 1);
-  if (DR.play) { save(); return showPlayground(); }
+  const stk = r.i > 0 ? giveSticker(DR) : null;   // 11/04 대표님: 놀이 하나 끝낼 때마다 스티커(오늘·지난 날 다시 하기·놀이터 모두, 정답률 상관없이)
+  if (DR.play) { save(); return stk ? showStickerPop(stk, showPlayground) : showPlayground(); }
   DR.segIdx = r.segIdx + 1; DR.segsDone = (DR.segsDone || 0) + 1;
   if (DR.mode !== 'replay' && DR.segsDone >= 3) markDayDone();
+  if (stk && S.done[DR.plan.day]) S.done[DR.plan.day].sticker = stk;
   save();
   const P = DR.plan, last = r.segIdx >= P.segs.length - 1;
-  if (last) return endDay();
-  if ((cut || timeUp() || limitMs() - usedMs() < 60000) && DR.mode !== 'replay') { DR.segIdx = P.segs.length - 1; }
-  showStep();
+  if ((cut || timeUp() || limitMs() - usedMs() < 60000) && timed() && !last) { DR.segIdx = P.segs.length - 1; }
+  const go = last ? endDay : showStep;
+  return stk ? showStickerPop(stk, go) : go();
+}
+/* ---------- 스티커(11/04): 놀이 하나 끝 = 스티커 하나. S.stickers 에 쌓이고(옛 스티커 그대로), 지도 돌에는 그날 마지막 스티커 ---------- */
+/* 11/04 대표님: 스티커 종류를 많이 → 피자 스티커 24장 + 앱 속 피자 그림(동물·탈것·과일·간식…)으로 만든 그림 스티커. id: 숫자 = st_XX, 'p:고래id' = 그림 스티커 */
+const PIC_STK = ['gorae', 'sangeo', 'ojingeo', 'geobuk', 'haema', 'saeu', 'girin', 'gorilla', 'goyangi', 'gangaji', 'gom', 'kokkiri', 'lion', 'tokki', 'yeou', 'wonsungi', 'nabi', 'ori', 'kkachi', 'dwaeji', 'hama', 'mal', 'so', 'tajo', 'geomi',
+  'nunsaram', 'kkot', 'byeol', 'dal', 'pungseon', 'robot', 'yoyo', 'sobangcha', 'gicha', 'beoseu', 'bae', 'cha', 'gita', 'radio', 'keikeu', 'pija', 'ppang', 'satang', 'subak', 'ttalgi', 'sagwa', 'podo', 'banana', 'tomato', 'juseu',
+  'gimbap', 'tteok', 'seonmul', 'siso', 'gong', 'moja', 'hwabun', 'namu', 'skin_balloon', 'skin_star', 'skin_fish', 'chest_open', 'cloud_smile', 'town_b1', 'town_b2', 'town_b3', 'town_b4', 'town_b5', 'town_b6'].filter(w => ARTS.pic.includes(w));
+const STK_ALL = STICKER_IDS.concat(PIC_STK.map(w => 'p:' + w));
+const stkSrc = id => typeof id === 'string' && id.startsWith('p:') ? PIC(id.slice(2)) : STICKER(id);
+const stkImg = (id, cls = '') => '<img class="stki' + (typeof id === 'string' ? ' pstk' : '') + (cls ? ' ' + cls : '') + '" alt="스티커" src="' + stkSrc(id) + '">';
+function giveSticker(dr) {   // 아직 없는 스티커 중에서 무작위(다 모았으면 아무거나)
+  const have = new Set(S.stickers.map(String)), fresh = STK_ALL.filter(x => !have.has(String(x)));
+  const pool = fresh.length ? fresh : STK_ALL, st = pool[Math.floor(Math.random() * pool.length)];
+  S.stickers.push(st); dr.got = (dr.got || []).concat(st); dr.gotNew = (dr.gotNew || 0) + (fresh.length ? 1 : 0);
+  return st;
+}
+function showStickerPop(st, next) {
+  const [id, s] = screen('sticker', { home: true });
+  const got = (DR && DR.got) || [st];
+  const box = el('div', 'reward');
+  const isNew = S.stickers.filter(x => String(x) === String(st)).length === 1;
+  const card = el('div', 'stk' + (typeof st === 'string' ? ' pic' : ''), stkImg(st));
+  box.append(mg('jump'), el('h1', '', isNew ? '새 스티커 받았다!' : '스티커 받았다!'), card);
+  if (got.length > 1) box.append(el('div', 'stkrow', got.slice(-8).map((x, k) => stkImg(x, k === Math.min(got.length, 8) - 1 ? 'new' : '')).join('')));
+  const dock = el('div', 'dock'), b = el('button', 'kid-btn next', '좋아!<img alt="" src="' + ICON('arrow') + '">'); b.id = 'stickerNext';
+  let gone = false; const go = () => { if (gone || !alive(id)) return; gone = true; next(); };
+  b.addEventListener('click', () => { ding(1.3); go(); }); dock.append(b);
+  s.append(box, dock);
+  requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('show')));
+  if (window.HP) { HP.sticker = { id: st, n: S.stickers.length }; HP.solve = async () => go(); }
+  (async () => { ding(); sparkAt(card); surprise(s, true); await wait(300); if (!alive(id)) return; await say(['ui_sticker', 'ui_good' + (1 + rand(3))]); if (alive(id)) setTimeout(go, 1800); })();
 }
 function showStep() {   // 칸 사이: 길 위 몽글이가 한 칸 앞으로(짧게)
   const P = DR.plan, [id, s] = screen('step', { home: true });
   const steps = el('div', 'steps lg', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + (PLAY_ICON[g.type] || '⭐') + '</span>').join(''));
   s.append(guide(rand(2) ? 'laugh' : 'clap', ['잘했어! 다음 놀이로 가 볼까?', '좋아! 한 칸 더!', '다음은 뭘까?'][rand(3)]), steps);
   const dock = el('div', 'dock'), go = el('button', 'kid-btn next', '다음<img alt="" src="' + ICON('arrow') + '">'); go.id = 'stepNext'; dock.append(go); s.append(dock);
-  const t = setTimeout(() => alive(id) && runSeg(DR.segIdx), 2600);
+  // 11/04: 몽글이가 지난 칸에서 다음 칸으로 걸어가고, 다음 칸·'다음' 단추가 반짝 + 손가락
+  const sp = [...steps.children], from = sp[Math.max(0, DR.segIdx - 1)], to = sp[DR.segIdx], walker = mg('wave', 'stepme');
+  if (from && to) { steps.append(walker); const at = n => { walker.style.left = (n.offsetLeft + n.offsetWidth / 2) + 'px'; }; requestAnimationFrame(() => { at(from); requestAnimationFrame(() => requestAnimationFrame(() => { walker.classList.add('go'); at(to); })); }); to.classList.add('gonext'); }
+  tapHint(go, 1200);
+  const t = setTimeout(() => alive(id) && runSeg(DR.segIdx), 4500);
   go.addEventListener('click', () => { clearTimeout(t); runSeg(DR.segIdx); });
   ding(1.2); if (DR.segsDone % 2 === 0) say('ui4_proc' + (1 + rand(4)));
   if (window.HP) HP.solve = async () => { clearTimeout(t); runSeg(DR.segIdx); };
@@ -212,10 +282,10 @@ function endDay() {
   const P = DR.plan, d = DAYS[P.day - 1], mode = DR.mode;
   if (mode !== 'replay') { markDayDone(); S.session.finished = true; }
   if (P.segs.some(g => g.type === 'treasure') && mode !== 'replay') afterCheck(P.day);
-  let sticker = null, grew = '';
+  let grew = '';
+  const got = DR.got || [], sticker = got.length ? got[got.length - 1] : null;
+  if (sticker && S.done[P.day]) S.done[P.day].sticker = sticker;
   if (mode !== 'replay') {
-    const lucky = d.special || hashN(P.day + today()) < 0.3;
-    if (lucky) { sticker = STICKER_IDS[S.stickers.length % STICKER_IDS.length]; S.stickers.push(sticker); if (S.done[P.day]) S.done[P.day].sticker = sticker; }
     if (d.special === 'big' && mode === 'today') { S.town.buildings = Math.min(6, S.town.buildings + 1); grew = 'b'; }
     if (d.special === 'adventure' && mode === 'today') { S.town.props = Math.min(17, S.town.props + 1); grew = 'p'; }
     if (d.k >= 4 && !S.books.includes(d.unit)) S.books.push(d.unit);
@@ -223,14 +293,18 @@ function endDay() {
   save();
   const [id, s] = screen('dayend', { night: true });
   const hero = el('div', 'endhero', '<img class="moon" alt="" src="' + ICON('moon') + '">');
-  hero.append(mg(sticker ? 'surprise' : 'sleep'), el('h1', '', sticker ? '깜짝 선물이 왔어!' : '오늘은 여기까지!'), el('p', '', '내일 또 만나'));
-  if (sticker) hero.append(el('div', 'stk show', '<img alt="스티커" src="' + STICKER(sticker) + '">'));
+  hero.append(mg(sticker ? 'surprise' : 'sleep'), el('h1', '', sticker ? '스티커를 모았어!' : '오늘은 여기까지!'), el('p', '', '내일 또 만나'));
+  if (got.length) hero.append(el('div', 'stkrow end', got.map(x => stkImg(x)).join('')));
   if (grew) hero.append(el('div', 'grow', grew === 'b' ? '몽글이 마을에 새 집이 생겼어! ' + TOWN_BUILDINGS[S.town.buildings - 1] : '몽글이 마을이 더 예뻐졌어! ' + TOWN_PROPS[S.town.props - 1]));
   const paper = el('div', 'paper', '<div class="h"><img alt="" src="' + ICON('pencil') + '">보호자께 · 집에서 한 가지</div><p>' + (UNITS[d.unit - 1].paper || '') + '</p><small>오늘 숨은 목표: ' + d.goal + '</small>');
   const dock = el('div', 'dock'), b = el('button', 'kid-btn lav', '지도로'); b.id = 'endMap'; b.addEventListener('click', showHome); dock.append(b);
   if (!timeUp()) { const p = el('button', 'kid-btn', '<span class="dexic">🛝</span>놀이터'); p.id = 'endPlay'; p.addEventListener('click', showPlayground); dock.append(p); }
   s.append(hero, paper, dock);
-  (async () => { if (sticker) { sparkPop(); ding(); await say('ui4_surprise'); } if (grew && alive(id)) await say('ui4_town'); if (alive(id)) await say(mode === 'replay' ? 'ui_good1' : 'ui4_bye'); if (alive(id) && !timeUp() && mode !== 'replay') say('ui4_free'); })();
+  let moreB = null;
+  if (canPlayMore() || canReplayMore()) { moreB = el('button', 'kid-btn next moreBtn', '<span class="dexic">▶</span>더 놀까?'); moreB.id = 'endMore'; moreB.addEventListener('click', playMore); s.insertBefore(el('div', 'dock moredock'), dock).append(moreB); }
+  tapHint(moreB || b, 2600);
+  if (mode !== 'replay' && S.cur > P.day) showHome.walkFrom = P.day;
+  (async () => { if (sticker) { sparkPop(); ding(); await say('ui_book'); } if (grew && alive(id)) await say('ui4_town'); if (alive(id)) await say(mode === 'replay' ? 'ui_good1' : 'ui4_bye'); if (alive(id) && !timeUp() && mode !== 'replay') say('ui4_free'); })();
   if (window.HP) HP.solve = null;
   DR = null;
 }
@@ -267,13 +341,16 @@ function showDex() {
   });
   s.append(g);
 }
-function showBook() {
+function showBook() {   // 스티커 모음: 모든 스티커 칸, 모은 건 색깔, 아직 없는 건 흐린 그림자(숫자 없음)
   const [, s] = screen('bookscr', { scroll: true, home: true });
-  const n = S.stickers.length;
-  s.append(guide(n ? 'laugh' : 'basic', n ? '스티커를 모았어!' : '깜짝 스티커가 가끔 찾아와!'));
-  const book = el('div', 'book b60');
-  for (let k = 0; k < 60; k++) { const c = el('div'); if (S.stickers[k]) c.innerHTML = '<img alt="" src="' + STICKER(S.stickers[k]) + '">'; book.append(c); }
+  const have = new Set(S.stickers.map(String)), n = have.size;
+  s.append(guide(n ? 'laugh' : 'basic', n ? '스티커를 모았어! 그림자 친구도 모아 볼까?' : '놀이를 하나 끝내면 스티커가 와!'));
+  const book = el('div', 'book stkbook');
+  const extra = [...have].filter(x => !STK_ALL.some(y => String(y) === x)).map(x => isNaN(+x) ? x : +x);   // 옛 스티커(목록 밖)도 그대로 보임
+  const last = S.stickers.length ? String(S.stickers[S.stickers.length - 1]) : '';
+  STK_ALL.concat(extra).forEach(id => { const on = have.has(String(id)); const c = el('div', 'slot' + (on ? ' on' : ' off') + (String(id) === last ? ' last' : ''), stkImg(id)); c.dataset.id = String(id); if (on) c.addEventListener('click', () => { c.classList.remove('wig'); void c.offsetWidth; c.classList.add('wig'); ding(1.2); if (typeof id === 'string' && WORDS[id.slice(2)] && hasA(VOICE.word(id.slice(2)))) say(VOICE.word(id.slice(2))); }); book.append(c); });
   s.append(book); say('ui_book');
+  if (window.HP) HP.book = { total: STK_ALL.length + extra.length, have: n };
 }
 function showShelf() {
   const [, s] = screen('shelf', { scroll: true, home: true });

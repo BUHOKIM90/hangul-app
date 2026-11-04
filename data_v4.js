@@ -41,5 +41,5 @@ WCAT.sea = ['gorae', 'haema', 'saeu', 'sora', 'sangeo', 'ojingeo', 'geobuk'].fil
 ['sobangcha', 'keikeu', 'kkot', 'nunsaram', 'pungseon', 'tteokguk'].forEach((w, k) => { const c = ['thing', 'food', 'thing', 'thing', 'thing', 'food'][k]; if (WCAT[c] && !WCAT[c].includes(w)) WCAT[c].push(w); });
 WCAT.sea.forEach(w => { if (ARTS.pic.includes(w) && !PW_WORDS.includes(w)) PW_WORDS.push(w); });
 /* 그림이 너무 닮아 한 판에 같이 내면 안 되는 짝(개 ↔ 강아지) */
-const PIC_CLASH_PAIRS = [['gae', 'gangaji']];
+const PIC_CLASH_PAIRS = [['gae', 'gangaji'], ['ai', 'agi']];   // 11/04 아이·아기 그림이 거의 같음
 const PIC_CLASH = (a, b) => PIC_CLASH_PAIRS.some(([x, y]) => (a === x && b === y) || (a === y && b === x));

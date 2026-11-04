@@ -1,6 +1,8 @@
 'use strict';
 /* 음성 대사(v4 = v3 + v4 새 줄). v4/tools/merge_audio_v4.py가 만듦 */
 const LINES = {
+"ui4_tapnext": "여기 눌러 볼까?",
+"ui4_newtmr": "내일 또 새 놀이가 기다려!",
 "ui_hello": "안녕! 오늘도 같이 놀자!",
 "ui_listen": "잘 듣고 골라 봐.",
 "ui_retry": "다시 해 볼까?",

@@ -25,7 +25,7 @@ function quiz(q, id, host, onAns, oneShot) {
       if (locked || !alive(id)) return;
       const ok = q.opts[i] === q.target;
       if (oneShot) { locked = true; c.classList.add('picked'); ding(1.1); await wait(350); return onAns(ok); }
-      if (ok) { locked = true; c.classList.add('ok'); ding(); setChar('clap'); await say(read ? VOICE.word(q.target) : glyphVoice(q.target)); if (alive(id)) onAns(first); }
+      if (ok) { locked = true; c.classList.add('ok'); if (await reveal(id, q.target)) onAns(first); }
       else { first = false; locked = true; await retryFx(id, c); locked = false; }
     });
   });
@@ -72,7 +72,7 @@ Object.assign(RUN, {
       sky.querySelectorAll('.bal').forEach(b => b.remove()); wave++;
       opts.forEach((g, k) => { const b = el('button', 'bal', '<span class="sk">' + artImg('skin_' + ['balloon', 'fish', 'star'][(run.ctx.dn + run.segIdx) % 3], sk[0]) + '</span><span class="g">' + g + '</span>'); b.dataset.k = g; b.style.left = (8 + k * (84 / opts.length)) + '%'; b.style.animationDelay = (k * 0.35) + 's';
         b.addEventListener('pointerdown', async () => { if (got || !alive(id)) return;
-          if (g === x) { got = true; b.classList.add('pop'); ding(); sparkAt(b); setChar('clap'); bounce(); await say(glyphVoice(x)); if (alive(id)) done(first); }
+          if (g === x) { got = true; b.classList.add('pop'); sparkAt(b); if (await reveal(id, x)) done(first); }
           else { first = false; b.classList.add('wob'); setTimeout(() => b.classList.remove('wob'), 500); setChar('think'); say(glyphVoice(x)); } });
         b.addEventListener('animationend', () => { if (!got && alive(id) && k === opts.length - 1) launch(); });
         sky.append(b); });
@@ -91,7 +91,7 @@ Object.assign(RUN, {
     const bs = r.groups.map((g, gi) => { const b = el('button', 'basket', '<span class="sk">' + artImg('basket_' + (gi + 1), sk[0]) + '</span><span class="g">' + g.label + '</span><div class="in"></div>'); b.dataset.g = gi; b.addEventListener('click', () => { if (sel) put(sel, gi); else say(g.voice); }); top.append(b); return b; });
     const put = async (c, gi) => {
       if (busy || !alive(id)) return; busy = true; const node = c.n; node.classList.remove('sel'); sel = null; node.style.transform = '';
-      if (c.g === gi) { if (!firstTry.has(c.w)) firstTry.set(c.w, true); rec('w:' + c.w, firstTry.get(c.w)); node.classList.add('used'); bs[gi].querySelector('.in').insertAdjacentHTML('beforeend', '<span>' + picHTML(c.w, WORDS[c.w]) + '</span>'); ding(1.2); await say(VOICE.word(c.w)); left--;
+      if (c.g === gi) { if (!firstTry.has(c.w)) firstTry.set(c.w, true); rec('w:' + c.w, firstTry.get(c.w)); node.classList.add('used'); bs[gi].querySelector('.in').insertAdjacentHTML('beforeend', '<span>' + picHTML(c.w, WORDS[c.w]) + '</span>'); await reveal(id, c.w, { praise: false, quick: true }); if (!alive(id)) return; left--;
         if (!left && alive(id)) { busy = true; setChar('clap'); bounce(); await say('ui4_proc1'); if (alive(id)) done(null); return; } }
       else { firstTry.set(c.w, false); await retryFx(id, node); }
       busy = false;
@@ -127,7 +127,7 @@ Object.assign(RUN, {
       if (x !== w) { first = false; await retryFx(id, node); busy = false; return; }
       node.classList.add('used'); line.querySelector('.blank').textContent = kr; line.querySelector('.blank').classList.add('ok');
       sc.querySelector('.stk-slot').innerHTML = picHTML(w, kr, 'stk-pic'); sc.classList.add('got'); ding(); sparkAt(sc); setChar('clap');
-      await say(hasA(VOICE.st4(pg.u, pg.k)) ? VOICE.st4(pg.u, pg.k) : VOICE.word(w)); if (alive(id)) { await wait(300); done(first); }
+      await say(hasA(VOICE.st4(pg.u, pg.k)) ? VOICE.st4(pg.u, pg.k) : VOICE.word(w)); if (alive(id) && await reveal(id, w)) done(first);
     };
     opts.forEach(x => { const c = el('div', 'wcard big', WORDS[x]); c.dataset.k = x; row.append(c); draggable(c, { onTap: () => place(x, c), onDrop: (px, py) => { if (!inside(line, px, py) && !inside(sc, px, py)) return false; place(x, c); return true; } }); });
     s.append(sc, line, row, guide('think', '빈칸에 맞는 낱말은?', true));
@@ -150,7 +150,7 @@ Object.assign(RUN, {
       asking = true; setBubble('‘' + kr + '’ 어디 있지?'); await say(['ui_storyq', VOICE.word(w)]); if (alive(id)) setChar('think');
     };
     spans.forEach((b, k) => b.addEventListener('click', async () => { if (!asking || busy || !alive(id)) return;
-      if (k === at) { busy = true; b.classList.add('ok'); if (await success(id)) done(first); } else { first = false; busy = true; await retryFx(id, b); busy = false; } }));
+      if (k === at) { busy = true; b.classList.add('ok'); if (await success(id, w)) done(first); } else { first = false; busy = true; await retryFx(id, b); busy = false; } }));
     const tools = el('div', 'tools'), hb = el('button', 'kid-btn', '<img alt="" src="' + ICON('speaker') + '">다시 읽기'); hb.addEventListener('click', prompt); tools.append(hb);
     s.append(pg2, tools, guide('think', '같이 읽어 보자', true)); prompt();
     setSolve(async () => { await waitFor(() => asking, 15000); spans[at].click(); });
@@ -178,7 +178,7 @@ Object.assign(RUN, {
       const tryP = async (p, node) => { if (busy || !alive(id)) return; const ok = (p.t === 'c' && p.g === cho && !sc.textContent) || (p.t === 'v' && p.g === jung && !sv.textContent);
         node.style.transform = ''; if (!ok) { first = false; busy = true; await retryFx(id, node); busy = false; return; }
         (p.t === 'c' ? sc : sv).textContent = p.g; (p.t === 'c' ? sc : sv).classList.add('filled'); node.classList.add('used'); ding(1.2); say(glyphVoice(p.g)); filled++;
-        if (filled === 2) { busy = true; await wait(400); frame.classList.add('done'); await say(VOICE.syl(sy)); if (alive(id)) { setChar('clap'); await say('ui4_proc4'); if (alive(id)) done(first); } } };
+        if (filled === 2) { busy = true; await wait(400); frame.classList.add('done'); if (await reveal(id, sy)) done(first); } };
       pieces.forEach(p => { const n = el('div', 'piece ' + p.t, p.g); n.dataset.k = p.t + p.g; draggable(n, { onTap: () => tryP(p, n), onDrop: (x, y) => { if (!inside(frame, x, y)) return false; tryP(p, n); return true; } }); col.append(n); });
       const pr = el('div', 'prompt', '<div class="body"><span class="eye">블록으로 <b style="font-size:30px;color:var(--lav-ink)">' + sy + '</b> 만들기</span></div>'); pr.append(speakerBtn(() => say(VOICE.syl(sy))));
       const wrap = el('div', 'merge'); wrap.append(frame, col); s.append(pr, wrap, guide('think', '블록을 눌러 봐', true));
@@ -191,7 +191,7 @@ Object.assign(RUN, {
       const tryP = async (g, node) => { if (busy || !alive(id)) return; node.style.transform = '';
         if (g !== sl[at]) { first = false; busy = true; await retryFx(id, node); busy = false; return; }
         bx[at].textContent = g; bx[at].classList.add('filled'); node.classList.add('used'); ding(1.2); say(VOICE.syl(g)); at++;
-        if (at === sl.length) { busy = true; await wait(400); boxes.classList.add('done'); await say(VOICE.word(w)); if (alive(id) && await success(id)) done(first); } };
+        if (at === sl.length) { busy = true; await wait(400); boxes.classList.add('done'); if (alive(id) && await success(id, w)) done(first); } };
       shuffle(sl.concat(extra)).forEach(g => { const n = el('div', 'piece v', g); n.dataset.k = g; draggable(n, { onTap: () => tryP(g, n), onDrop: (x, y) => { if (!inside(boxes, x, y)) return false; tryP(g, n); return true; } }); col.append(n); });
       const pr = el('div', 'prompt blockw', '<div class="body">' + picHTML(w, WORDS[w], 'hero-pic') + '</div>'); pr.append(speakerBtn(() => say(VOICE.word(w))));
       s.append(pr, boxes, col, guide('think', '소리 한 번에 상자 하나!', true));
@@ -303,7 +303,7 @@ RUN.hidden = function (w, id, s, done) {
     touch('s:' + m.g);
     if (got.size < syl.length) { setChar(revealed ? 'point' : 'clap'); setBubble((revealed ? '여기 있었어! ' : '찾았다! ') + '<b>' + m.g + '</b>!'); fit(); await say(VOICE.syl(m.g)); return; }
     clearInterval(tick); setChar('jump'); setBubble('다 찾았다! <b>' + WORDS[w] + '</b>!');
-    await say(['ui_found', VOICE.word(w)]); await wait(500);
+    await say('ui_found'); if (!(await reveal(id, w))) return;
     run.hid = run.hid || { rounds: 0, clean: 0, decoy: 0, rev: 0 }; run.hid.rounds++; run.hid.decoy += decoyTaps; run.hid.rev += reveals; if (!decoyTaps && !reveals) run.hid.clean++;
     if (alive(id)) done(reveals ? false : decoyTaps === 0);
   }
@@ -319,4 +319,64 @@ RUN.hidden = function (w, id, s, done) {
   });
   if (window.HP) HP.hidden = { target: w, lv, syl, decoys: dec, marks: marks.map(m => ({ g: m.g, target: m.target })), rect: k => { const m = k == null ? nextT() : marks[k]; const r = m.el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, get found() { return got.size === syl.length; }, get got() { return got.size; }, ring: () => ring.classList.contains('on') };
   prompt();
+};
+
+/* ---------- 👀 글자 보고 그림 찾기(11/04 대표님: "할아버지" 소리만 듣고 고르면 너무 쉬움 → 글자를 읽고 고르게) ----------
+   예전 '어디 있니?'(소리 듣고 그림) 자리. 낱말 글자를 크게 보여 주고 소리는 먼저 들려주지 않음. 아이가 글자를 읽고 그림을 톡.
+   도움(단계별로 약해짐): 가만히 있으면 첫 글자가 반짝 + 첫 글자 소리만(1~2단계 7초, 3~4단계 12초, 5단계부터 없음, 어른 메뉴 색 힌트 '켜기'면 늘 7초).
+   '도와줘' 단추 = 한 글자씩 짚으며 읽어 줌(낱말 통째로는 안 읽음). 두 번 틀리면 자동으로 한 글자씩 읽어 줌.
+   가짜 그림: 1단계 = 글자 모양이 다른 낱말, 2단계부터 = 첫 글자·글자가 겹치는 닮은 낱말(할아버지 ↔ 할머니), 3단계부터·잘하는 아이는 4장.
+   맞히면 글자 칸이 한 글자씩 불이 켜지며 읽어 주고 낱말 전체 + 칭찬. 도움 받고 맞힌 건 복습 기록에 넣지 않음(null). */
+if (CURR.plays && CURR.plays.listen) { CURR.plays.listen.kid = '글자 보고 그림 찾기'; CURR.plays.listen.goal = '낱말 글자를 읽고 뜻(그림)과 잇기'; }
+if (typeof PLAY_ICON !== 'undefined') PLAY_ICON.listen = '👀';
+RUN.listen = function (w, id, s, done) {
+  const st = (run.ctx && run.ctx.stage) || 1, syl = [...WORDS[w]];
+  const picOk = x => WORDS[x] && (hasPic(x) || PH_EMOJI[x]) && hasA(VOICE.word(x));
+  const n = st >= 3 || S.hard ? 4 : 3;
+  const base = (run.p.items.length >= 6 ? run.p.items : run.p.items.concat(WORD_IDS)).filter(x => x !== w && picOk(x) && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w));
+  const look = x => { const a = [...WORDS[x]]; return (a[0] === syl[0] ? 3 : 0) + a.filter(c => syl.includes(c)).length * 2 + (a.length === syl.length ? 1 : 0) + (splitSyllable(a[0]).cho === splitSyllable(syl[0]).cho ? 1 : 0) + Math.random(); };
+  let dis;
+  if (st <= 1 && !S.hard) dis = others(base.filter(x => WORDS[x][0] !== syl[0] && ![...WORDS[x]].some(c => syl.includes(c))), w, n - 1);
+  else { const near = shuffle(base.concat(WORD_IDS.filter(x => x !== w && picOk(x) && !PIC_CLASH(x, w) && WORDS[x] !== WORDS[w]))).sort((a, b) => look(b) - look(a)); dis = others(near.slice(0, 6), w, n - 1); }
+  if (dis.length < n - 1) dis = dis.concat(others(base.filter(x => !dis.includes(x)), w, n - 1 - dis.length));
+  { const seen = new Set([PIC(w)]); dis = dis.filter(x => { const k = PIC(x); if (seen.has(k)) return false; seen.add(k); return true; }); }   // 같은 그림 두 장 금지
+  const opts = shuffle([w, ...dis]);
+  const autoMs = S.settings.colorHint === 'on' ? 7000 : st <= 2 ? 7000 : st <= 4 ? 12000 : 0;
+  const pr = el('div', 'prompt lw' + (syl.length >= 4 ? ' long' : ''), '<div class="body syl">' + syl.map(c => '<span>' + c + '</span>').join('') + '</div>');
+  const tiles = [...pr.querySelectorAll('.syl span')];
+  let helped = false, first = true, locked = false, wrong = 0, lastT = Date.now(), hinted = false;
+  const allSyl = syl.every(c => hasA(VOICE.syl(c)));
+  const readSlow = async () => {   // 한 글자씩 짚으며 읽기
+    helped = true; lastT = Date.now(); setChar('point');
+    const ok = allSyl ? await sayGap(syl.map(VOICE.syl), 550, k => tiles.forEach((t, i) => t.classList.toggle('on', i === k))) : await say(VOICE.word(w));
+    tiles.forEach(t => t.classList.remove('on')); if (ok && alive(id)) setChar('think'); lastT = Date.now();
+  };
+  const help = speakerBtn(() => { if (!locked) readSlow(); }, 'spk helpbtn', '도와줘');
+  pr.append(help);
+  const row = el('div', 'choices' + (n > 3 ? ' n4' : ''));
+  const cards = opts.map(x => { const c = picCard(x); c.insertAdjacentHTML('beforeend', '<span class="badge"><img alt="" src="' + ICON('check') + '"></span>'); row.append(c); return c; });
+  cards.forEach((c, i) => c.addEventListener('click', async () => {
+    const x = opts[i]; if (locked || !alive(id) || c.classList.contains('no')) return;
+    lastT = Date.now(); locked = true; stopAudio();
+    if (x === w) {
+      c.classList.add('ok'); sparkAt(c); tiles.forEach(t => t.classList.add('on')); setBubble('맞아! <b>' + WORDS[w] + '</b>!');
+      if (await reveal(id, w)) done(helped ? (first ? null : false) : first);
+      return;
+    }
+    first = false; wrong++; c.classList.add('retry', 'no'); setChar('think'); setBubble('그건 <b>' + WORDS[x] + '</b>!');
+    c.insertAdjacentHTML('beforeend', '<span class="wname">' + WORDS[x] + '</span>');
+    await say(VOICE.word(x)); if (!alive(id)) return;
+    locked = false;
+    if (wrong >= 2) readSlow(); else say('ui_retry');
+  }));
+  s.append(pr, el('div', 'ask', '글자를 읽고 그림을 찾아 봐'), row, guide('think', '<b>' + WORDS[w] + '</b>, 어떤 그림일까?', true));
+  const tick = setInterval(() => {
+    if (!alive(id)) return clearInterval(tick);
+    if (!autoMs || hinted || locked || Date.now() - lastT < autoMs) return;
+    hinted = true; helped = true; tiles[0].classList.add('hint'); setBubble('첫 글자는 <b>' + syl[0] + '</b>!');
+    say(hasA(VOICE.syl(syl[0])) ? VOICE.syl(syl[0]) : VOICE.word(w));
+  }, 500);
+  if (window.HP) HP.listen = { word: w, text: WORDS[w], opts: opts.slice(), stage: st, get helped() { return helped; } };
+  setSolve(async () => { const c = cards[opts.indexOf(w)]; if (c) c.click(); });
+  if (run.i === 0) say('ui_which');
 };
