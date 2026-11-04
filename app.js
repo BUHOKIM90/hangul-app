@@ -90,8 +90,8 @@ function showHome() {
   const nextDn = st === 'done' || st === 'soon' || st === 'all' ? S.cur : S.cur + 1, here = Math.min(S.cur, 170);
   const arrows = [];
   for (let k = 0; k < L.nodes.length - 1; k++) { const a = L.nodes[k], b2 = L.nodes[k + 1]; const ar = el('i', 'parrow' + (b2.dn <= here ? ' gone' : b2.dn > READY_DAYS ? ' later' : b2.dn <= here + 3 ? ' near' : '')); ar.textContent = '➜'; ar.style.left = ((a.x + b2.x) / 2) + '%'; ar.style.top = ((a.y + b2.y) / 2 + 30) + 'px'; arrows.push([ar, a, b2]); M.append(ar); }
-  const tagAt = (n, cls, txt) => { const t = el('div', 'ntag ' + cls, txt); t.style.left = n.x + '%'; t.style.top = (n.y - 30) + 'px'; M.append(t); };
-  tagAt(L.nodes[0], 'start', '🚩 출발'); tagAt(L.nodes[169], 'goal', '🏁 도착');
+  const tagAt = (n, cls, txt, side) => { const t = el('div', 'ntag ' + cls + (side ? ' side' : ''), txt); t.style.left = side ? 'calc(' + n.x + '% + 62px)' : n.x + '%'; t.style.top = (side ? n.y - 52 : n.y - 30) + 'px'; M.append(t); };
+  tagAt(L.nodes[0], 'start', '🚩 출발', 1); tagAt(L.nodes[169], 'goal', '🏁 도착');
   if (nextDn <= 170 && nextDn !== 1) { const nn = L.nodes[nextDn - 1], t = el('div', 'ntag next below', '다음'); t.style.left = nn.x + '%'; t.style.top = (nn.y + (nextDn === S.cur ? 84 : 70)) + 'px'; M.append(t); }
   const fixArrows = () => { const W = M.clientWidth; if (!W) return; arrows.forEach(([ar, a, b2]) => { ar.style.transform = 'translate(-50%,-50%) rotate(' + (Math.atan2((b2.y - a.y), (b2.x - a.x) * W / 100) * 180 / Math.PI).toFixed(1) + 'deg)'; }); };
   // 몽글이(오늘 돌 위)
