@@ -9,7 +9,21 @@ const POSE_HOW = { 'ㅣ': '똑바로 서서 팔을 몸에 붙여요', 'ㅏ': '�
   'ㅡ': '바닥에 누워 몸을 쭉 펴요', 'ㅇ': '두 팔로 머리 위에 동그라미를 만들어요', 'ㄱ': '허리를 숙여 ㄱ 모양을 만들어요', 'ㄴ': '앉아서 다리를 앞으로 쭉 뻗어요', 'ㄷ': '엄마 아빠랑 둘이 ㄷ 모양을 만들어요',
   'ㄹ': '팔을 꼬불꼬불 흔들어요', 'ㅁ': '엄마 아빠랑 손을 잡고 네모를 만들어요', 'ㅂ': '두 팔을 위로 들고 가운데 손을 모아요', 'ㅅ': '두 팔을 비스듬히 내려 지붕을 만들어요', 'ㅈ': '팔을 위에 한 줄 놓고 ㅅ처럼 서요',
   'ㅎ': '손으로 모자를 쓰고 동그랗게 웃어요', 'ㅋ': 'ㄱ 모양에서 팔 하나를 더 뻗어요', 'ㅌ': 'ㄷ 모양에 팔 하나를 더해요', 'ㅊ': 'ㅈ 위에 손가락 모자를 콕', 'ㅍ': '두 팔을 위아래로 쭉, 다리도 쭉' };
-const POSE_PIC = { 'ㅣ': 'pose_i', 'ㅏ': 'pose_a', 'ㄱ': 'pose_g', 'ㅇ': 'pose_ng' };
+const POSE_PIC = { 'ㅣ': 'pose_i', 'ㅏ': 'pose_a', 'ㅓ': 'pose_eo', 'ㅗ': 'pose_o', 'ㅜ': 'pose_u', 'ㅡ': 'pose_eu', 'ㄱ': 'pose_g', 'ㄴ': 'pose_n', 'ㄷ': 'pose_d', 'ㄹ': 'pose_r',
+  'ㅁ': 'pose_m', 'ㅂ': 'pose_b', 'ㅅ': 'pose_s', 'ㅇ': 'pose_ng', 'ㅈ': 'pose_j', 'ㅊ': 'pose_ch', 'ㅋ': 'pose_k', 'ㅌ': 'pose_t', 'ㅍ': 'pose_p', 'ㅎ': 'pose_h' };   // 11/06 v5: 자모 20개 전부(약한 컷 pose_u·m·s·g·k·r·p 도 연결만, 재생성 예정)
+/* 11/06 v5 아트(assets/v5_art.js → V5ART): 하위 폴더 그림. v5Has(id) / V5PIC(id) / v5Img(id, 대체, cls) */
+const V5 = typeof V5ART !== 'undefined' ? V5ART : {};
+const V5_KIND = {}; Object.entries(V5).forEach(([k, ids]) => ids.forEach(i => { V5_KIND[i] = k; }));
+const v5Has = id => !!V5_KIND[id];
+const V5PIC = id => 'assets/pic/' + (V5_KIND[id] && V5_KIND[id] !== 'pose' ? V5_KIND[id] + '/' : '') + id + '.webp';
+const v5Img = (id, fb, cls) => v5Has(id) ? '<img class="' + (cls || 'v5') + '" alt="" src="' + V5PIC(id) + '" draggable="false">' : (fb || '');
+/* 몸쉼(쭈욱 쉬기) 그림 12장: 판정 없이 골라서 따라 하기 */
+const STRETCH_HOW = ['하늘까지 쭉!', '옆으로 쭉 기울여요', '어깨를 빙글빙글', '앉아서 발끝 콕', '고양이처럼 등을 둥글게', '나무처럼 한 발로', '두 팔 크게 동그라미', '목을 천천히 끄덕끄덕', '손목 발목 흔들흔들', '깊게 숨 쉬기 후—', '무릎 안고 쉬기', '기지개 쭉 — 다 했다!'];
+/* 놀이 그림 아이콘(v5 playicon). 없는 놀이는 PLAY_ICON 이모지 */
+const PLAY_PIC = { balloon: 'pi_balloon', body: 'pi_body', chant: 'pi_chant', readword: 'pi_read', listen: 'pi_read', story: 'pi_story', stickerstory: 'pi_story', sort: 'pi_sort', trace: 'pi_trace', copy: 'pi_trace' };
+/* 11/06: v5 그림이 없는 놀이는 같은 모양의 SVG 아이콘(assets/icons/play/*.svg) — OS 이모지 섞이지 않게 */
+const PLAY_SVG = { yesterday: 'cards', memory: 'cards', match: 'cards', letter: 'letter', block: 'block', merge: 'block', map: 'map', cloud: 'cloud', treasure: 'treasure', name: 'name', clap: 'clap', blend: 'blend', same: 'same', pick: 'pick', seek: 'seek', train: 'train', choose: 'choose', pick3: 'dice', dictate: 'ear', echo: 'echo' };
+const playIcon = (t, cls) => v5Has(PLAY_PIC[t]) ? v5Img(PLAY_PIC[t], '', cls || 'picon') : PLAY_SVG[t] ? '<img class="' + (cls || 'picon') + ' psvg" alt="" src="assets/icons/play/' + PLAY_SVG[t] + '.svg" draggable="false">' : ((typeof PLAY_ICON !== 'undefined' && PLAY_ICON[t]) || '⭐');
 /* 헷갈리는 짝(오답 보기 먼저) */
 const CONF = { 'ㅏ': 'ㅓ', 'ㅓ': 'ㅏ', 'ㅗ': 'ㅜ', 'ㅜ': 'ㅗ', 'ㅡ': 'ㅣ', 'ㅣ': 'ㅡ', 'ㄱ': 'ㅋ', 'ㅋ': 'ㄱ', 'ㄷ': 'ㅌ', 'ㅌ': 'ㄷ', 'ㅂ': 'ㅍ', 'ㅍ': 'ㅂ', 'ㅈ': 'ㅊ', 'ㅊ': 'ㅈ', 'ㄴ': 'ㄷ', 'ㅁ': 'ㅂ', 'ㅅ': 'ㅈ', 'ㅎ': 'ㅇ', 'ㅇ': 'ㅎ', 'ㄹ': 'ㄷ' };
 /* 놀이 아이콘(아이 화면, 그림 없을 때) */
@@ -22,6 +36,8 @@ const WORLDS = [
   { n: 1, name: '몽글이 숲', deco: ['🌳', '🍄', '🌼', '🌲'], acc: '🎀' }, { n: 2, name: '자음 기차역', deco: ['🚉', '🚂', '🛤️', '🎫'], acc: '🎒' },
   { n: 3, name: '글자 놀이터', deco: ['🛝', '🎠', '🪁', '⚽'], acc: '🦸' }, { n: 4, name: '받침 나라', deco: ['🏰', '🧱', '🚩', '🗝️'], acc: '🧭' },
   { n: 5, name: '글자 탐험대', deco: ['🧭', '🏕️', '🔭', '⛺'], acc: '✏️' }, { n: 6, name: '려원이 도서관', deco: ['📚', '🖍️', '📖', '🪑'], acc: '🎨' }];
+/* 11/06 v5: 세계마다 지도 랜드마크 그림(assets/pic/map/lm_*). 그림이 있으면 이모지 deco 대신 씀 */
+const WORLD_LM = { 1: ['lm_garden', 'lm_pond', 'lm_park'], 2: ['lm_train', 'lm_bus', 'lm_radio'], 3: ['lm_park', 'lm_zoo', 'lm_hat'], 4: ['lm_pizza', 'lm_garden', 'lm_hat'], 5: ['lm_zoo', 'lm_pond', 'lm_bus'], 6: ['lm_radio', 'lm_pizza', 'lm_train'] };
 const TOWN_BUILDINGS = ['🏠', '🚉', '🎪', '🏰', '⛺', '📚'];
 const TOWN_PROPS = ['🌷', '🪑', '🏮', '🌳', '🎐', '🪁', '🐤', '🌻', '🚲', '🎈', '🏵️', '🪴', '🧸', '⛲', '🎠', '🌈', '⭐'];
 const READY_DAYS = 55;   // v4 1부: 1~55일(1·2단계)까지 내용·음성 있음. 56일부터는 지도에 '곧 열려요'

@@ -1,2392 +1,2502 @@
 [
-{
-"id": "ryeowon",
-"file": "ryeowon.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "려원",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "eomma",
-"file": "eomma.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "엄마",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "appa",
-"file": "appa.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "아빠",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "halmeoni",
-"file": "halmeoni.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "할머니",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "harabeoji",
-"file": "harabeoji.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "할아버지",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "agi",
-"file": "agi.png",
-"kind": "word",
-"need_by_day": 1,
-"what": "아기",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ai",
-"file": "ai.png",
-"kind": "word",
-"need_by_day": 6,
-"what": "아이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "i_tooth",
-"file": "i_tooth.png",
-"kind": "word",
-"need_by_day": 6,
-"what": "이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "oi",
-"file": "oi.png",
-"kind": "word",
-"need_by_day": 6,
-"what": "오이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ori",
-"file": "ori.png",
-"kind": "word",
-"need_by_day": 11,
-"what": "오리",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "uyu",
-"file": "uyu.png",
-"kind": "word",
-"need_by_day": 11,
-"what": "우유",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ubi",
-"file": "ubi.png",
-"kind": "word",
-"need_by_day": 11,
-"what": "우비",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "eobu",
-"file": "eobu.png",
-"kind": "word",
-"need_by_day": 16,
-"what": "어부",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "eureureong",
-"file": "eureureong.png",
-"kind": "word",
-"need_by_day": 16,
-"what": "으르렁",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "yeou",
-"file": "yeou.png",
-"kind": "word",
-"need_by_day": 16,
-"what": "여우",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ima",
-"file": "ima.png",
-"kind": "word",
-"need_by_day": 16,
-"what": "이마",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gicha",
-"file": "gicha.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "기차",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "nabi",
-"file": "nabi.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "나비",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "geomi",
-"file": "geomi.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "거미",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "nuna",
-"file": "nuna.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "누나",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gogi",
-"file": "gogi.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "고기",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "namu",
-"file": "namu.png",
-"kind": "word",
-"need_by_day": 21,
-"what": "나무",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "dari",
-"file": "dari.png",
-"kind": "word",
-"need_by_day": 26,
-"what": "다리",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "dubu",
-"file": "dubu.png",
-"kind": "word",
-"need_by_day": 26,
-"what": "두부",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "moja",
-"file": "moja.png",
-"kind": "word",
-"need_by_day": 26,
-"what": "모자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "meori",
-"file": "meori.png",
-"kind": "word",
-"need_by_day": 26,
-"what": "머리",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "mogi",
-"file": "mogi.png",
-"kind": "word",
-"need_by_day": 26,
-"what": "모기",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bada",
-"file": "bada.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "바다",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "banana",
-"file": "banana.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "바나나",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "beoseu",
-"file": "beoseu.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "버스",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "lion",
-"file": "lion.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "사자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "so",
-"file": "so.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "소",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "siso",
-"file": "siso.png",
-"kind": "word",
-"need_by_day": 31,
-"what": "시소",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "jadu",
-"file": "jadu.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "자두",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "juseu",
-"file": "juseu.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "주스",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "hama",
-"file": "hama.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "하마",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "heori",
-"file": "heori.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "허리",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "hodu",
-"file": "hodu.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "호두",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "jido",
-"file": "jido.png",
-"kind": "word",
-"need_by_day": 36,
-"what": "지도",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "radio",
-"file": "radio.png",
-"kind": "word",
-"need_by_day": 41,
-"what": "라디오",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "sora",
-"file": "sora.png",
-"kind": "word",
-"need_by_day": 41,
-"what": "소라",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ko",
-"file": "ko.png",
-"kind": "word",
-"need_by_day": 46,
-"what": "코",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ki",
-"file": "ki.png",
-"kind": "word",
-"need_by_day": 46,
-"what": "키",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "tajo",
-"file": "tajo.png",
-"kind": "word",
-"need_by_day": 46,
-"what": "타조",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gita",
-"file": "gita.png",
-"kind": "word",
-"need_by_day": 46,
-"what": "기타",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "tomato",
-"file": "tomato.png",
-"kind": "word",
-"need_by_day": 46,
-"what": "토마토",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "chima",
-"file": "chima.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "치마",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "chijeu",
-"file": "chijeu.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "치즈",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "pija",
-"file": "pija.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "피자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "podo",
-"file": "podo.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "포도",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "pado",
-"file": "pado.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "파도",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "cha",
-"file": "cha.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "차",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gochu",
-"file": "gochu.png",
-"kind": "word",
-"need_by_day": 51,
-"what": "고추",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gudu",
-"file": "gudu.png",
-"kind": "word",
-"need_by_day": 56,
-"what": "구두",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "yagu",
-"file": "yagu.png",
-"kind": "word",
-"need_by_day": 61,
-"what": "야구",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "yoyo",
-"file": "yoyo.png",
-"kind": "word",
-"need_by_day": 61,
-"what": "요요",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "hyuji",
-"file": "hyuji.png",
-"kind": "word",
-"need_by_day": 61,
-"what": "휴지",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gae",
-"file": "gae.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "개",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bae",
-"file": "bae.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "배",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ge",
-"file": "ge.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "게",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "saeu",
-"file": "saeu.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "새우",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "haema",
-"file": "haema.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "해마",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "nemo",
-"file": "nemo.png",
-"kind": "word",
-"need_by_day": 66,
-"what": "네모",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gorae",
-"file": "gorae.png",
-"kind": "word",
-"need_by_day": 71,
-"what": "고래",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gong",
-"file": "gong.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "공",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gabang",
-"file": "gabang.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "가방",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "satang",
-"file": "satang.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "사탕",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gangaji",
-"file": "gangaji.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "강아지",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "goyangi",
-"file": "goyangi.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "고양이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "kong",
-"file": "kong.png",
-"kind": "word",
-"need_by_day": 76,
-"what": "콩",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gom",
-"file": "gom.png",
-"kind": "word",
-"need_by_day": 81,
-"what": "곰",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gam",
-"file": "gam.png",
-"kind": "word",
-"need_by_day": 81,
-"what": "감",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bam",
-"file": "bam.png",
-"kind": "word",
-"need_by_day": 81,
-"what": "밤",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gimchi",
-"file": "gimchi.png",
-"kind": "word",
-"need_by_day": 81,
-"what": "김치",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "geurim",
-"file": "geurim.png",
-"kind": "word",
-"need_by_day": 81,
-"what": "그림",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "nun",
-"file": "nun.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "눈",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "son",
-"file": "son.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "손",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "san",
-"file": "san.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "산",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "mun",
-"file": "mun.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "문",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "girin",
-"file": "girin.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "기린",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ramyeon",
-"file": "ramyeon.png",
-"kind": "word",
-"need_by_day": 86,
-"what": "라면",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "mul",
-"file": "mul.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "물",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "dal",
-"file": "dal.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "달",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "byeol",
-"file": "byeol.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "별",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bal",
-"file": "bal.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "발",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "mal",
-"file": "mal.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "말",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "haneul",
-"file": "haneul.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "하늘",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gorilla",
-"file": "gorilla.png",
-"kind": "word",
-"need_by_day": 91,
-"what": "고릴라",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "chaek",
-"file": "chaek.png",
-"kind": "word",
-"need_by_day": 96,
-"what": "책",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "subak",
-"file": "subak.png",
-"kind": "word",
-"need_by_day": 96,
-"what": "수박",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ageo",
-"file": "ageo.png",
-"kind": "word",
-"need_by_day": 96,
-"what": "악어",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "guk",
-"file": "guk.png",
-"kind": "word",
-"need_by_day": 96,
-"what": "국",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "hobak",
-"file": "hobak.png",
-"kind": "word",
-"need_by_day": 96,
-"what": "호박",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bap",
-"file": "bap.png",
-"kind": "word",
-"need_by_day": 101,
-"what": "밥",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "jip",
-"file": "jip.png",
-"kind": "word",
-"need_by_day": 101,
-"what": "집",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ip",
-"file": "ip.png",
-"kind": "word",
-"need_by_day": 101,
-"what": "입",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "keop",
-"file": "keop.png",
-"kind": "word",
-"need_by_day": 101,
-"what": "컵",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gimbap",
-"file": "gimbap.png",
-"kind": "word",
-"need_by_day": 101,
-"what": "김밥",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ot",
-"file": "ot.png",
-"kind": "word",
-"need_by_day": 106,
-"what": "옷",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "bit",
-"file": "bit.png",
-"kind": "word",
-"need_by_day": 106,
-"what": "빗",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "beoseot",
-"file": "beoseot.png",
-"kind": "word",
-"need_by_day": 106,
-"what": "버섯",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "robot",
-"file": "robot.png",
-"kind": "word",
-"need_by_day": 106,
-"what": "로봇",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "tokki",
-"file": "tokki.png",
-"kind": "word",
-"need_by_day": 116,
-"what": "토끼",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ttalgi",
-"file": "ttalgi.png",
-"kind": "word",
-"need_by_day": 116,
-"what": "딸기",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "tteok",
-"file": "tteok.png",
-"kind": "word",
-"need_by_day": 116,
-"what": "떡",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "kkachi",
-"file": "kkachi.png",
-"kind": "word",
-"need_by_day": 116,
-"what": "까치",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "kkori",
-"file": "kkori.png",
-"kind": "word",
-"need_by_day": 116,
-"what": "꼬리",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ppang",
-"file": "ppang.png",
-"kind": "word",
-"need_by_day": 121,
-"what": "빵",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ssiat",
-"file": "ssiat.png",
-"kind": "word",
-"need_by_day": 121,
-"what": "씨앗",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "jjigae",
-"file": "jjigae.png",
-"kind": "word",
-"need_by_day": 121,
-"what": "찌개",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "ppoppo",
-"file": "ppoppo.png",
-"kind": "word",
-"need_by_day": 121,
-"what": "뽀뽀",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "sagwa",
-"file": "sagwa.png",
-"kind": "word",
-"need_by_day": 126,
-"what": "사과",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gwaja",
-"file": "gwaja.png",
-"kind": "word",
-"need_by_day": 126,
-"what": "과자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "hwabun",
-"file": "hwabun.png",
-"kind": "word",
-"need_by_day": 126,
-"what": "화분",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "wonsungi",
-"file": "wonsungi.png",
-"kind": "word",
-"need_by_day": 126,
-"what": "원숭이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "uija",
-"file": "uija.png",
-"kind": "word",
-"need_by_day": 131,
-"what": "의자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gawi",
-"file": "gawi.png",
-"kind": "word",
-"need_by_day": 131,
-"what": "가위",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gwi",
-"file": "gwi.png",
-"kind": "word",
-"need_by_day": 131,
-"what": "귀",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "dwaeji",
-"file": "dwaeji.png",
-"kind": "word",
-"need_by_day": 131,
-"what": "돼지",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "sijang",
-"file": "sijang.png",
-"kind": "word",
-"need_by_day": 136,
-"what": "시장",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "monggeuri",
-"file": "monggeuri.png",
-"kind": "word",
-"need_by_day": 146,
-"what": "몽글이",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "saranghae",
-"file": "saranghae.png",
-"kind": "word",
-"need_by_day": 161,
-"what": "사랑해",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "gomawo",
-"file": "gomawo.png",
-"kind": "word",
-"need_by_day": 161,
-"what": "고마워",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "nolja",
-"file": "nolja.png",
-"kind": "word",
-"need_by_day": 161,
-"what": "놀자",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "seonmul",
-"file": "seonmul.png",
-"kind": "word",
-"need_by_day": 166,
-"what": "선물",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "janchi",
-"file": "janchi.png",
-"kind": "word",
-"need_by_day": 166,
-"what": "잔치",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "기존 낱말 그림과 같은 스타일"
-},
-{
-"id": "scene_01",
-"file": "scene_01.png",
-"kind": "scene",
-"need_by_day": 1,
-"what": "몽글이 집 (단원 1 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_02",
-"file": "scene_02.png",
-"kind": "scene",
-"need_by_day": 6,
-"what": "몽글이 마당 (단원 2 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_03",
-"file": "scene_03.png",
-"kind": "scene",
-"need_by_day": 11,
-"what": "연못 (단원 3 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_04",
-"file": "scene_04.png",
-"kind": "scene",
-"need_by_day": 16,
-"what": "숲속 동굴 (단원 4 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_05",
-"file": "scene_05.png",
-"kind": "scene",
-"need_by_day": 21,
-"what": "기차역 (단원 5 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_06",
-"file": "scene_06.png",
-"kind": "scene",
-"need_by_day": 26,
-"what": "모자 가게 (단원 6 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_07",
-"file": "scene_07.png",
-"kind": "scene",
-"need_by_day": 31,
-"what": "버스 정류장 (단원 7 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_08",
-"file": "scene_08.png",
-"kind": "scene",
-"need_by_day": 36,
-"what": "동물원 (단원 8 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_09",
-"file": "scene_09.png",
-"kind": "scene",
-"need_by_day": 41,
-"what": "라디오 방송국 (단원 9 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_10",
-"file": "scene_10.png",
-"kind": "scene",
-"need_by_day": 46,
-"what": "놀이공원 (단원 10 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_11",
-"file": "scene_11.png",
-"kind": "scene",
-"need_by_day": 51,
-"what": "피자 가게 (단원 11 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_12",
-"file": "scene_12.png",
-"kind": "scene",
-"need_by_day": 56,
-"what": "신발 가게 (단원 12 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_13",
-"file": "scene_13.png",
-"kind": "scene",
-"need_by_day": 61,
-"what": "야구장 (단원 13 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_14",
-"file": "scene_14.png",
-"kind": "scene",
-"need_by_day": 66,
-"what": "바닷가 마을 (단원 14 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_15",
-"file": "scene_15.png",
-"kind": "scene",
-"need_by_day": 71,
-"what": "고래 섬 (단원 15 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_16",
-"file": "scene_16.png",
-"kind": "scene",
-"need_by_day": 76,
-"what": "강아지 마을 (단원 16 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_17",
-"file": "scene_17.png",
-"kind": "scene",
-"need_by_day": 81,
-"what": "곰 숲 (단원 17 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_18",
-"file": "scene_18.png",
-"kind": "scene",
-"need_by_day": 86,
-"what": "눈 마을 (단원 18 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_19",
-"file": "scene_19.png",
-"kind": "scene",
-"need_by_day": 91,
-"what": "밤하늘 (단원 19 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_20",
-"file": "scene_20.png",
-"kind": "scene",
-"need_by_day": 96,
-"what": "도서관 (단원 20 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_21",
-"file": "scene_21.png",
-"kind": "scene",
-"need_by_day": 101,
-"what": "부엌 (단원 21 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_22",
-"file": "scene_22.png",
-"kind": "scene",
-"need_by_day": 106,
-"what": "옷 가게 (단원 22 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_23",
-"file": "scene_23.png",
-"kind": "scene",
-"need_by_day": 111,
-"what": "받침 나라 성 (단원 23 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_24",
-"file": "scene_24.png",
-"kind": "scene",
-"need_by_day": 116,
-"what": "딸기 밭 (단원 24 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_25",
-"file": "scene_25.png",
-"kind": "scene",
-"need_by_day": 121,
-"what": "빵집 (단원 25 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_26",
-"file": "scene_26.png",
-"kind": "scene",
-"need_by_day": 126,
-"what": "과수원 (단원 26 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_27",
-"file": "scene_27.png",
-"kind": "scene",
-"need_by_day": 131,
-"what": "미용실 (단원 27 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_28",
-"file": "scene_28.png",
-"kind": "scene",
-"need_by_day": 136,
-"what": "시장 (단원 28 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_29",
-"file": "scene_29.png",
-"kind": "scene",
-"need_by_day": 141,
-"what": "바다 (단원 29 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_30",
-"file": "scene_30.png",
-"kind": "scene",
-"need_by_day": 146,
-"what": "몽글이 우체국 (단원 30 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_31",
-"file": "scene_31.png",
-"kind": "scene",
-"need_by_day": 151,
-"what": "몽글이 학교 (단원 31 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_32",
-"file": "scene_32.png",
-"kind": "scene",
-"need_by_day": 156,
-"what": "몽글이 학교 운동장 (단원 32 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_33",
-"file": "scene_33.png",
-"kind": "scene",
-"need_by_day": 161,
-"what": "몽글이 편지함 (단원 33 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "scene_34",
-"file": "scene_34.png",
-"kind": "scene",
-"need_by_day": 166,
-"what": "몽글이 마을 광장 (단원 34 이야기 배경)",
-"size": "1024x768 가로 4:3",
-"have": true,
-"note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
-},
-{
-"id": "map_w1",
-"file": "map_w1.png",
-"kind": "map",
-"need_by_day": 1,
-"what": "지도 세계 배경: 몽글이 숲",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "map_w2",
-"file": "map_w2.png",
-"kind": "map",
-"need_by_day": 31,
-"what": "지도 세계 배경: 자음 기차역",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "map_w3",
-"file": "map_w3.png",
-"kind": "map",
-"need_by_day": 61,
-"what": "지도 세계 배경: 글자 놀이터",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "map_w4",
-"file": "map_w4.png",
-"kind": "map",
-"need_by_day": 91,
-"what": "지도 세계 배경: 받침 나라",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "map_w5",
-"file": "map_w5.png",
-"kind": "map",
-"need_by_day": 121,
-"what": "지도 세계 배경: 글자 탐험대",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "map_w6",
-"file": "map_w6.png",
-"kind": "map",
-"need_by_day": 151,
-"what": "지도 세계 배경: 려원이 도서관",
-"size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
-"have": true,
-"note": "길·돌은 앱이 그림(배경만)"
-},
-{
-"id": "lp_k",
-"file": "lp_k.png",
-"kind": "letter-pic",
-"need_by_day": 46,
-"what": "그림 속 글자 ㅋ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_t",
-"file": "lp_t.png",
-"kind": "letter-pic",
-"need_by_day": 47,
-"what": "그림 속 글자 ㅌ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_ch",
-"file": "lp_ch.png",
-"kind": "letter-pic",
-"need_by_day": 51,
-"what": "그림 속 글자 ㅊ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_p",
-"file": "lp_p.png",
-"kind": "letter-pic",
-"need_by_day": 52,
-"what": "그림 속 글자 ㅍ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_ya",
-"file": "lp_ya.png",
-"kind": "letter-pic",
-"need_by_day": 61,
-"what": "그림 속 글자 ㅑ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_yeo",
-"file": "lp_yeo.png",
-"kind": "letter-pic",
-"need_by_day": 61,
-"what": "그림 속 글자 ㅕ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_yo",
-"file": "lp_yo.png",
-"kind": "letter-pic",
-"need_by_day": 61,
-"what": "그림 속 글자 ㅛ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_yu",
-"file": "lp_yu.png",
-"kind": "letter-pic",
-"need_by_day": 61,
-"what": "그림 속 글자 ㅠ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_ae",
-"file": "lp_ae.png",
-"kind": "letter-pic",
-"need_by_day": 66,
-"what": "그림 속 글자 ㅐ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_e",
-"file": "lp_e.png",
-"kind": "letter-pic",
-"need_by_day": 66,
-"what": "그림 속 글자 ㅔ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_kk",
-"file": "lp_kk.png",
-"kind": "letter-pic",
-"need_by_day": 121,
-"what": "그림 속 글자 ㄲ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "lp_wa",
-"file": "lp_wa.png",
-"kind": "letter-pic",
-"need_by_day": 131,
-"what": "그림 속 글자 ㅘ",
-"size": "512x512",
-"have": true,
-"note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
-},
-{
-"id": "town_b1",
-"file": "town_b1.png",
-"kind": "town",
-"need_by_day": 20,
-"what": "마을 건물: 숲속 집",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_b2",
-"file": "town_b2.png",
-"kind": "town",
-"need_by_day": 55,
-"what": "마을 건물: 기차역",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_b3",
-"file": "town_b3.png",
-"kind": "town",
-"need_by_day": 75,
-"what": "마을 건물: 놀이터",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_b4",
-"file": "town_b4.png",
-"kind": "town",
-"need_by_day": 95,
-"what": "마을 건물: 받침 성",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_b5",
-"file": "town_b5.png",
-"kind": "town",
-"need_by_day": 115,
-"what": "마을 건물: 탐험대 텐트",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_b6",
-"file": "town_b6.png",
-"kind": "town",
-"need_by_day": 135,
-"what": "마을 건물: 도서관",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p1",
-"file": "town_p1.png",
-"kind": "town",
-"need_by_day": 5,
-"what": "마을 소품: 나무",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p2",
-"file": "town_p2.png",
-"kind": "town",
-"need_by_day": 15,
-"what": "마을 소품: 꽃밭",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p3",
-"file": "town_p3.png",
-"kind": "town",
-"need_by_day": 25,
-"what": "마을 소품: 우체통",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p4",
-"file": "town_p4.png",
-"kind": "town",
-"need_by_day": 35,
-"what": "마을 소품: 벤치",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p5",
-"file": "town_p5.png",
-"kind": "town",
-"need_by_day": 45,
-"what": "마을 소품: 가로등",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p6",
-"file": "town_p6.png",
-"kind": "town",
-"need_by_day": 55,
-"what": "마을 소품: 분수",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p7",
-"file": "town_p7.png",
-"kind": "town",
-"need_by_day": 65,
-"what": "마을 소품: 연못",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p8",
-"file": "town_p8.png",
-"kind": "town",
-"need_by_day": 75,
-"what": "마을 소품: 다리",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p9",
-"file": "town_p9.png",
-"kind": "town",
-"need_by_day": 85,
-"what": "마을 소품: 그네",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p10",
-"file": "town_p10.png",
-"kind": "town",
-"need_by_day": 95,
-"what": "마을 소품: 미끄럼틀",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p11",
-"file": "town_p11.png",
-"kind": "town",
-"need_by_day": 105,
-"what": "마을 소품: 텃밭",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p12",
-"file": "town_p12.png",
-"kind": "town",
-"need_by_day": 115,
-"what": "마을 소품: 풍차",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p13",
-"file": "town_p13.png",
-"kind": "town",
-"need_by_day": 125,
-"what": "마을 소품: 신호등",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p14",
-"file": "town_p14.png",
-"kind": "town",
-"need_by_day": 135,
-"what": "마을 소품: 시계탑",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p15",
-"file": "town_p15.png",
-"kind": "town",
-"need_by_day": 145,
-"what": "마을 소품: 깃발",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p16",
-"file": "town_p16.png",
-"kind": "town",
-"need_by_day": 155,
-"what": "마을 소품: 무지개",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "town_p17",
-"file": "town_p17.png",
-"kind": "town",
-"need_by_day": 165,
-"what": "마을 소품: 열기구",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "cloud_grump",
-"file": "cloud_grump.png",
-"kind": "play",
-"need_by_day": 5,
-"what": "심술 구름(심술, 무섭지 않게)",
-"size": "512x320 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "cloud_surprise",
-"file": "cloud_surprise.png",
-"kind": "play",
-"need_by_day": 5,
-"what": "심술 구름(놀람)",
-"size": "512x320 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "cloud_smile",
-"file": "cloud_smile.png",
-"kind": "play",
-"need_by_day": 5,
-"what": "구름(웃음)",
-"size": "512x320 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "chest_closed",
-"file": "chest_closed.png",
-"kind": "play",
-"need_by_day": 10,
-"what": "보물 상자(닫힘)",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "chest_open",
-"file": "chest_open.png",
-"kind": "play",
-"need_by_day": 10,
-"what": "보물 상자(열림, 반짝)",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "skin_balloon",
-"file": "skin_balloon.png",
-"kind": "play",
-"need_by_day": 2,
-"what": "풍선(글자 칸 비워 둠)",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "skin_fish",
-"file": "skin_fish.png",
-"kind": "play",
-"need_by_day": 2,
-"what": "물고기(글자 칸)",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "skin_star",
-"file": "skin_star.png",
-"kind": "play",
-"need_by_day": 2,
-"what": "별똥별(글자 칸)",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "basket_1",
-"file": "basket_1.png",
-"kind": "play",
-"need_by_day": 2,
-"what": "바구니 1",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "basket_2",
-"file": "basket_2.png",
-"kind": "play",
-"need_by_day": 2,
-"what": "바구니 2",
-"size": "256x256 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "pose_g",
-"file": "pose_g.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㄱ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_n",
-"file": "pose_n.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㄴ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_d",
-"file": "pose_d.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㄷ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_s",
-"file": "pose_s.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅅ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_ng",
-"file": "pose_ng.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅇ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_a",
-"file": "pose_a.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅏ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_i",
-"file": "pose_i.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅣ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_o",
-"file": "pose_o.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅗ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_u",
-"file": "pose_u.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅜ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "pose_eu",
-"file": "pose_eu.png",
-"kind": "pose",
-"need_by_day": 3,
-"what": "몽글이 몸 글자 포즈 ㅡ(선택)",
-"size": "512x512 투명",
-"have": false,
-"note": ""
-},
-{
-"id": "b_ng",
-"file": "b_ng.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㅇ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_m",
-"file": "b_m.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㅁ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_n",
-"file": "b_n.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㄴ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_l",
-"file": "b_l.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㄹ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_g",
-"file": "b_g.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㄱ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_b",
-"file": "b_b.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㅂ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "b_s",
-"file": "b_s.png",
-"kind": "batchim",
-"need_by_day": 56,
-"what": "받침 친구 ㅅ(글자 집 1층)",
-"size": "512x512 투명",
-"have": true,
-"note": ""
-},
-{
-"id": "treasure_map",
-"file": "treasure_map.png",
-"kind": "play",
-"need_by_day": 10,
-"what": "보물 지도(나침반 글자 지움)",
-"size": "1600x1200",
-"have": true,
-"note": ""
-},
-{
-"id": "keikeu",
-"file": "keikeu.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "케이크",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "추가 낱말(그림 고르기 무리·받침 단원)"
-},
-{
-"id": "kkot",
-"file": "kkot.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "꽃",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "추가 낱말(그림 고르기 무리·받침 단원)"
-},
-{
-"id": "nunsaram",
-"file": "nunsaram.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "눈사람",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "추가 낱말(그림 고르기 무리·받침 단원)"
-},
-{
-"id": "pungseon",
-"file": "pungseon.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "풍선",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "추가 낱말(그림 고르기 무리·받침 단원)"
-},
-{
-"id": "tteokguk",
-"file": "tteokguk.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "떡국",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "추가 낱말(그림 고르기 무리·받침 단원)"
-},
-{
-"id": "sobangcha",
-"file": "sobangcha.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "소방차",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "곧 옴 — 파일이 생기면 바로 씀"
-},
-{
-"id": "sangeo",
-"file": "sangeo.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "상어",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "곧 옴 — 파일이 생기면 바로 씀"
-},
-{
-"id": "ojingeo",
-"file": "ojingeo.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "오징어",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "곧 옴 — 파일이 생기면 바로 씀"
-},
-{
-"id": "geobuk",
-"file": "geobuk.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "거북",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "곧 옴 — 파일이 생기면 바로 씀"
-},
-{
-"id": "nuna_big",
-"file": "nuna_big.png",
-"kind": "word",
-"need_by_day": 999,
-"what": "누나 크게(숨은 글자 놀이에서만 nuna 대신 씀)",
-"size": "512x512 투명 배경",
-"have": true,
-"note": "곧 옴 — 파일이 생기면 바로 씀"
-}
+  {
+    "id": "ryeowon",
+    "file": "ryeowon.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "려원",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "eomma",
+    "file": "eomma.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "엄마",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "appa",
+    "file": "appa.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "아빠",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "halmeoni",
+    "file": "halmeoni.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "할머니",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "harabeoji",
+    "file": "harabeoji.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "할아버지",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "agi",
+    "file": "agi.png",
+    "kind": "word",
+    "need_by_day": 1,
+    "what": "아기",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ai",
+    "file": "ai.png",
+    "kind": "word",
+    "need_by_day": 6,
+    "what": "아이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "i_tooth",
+    "file": "i_tooth.png",
+    "kind": "word",
+    "need_by_day": 6,
+    "what": "이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "oi",
+    "file": "oi.png",
+    "kind": "word",
+    "need_by_day": 6,
+    "what": "오이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ori",
+    "file": "ori.png",
+    "kind": "word",
+    "need_by_day": 11,
+    "what": "오리",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "uyu",
+    "file": "uyu.png",
+    "kind": "word",
+    "need_by_day": 11,
+    "what": "우유",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ubi",
+    "file": "ubi.png",
+    "kind": "word",
+    "need_by_day": 11,
+    "what": "우비",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "eobu",
+    "file": "eobu.png",
+    "kind": "word",
+    "need_by_day": 16,
+    "what": "어부",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "eureureong",
+    "file": "eureureong.png",
+    "kind": "word",
+    "need_by_day": 16,
+    "what": "으르렁",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "yeou",
+    "file": "yeou.png",
+    "kind": "word",
+    "need_by_day": 16,
+    "what": "여우",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ima",
+    "file": "ima.png",
+    "kind": "word",
+    "need_by_day": 16,
+    "what": "이마",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gicha",
+    "file": "gicha.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "기차",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "nabi",
+    "file": "nabi.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "나비",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "geomi",
+    "file": "geomi.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "거미",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "nuna",
+    "file": "nuna.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "누나",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gogi",
+    "file": "gogi.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "고기",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "namu",
+    "file": "namu.png",
+    "kind": "word",
+    "need_by_day": 21,
+    "what": "나무",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "dari",
+    "file": "dari.png",
+    "kind": "word",
+    "need_by_day": 26,
+    "what": "다리",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "dubu",
+    "file": "dubu.png",
+    "kind": "word",
+    "need_by_day": 26,
+    "what": "두부",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "moja",
+    "file": "moja.png",
+    "kind": "word",
+    "need_by_day": 26,
+    "what": "모자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "meori",
+    "file": "meori.png",
+    "kind": "word",
+    "need_by_day": 26,
+    "what": "머리",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "mogi",
+    "file": "mogi.png",
+    "kind": "word",
+    "need_by_day": 26,
+    "what": "모기",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bada",
+    "file": "bada.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "바다",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "banana",
+    "file": "banana.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "바나나",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "beoseu",
+    "file": "beoseu.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "버스",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "lion",
+    "file": "lion.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "사자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "so",
+    "file": "so.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "소",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "siso",
+    "file": "siso.png",
+    "kind": "word",
+    "need_by_day": 31,
+    "what": "시소",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "jadu",
+    "file": "jadu.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "자두",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "juseu",
+    "file": "juseu.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "주스",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "hama",
+    "file": "hama.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "하마",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "heori",
+    "file": "heori.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "허리",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "hodu",
+    "file": "hodu.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "호두",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "jido",
+    "file": "jido.png",
+    "kind": "word",
+    "need_by_day": 36,
+    "what": "지도",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "radio",
+    "file": "radio.png",
+    "kind": "word",
+    "need_by_day": 41,
+    "what": "라디오",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "sora",
+    "file": "sora.png",
+    "kind": "word",
+    "need_by_day": 41,
+    "what": "소라",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ko",
+    "file": "ko.png",
+    "kind": "word",
+    "need_by_day": 46,
+    "what": "코",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ki",
+    "file": "ki.png",
+    "kind": "word",
+    "need_by_day": 46,
+    "what": "키",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "tajo",
+    "file": "tajo.png",
+    "kind": "word",
+    "need_by_day": 46,
+    "what": "타조",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gita",
+    "file": "gita.png",
+    "kind": "word",
+    "need_by_day": 46,
+    "what": "기타",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "tomato",
+    "file": "tomato.png",
+    "kind": "word",
+    "need_by_day": 46,
+    "what": "토마토",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "chima",
+    "file": "chima.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "치마",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "chijeu",
+    "file": "chijeu.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "치즈",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "pija",
+    "file": "pija.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "피자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "podo",
+    "file": "podo.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "포도",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "pado",
+    "file": "pado.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "파도",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "cha",
+    "file": "cha.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "차",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gochu",
+    "file": "gochu.png",
+    "kind": "word",
+    "need_by_day": 51,
+    "what": "고추",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gudu",
+    "file": "gudu.png",
+    "kind": "word",
+    "need_by_day": 56,
+    "what": "구두",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "yagu",
+    "file": "yagu.png",
+    "kind": "word",
+    "need_by_day": 61,
+    "what": "야구",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "yoyo",
+    "file": "yoyo.png",
+    "kind": "word",
+    "need_by_day": 61,
+    "what": "요요",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "hyuji",
+    "file": "hyuji.png",
+    "kind": "word",
+    "need_by_day": 61,
+    "what": "휴지",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gae",
+    "file": "gae.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "개",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bae",
+    "file": "bae.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "배",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ge",
+    "file": "ge.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "게",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "saeu",
+    "file": "saeu.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "새우",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "haema",
+    "file": "haema.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "해마",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "nemo",
+    "file": "nemo.png",
+    "kind": "word",
+    "need_by_day": 66,
+    "what": "네모",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gorae",
+    "file": "gorae.png",
+    "kind": "word",
+    "need_by_day": 71,
+    "what": "고래",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gong",
+    "file": "gong.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "공",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gabang",
+    "file": "gabang.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "가방",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "satang",
+    "file": "satang.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "사탕",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gangaji",
+    "file": "gangaji.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "강아지",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "goyangi",
+    "file": "goyangi.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "고양이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "kong",
+    "file": "kong.png",
+    "kind": "word",
+    "need_by_day": 76,
+    "what": "콩",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gom",
+    "file": "gom.png",
+    "kind": "word",
+    "need_by_day": 81,
+    "what": "곰",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gam",
+    "file": "gam.png",
+    "kind": "word",
+    "need_by_day": 81,
+    "what": "감",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bam",
+    "file": "bam.png",
+    "kind": "word",
+    "need_by_day": 81,
+    "what": "밤",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gimchi",
+    "file": "gimchi.png",
+    "kind": "word",
+    "need_by_day": 81,
+    "what": "김치",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "geurim",
+    "file": "geurim.png",
+    "kind": "word",
+    "need_by_day": 81,
+    "what": "그림",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "nun",
+    "file": "nun.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "눈",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "son",
+    "file": "son.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "손",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "san",
+    "file": "san.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "산",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "mun",
+    "file": "mun.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "문",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "girin",
+    "file": "girin.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "기린",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ramyeon",
+    "file": "ramyeon.png",
+    "kind": "word",
+    "need_by_day": 86,
+    "what": "라면",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "mul",
+    "file": "mul.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "물",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "dal",
+    "file": "dal.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "달",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "byeol",
+    "file": "byeol.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "별",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bal",
+    "file": "bal.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "발",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "mal",
+    "file": "mal.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "말",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "haneul",
+    "file": "haneul.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "하늘",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gorilla",
+    "file": "gorilla.png",
+    "kind": "word",
+    "need_by_day": 91,
+    "what": "고릴라",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "chaek",
+    "file": "chaek.png",
+    "kind": "word",
+    "need_by_day": 96,
+    "what": "책",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "subak",
+    "file": "subak.png",
+    "kind": "word",
+    "need_by_day": 96,
+    "what": "수박",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ageo",
+    "file": "ageo.png",
+    "kind": "word",
+    "need_by_day": 96,
+    "what": "악어",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "guk",
+    "file": "guk.png",
+    "kind": "word",
+    "need_by_day": 96,
+    "what": "국",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "hobak",
+    "file": "hobak.png",
+    "kind": "word",
+    "need_by_day": 96,
+    "what": "호박",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bap",
+    "file": "bap.png",
+    "kind": "word",
+    "need_by_day": 101,
+    "what": "밥",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "jip",
+    "file": "jip.png",
+    "kind": "word",
+    "need_by_day": 101,
+    "what": "집",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ip",
+    "file": "ip.png",
+    "kind": "word",
+    "need_by_day": 101,
+    "what": "입",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "keop",
+    "file": "keop.png",
+    "kind": "word",
+    "need_by_day": 101,
+    "what": "컵",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gimbap",
+    "file": "gimbap.png",
+    "kind": "word",
+    "need_by_day": 101,
+    "what": "김밥",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ot",
+    "file": "ot.png",
+    "kind": "word",
+    "need_by_day": 106,
+    "what": "옷",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "bit",
+    "file": "bit.png",
+    "kind": "word",
+    "need_by_day": 106,
+    "what": "빗",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "beoseot",
+    "file": "beoseot.png",
+    "kind": "word",
+    "need_by_day": 106,
+    "what": "버섯",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "robot",
+    "file": "robot.png",
+    "kind": "word",
+    "need_by_day": 106,
+    "what": "로봇",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "tokki",
+    "file": "tokki.png",
+    "kind": "word",
+    "need_by_day": 116,
+    "what": "토끼",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ttalgi",
+    "file": "ttalgi.png",
+    "kind": "word",
+    "need_by_day": 116,
+    "what": "딸기",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "tteok",
+    "file": "tteok.png",
+    "kind": "word",
+    "need_by_day": 116,
+    "what": "떡",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "kkachi",
+    "file": "kkachi.png",
+    "kind": "word",
+    "need_by_day": 116,
+    "what": "까치",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "kkori",
+    "file": "kkori.png",
+    "kind": "word",
+    "need_by_day": 116,
+    "what": "꼬리",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ppang",
+    "file": "ppang.png",
+    "kind": "word",
+    "need_by_day": 121,
+    "what": "빵",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ssiat",
+    "file": "ssiat.png",
+    "kind": "word",
+    "need_by_day": 121,
+    "what": "씨앗",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "jjigae",
+    "file": "jjigae.png",
+    "kind": "word",
+    "need_by_day": 121,
+    "what": "찌개",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "ppoppo",
+    "file": "ppoppo.png",
+    "kind": "word",
+    "need_by_day": 121,
+    "what": "뽀뽀",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "sagwa",
+    "file": "sagwa.png",
+    "kind": "word",
+    "need_by_day": 126,
+    "what": "사과",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gwaja",
+    "file": "gwaja.png",
+    "kind": "word",
+    "need_by_day": 126,
+    "what": "과자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "hwabun",
+    "file": "hwabun.png",
+    "kind": "word",
+    "need_by_day": 126,
+    "what": "화분",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "wonsungi",
+    "file": "wonsungi.png",
+    "kind": "word",
+    "need_by_day": 126,
+    "what": "원숭이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "uija",
+    "file": "uija.png",
+    "kind": "word",
+    "need_by_day": 131,
+    "what": "의자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gawi",
+    "file": "gawi.png",
+    "kind": "word",
+    "need_by_day": 131,
+    "what": "가위",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gwi",
+    "file": "gwi.png",
+    "kind": "word",
+    "need_by_day": 131,
+    "what": "귀",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "dwaeji",
+    "file": "dwaeji.png",
+    "kind": "word",
+    "need_by_day": 131,
+    "what": "돼지",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "sijang",
+    "file": "sijang.png",
+    "kind": "word",
+    "need_by_day": 136,
+    "what": "시장",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "monggeuri",
+    "file": "monggeuri.png",
+    "kind": "word",
+    "need_by_day": 146,
+    "what": "몽글이",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "saranghae",
+    "file": "saranghae.png",
+    "kind": "word",
+    "need_by_day": 161,
+    "what": "사랑해",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "gomawo",
+    "file": "gomawo.png",
+    "kind": "word",
+    "need_by_day": 161,
+    "what": "고마워",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "nolja",
+    "file": "nolja.png",
+    "kind": "word",
+    "need_by_day": 161,
+    "what": "놀자",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "seonmul",
+    "file": "seonmul.png",
+    "kind": "word",
+    "need_by_day": 166,
+    "what": "선물",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "janchi",
+    "file": "janchi.png",
+    "kind": "word",
+    "need_by_day": 166,
+    "what": "잔치",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "기존 낱말 그림과 같은 스타일"
+  },
+  {
+    "id": "scene_01",
+    "file": "scene_01.png",
+    "kind": "scene",
+    "need_by_day": 1,
+    "what": "몽글이 집 (단원 1 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_02",
+    "file": "scene_02.png",
+    "kind": "scene",
+    "need_by_day": 6,
+    "what": "몽글이 마당 (단원 2 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_03",
+    "file": "scene_03.png",
+    "kind": "scene",
+    "need_by_day": 11,
+    "what": "연못 (단원 3 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_04",
+    "file": "scene_04.png",
+    "kind": "scene",
+    "need_by_day": 16,
+    "what": "숲속 동굴 (단원 4 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_05",
+    "file": "scene_05.png",
+    "kind": "scene",
+    "need_by_day": 21,
+    "what": "기차역 (단원 5 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_06",
+    "file": "scene_06.png",
+    "kind": "scene",
+    "need_by_day": 26,
+    "what": "모자 가게 (단원 6 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_07",
+    "file": "scene_07.png",
+    "kind": "scene",
+    "need_by_day": 31,
+    "what": "버스 정류장 (단원 7 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_08",
+    "file": "scene_08.png",
+    "kind": "scene",
+    "need_by_day": 36,
+    "what": "동물원 (단원 8 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_09",
+    "file": "scene_09.png",
+    "kind": "scene",
+    "need_by_day": 41,
+    "what": "라디오 방송국 (단원 9 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_10",
+    "file": "scene_10.png",
+    "kind": "scene",
+    "need_by_day": 46,
+    "what": "놀이공원 (단원 10 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_11",
+    "file": "scene_11.png",
+    "kind": "scene",
+    "need_by_day": 51,
+    "what": "피자 가게 (단원 11 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_12",
+    "file": "scene_12.png",
+    "kind": "scene",
+    "need_by_day": 56,
+    "what": "신발 가게 (단원 12 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_13",
+    "file": "scene_13.png",
+    "kind": "scene",
+    "need_by_day": 61,
+    "what": "야구장 (단원 13 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_14",
+    "file": "scene_14.png",
+    "kind": "scene",
+    "need_by_day": 66,
+    "what": "바닷가 마을 (단원 14 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_15",
+    "file": "scene_15.png",
+    "kind": "scene",
+    "need_by_day": 71,
+    "what": "고래 섬 (단원 15 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_16",
+    "file": "scene_16.png",
+    "kind": "scene",
+    "need_by_day": 76,
+    "what": "강아지 마을 (단원 16 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_17",
+    "file": "scene_17.png",
+    "kind": "scene",
+    "need_by_day": 81,
+    "what": "곰 숲 (단원 17 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_18",
+    "file": "scene_18.png",
+    "kind": "scene",
+    "need_by_day": 86,
+    "what": "눈 마을 (단원 18 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_19",
+    "file": "scene_19.png",
+    "kind": "scene",
+    "need_by_day": 91,
+    "what": "밤하늘 (단원 19 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_20",
+    "file": "scene_20.png",
+    "kind": "scene",
+    "need_by_day": 96,
+    "what": "도서관 (단원 20 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_21",
+    "file": "scene_21.png",
+    "kind": "scene",
+    "need_by_day": 101,
+    "what": "부엌 (단원 21 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_22",
+    "file": "scene_22.png",
+    "kind": "scene",
+    "need_by_day": 106,
+    "what": "옷 가게 (단원 22 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_23",
+    "file": "scene_23.png",
+    "kind": "scene",
+    "need_by_day": 111,
+    "what": "받침 나라 성 (단원 23 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_24",
+    "file": "scene_24.png",
+    "kind": "scene",
+    "need_by_day": 116,
+    "what": "딸기 밭 (단원 24 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_25",
+    "file": "scene_25.png",
+    "kind": "scene",
+    "need_by_day": 121,
+    "what": "빵집 (단원 25 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_26",
+    "file": "scene_26.png",
+    "kind": "scene",
+    "need_by_day": 126,
+    "what": "과수원 (단원 26 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_27",
+    "file": "scene_27.png",
+    "kind": "scene",
+    "need_by_day": 131,
+    "what": "미용실 (단원 27 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_28",
+    "file": "scene_28.png",
+    "kind": "scene",
+    "need_by_day": 136,
+    "what": "시장 (단원 28 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_29",
+    "file": "scene_29.png",
+    "kind": "scene",
+    "need_by_day": 141,
+    "what": "바다 (단원 29 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_30",
+    "file": "scene_30.png",
+    "kind": "scene",
+    "need_by_day": 146,
+    "what": "몽글이 우체국 (단원 30 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_31",
+    "file": "scene_31.png",
+    "kind": "scene",
+    "need_by_day": 151,
+    "what": "몽글이 학교 (단원 31 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_32",
+    "file": "scene_32.png",
+    "kind": "scene",
+    "need_by_day": 156,
+    "what": "몽글이 학교 운동장 (단원 32 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_33",
+    "file": "scene_33.png",
+    "kind": "scene",
+    "need_by_day": 161,
+    "what": "몽글이 편지함 (단원 33 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "scene_34",
+    "file": "scene_34.png",
+    "kind": "scene",
+    "need_by_day": 166,
+    "what": "몽글이 마을 광장 (단원 34 이야기 배경)",
+    "size": "1024x768 가로 4:3",
+    "have": true,
+    "note": "가운데 비워 두기 — 낱말 그림을 스티커처럼 올림"
+  },
+  {
+    "id": "map_w1",
+    "file": "map_w1.png",
+    "kind": "map",
+    "need_by_day": 1,
+    "what": "지도 세계 배경: 몽글이 숲",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "map_w2",
+    "file": "map_w2.png",
+    "kind": "map",
+    "need_by_day": 31,
+    "what": "지도 세계 배경: 자음 기차역",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "map_w3",
+    "file": "map_w3.png",
+    "kind": "map",
+    "need_by_day": 61,
+    "what": "지도 세계 배경: 글자 놀이터",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "map_w4",
+    "file": "map_w4.png",
+    "kind": "map",
+    "need_by_day": 91,
+    "what": "지도 세계 배경: 받침 나라",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "map_w5",
+    "file": "map_w5.png",
+    "kind": "map",
+    "need_by_day": 121,
+    "what": "지도 세계 배경: 글자 탐험대",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "map_w6",
+    "file": "map_w6.png",
+    "kind": "map",
+    "need_by_day": 151,
+    "what": "지도 세계 배경: 려원이 도서관",
+    "size": "가로 2360x1640 그대로 OK (지도 띠에 cover로 깔림)",
+    "have": true,
+    "note": "길·돌은 앱이 그림(배경만)"
+  },
+  {
+    "id": "lp_k",
+    "file": "lp_k.png",
+    "kind": "letter-pic",
+    "need_by_day": 46,
+    "what": "그림 속 글자 ㅋ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_t",
+    "file": "lp_t.png",
+    "kind": "letter-pic",
+    "need_by_day": 47,
+    "what": "그림 속 글자 ㅌ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_ch",
+    "file": "lp_ch.png",
+    "kind": "letter-pic",
+    "need_by_day": 51,
+    "what": "그림 속 글자 ㅊ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_p",
+    "file": "lp_p.png",
+    "kind": "letter-pic",
+    "need_by_day": 52,
+    "what": "그림 속 글자 ㅍ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_ya",
+    "file": "lp_ya.png",
+    "kind": "letter-pic",
+    "need_by_day": 61,
+    "what": "그림 속 글자 ㅑ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_yeo",
+    "file": "lp_yeo.png",
+    "kind": "letter-pic",
+    "need_by_day": 61,
+    "what": "그림 속 글자 ㅕ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_yo",
+    "file": "lp_yo.png",
+    "kind": "letter-pic",
+    "need_by_day": 61,
+    "what": "그림 속 글자 ㅛ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_yu",
+    "file": "lp_yu.png",
+    "kind": "letter-pic",
+    "need_by_day": 61,
+    "what": "그림 속 글자 ㅠ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_ae",
+    "file": "lp_ae.png",
+    "kind": "letter-pic",
+    "need_by_day": 66,
+    "what": "그림 속 글자 ㅐ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_e",
+    "file": "lp_e.png",
+    "kind": "letter-pic",
+    "need_by_day": 66,
+    "what": "그림 속 글자 ㅔ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_kk",
+    "file": "lp_kk.png",
+    "kind": "letter-pic",
+    "need_by_day": 121,
+    "what": "그림 속 글자 ㄲ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "lp_wa",
+    "file": "lp_wa.png",
+    "kind": "letter-pic",
+    "need_by_day": 131,
+    "what": "그림 속 글자 ㅘ",
+    "size": "512x512",
+    "have": true,
+    "note": "글자 모양이 그림 속에 숨은 그림(v3 lp_ 와 같은 스타일)"
+  },
+  {
+    "id": "town_b1",
+    "file": "town_b1.png",
+    "kind": "town",
+    "need_by_day": 20,
+    "what": "마을 건물: 숲속 집",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_b2",
+    "file": "town_b2.png",
+    "kind": "town",
+    "need_by_day": 55,
+    "what": "마을 건물: 기차역",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_b3",
+    "file": "town_b3.png",
+    "kind": "town",
+    "need_by_day": 75,
+    "what": "마을 건물: 놀이터",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_b4",
+    "file": "town_b4.png",
+    "kind": "town",
+    "need_by_day": 95,
+    "what": "마을 건물: 받침 성",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_b5",
+    "file": "town_b5.png",
+    "kind": "town",
+    "need_by_day": 115,
+    "what": "마을 건물: 탐험대 텐트",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_b6",
+    "file": "town_b6.png",
+    "kind": "town",
+    "need_by_day": 135,
+    "what": "마을 건물: 도서관",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p1",
+    "file": "town_p1.png",
+    "kind": "town",
+    "need_by_day": 5,
+    "what": "마을 소품: 나무",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p2",
+    "file": "town_p2.png",
+    "kind": "town",
+    "need_by_day": 15,
+    "what": "마을 소품: 꽃밭",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p3",
+    "file": "town_p3.png",
+    "kind": "town",
+    "need_by_day": 25,
+    "what": "마을 소품: 우체통",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p4",
+    "file": "town_p4.png",
+    "kind": "town",
+    "need_by_day": 35,
+    "what": "마을 소품: 벤치",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p5",
+    "file": "town_p5.png",
+    "kind": "town",
+    "need_by_day": 45,
+    "what": "마을 소품: 가로등",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p6",
+    "file": "town_p6.png",
+    "kind": "town",
+    "need_by_day": 55,
+    "what": "마을 소품: 분수",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p7",
+    "file": "town_p7.png",
+    "kind": "town",
+    "need_by_day": 65,
+    "what": "마을 소품: 연못",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p8",
+    "file": "town_p8.png",
+    "kind": "town",
+    "need_by_day": 75,
+    "what": "마을 소품: 다리",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p9",
+    "file": "town_p9.png",
+    "kind": "town",
+    "need_by_day": 85,
+    "what": "마을 소품: 그네",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p10",
+    "file": "town_p10.png",
+    "kind": "town",
+    "need_by_day": 95,
+    "what": "마을 소품: 미끄럼틀",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p11",
+    "file": "town_p11.png",
+    "kind": "town",
+    "need_by_day": 105,
+    "what": "마을 소품: 텃밭",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p12",
+    "file": "town_p12.png",
+    "kind": "town",
+    "need_by_day": 115,
+    "what": "마을 소품: 풍차",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p13",
+    "file": "town_p13.png",
+    "kind": "town",
+    "need_by_day": 125,
+    "what": "마을 소품: 신호등",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p14",
+    "file": "town_p14.png",
+    "kind": "town",
+    "need_by_day": 135,
+    "what": "마을 소품: 시계탑",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p15",
+    "file": "town_p15.png",
+    "kind": "town",
+    "need_by_day": 145,
+    "what": "마을 소품: 깃발",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p16",
+    "file": "town_p16.png",
+    "kind": "town",
+    "need_by_day": 155,
+    "what": "마을 소품: 무지개",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "town_p17",
+    "file": "town_p17.png",
+    "kind": "town",
+    "need_by_day": 165,
+    "what": "마을 소품: 열기구",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "cloud_grump",
+    "file": "cloud_grump.png",
+    "kind": "play",
+    "need_by_day": 5,
+    "what": "심술 구름(심술, 무섭지 않게)",
+    "size": "512x320 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "cloud_surprise",
+    "file": "cloud_surprise.png",
+    "kind": "play",
+    "need_by_day": 5,
+    "what": "심술 구름(놀람)",
+    "size": "512x320 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "cloud_smile",
+    "file": "cloud_smile.png",
+    "kind": "play",
+    "need_by_day": 5,
+    "what": "구름(웃음)",
+    "size": "512x320 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "chest_closed",
+    "file": "chest_closed.png",
+    "kind": "play",
+    "need_by_day": 10,
+    "what": "보물 상자(닫힘)",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "chest_open",
+    "file": "chest_open.png",
+    "kind": "play",
+    "need_by_day": 10,
+    "what": "보물 상자(열림, 반짝)",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "skin_balloon",
+    "file": "skin_balloon.png",
+    "kind": "play",
+    "need_by_day": 2,
+    "what": "풍선(글자 칸 비워 둠)",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "skin_fish",
+    "file": "skin_fish.png",
+    "kind": "play",
+    "need_by_day": 2,
+    "what": "물고기(글자 칸)",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "skin_star",
+    "file": "skin_star.png",
+    "kind": "play",
+    "need_by_day": 2,
+    "what": "별똥별(글자 칸)",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "basket_1",
+    "file": "basket_1.png",
+    "kind": "play",
+    "need_by_day": 2,
+    "what": "바구니 1",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "basket_2",
+    "file": "basket_2.png",
+    "kind": "play",
+    "need_by_day": 2,
+    "what": "바구니 2",
+    "size": "256x256 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_g",
+    "file": "pose_g.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㄱ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_n",
+    "file": "pose_n.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㄴ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_d",
+    "file": "pose_d.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㄷ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_s",
+    "file": "pose_s.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅅ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_ng",
+    "file": "pose_ng.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅇ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_a",
+    "file": "pose_a.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅏ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_i",
+    "file": "pose_i.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅣ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_o",
+    "file": "pose_o.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅗ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_u",
+    "file": "pose_u.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅜ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "pose_eu",
+    "file": "pose_eu.png",
+    "kind": "pose",
+    "need_by_day": 3,
+    "what": "몽글이 몸 글자 포즈 ㅡ(선택)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_ng",
+    "file": "b_ng.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㅇ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_m",
+    "file": "b_m.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㅁ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_n",
+    "file": "b_n.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㄴ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_l",
+    "file": "b_l.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㄹ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_g",
+    "file": "b_g.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㄱ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_b",
+    "file": "b_b.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㅂ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "b_s",
+    "file": "b_s.png",
+    "kind": "batchim",
+    "need_by_day": 56,
+    "what": "받침 친구 ㅅ(글자 집 1층)",
+    "size": "512x512 투명",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "treasure_map",
+    "file": "treasure_map.png",
+    "kind": "play",
+    "need_by_day": 10,
+    "what": "보물 지도(나침반 글자 지움)",
+    "size": "1600x1200",
+    "have": true,
+    "note": ""
+  },
+  {
+    "id": "keikeu",
+    "file": "keikeu.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "케이크",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "추가 낱말(그림 고르기 무리·받침 단원)"
+  },
+  {
+    "id": "kkot",
+    "file": "kkot.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "꽃",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "추가 낱말(그림 고르기 무리·받침 단원)"
+  },
+  {
+    "id": "nunsaram",
+    "file": "nunsaram.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "눈사람",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "추가 낱말(그림 고르기 무리·받침 단원)"
+  },
+  {
+    "id": "pungseon",
+    "file": "pungseon.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "풍선",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "추가 낱말(그림 고르기 무리·받침 단원)"
+  },
+  {
+    "id": "tteokguk",
+    "file": "tteokguk.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "떡국",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "추가 낱말(그림 고르기 무리·받침 단원)"
+  },
+  {
+    "id": "sobangcha",
+    "file": "sobangcha.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "소방차",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "곧 옴 — 파일이 생기면 바로 씀"
+  },
+  {
+    "id": "sangeo",
+    "file": "sangeo.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "상어",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "곧 옴 — 파일이 생기면 바로 씀"
+  },
+  {
+    "id": "ojingeo",
+    "file": "ojingeo.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "오징어",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "곧 옴 — 파일이 생기면 바로 씀"
+  },
+  {
+    "id": "geobuk",
+    "file": "geobuk.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "거북",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "곧 옴 — 파일이 생기면 바로 씀"
+  },
+  {
+    "id": "nuna_big",
+    "file": "nuna_big.png",
+    "kind": "word",
+    "need_by_day": 999,
+    "what": "누나 크게(숨은 글자 놀이에서만 nuna 대신 씀)",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "곧 옴 — 파일이 생기면 바로 씀"
+  },
+  {
+    "id": "noeul",
+    "file": "noeul.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "노을",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "boteu",
+    "file": "boteu.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "보트",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "huchu",
+    "file": "huchu.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "후추",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "hieoro",
+    "file": "hieoro.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "히어로",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "rubi",
+    "file": "rubi.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "루비",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "kadeu",
+    "file": "kadeu.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "카드",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "kuki",
+    "file": "kuki.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "쿠키",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "tyubeu",
+    "file": "tyubeu.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "튜브",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "tiara",
+    "file": "tiara.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "티아라",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "choko",
+    "file": "choko.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "초코",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  },
+  {
+    "id": "puding",
+    "file": "puding.png",
+    "kind": "word",
+    "need_by_day": 0,
+    "what": "푸딩",
+    "size": "512x512 투명 배경",
+    "have": true,
+    "note": "노래칸 예시 songex12 11/07"
+  }
 ]

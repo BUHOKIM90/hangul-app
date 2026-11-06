@@ -13,6 +13,9 @@ const today = (plus = 0) => { const d = new Date(Date.now() + DAY_OFFSET * 86400
 const params = new URLSearchParams(location.search);
 const ICON = n => 'assets/icons/' + n + '.svg';
 const isSyl = c => c >= '가' && c <= '힣';
+/* 11/07 조사 맞추기(받침 있으면 a, 없으면 b): 거북을/오리를, 곰이야/오리야 — 화면 말풍선 글이 어색하지 않게 */
+const hasJong = w => { const c = String(w || '').slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; };
+const jo = (w, a, b) => hasJong(w) ? a : b;
 const JNAME = { 'ㄱ': '기역', 'ㄴ': '니은', 'ㄷ': '디귿', 'ㄹ': '리을', 'ㅁ': '미음', 'ㅂ': '비읍', 'ㅅ': '시옷', 'ㅇ': '이응', 'ㅈ': '지읒', 'ㅎ': '히읗', 'ㅏ': '아', 'ㅓ': '어', 'ㅗ': '오', 'ㅜ': '우', 'ㅡ': '으', 'ㅣ': '이', 'ㅊ': '치읓', 'ㅋ': '키읔', 'ㅌ': '티읕', 'ㅍ': '피읖', 'ㅑ': '야', 'ㅕ': '여', 'ㅛ': '요', 'ㅠ': '유' };
 const realIds = a => a.filter(x => x[0] !== '@');
 const compose = (c, v) => String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JUNG.indexOf(v) * 28);
@@ -20,14 +23,20 @@ const compose = (c, v) => String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JU
 /* ---------- 소리 (v1과 같음 + 소리 크기) ---------- */
 const player = new Audio();
 let sayToken = 0, pending = null, actx = null, playSeq = 0;
-function localKoVoice() { if (!('speechSynthesis' in window)) return null; return speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('ko') && v.localService) || null; }
+/* 11/07 TTS 대체(MDN voiceschanged · 브라우저별 특이점 정리글): 목소리 목록은 늦게 채워짐 → onvoiceschanged로 다시 읽어 둠. lang은 ko-KR/ko_KR 둘 다.
+   기기 안 목소리(localService)만 씀 — 인터넷 목소리는 글을 밖으로 보내므로 쓰지 않음(개인정보 약속). 속도 0.9·높이 1.1(아이에게 조금 밝게) */
+let KO_VOICE = null;
+function pickKoVoice() { if (!('speechSynthesis' in window)) return null; const vs = speechSynthesis.getVoices() || []; KO_VOICE = vs.find(v => v.lang && /^ko([-_]|$)/i.test(v.lang) && v.localService) || null; return KO_VOICE; }
+if ('speechSynthesis' in window) { pickKoVoice(); speechSynthesis.onvoiceschanged = pickKoVoice; }
+function localKoVoice() { return KO_VOICE || pickKoVoice(); }
 function speakFallback(key) {
   const v = localKoVoice(), text = (typeof LINES !== 'undefined' && LINES[key]) || '';
   if (!v || !text) return wait(350);
-  return new Promise(res => { const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = v.lang; u.rate = 0.85; u.onend = u.onerror = res; pending = res; speechSynthesis.speak(u); });
+  return new Promise(res => { const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = v.lang; u.rate = 0.9; u.pitch = 1.1; u.volume = S.settings.volume; u.onend = u.onerror = res; pending = res; speechSynthesis.speak(u); });
 }
 function playOne(key, onProgress) {
-  if (!S.settings.sound) return wait(250);
+  if (!S.settings.sound) { syncSoftMuteChip(); const c = document.getElementById('softMute'); if (c) { c.classList.remove('pulse'); void c.offsetWidth; c.classList.add('pulse'); } return wait(250); }
+  unlockAudio();
   return new Promise(res => {
     const my = ++playSeq; let fin = false, guard = 0;
     const finish = () => { if (fin) return; fin = true; clearTimeout(guard); if (playSeq === my) { player.ontimeupdate = player.onended = player.onerror = player.onpause = player.onloadedmetadata = null; pending = null; } res(); };
@@ -37,21 +46,144 @@ function playOne(key, onProgress) {
     player.onerror = () => { player.onerror = null; if (window.HP) HP.audioErr.push(key); speakFallback(key).then(finish); };
     player.ontimeupdate = onProgress ? () => player.duration && onProgress(player.currentTime / player.duration) : null;
     player.volume = S.settings.volume; player.src = 'audio/' + key + '.mp3'; if (window.HP) HP.audioLog.push(key);
-    player.play().catch(err => { if (playSeq !== my || (err && (err.name === 'NotAllowedError' || err.name === 'AbortError'))) finish(); else if (player.onerror) player.onerror(); });   // v3: 새 소리로 끊긴 것(AbortError)은 오류가 아님
+    player.play().catch(err => { if (err && err.name === 'NotAllowedError') { playerUnlocked = false; audioGestureNeeded = true; syncSoftMuteChip(); } if (playSeq !== my || (err && (err.name === 'NotAllowedError' || err.name === 'AbortError'))) finish(); else if (player.onerror) player.onerror(); });
   });
+}
+
+/* §19 deep-learn Lycore: 다음 음성 미리 받기(아이들 대기 없음). 실패해도 무시 */
+function prefetchAudio(keys) {
+  try {
+    [].concat(keys || []).slice(0, 3).forEach(k => {
+      if (!k) return;
+      const a = new Audio();
+      a.preload = 'auto';
+      a.src = 'audio/' + k + '.mp3';
+    });
+  } catch (e) { /* ignore */ }
 }
 function stopAudio() { sayToken++; player.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (pending) pending(); }
 function say(keys, each) {
-  stopAudio(); const t = sayToken;
-  return [].concat(keys).reduce((p, k, i) => p.then(() => { if (t !== sayToken) return; if (each) each(i, true); return playOne(k).then(() => each && t === sayToken && each(i, false)); }), Promise.resolve()).then(() => t === sayToken);
+  stopAudio(); const t = sayToken; const list = [].concat(keys); prefetchAudio(list.slice(1));
+  return list.reduce((p, k, i) => p.then(() => { if (t !== sayToken) return; if (each) each(i, true); return playOne(k).then(() => each && t === sayToken && each(i, false)); }), Promise.resolve()).then(() => t === sayToken);
 }
 async function sayGap(keys, gap, each) {   // 낱말 사이에 쉼(뚝딱 소리 붙이기 "하… 마")
   stopAudio(); const t = sayToken;
   for (let i = 0; i < keys.length; i++) { if (t !== sayToken) return false; if (each) each(i); await playOne(keys[i]); if (t !== sayToken) return false; if (i < keys.length - 1) await wait(gap); }
   return t === sayToken;
 }
+
+/* §19 deep-learn 2026-11-07 (~40분): 웹·레딧·X·Flowy·Google Kids·Lycore·PWA UX
+   1) iOS HTMLAudio는 AudioContext와 별개로 "제스처 안 play()"가 필요 → silent WAV data URL로 요소 unlock (flowy.fm)
+   2) click/touchend에서 AudioContext.resume (touchstart만으로는 부족한 경우 있음)
+   3) passive touchstart → iOS :active 누름표시 (progressivewebapps)
+   4) Google Building for Kids: 소리 꺼진 줄 모르는 아이 → 시각 칩으로 소리 켜기
+   5) Lycore offline-first: 진도 중간 저장(세션 중 autosave)
+   6) iOS 가장자리 시스템 제스처 피하기 → 하단/측면 inset (이미 safe-area, dock 보강) */
+const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+let playerUnlocked = false, audioGestureNeeded = false;
+function unlockAudio() {
+  try {
+    /* §19: Safari 16.4+ audioSession playback — 무음 스위치에 WebAudio가 죽지 않게(lans.cloud / unmute-ios) */
+    if (navigator.audioSession && navigator.audioSession.type !== 'playback') {
+      try { navigator.audioSession.type = 'playback'; } catch (as) { /* ignore */ }
+    }
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    /* interrupted도 running이 아님 — suspended만 보면 iOS 복귀 후 침묵 */
+    if (actx.state !== 'running' && actx.state !== 'closed') actx.resume().catch(() => {});
+    if (!actx._hangulStateHook) {
+      actx._hangulStateHook = true;
+      actx.addEventListener('statechange', () => {
+        if (actx.state !== 'running' && actx.state !== 'closed') {
+          audioGestureNeeded = true; syncSoftMuteChip();
+        }
+      });
+    }
+  } catch (e) { /* ignore */ }
+  try {
+    if (!playerUnlocked && player) {
+      const cur = player.src || '';
+      if (!cur || cur.indexOf('data:audio/wav') === 0) {
+        const wasMuted = player.muted;
+        player.muted = true;
+        player.src = SILENT_WAV;
+        const p = player.play();
+        if (p && p.then) {
+          p.then(() => {
+            if ((player.src || '').indexOf('data:audio/wav') === 0) { player.pause(); player.currentTime = 0; }
+            player.muted = wasMuted;
+            playerUnlocked = true; audioGestureNeeded = false; syncSoftMuteChip();
+          }).catch(() => { player.muted = wasMuted; });
+        }
+      } else {
+        playerUnlocked = true;
+      }
+    }
+  } catch (e2) { /* ignore */ }
+  syncSoftMuteChip();
+}
+function syncSoftMuteChip() {
+  try {
+    let chip = document.getElementById('softMute');
+    if (!S || !S.settings) return;
+    const need = !S.settings.sound || audioGestureNeeded;
+    if (!need) { if (chip) chip.remove(); return; }
+    if (!chip) {
+      chip = document.createElement('button');
+      chip.id = 'softMute';
+      chip.type = 'button';
+      chip.className = 'soft-mute';
+      chip.addEventListener('click', e => {
+        e.stopPropagation();
+        S.settings.sound = true;
+        audioGestureNeeded = false;
+        save();
+        unlockAudio();
+        syncSoftMuteChip();
+        try { ding(1.1); } catch (er) {}
+      });
+      (document.getElementById('app') || document.body).appendChild(chip);
+    }
+    const label = !S.settings.sound ? '소리 켜기' : '톡! 소리 열기';
+    chip.setAttribute('aria-label', label);
+    chip.innerHTML = '<span aria-hidden="true">' + (!S.settings.sound ? '🔇' : '🔊') + '</span><span class="sm-txt">' + label + '</span>';
+  } catch (e) { /* ignore */ }
+}
+(function wireAudioUnlock() {
+  const once = () => { unlockAudio(); };
+  ['click', 'touchend', 'pointerup', 'mousedown', 'keydown'].forEach(ev =>
+    document.addEventListener(ev, once, { capture: true, passive: true }));
+  document.addEventListener('touchstart', () => {}, { passive: true });
+  // 세션 중 진도 중간 저장 (Lycore: never lose progress)
+  setInterval(() => { try { if (typeof save === 'function' && S) save(); } catch (e) {} }, 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') try { save(); } catch (e) {}
+    /* §19: 백그라운드 복귀 후 AudioContext interrupted/suspended → 칩으로 탭 유도(webkit 291892) */
+    if (document.visibilityState === 'visible') {
+      try {
+        if (actx && actx.state !== 'running' && actx.state !== 'closed') {
+          audioGestureNeeded = true; syncSoftMuteChip();
+          actx.resume().catch(() => {});
+        }
+      } catch (ev) { /* ignore */ }
+    }
+  });
+  setTimeout(syncSoftMuteChip, 0);
+})();
+
+/* §19 deep-learn: Android Vibration API — 짧은 탭만, prefers-reduced-motion·설정 존중 (iOS는 API 없음) */
+function kidHaptic(kind) {
+  try {
+    if (typeof prefersReduce === 'function' && prefersReduce()) return;
+    if (!('vibrate' in navigator)) return;
+    if (kind === 'ok') navigator.vibrate(12);
+    else if (kind === 'soft') navigator.vibrate(8);
+    else if (kind === 'no') navigator.vibrate([10, 40, 10]);
+  } catch (e) { /* ignore */ }
+}
 function clapFx() {   // 손뼉 소리(짧은 잡음, 기기 안에서 만듦)
+  kidHaptic('ok');
   if (!S.settings.sound) return;
+  unlockAudio();
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     const len = Math.floor(actx.sampleRate * 0.09), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
@@ -62,7 +194,9 @@ function clapFx() {   // 손뼉 소리(짧은 잡음, 기기 안에서 만듦)
   } catch (e) { /* 소리 없이 */ }
 }
 function ding(high = 1) {
+  kidHaptic('ok');
   if (!S.settings.sound) return;
+  unlockAudio();
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     [[784 * high, 0], [1047 * high, 0.13]].forEach(([f, t0]) => {
@@ -73,12 +207,57 @@ function ding(high = 1) {
   } catch (e) { /* 소리 없이 */ }
 }
 
+/* 11/06 풍선 터짐 소리(기기 안에서 만듦, mp3 아님): 짧은 '퐁' + 높은 반짝. 틀렸을 때는 낮고 부드러운 '뿡'(꾸중 아님) */
+function popFx() {
+  if (!S.settings.sound) return;
+  unlockAudio();
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime, v = S.settings.volume;
+    const len = Math.floor(actx.sampleRate * 0.06), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    src.buffer = buf; f.type = 'highpass'; f.frequency.value = 900; g.gain.value = 0.7 * v;
+    src.connect(f).connect(g).connect(actx.destination); src.start(t);
+    const o = actx.createOscillator(), og = actx.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(1400, t + 0.12);
+    og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.16 * v + 0.0002, t + 0.02); og.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    o.connect(og).connect(actx.destination); o.start(t); o.stop(t + 0.25);
+  } catch (e) { /* 소리 없이 */ }
+}
+function boopFx() {
+  kidHaptic('no');
+  if (!S.settings.sound) return;
+  unlockAudio();
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(330, t); o.frequency.exponentialRampToValueAtTime(240, t + 0.18);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09 * S.settings.volume + 0.0002, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.28);
+  } catch (e) { /* 소리 없이 */ }
+}
+/* 풍선이 터질 때 색 조각 8개가 사방으로(움직임 줄이기면 생략) */
+function balloonBurst(host, node) {
+  if (prefersReduce() || !host || !node) return;
+  const hr = host.getBoundingClientRect(), r = node.getBoundingClientRect(), cx = r.left - hr.left + r.width / 2, cy = r.top - hr.top + r.height * 0.4;
+  const cols = ['#F27BA6', '#F5C04A', '#7CC6A4', '#8E7CE0', '#F2994A', '#6BB7E8'];
+  for (let i = 0; i < 10; i++) {
+    const p = el('i', 'burst'); const a = (i / 10) * Math.PI * 2 + Math.random() * 0.4, dist = 60 + Math.random() * 50;
+    p.style.left = cx + 'px'; p.style.top = cy + 'px'; p.style.background = cols[i % cols.length];
+    host.append(p);
+    requestAnimationFrame(() => requestAnimationFrame(() => { p.style.transform = 'translate(' + Math.cos(a) * dist + 'px,' + Math.sin(a) * dist + 'px) scale(.4)'; p.style.opacity = '0'; }));
+    setTimeout(() => p.remove(), 700);
+  }
+}
+
 /* ---------- 몽글이 ---------- */
 let charImg = null;
 function mg(expr = 'basic', cls = 'mg') { const i = el('img', cls); i.alt = '몽글이'; i.src = CHAR_DIR + expr + CHAR_EXT; return i; }
 function charEl(expr) { charImg = mg(expr); return charImg; }
 function setChar(expr) { if (charImg) charImg.src = CHAR_DIR + expr + CHAR_EXT; }
-function bounce(n = charImg) { if (!n) return; n.classList.remove('bounce'); void n.offsetWidth; n.classList.add('bounce'); }
+const prefersReduce = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function bounce(n = charImg) { if (!n || prefersReduce()) return; n.classList.remove('bounce'); void n.offsetWidth; n.classList.add('bounce'); }
 let bubbleEl = null;
 function guide(expr, text, low) { const g = el('div', 'guide' + (low ? ' low' : '')); bubbleEl = el('div', 'bubble', text); g.append(charEl(expr), bubbleEl); return g; }
 const setBubble = t => { if (bubbleEl) bubbleEl.innerHTML = t; };
@@ -87,20 +266,42 @@ function pointSay(keys, each) { setChar('point'); return say(keys, each).then(ok
 /* ---------- 그림 (없으면 첫 글자 자리표시: 그림 파일만 넣으면 바로 바뀜) ---------- */
 const hasPic = w => ARTS.pic.includes(w);
 const picHTML = (w, label, cls = '') => hasPic(w) ? '<img class="' + cls + '" alt="' + (label || '') + '" src="' + PIC(w) + '">' : '<div class="ph ' + (PH_EMOJI[w] ? 'emo ' : '') + cls + '" aria-label="' + (label || WORDS[w] || '') + '">' + (PH_EMOJI[w] || (label || WORDS[w] || '?')[0]) + '</div>';
+/* 11/06: 목록(art.js)에는 있는데 파일이 아직 없는 그림(예: hobak·subak·scene_*)이 깨진 그림 표시로 보이지 않게 → 글자/이모지 자리표시로 바꿈 */
+document.addEventListener('error', e => {
+  const t = e.target; if (!t || t.tagName !== 'IMG' || t.dataset.fb) return;
+  const m = /assets\/pic\/([^/.]+)\.webp/.exec(t.getAttribute('src') || ''); if (!m) return;
+  t.dataset.fb = '1'; const id = m[1], lab = (typeof WORDS !== 'undefined' && WORDS[id]) || t.alt || '';
+  if (!lab && !PH_EMOJI[id]) { t.style.visibility = 'hidden'; return; }
+  const d = el('div', 'ph ' + (PH_EMOJI[id] ? 'emo ' : '') + (t.className || ''), PH_EMOJI[id] || lab[0]); d.setAttribute('aria-label', lab); t.replaceWith(d);
+}, true);
 const exPic = j => { const e = JAMO_EX[j]; return e ? picHTML(e.pic, e.word) : ''; };
 
 /* ---------- 화면 공통 ---------- */
 let screenId = 0, run = null, roundTok = 0;
+/* 11/07: 화면마다 만든 ResizeObserver를 화면이 바뀔 때 끊음(지난 화면 그림·지도에 계속 붙어 있던 누수) */
+let ROS = [];
+function watchSize(node, fn) { try { const ro = new ResizeObserver(fn); ro.observe(node); ROS.push(ro); } catch (e) { /* 옛 기기 */ } }
 function screen(name, opts = {}) {
-  screenId++; stopAudio(); main.innerHTML = ''; main.dataset.screen = name; charImg = null; bubbleEl = null; ticking = false;
+  ROS.forEach(r => r.disconnect()); ROS = [];
+  // 11/06: 화면이 바뀌면 지난 정답 판(.rvwrap)이 남아 새 화면을 가리지 않게 지움
+  screenId++; stopAudio(); document.querySelectorAll('.rvwrap').forEach(x => x.remove()); main.innerHTML = ''; missedSince = false; main.dataset.screen = name; charImg = null; bubbleEl = null; ticking = false;
   $('#homeBtn').hidden = !opts.home; document.body.classList.toggle('night', !!opts.night);
   drawTime(); if (window.HP) HP.screen = name;
   const s = el('div', 'scr s-' + name + (opts.scroll ? ' scroll' : '')); main.appendChild(s); return [screenId, s];
 }
 const alive = id => id === screenId;
 const spark = el('img'); spark.id = 'spark'; spark.alt = ''; spark.src = ICON('flower'); document.body.appendChild(spark);
-function sparkPop() { spark.classList.remove('go'); void spark.offsetWidth; spark.classList.add('go'); }
+function sparkPop() { if (prefersReduce()) return; spark.classList.remove('go'); void spark.offsetWidth; spark.classList.add('go'); }
 let praiseFlip = 0;
+/* 11/06 §19 칭찬 고르기(근거: Mueller & Dweck 1998, Kamins & Dweck 1999 — 사람 칭찬보다 과정 칭찬이 실패 뒤 버티는 힘을 키움).
+   ① 같은 칭찬을 연달아 두 번 하지 않음 ② 이번 판에서 한 번 틀렸다가 맞히면 '다시 해 봤네'류 과정 칭찬(소리 파일이 있을 때만, 없으면 기본 칭찬 — 기기 TTS 로봇 목소리 방지) */
+let lastPraise = '', missedSince = false;
+const hasVoice = k => typeof HAVE_AUDIO === 'undefined' || HAVE_AUDIO.has(k);
+function praiseKey() {
+  const retry = missedSince ? ['ui4_proc16', 'ui4_proc7'].filter(hasVoice) : []; missedSince = false;
+  if (retry.length) { lastPraise = retry[rand(retry.length)]; return lastPraise; }
+  const c = ['ui_good1', 'ui_good2', 'ui_good3'].filter(k => k !== lastPraise); lastPraise = c[rand(c.length)]; return lastPraise;
+}
 /* ---------- 정답 순간 공통(11/04 대표님): 맞힌 낱말·글자를 크게 + 몽글이가 한 글자씩 읽을 때 칸이 켜짐 + 칭찬 → 잠깐 머묾(톡 하면 바로 다음) ----------
    FB(모든 놀이 공통 시간, ms): sylGap 글자 사이 쉼 / beat 소리 끝난 뒤 머무는 시간 / min 화면에 최소로 떠 있는 시간 / skip 이만큼 지나면 톡해서 넘길 수 있음 / plain 낱말·글자가 아닌 정답(박자 수 등) 칭찬 뒤 쉼 */
 const FB = { sylGap: 380, beat: 900, min: 2400, skip: 700, plain: 700, quickBeat: 450, quickMin: 1600 };   // quick = 한 판에 여러 번 나오는 작은 정답(바구니 나누기 카드)
@@ -125,7 +326,7 @@ async function reveal(id, target, opt = {}) {   // 공통 '크게 보여 주기'
     if (opt.say !== false && R.syl.length > 1 && R.syl.every(c => hasA(VOICE.syl(c)))) await sayGap(R.syl.map(VOICE.syl), FB.sylGap, k => tiles.forEach((t, i) => { t.classList.toggle('on', i <= k); t.classList.toggle('now', i === k); }));
     if (skip || !alive(id)) return; tiles.forEach(t => { t.classList.remove('now'); t.classList.add('on', 'all'); });
     if (opt.say !== false) await say(R.voice);
-    if (skip || !alive(id)) return; if (opt.praise !== false) { setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); await say('ui_good' + (1 + rand(3))); }
+    if (skip || !alive(id)) return; if (opt.praise !== false) { setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); await say(praiseKey()); }
     if (skip || !alive(id)) return; ov.classList.add('cango'); await wait(opt.quick ? Math.max(FB.quickBeat, FB.quickMin - (Date.now() - t0)) : Math.max(FB.beat, FB.min - (Date.now() - t0)));
   })();
   await Promise.race([run1, skipP]);
@@ -135,30 +336,42 @@ async function reveal(id, target, opt = {}) {   // 공통 '크게 보여 주기'
 /* 11/04 다음 칸 안내: 누를 곳이 반짝·통통 + 잠시 뒤 손가락(👆)이 톡톡. 소리는 부르는 쪽에서 가끔만 */
 function tapHint(node, delay = 1400) {
   if (!node) return; node.classList.add('gonext');
-  const id = screenId; setTimeout(() => { if (!alive(id) || !node.isConnected || node.querySelector('.taphand')) return; node.append(el('i', 'taphand', '👆')); }, delay);
+  if (prefersReduce()) return;   // 움직임 줄이기: 반짝·손가락 생략, gonext 테두리만
+  const id = screenId; setTimeout(() => { if (!alive(id) || !node.isConnected || node.querySelector('.taphand')) return; node.append(el('i', 'taphand', '<img alt="" src="' + ICON('hand') + '">')); }, delay);
 }
 async function success(id, target) {
   if (revealOf(target)) return reveal(id, target);
-  sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say('ui_good' + (1 + rand(3))); await wait(FB.plain); return alive(id);
+  sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say(praiseKey()); await wait(FB.plain); return alive(id);
 }
-async function retryFx(id, node) {
+/* §19 deep-learn: PBS Kids / Callaghan 스캐폴딩 — 1차 격려, 2차 힌트음성, 3차+ 정답 반짝(수치심 없이) */
+async function retryFx(id, node, opts) {
+  missedSince = true;   // 11/06 §19: 다음 정답 때 과정 칭찬
+  opts = opts || {};
+  const n = opts.wrongN || 1;
   if (node) { node.classList.remove('retry'); void node.offsetWidth; node.classList.add('retry'); setTimeout(() => node.classList.remove('retry'), 1100); }
-  setChar('cheer'); await say('ui_retry'); if (alive(id)) setChar('think');
+  setChar('cheer');
+  if (n <= 1) await say('ui_retry');
+  else if (n === 2) { await say('ui_retry'); if (alive(id)) await say('ui4_hint'); }
+  else {
+    await say('ui4_try');
+    if (opts.correct) tapHint(opts.correct, 200);
+  }
+  if (alive(id)) setChar('think');
 }
 
 /* ---------- 문제 엔진 ---------- */
 const others = (pool, x, n) => { const out = []; for (const p of shuffle(pool.filter(p => p !== x && !PIC_CLASH(p, x)))) if (out.length < n && !out.some(o => PIC_CLASH(o, p))) out.push(p); return out; };   // 개·강아지처럼 닮은 그림은 한 판에 같이 안 냄
 const pool3 = () => (run && run.p.items.length >= 3 ? run.p.items : WORD_IDS);
-function speakerBtn(fn, cls = 'spk', label = '다시 듣기') { const b = el('button', cls, '<img alt="' + label + '" src="' + ICON('speaker') + '">'); b.addEventListener('click', fn); return b; }
+function speakerBtn(fn, cls = 'spk', label = '다시 듣기') { const b = el('button', cls, '<img alt="" src="' + ICON('speaker') + '">'); b.setAttribute('aria-label', label); b.addEventListener('click', fn); return b; }
 function choiceRound(id, cards, correct, done, target) {
-  let first = true, locked = false;
+  let first = true, locked = false, wrongN = 0;
   const row = el('div', 'choices');
   cards.forEach((c, i) => {
     c.insertAdjacentHTML('beforeend', '<span class="badge"><img alt="" src="' + ICON('check') + '"></span>');
     c.addEventListener('click', async () => {
       if (locked || !alive(id)) return;
       if (i === correct) { locked = true; c.classList.add('ok'); if (await success(id, target === undefined ? cards[correct].dataset.k : target)) done(first); }
-      else { first = false; locked = true; await retryFx(id, c); locked = false; }
+      else { first = false; locked = true; wrongN++; await retryFx(id, c, { wrongN, correct: cards[correct] }); locked = false; }
     });
     row.appendChild(c);
   });
@@ -211,7 +424,7 @@ const RUN = {
       const t = marks[0].el.getBoundingClientRect(), b = box.getBoundingClientRect(), pad = 26;
       ring.style.left = (t.left - b.left - pad) + 'px'; ring.style.top = (t.top - b.top - pad) + 'px'; ring.style.width = (t.width + 2 * pad) + 'px'; ring.style.height = (t.height + 2 * pad) + 'px'; };
     s.append(guide('think', '<b>' + WORDS[w] + '</b> 글씨를 찾아봐!'), pr, box);
-    fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
+    fit(); requestAnimationFrame(fit); watchSize(box, fit);
     const t0 = Date.now();
     const hintT = setTimeout(() => { if (!alive(id) || found) return; ring.classList.add('on'); setBubble('반짝이는 데를 봐!'); say('ui_hwhint'); first = false; }, HIDDEN.hint);
     const revT = setTimeout(() => { if (!alive(id) || found) return; got(true); }, HIDDEN.reveal);
@@ -229,7 +442,7 @@ const RUN = {
       if (hit.m.target) return got(false);
       if (hit.m.el.classList.contains('seen')) return;
       first = false; missed++; hit.m.el.classList.add('seen'); setChar('think');
-      setBubble('그건 <b>' + WORDS[hit.m.w] + '</b>야! <b>' + WORDS[w] + '</b>를 찾아볼까?'); await say([VOICE.hy(hit.m.w), VOICE.hw(w)]);
+      setBubble('그건 <b>' + WORDS[hit.m.w] + '</b>' + jo(WORDS[hit.m.w], '이야', '야') + '! <b>' + WORDS[w] + '</b>' + jo(WORDS[w], '을', '를') + ' 찾아볼까?'); await say([VOICE.hy(hit.m.w), VOICE.hw(w)]);
     });
     if (window.HP) HP.hidden = { target: w, lv: run.p.lv || 1, marks: marks.map(m => ({ w: m.w, target: !!m.target })), rect: k => { const r = marks[k || 0].el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, t0, get found() { return found; }, ring: () => ring.classList.contains('on') };
     prompt();
@@ -281,7 +494,7 @@ const RUN = {
           if (!alive(id)) return; if (await reveal(id, w)) done(first);
         } else {
           first = false; locked = true; S.pw.streak[w] = 0; c.classList.remove('retry'); void c.offsetWidth; c.classList.add("retry", "pwno"); setChar('cheer');
-          setBubble('그건 <b>' + WORDS[x] + '</b>야!'); await say(VOICE.hy(x)); locked = false; if (alive(id)) { setChar('think'); setBubble('이건 뭘까?'); }
+          setBubble('그건 <b>' + WORDS[x] + '</b>' + jo(WORDS[x], '이야', '야') + '!'); await say(VOICE.hy(x)); locked = false; if (alive(id)) { setChar('think'); setBubble('이건 뭘까?'); }
         }
       });
       row.append(c);
@@ -349,7 +562,7 @@ const RUN = {
       if (!ok) { first = false; busy = true; node.style.transform = ''; await retryFx(id, node); busy = false; return false; }
       const slot = p.t === 'c' ? slotC : slotV; slot.textContent = p.g; slot.classList.add('filled'); node.classList.add('used'); node.style.transform = '';
       ding(1.2); filled++;
-      if (filled === 2) { busy = true; await wait(300); frame.classList.add('done'); setBubble('<b>' + sy + '</b>가 됐어!'); if (alive(id) && await success(id, sy)) done(first); }
+      if (filled === 2) { busy = true; await wait(300); frame.classList.add('done'); setBubble('<b>' + sy + '</b>' + jo(sy, '이', '가') + ' 됐어!'); if (alive(id) && await success(id, sy)) done(first); }
       return true;
     };
     pieces.forEach(p => { const n = el('div', 'piece ' + p.t, p.g); n.dataset.k = p.t + p.g; draggable(n, { onTap: () => tryPlace(p, n), onDrop: (x, y) => { if (!inside(frame, x, y)) return false; tryPlace(p, n); return true; } }); col.appendChild(n); });
@@ -484,7 +697,7 @@ const RUN = {
       if (b.dataset.k === target) { busy = true; b.classList.add('ok'); if (await success(id, target)) done(first); }
       else { first = false; busy = true; await retryFx(id, b); busy = false; }
     }));
-    const pr = el('div', 'prompt', '<div class="body"><span class="eye"><b style="color:var(--peach-ink);font-size:30px">' + c + '</b> 기차에 모음 친구들이 탔어요</span></div>');
+    const pr = el('div', 'prompt', '<div class="body"><span class="eye"><b style="color:var(--peach-ink);font-size:30px">' + c + '</b> 기차 출발!</span></div>');
     pr.append(speakerBtn(() => { if (phase === 1) pointSay([VOICE.syl(target), 'ui_find']); else eng.click(); }));
     s.append(pr, tr, ask, guide('think', '칸을 눌러 봐', true), dock);
     if (run.i === 0) say('ui_train');
@@ -539,6 +752,8 @@ function draggable(n, { onTap, onDrop }) {
    지금: 손을 뗄 때 그 획 하나만 봄. 맞으면 반짝 + 다음 획 분홍 점, 다 쓰면 칭찬. 틀린 획만 지우고 그 획만 다시 보여 줌. 같은 획 3번 안 되면 같이 써 줌.
    방향·순서는 너그럽게(거꾸로 그어도, 남은 다른 획을 먼저 그어도, 두 획을 한 번에 이어 그어도 인정). 아주 짧은 터치는 조용히 무시. */
 const TRACE_PX = { guide: 30, dash: 8, ink: 20, trail: 20, dot: 13, pad: 6 };
+/* 11/06 대표님: 태블릿(≥768px)은 쓰기 칸을 작게 → 획 굵기도 살짝 줄임(그리기 전용, 판정 무관). 폰은 그대로 크게 */
+if (window.matchMedia && matchMedia('(min-width: 768px)').matches) Object.assign(TRACE_PX, { guide: 24, dash: 7, ink: 16, trail: 16, dot: 11 });
 function strokePoints(st) { if (Array.isArray(st)) return st; const [cx, cy, r] = st.c, pts = []; for (let k = 0; k <= 48; k++) { const a = -Math.PI / 2 - k * (2 * Math.PI / 48); pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return pts; }
 /* 글자 → 획 목록(100칸 좌표) + 획마다 크기(sc, 판정 너비용). 받침 없는 음절은 자음+모음을 옆 짜임(ㅏㅑㅓㅕㅣ)·위아래 짜임(ㅗㅛㅜㅠㅡ)으로 배치 */
 function strokesOf(ch) {
@@ -667,7 +882,7 @@ function traceRound(j, id, s, done, copyMode) {
   const eb = el('button', 'kid-btn', '지우기'); eb.addEventListener('click', () => { if (busy || finished) return; ink = []; doneK.fill(false); helped.fill(false); badK.fill(0); demoTok++; clearTrails(); redraw(); park(); });
   tools.append(hb, eb);
   s.append(box, tools, el('div', '', '<div style="height:20px"></div>'));
-  fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
+  fit(); requestAnimationFrame(fit); watchSize(box, fit);
   if (window.HP) HP.trace = { letter: j, guide: guideP, sc: SO.sc, demoDone: false, toPx: p => { const r = box.getBoundingClientRect(), q = toPx(p); return [r.left + q[0], r.top + q[1]]; }, get state() { return { done: doneK.slice(), helped: helped.slice(), bad, badK: badK.slice(), next: nextK(), finished, busy, ink: ink.length }; },
     inject: pts => { ink.push(pts); redraw(); return onStroke(pts); } };
   if (copyMode) { say([isSyl(j) ? VOICE.syl(j) : VOICE.jamo(j), 'ui_trace']); mover.style.display = 'none'; drawGuide(); } else prompt();

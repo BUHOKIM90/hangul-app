@@ -19,6 +19,8 @@ const PH_EMOJI = { ryeowon: '👧', eomma: '👩', appa: '👨', halmeoni: '👵
 const WORD_IDS = Object.keys(WORDS);
 /* 그림 경로: 피자 그림이 tools/import_art.py로 들어오면(assets/art.js의 ART 목록) WebP, 없으면 자리표시 SVG */
 const ARTS = typeof ART !== 'undefined' ? ART : { pic: [], sticker: [], phrase: [] };
+/* 11/06 §19: 목록에만 있고 파일이 없는 그림은 빼서 아예 요청하지 않음(404·깨진 배경 방지). pic_have.js가 없으면 그대로 */
+if (typeof PIC_HAVE !== 'undefined' && Array.isArray(ARTS.pic)) ARTS.pic = ARTS.pic.filter(id => PIC_HAVE.has(id));
 const PIC = w => 'assets/pic/' + w + (ARTS.pic.includes(w) ? '.webp' : '.svg');
 const STICKER = n => { const id = 'st_' + String(n).padStart(2, '0'); return 'assets/sticker/' + id + (ARTS.sticker.includes(id) ? '.webp' : '.svg'); };
 

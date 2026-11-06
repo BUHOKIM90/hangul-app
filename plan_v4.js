@@ -216,6 +216,12 @@ const SHOW_SEEK = 'sobangcha', SEA_SET = ['gorae', 'sangeo', 'ojingeo', 'geobuk'
 const seekOk = w => !!(HSPOT4[w] && WORDS[w] && HSPOT4[w].length >= [...WORDS[w]].length && hasA(VOICE.hw(w)) && [...WORDS[w]].every(g => hasA(VOICE.syl(g))) && ARTS.pic.includes(w));
 const seaOk = () => SEA_SET.filter(w => ARTS.pic.includes(w) && hasA(VOICE.word(w)));
 function addShowcase(t, items, ctx, free) {
+  /* 11/06: 1~20일에도 예시 판을 덤으로(대표님 '예시 다양화' 체감). 숨은 글자 날(9·10·18일 등)은 소방차, 그림 고르기 날(4일부터)은 바다 친구 1장. 첫날은 쉬게 둠 */
+  /* §19 UX2 11/06: 21일 이후에도 같은 규칙(숨은 글자 날마다 소방차, 그림 고르기 날마다 바다 친구 1장). 예전엔 21~30일 그림 고르기 덤 0번 */
+  if (!free) {
+    if (t === 'seek' && seekOk(SHOW_SEEK) && !items.includes(SHOW_SEEK)) return items.concat(SHOW_SEEK);
+    if (t === 'choose' && ctx.dn >= 4 && seaOk().length >= 3) { const w = seaOk()[ctx.dn % seaOk().length]; return items.includes(w) ? items : items.concat(w); }
+  }
   if (t === 'seek' && seekOk(SHOW_SEEK) && !items.includes(SHOW_SEEK) && (free || (ctx.dn >= 21 && ctx.dn % 3 === 0))) return free ? [SHOW_SEEK].concat(items) : items.concat(SHOW_SEEK);
   if (t === 'choose' && seaOk().length >= 3 && (free || (ctx.dn >= 31 && ctx.dn % 4 === 0))) { const w = seaOk()[(ctx.dn + (free ? Date.now() : 0)) % seaOk().length]; return items.includes(w) ? items : free ? [w].concat(items) : items.concat(w); }
   return items;
