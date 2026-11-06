@@ -1,0 +1,1 @@
+item_beret.webp item_bandi_hat.webp item_stripe_vest.webp item_apron.webp item_round_window.webp item_rest_cushion.webp

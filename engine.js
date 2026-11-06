@@ -61,16 +61,22 @@ function clapFx() {   // 손뼉 소리(짧은 잡음, 기기 안에서 만듦)
     src.connect(f).connect(g).connect(actx.destination); src.start();
   } catch (e) { /* 소리 없이 */ }
 }
+const sfxAudio = new Audio();
+function playSfx(name) {
+  if (!S || !S.settings || !S.settings.sound || !name) return;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const file = reduce && (name === 'balloon' || name === 'sticker') ? 'tap' : name;
+  const duck = player && !player.paused && player.currentTime > 0 && !player.ended;
+  try {
+    sfxAudio.pause();
+    sfxAudio.src = 'audio/sfx/' + file + '.wav';
+    sfxAudio.volume = Math.max(0.05, Math.min(0.7, (S.settings.volume || 0.9) * (duck ? 0.2 : 0.5)));
+    sfxAudio.play().catch(() => {});
+  } catch (e) { /* 효과음 없이 */ }
+}
 function ding(high = 1) {
   if (!S.settings.sound) return;
-  try {
-    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    [[784 * high, 0], [1047 * high, 0.13]].forEach(([f, t0]) => {
-      const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + t0, peak = 0.12 * S.settings.volume + 0.0002;
-      o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.3);
-    });
-  } catch (e) { /* 소리 없이 */ }
+  playSfx(high >= 1.25 ? 'sticker' : 'correct');
 }
 
 /* ---------- 몽글이 ---------- */
@@ -125,7 +131,7 @@ async function reveal(id, target, opt = {}) {   // 공통 '크게 보여 주기'
     if (opt.say !== false && R.syl.length > 1 && R.syl.every(c => hasA(VOICE.syl(c)))) await sayGap(R.syl.map(VOICE.syl), FB.sylGap, k => tiles.forEach((t, i) => { t.classList.toggle('on', i <= k); t.classList.toggle('now', i === k); }));
     if (skip || !alive(id)) return; tiles.forEach(t => { t.classList.remove('now'); t.classList.add('on', 'all'); });
     if (opt.say !== false) await say(R.voice);
-    if (skip || !alive(id)) return; if (opt.praise !== false) { setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); await say('ui_good' + (1 + rand(3))); }
+    if (skip || !alive(id)) return; if (opt.praise !== false) { setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); await say(praiseKey()); }
     if (skip || !alive(id)) return; ov.classList.add('cango'); await wait(opt.quick ? Math.max(FB.quickBeat, FB.quickMin - (Date.now() - t0)) : Math.max(FB.beat, FB.min - (Date.now() - t0)));
   })();
   await Promise.race([run1, skipP]);
@@ -135,15 +141,20 @@ async function reveal(id, target, opt = {}) {   // 공통 '크게 보여 주기'
 /* 11/04 다음 칸 안내: 누를 곳이 반짝·통통 + 잠시 뒤 손가락(👆)이 톡톡. 소리는 부르는 쪽에서 가끔만 */
 function tapHint(node, delay = 1400) {
   if (!node) return; node.classList.add('gonext');
-  const id = screenId; setTimeout(() => { if (!alive(id) || !node.isConnected || node.querySelector('.taphand')) return; node.append(el('i', 'taphand', '👆')); }, delay);
+  const id = screenId; setTimeout(() => { if (!alive(id) || !node.isConnected || node.querySelector('.taphand')) return; node.append(el('i', 'taphand', '<img alt="" src="assets/pic/map/mong_walk_2.webp">')); }, delay);
+}
+function praiseKey() {
+  const k = (run && run.p && (run.p.kind || run.p.type)) || '';
+  const map = { listen: 'ui4_proc1', blend: 'ui4_proc1', same: 'ui4_proc1', balloon: 'ui4_proc1', sort: 'ui4_proc1', clap: 'ui4_proc1', seek: 'ui4_proc1', hidden: 'ui4_proc1', trace: 'ui4_proc2', copy: 'ui4_proc2', picword: 'ui4_proc3', choose: 'ui4_proc3', story: 'ui4_proc3', name: 'ui4_proc3', stickerstory: 'ui4_proc3', yesterday: 'ui4_proc3', readword: 'ui4_proc3', block: 'ui4_proc4', merge: 'ui4_proc4', train: 'ui4_proc4' };
+  return map[k] || ('ui_good' + (1 + rand(3)));
 }
 async function success(id, target) {
   if (revealOf(target)) return reveal(id, target);
-  sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say('ui_good' + (1 + rand(3))); await wait(FB.plain); return alive(id);
+  sparkPop(); ding(); setChar(praiseFlip++ % 2 ? 'laugh' : 'clap'); bounce(); await say(praiseKey()); await wait(FB.plain); return alive(id);
 }
 async function retryFx(id, node) {
   if (node) { node.classList.remove('retry'); void node.offsetWidth; node.classList.add('retry'); setTimeout(() => node.classList.remove('retry'), 1100); }
-  setChar('cheer'); await say('ui_retry'); if (alive(id)) setChar('think');
+  playSfx('wrong'); setChar('cheer'); await say('ui_retry'); if (alive(id)) setChar('think');
 }
 
 /* ---------- 문제 엔진 ---------- */
@@ -157,6 +168,7 @@ function choiceRound(id, cards, correct, done, target) {
     c.insertAdjacentHTML('beforeend', '<span class="badge"><img alt="" src="' + ICON('check') + '"></span>');
     c.addEventListener('click', async () => {
       if (locked || !alive(id)) return;
+      stopAudio(); playSfx('tap');
       if (i === correct) { locked = true; c.classList.add('ok'); if (await success(id, target === undefined ? cards[correct].dataset.k : target)) done(first); }
       else { first = false; locked = true; await retryFx(id, c); locked = false; }
     });
@@ -174,11 +186,11 @@ function sparkAt(node) { const r = node.getBoundingClientRect(); spark.style.lef
 function starJar() {   // 별 10개 = 별 병 하나(이 기기에만 저장)
   const j = el('div', 'jar', '<div class="glass"><div class="fill"></div><span class="cnt"></span></div><span class="jars"></span>'); drawJar(j); return j;
 }
-function drawJar(j) { const n = S.pw.stars % 10; j.querySelector('.fill').style.height = (n * 10) + '%'; j.querySelector('.cnt').textContent = '★'; j.querySelector('.jars').textContent = '🫙'.repeat(Math.min(S.pw.jars || 0, 5)); /* v4: 아이 화면에 숫자 없음 */ }
-function addStar(j) { S.pw.stars++; const full = S.pw.stars % 10 === 0; if (full) S.pw.jars++; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); if (full) { j.querySelector('.fill').style.height = '100%'; j.querySelector('.cnt').textContent = '★'; setTimeout(() => drawJar(j), 2600); } else drawJar(j); return full; }
+function drawJar(j) { const n = S.pw.stars % 10; j.querySelector('.fill').style.height = (n * 10) + '%'; j.querySelector('.cnt').innerHTML = '<img alt="" src="' + ICON('flower') + '">'; j.querySelector('.jars').innerHTML = Array.from({ length: Math.min(S.pw.jars || 0, 5) }, () => '<img alt="" src="' + ICON('flower') + '">').join(''); }
+function addStar(j) { S.pw.stars++; const full = S.pw.stars % 10 === 0; if (full) S.pw.jars++; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); if (full) { j.querySelector('.fill').style.height = '100%'; j.querySelector('.cnt').innerHTML = '<img alt="" src="' + ICON('flower') + '">'; setTimeout(() => drawJar(j), 2600); } else drawJar(j); return full; }
 async function surprise(s, big) {   // 가끔 깜짝: 몽글이 점프 + 별·꽃 비
   const box = el('div', 'confetti' + (big ? ' big' : ''));
-  for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', '', ['★', '✿', '♥', '●'][i % 4]); c.style.left = (Math.random() * 100) + '%'; c.style.color = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
+  for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', 'bit'); c.style.left = (Math.random() * 100) + '%'; c.style.background = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
   document.body.append(box); setChar('jump'); bounce(); await wait(big ? 1600 : 1100); box.remove();
 }
 const RUN = {
@@ -240,7 +252,7 @@ const RUN = {
     const hint = Math.max(0, (p.hint == null ? 2 : p.hint) - (st >= 2 ? 1 : 0));
     const easy = n <= 3;
     const score = x => (WORDS[x][0] === WORDS[w][0] ? 3 : 0) + (WCAT_OF[x] === WCAT_OF[w] ? 2 : 0) + ([...WORDS[x]].some(c => WORDS[w].includes(c)) ? 1 : 0) + Math.random() * 1.5;
-    const cand = PW_WORDS.filter(x => x !== w && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w));
+    const cand = PW_WORDS.filter(x => x !== w && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w) && (typeof readCardOk !== 'function' || readCardOk(x, run && run.ctx)));
     const dis = easy ? shuffle(cand.filter(x => WCAT_OF[x] !== WCAT_OF[w] && WORDS[x][0] !== WORDS[w][0])).slice(0, n - 1)
       : cand.sort((a, b) => score(b) - score(a)).slice(0, n - 1);
     const sea = WCAT_OF[w] === 'sea' ? shuffle(PW_WORDS.filter(x => x !== w && WCAT_OF[x] === 'sea' && (!SEA_SET.includes(w) || SEA_SET.includes(x)))) : [];   // 바다 친구 판: 가짜도 다 바다 친구(고래·상어·오징어·거북·해마)
@@ -286,7 +298,7 @@ const RUN = {
       });
       row.append(c);
     });
-    s.append(guide('think', '이건 뭘까?'), jar, frame, row);
+    s.append(guide('think', '이거 뭐야?'), jar, frame, row);
     if (window.HP) HP.pw = { target: w, opts, hint, cards: n, colors: opts.map(x => [...row.querySelectorAll('.pwcard')].find(c => c.dataset.k === x).style.background) };
     pointSay('ui_pw');
   },
@@ -539,6 +551,19 @@ function draggable(n, { onTap, onDrop }) {
    지금: 손을 뗄 때 그 획 하나만 봄. 맞으면 반짝 + 다음 획 분홍 점, 다 쓰면 칭찬. 틀린 획만 지우고 그 획만 다시 보여 줌. 같은 획 3번 안 되면 같이 써 줌.
    방향·순서는 너그럽게(거꾸로 그어도, 남은 다른 획을 먼저 그어도, 두 획을 한 번에 이어 그어도 인정). 아주 짧은 터치는 조용히 무시. */
 const TRACE_PX = { guide: 30, dash: 8, ink: 20, trail: 20, dot: 13, pad: 6 };
+/* 아이패드(짧은 변 744+ 또는 너비 900+)에서는 글자를 화면 가득 그리지 않음. 폰은 그대로. */
+function traceTablet() {
+  const vv = window.visualViewport;
+  const w = vv ? vv.width : window.innerWidth, h = vv ? vv.height : window.innerHeight;
+  const short = Math.min(w, h), wide = Math.max(w, h);
+  const mq = window.matchMedia('(min-width: 900px), (min-width: 768px) and (min-height: 700px)');
+  return !!(mq.matches || short >= 744 || wide >= 1000);
+}
+function tracePxNow() {
+  const k = traceTablet() ? 0.78 : 1, o = {};
+  Object.keys(TRACE_PX).forEach(key => { o[key] = TRACE_PX[key] * k; });
+  return o;
+}
 function strokePoints(st) { if (Array.isArray(st)) return st; const [cx, cy, r] = st.c, pts = []; for (let k = 0; k <= 48; k++) { const a = -Math.PI / 2 - k * (2 * Math.PI / 48); pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return pts; }
 /* 글자 → 획 목록(100칸 좌표) + 획마다 크기(sc, 판정 너비용). 받침 없는 음절은 자음+모음을 옆 짜임(ㅏㅑㅓㅕㅣ)·위아래 짜임(ㅗㅛㅜㅠㅡ)으로 배치 */
 function strokesOf(ch) {
@@ -577,7 +602,9 @@ function traceRound(j, id, s, done, copyMode) {
   const SO = strokesOf(j), guideP = SO.pts, N = guideP.length;
   const xs = guideP.flat().map(p => p[0]), ys = guideP.flat().map(p => p[1]);
   const bb = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
-  s.append(guide('think', copyMode ? '<b>' + j + '</b> 보고 써 봐' : '점을 따라 <b>' + j + '</b> 써 봐'));
+  s.append(guide('think', copyMode ? '<b>' + j + '</b> 보고 써 볼까?' : '분홍 점을 따라 <b>' + j + '</b> 써 볼까?'));
+  const stage = el('div', 'trace-stage' + (traceTablet() ? ' tablet' : ''));
+  const side = el('div', 'trace-side', '<img alt="" src="assets/pic/friends/donggeul_hello.webp"><img alt="몽글이" src="' + CHAR_DIR + 'think' + CHAR_EXT + '">');
   const box = el('div', 'trace');
   box.innerHTML = '<svg><path class="g1" fill="none" stroke="' + (copyMode ? '#F4EFE9' : '#EFE6DA') + '" stroke-width="' + TRACE_PX.guide + '" stroke-linecap="round" stroke-linejoin="round"/>' +
     '<path class="g2" fill="none" stroke="#F27BA6" stroke-width="' + TRACE_PX.dash + '" stroke-dasharray="0.1 14" stroke-linecap="round"' + (copyMode ? ' opacity="0"' : '') + '/>' +
@@ -599,8 +626,14 @@ function traceRound(j, id, s, done, copyMode) {
     box.querySelectorAll('.sdots i').forEach((d, q) => { d.className = doneK[q] ? 'on' : q === k ? 'now' : ''; });
   };
   const fit = () => {
+    stage.classList.toggle('tablet', traceTablet());
     const r = box.getBoundingClientRect(); if (!r.width) return;
-    const W = r.width, Hh = r.height, pad = TRACE_PX.guide / 2 + TRACE_PX.pad;
+    const px = tracePxNow();
+    svg.querySelector('.g1').setAttribute('stroke-width', px.guide);
+    svg.querySelector('.g2').setAttribute('stroke-width', px.dash);
+    trails.forEach(t => t.setAttribute('stroke-width', px.trail));
+    mover.setAttribute('r', px.dot);
+    const W = r.width, Hh = r.height, pad = px.guide / 2 + px.pad;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + Hh);
     T.s = Math.min((W - 2 * pad) / Math.max(bb.x1 - bb.x0, 1), (Hh - 2 * pad) / Math.max(bb.y1 - bb.y0, 1)) * 0.92;
     T.ox = W / 2 - T.s * (bb.x0 + bb.x1) / 2; T.oy = Hh / 2 - T.s * (bb.y0 + bb.y1) / 2;
@@ -610,7 +643,7 @@ function traceRound(j, id, s, done, copyMode) {
   };
   const redraw = () => {
     const d = window.devicePixelRatio || 1; ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
-    ctx.lineCap = ctx.lineJoin = 'round'; ctx.lineWidth = TRACE_PX.ink;
+    ctx.lineCap = ctx.lineJoin = 'round'; ctx.lineWidth = tracePxNow().ink;
     const line = (st, color) => { ctx.strokeStyle = color; ctx.beginPath(); st.forEach((p, i) => { const [x, y] = toPx(p); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); if (st.length === 1) { const [x, y] = toPx(st[0]); ctx.lineTo(x + 0.1, y); } ctx.stroke(); };
     ink.forEach(st => line(st, '#F47B58'));
     guideP.forEach((g, k) => helped[k] && line(g, '#F7A98F'));   // 같이 써 준 획
@@ -666,8 +699,14 @@ function traceRound(j, id, s, done, copyMode) {
   const hb = el('button', 'kid-btn', '<img alt="" src="' + ICON('speaker') + '">' + (copyMode ? '보여 줘' : '다시 보기')); hb.addEventListener('click', prompt);
   const eb = el('button', 'kid-btn', '지우기'); eb.addEventListener('click', () => { if (busy || finished) return; ink = []; doneK.fill(false); helped.fill(false); badK.fill(0); demoTok++; clearTrails(); redraw(); park(); });
   tools.append(hb, eb);
-  s.append(box, tools, el('div', '', '<div style="height:20px"></div>'));
+  stage.append(side, box);
+  s.append(stage, tools);
+  const refit = () => { stage.classList.toggle('tablet', traceTablet()); fit(); };
   fit(); requestAnimationFrame(fit); new ResizeObserver(fit).observe(box);
+  window.addEventListener('resize', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+  const mq = window.matchMedia('(min-width: 900px), (min-width: 768px) and (min-height: 700px)');
+  if (mq.addEventListener) mq.addEventListener('change', refit);
   if (window.HP) HP.trace = { letter: j, guide: guideP, sc: SO.sc, demoDone: false, toPx: p => { const r = box.getBoundingClientRect(), q = toPx(p); return [r.left + q[0], r.top + q[1]]; }, get state() { return { done: doneK.slice(), helped: helped.slice(), bad, badK: badK.slice(), next: nextK(), finished, busy, ink: ink.length }; },
     inject: pts => { ink.push(pts); redraw(); return onStroke(pts); } };
   if (copyMode) { say([isSyl(j) ? VOICE.syl(j) : VOICE.jamo(j), 'ui_trace']); mover.style.display = 'none'; drawGuide(); } else prompt();

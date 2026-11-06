@@ -2,7 +2,7 @@
 @font-face { font-family: 'Pretendard'; src: url('fonts/Pretendard-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
 :root {
   --cream: #FBF6EE; --paper: #FFFFFF; --line: #EFE6DA;
-  --ink: #3B3236; --ink-2: #8C8079; --ink-3: #B9AEA6;
+  --ink: #3B3236; --ink-2: #5E534C; --ink-3: #8A7B72;
   --peach: #FF9F80; --peach-soft: #FFE9E0; --peach-strong: #F47B58; --peach-ink: #F07F5E;
   --mint: #5FBF9C; --mint-soft: #E1F4EB; --mint-ink: #3E9C7A;
   --lav: #9D8DE6; --lav-soft: #EEEBFB; --lav-ink: #7A68CC;
@@ -501,6 +501,7 @@ body.night .time .knob { border-color: #B9AEEA; }
 .jar.pop { animation: bounce .6s ease; }
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
 .confetti i { position: absolute; top: -40px; font-style: normal; font-size: 26px; animation: fall 1.4s ease-in forwards; }
+.confetti i.bit { width: 12px; height: 16px; border-radius: 4px; display: block; font-size: 0; }
 .confetti.big i { font-size: 34px; animation-duration: 1.8s; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 .s-round-picword, .s-round-hidden { position: relative; }
@@ -545,13 +546,13 @@ body.night .time .knob { border-color: #B9AEEA; }
 .mapme { position: absolute; width: 72px; margin-left: -36px; z-index: 4; pointer-events: none; transition: top .8s, left .8s; }
 .mapme img { width: 72px; height: 72px; }
 .mapme .acc { position: absolute; right: -4px; top: -4px; font-size: 24px; }
-.map.season::after { content: '❄️ 🍂 ✨'; position: absolute; right: 12px; top: 6px; font-size: 20px; opacity: .6; }
+.map.season::after { content: none; }
 .seaTag { position: absolute; right: 12px; top: 34px; font-size: var(--t-xs); background: #fff; padding: 2px 10px; border-radius: 10px; color: var(--ink-2); z-index: 5; }
 .mapdock { padding-bottom: 8px; }
 .kid-btn.todaygo { min-height: 96px; font-size: var(--t-l); }
 .dock2 { display: flex; gap: 8px; padding: 0 16px 18px; padding-bottom: max(18px, env(safe-area-inset-bottom)); }
 .dock2 .kid-btn { flex: 1; min-height: 64px; font-size: var(--t-s); padding: 0 6px; gap: 4px; flex-direction: column; border-radius: 24px; }
-.dock2 .kid-btn img { width: 24px; height: 24px; }
+.dock2 .kid-btn img, .dock2 .stepic { width: 26px; height: 26px; }
 .dock2 .dexic { font-size: 22px; }
 .pnote { margin: 0 16px 8px; padding: 10px 14px; border-radius: 16px; background: var(--butter-soft); color: var(--butter-ink); font-size: var(--t-xs); }
 
@@ -567,7 +568,8 @@ body.night .time .knob { border-color: #B9AEEA; }
 .steps span.on { opacity: 1; background: var(--mint-soft); }
 .steps span.now { opacity: 1; background: var(--peach-soft); transform: scale(1.18); box-shadow: 0 0 0 4px var(--peach); }
 .steps.lg span { width: 64px; height: 64px; font-size: 30px; }
-.segcard { margin: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 50px; border-radius: 40px; background: #fff; box-shadow: var(--shadow); animation: popIn .4s; }
+.s-segcard { justify-content: center; }
+.segcard { margin: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px 50px; min-height: 42vh; width: min(520px, 92%); border-radius: 40px; background: #fff; box-shadow: var(--shadow); animation: popIn .4s; }
 .segcard .emo { font-size: 84px; }
 .segcard b { font-size: var(--t-xl); }
 @keyframes popIn { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -661,7 +663,13 @@ body.night .time .knob { border-color: #B9AEEA; }
 .cloudsky.happy .grump { background: #fff; box-shadow: -40px 10px 0 -10px #fff, 40px 12px 0 -14px #fff; }
 .cloudsky .cf { font-size: 48px; }
 .cloudsky .rainbow { position: absolute; left: 50%; bottom: -120px; margin-left: -160px; width: 320px; height: 240px; border-radius: 50%; border: 18px solid transparent; box-shadow: inset 0 0 0 12px #F27B7B, inset 0 0 0 24px #F2C230, inset 0 0 0 36px #4FC08D, inset 0 0 0 48px #5FA8E8; opacity: 0; transition: opacity .8s; }
-.cloudsky .town { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 30px; }
+.cloudsky .town { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0; }
+.cloudsky .town img { width: 48px; height: 48px; display: inline-block; object-fit: contain; margin: 0 4px; }
+.skyfriend { position: absolute; left: 12px; bottom: 8px; width: 72px; height: 72px; object-fit: contain; pointer-events: none; }
+.map .homedecor { position: absolute; width: 72px; height: 72px; object-fit: contain; z-index: 2; pointer-events: none; }
+.map .homedecor.win { right: 18px; top: 78px; }
+.map .homedecor.cush { left: 14px; top: 210px; }
+.dx.next { animation: stkShimmer 1.4s ease-in-out infinite; }
 
 /* 🎁 보물 상자 */
 .chests { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 6px 20px; }
@@ -784,3 +792,82 @@ img.pstk { border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px #fff, 0 3
 .map .ntag.side { transform: translate(0, -50%); }
 .mapwrap { -webkit-mask-image: linear-gradient(#000 calc(100% - 36px), transparent); mask-image: linear-gradient(#000 calc(100% - 36px), transparent); }
 .map { padding-bottom: 40px; }
+
+/* 11/06 놀이 판: 회색 프롬프트 상자를 줄이고, 카드는 가운데에서 화면의 30% 이상 */
+.prompt { min-height: 0; margin: 2px 12px 0; padding: 4px 8px; background: transparent; box-shadow: none; border-radius: 0; }
+.prompt .syl span { width: 64px; height: 64px; font-size: 44px; border-radius: 18px; }
+.prompt .hero-pic { width: 72px; height: 72px; }
+.prompt .spk { width: 52px; height: 52px; }
+.ask { padding: 6px 20px 2px; }
+.scr[class*="s-round"] { overflow-x: hidden; overflow-y: auto; }
+.scr[class*="s-round"] .choices { flex: 1 0 auto; align-content: center; justify-content: center; margin: 6px 0 8px; }
+.scr[class*="s-round"] .ch { height: auto; min-height: 30vh; max-height: 42vh; overflow: hidden; }
+.scr[class*="s-round"] .ch img, .scr[class*="s-round"] .ch .ph { width: auto; height: auto; max-width: 72%; max-height: 68%; }
+.choices.four .ch, .choices.n4 .ch { height: auto; min-height: 30vh; overflow: hidden; }
+@media (min-width: 768px) and (max-width: 1180px) {
+  .choices, .choices.four, .choices.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choices .ch:last-child:nth-child(odd) { grid-column: 1 / -1; width: min(48%, 320px); max-width: 320px; justify-self: center; }
+  .pwframe { width: min(38vh, calc(100vw - 96px), 340px); max-height: 38vh; }
+  .pwcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; width: min(720px, calc(100% - 24px)); margin: 0 auto; position: relative; z-index: 2; }
+  .pwcard { min-width: 0; min-height: 72px; position: relative; }
+}
+.stkhero { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; padding: 8px 16px 28px; }
+.stkhero .slot { width: min(42vw, 168px); aspect-ratio: 1; border-radius: 28px; background: #fff; box-shadow: var(--shadow); display: grid; place-items: center; }
+.stkhero .slot img { width: 78%; height: 78%; object-fit: contain; }
+.stkhero .slot.next { width: min(34vw, 132px); }
+.stkhero .slot.shimmer, .shelf .bk.next { animation: stkShimmer 1.4s ease-in-out infinite; }
+.shelf .bk.next { opacity: 1; }
+@keyframes stkShimmer { 0%,100% { box-shadow: 0 0 0 3px #fff, 0 0 0 7px rgba(245,192,74,.35); } 50% { box-shadow: 0 0 0 3px #fff, 0 0 0 12px rgba(245,192,74,.9); } }
+.map .path polyline.pathbed { stroke: rgba(255,248,236,.94); stroke-width: 26; stroke-dasharray: none; opacity: 1; filter: drop-shadow(0 2px 0 rgba(120,80,40,.15)); }
+.map .path polyline.pathdash { stroke: #E25B2A; stroke-width: 7; stroke-dasharray: 2 16; opacity: .95; }
+.map .deco img { width: 40px; height: 40px; }
+.world.hasbg .deco { opacity: .9; }
+.utag.landmark { display: flex; align-items: center; gap: 4px; padding: 2px 6px 2px 2px; max-width: 42%; z-index: 2; pointer-events: none; }
+.utag.landmark b { font-size: 12px; }
+.utag.landmark .lm { width: 26px; height: 26px; border-radius: 8px; overflow: hidden; background: #fff; flex: none; }
+.utag.landmark .lm img { width: 100%; height: 100%; object-fit: cover; }
+.ntag.start, .ntag.goal { display: flex; align-items: center; gap: 4px; }
+.ntag .flag { width: 22px; height: 22px; }
+.stone .mk { width: 32px; height: 32px; }
+.stone .cloud img { width: 46px; height: 28px; }
+.parrow img, .mghead img { width: 22px; height: 22px; }
+.map .parrow.to-next img { width: 30px; height: 30px; }
+.stone.nextup { z-index: 5; box-shadow: 0 0 0 5px #fff, 0 0 0 9px #F27B4A; }
+.steps .stepic { width: 34px; height: 34px; }
+.segcard .stepic, .pcard3 .stepic { width: 72px; height: 72px; }
+.mapme .acc img { width: 28px; height: 28px; }
+.kid-btn.ghost { background: transparent; box-shadow: none; color: var(--ink-2); min-height: 64px; }
+.poseopts { display: flex; gap: 10px; justify-content: center; }
+.poseopt { min-width: 120px; min-height: 72px; border-radius: 22px; background: #F6F1EA; padding: 8px 12px; }
+.poseopt.on { background: var(--peach-soft); box-shadow: inset 0 0 0 3px var(--peach); }
+.poseopt small, .stretch-friend small { display: block; color: var(--ink-2); font-size: var(--t-xs); }
+.stretch-friend .g { font-size: 56px; color: var(--peach-ink); }
+.stretch-pic img, .stretch-pic .ph { width: min(46vh, 220px); height: min(46vh, 220px); object-fit: contain; }
+.stretch-friend-pic { width: 72px; height: 72px; object-fit: contain; }
+.stretch-pose { display: flex; align-items: center; gap: 8px; }
+.stretch-pose img, .stretch-pose .ph { width: 72px; height: 72px; }
+.posealt { min-height: 48px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--ink-2); }
+.piece.plain { color: var(--ink); background: #fff; }
+.trace-stage { flex: 1; min-height: 0; display: flex; align-items: stretch; justify-content: center; }
+.trace-stage .trace { flex: 1; margin: 10px 20px 0; }
+.trace-side { display: none; }
+.trace-stage.tablet { align-items: center; gap: 16px; background: radial-gradient(circle at 18% 78%, #fff4e4, transparent 46%); }
+.trace-stage.tablet .trace { flex: none; width: min(68vw, 280px); height: min(46vh, 400px); max-width: 280px; max-height: 400px; margin: 0; }
+.trace-stage.tablet .trace-side { display: flex; flex-direction: column; gap: 10px; }
+.trace-stage.tablet .trace-side img { width: 108px; height: 108px; object-fit: contain; }
+.trace-stage.tablet .model { font-size: 40px; }
+.map { background: #e7f6df url(assets/pic/map/map_bg_day.webp) center top / cover; }
+.map .world, .map .w1, .map .w2, .map .w3, .map .w4, .map .w5, .map .w6 { background: transparent; }
+.stone { background: transparent; box-shadow: none; overflow: visible; }
+.stone .stonepic { width: 76px; height: 76px; border-radius: 0; object-fit: contain; background: transparent; }
+.stone.today { background: transparent; }
+.stone.today .stonepic { width: 102px; height: 102px; }
+.stone .stki { position: absolute; width: 32px; height: 32px; right: -6px; bottom: -4px; }
+.mapme .walker { width: 84px; height: 84px; }
+.mapme .hatslot { position: absolute; left: 6px; top: -8px; width: 36px; height: 36px; }
+.sky { min-height: 54vh; flex: 1; }
+.bal { width: 132px; height: 168px; }
+.bal .sk { font-size: 0; }
+.bal .sk img { width: 120px; height: 120px; }
+.taphand img { width: 42px; height: 42px; }
+.prompt .eye { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

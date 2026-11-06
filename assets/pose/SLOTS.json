@@ -1,0 +1,105 @@
+{
+  "note": "pose_*.webp가 assets/pic에 있고 art.js 목록에 들어가기 전에는 몸으로 글자 놀이를 하루에 넣지 않는다. 몽글이 점프 그림으로 대신하지 않는다.",
+  "files": [
+    {
+      "id": "pose_i",
+      "file": "assets/pic/pose_i.webp",
+      "have": false
+    },
+    {
+      "id": "pose_a",
+      "file": "assets/pic/pose_a.webp",
+      "have": false
+    },
+    {
+      "id": "pose_eo",
+      "file": "assets/pic/pose_eo.webp",
+      "have": false
+    },
+    {
+      "id": "pose_o",
+      "file": "assets/pic/pose_o.webp",
+      "have": false
+    },
+    {
+      "id": "pose_u",
+      "file": "assets/pic/pose_u.webp",
+      "have": false
+    },
+    {
+      "id": "pose_eu",
+      "file": "assets/pic/pose_eu.webp",
+      "have": false
+    },
+    {
+      "id": "pose_ng",
+      "file": "assets/pic/pose_ng.webp",
+      "have": false
+    },
+    {
+      "id": "pose_g",
+      "file": "assets/pic/pose_g.webp",
+      "have": false
+    },
+    {
+      "id": "pose_n",
+      "file": "assets/pic/pose_n.webp",
+      "have": false
+    },
+    {
+      "id": "pose_d",
+      "file": "assets/pic/pose_d.webp",
+      "have": false
+    },
+    {
+      "id": "pose_r",
+      "file": "assets/pic/pose_r.webp",
+      "have": false
+    },
+    {
+      "id": "pose_m",
+      "file": "assets/pic/pose_m.webp",
+      "have": false
+    },
+    {
+      "id": "pose_b",
+      "file": "assets/pic/pose_b.webp",
+      "have": false
+    },
+    {
+      "id": "pose_s",
+      "file": "assets/pic/pose_s.webp",
+      "have": false
+    },
+    {
+      "id": "pose_j",
+      "file": "assets/pic/pose_j.webp",
+      "have": false
+    },
+    {
+      "id": "pose_h",
+      "file": "assets/pic/pose_h.webp",
+      "have": false
+    },
+    {
+      "id": "pose_k",
+      "file": "assets/pic/pose_k.webp",
+      "have": false
+    },
+    {
+      "id": "pose_t",
+      "file": "assets/pic/pose_t.webp",
+      "have": false
+    },
+    {
+      "id": "pose_ch",
+      "file": "assets/pic/pose_ch.webp",
+      "have": false
+    },
+    {
+      "id": "pose_p",
+      "file": "assets/pic/pose_p.webp",
+      "have": false
+    }
+  ]
+}
