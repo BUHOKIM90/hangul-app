@@ -186,11 +186,11 @@ function sparkAt(node) { const r = node.getBoundingClientRect(); spark.style.lef
 function starJar() {   // 별 10개 = 별 병 하나(이 기기에만 저장)
   const j = el('div', 'jar', '<div class="glass"><div class="fill"></div><span class="cnt"></span></div><span class="jars"></span>'); drawJar(j); return j;
 }
-function drawJar(j) { const n = S.pw.stars % 10; j.querySelector('.fill').style.height = (n * 10) + '%'; j.querySelector('.cnt').textContent = '★'; j.querySelector('.jars').textContent = '🫙'.repeat(Math.min(S.pw.jars || 0, 5)); /* v4: 아이 화면에 숫자 없음 */ }
-function addStar(j) { S.pw.stars++; const full = S.pw.stars % 10 === 0; if (full) S.pw.jars++; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); if (full) { j.querySelector('.fill').style.height = '100%'; j.querySelector('.cnt').textContent = '★'; setTimeout(() => drawJar(j), 2600); } else drawJar(j); return full; }
+function drawJar(j) { const n = S.pw.stars % 10; j.querySelector('.fill').style.height = (n * 10) + '%'; j.querySelector('.cnt').innerHTML = '<img alt="" src="' + ICON('flower') + '">'; j.querySelector('.jars').innerHTML = Array.from({ length: Math.min(S.pw.jars || 0, 5) }, () => '<img alt="" src="' + ICON('flower') + '">').join(''); }
+function addStar(j) { S.pw.stars++; const full = S.pw.stars % 10 === 0; if (full) S.pw.jars++; j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop'); if (full) { j.querySelector('.fill').style.height = '100%'; j.querySelector('.cnt').innerHTML = '<img alt="" src="' + ICON('flower') + '">'; setTimeout(() => drawJar(j), 2600); } else drawJar(j); return full; }
 async function surprise(s, big) {   // 가끔 깜짝: 몽글이 점프 + 별·꽃 비
   const box = el('div', 'confetti' + (big ? ' big' : ''));
-  for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', '', ['★', '✿', '♥', '●'][i % 4]); c.style.left = (Math.random() * 100) + '%'; c.style.color = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
+  for (let i = 0; i < (big ? 26 : 12); i++) { const c = el('i', 'bit'); c.style.left = (Math.random() * 100) + '%'; c.style.background = CARD_COLORS[i % CARD_COLORS.length]; c.style.animationDelay = (Math.random() * 0.5).toFixed(2) + 's'; box.append(c); }
   document.body.append(box); setChar('jump'); bounce(); await wait(big ? 1600 : 1100); box.remove();
 }
 const RUN = {

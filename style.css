@@ -2,7 +2,7 @@
 @font-face { font-family: 'Pretendard'; src: url('fonts/Pretendard-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
 :root {
   --cream: #FBF6EE; --paper: #FFFFFF; --line: #EFE6DA;
-  --ink: #3B3236; --ink-2: #8C8079; --ink-3: #B9AEA6;
+  --ink: #3B3236; --ink-2: #5E534C; --ink-3: #8A7B72;
   --peach: #FF9F80; --peach-soft: #FFE9E0; --peach-strong: #F47B58; --peach-ink: #F07F5E;
   --mint: #5FBF9C; --mint-soft: #E1F4EB; --mint-ink: #3E9C7A;
   --lav: #9D8DE6; --lav-soft: #EEEBFB; --lav-ink: #7A68CC;
@@ -501,6 +501,7 @@ body.night .time .knob { border-color: #B9AEEA; }
 .jar.pop { animation: bounce .6s ease; }
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
 .confetti i { position: absolute; top: -40px; font-style: normal; font-size: 26px; animation: fall 1.4s ease-in forwards; }
+.confetti i.bit { width: 12px; height: 16px; border-radius: 4px; display: block; font-size: 0; }
 .confetti.big i { font-size: 34px; animation-duration: 1.8s; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 .s-round-picword, .s-round-hidden { position: relative; }
@@ -567,7 +568,8 @@ body.night .time .knob { border-color: #B9AEEA; }
 .steps span.on { opacity: 1; background: var(--mint-soft); }
 .steps span.now { opacity: 1; background: var(--peach-soft); transform: scale(1.18); box-shadow: 0 0 0 4px var(--peach); }
 .steps.lg span { width: 64px; height: 64px; font-size: 30px; }
-.segcard { margin: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 50px; border-radius: 40px; background: #fff; box-shadow: var(--shadow); animation: popIn .4s; }
+.s-segcard { justify-content: center; }
+.segcard { margin: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px 50px; min-height: 42vh; width: min(520px, 92%); border-radius: 40px; background: #fff; box-shadow: var(--shadow); animation: popIn .4s; }
 .segcard .emo { font-size: 84px; }
 .segcard b { font-size: var(--t-xl); }
 @keyframes popIn { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -661,7 +663,13 @@ body.night .time .knob { border-color: #B9AEEA; }
 .cloudsky.happy .grump { background: #fff; box-shadow: -40px 10px 0 -10px #fff, 40px 12px 0 -14px #fff; }
 .cloudsky .cf { font-size: 48px; }
 .cloudsky .rainbow { position: absolute; left: 50%; bottom: -120px; margin-left: -160px; width: 320px; height: 240px; border-radius: 50%; border: 18px solid transparent; box-shadow: inset 0 0 0 12px #F27B7B, inset 0 0 0 24px #F2C230, inset 0 0 0 36px #4FC08D, inset 0 0 0 48px #5FA8E8; opacity: 0; transition: opacity .8s; }
-.cloudsky .town { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 30px; }
+.cloudsky .town { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0; }
+.cloudsky .town img { width: 48px; height: 48px; display: inline-block; object-fit: contain; margin: 0 4px; }
+.skyfriend { position: absolute; left: 12px; bottom: 8px; width: 72px; height: 72px; object-fit: contain; pointer-events: none; }
+.map .homedecor { position: absolute; width: 72px; height: 72px; object-fit: contain; z-index: 2; pointer-events: none; }
+.map .homedecor.win { right: 18px; top: 78px; }
+.map .homedecor.cush { left: 14px; top: 210px; }
+.dx.next { animation: stkShimmer 1.4s ease-in-out infinite; }
 
 /* 🎁 보물 상자 */
 .chests { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 6px 20px; }

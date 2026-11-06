@@ -66,7 +66,7 @@ Object.assign(RUN, {
   balloon(x, id, s, done) {
     const sk = SKINS.balloon[(run.ctx.dn + run.segIdx) % 3];
     const n = Math.min(4, run.ctx.nopt + 1), opts = shuffle([x, ...confGlyph(x, glyphPool(run.ctx), n - 1)]);
-    const sky = el('div', 'sky');
+    const sky = el('div', 'sky', '<img class="skyfriend" alt="" src="assets/pic/friends/donggeul_listen.webp">');
     let first = true, got = false, wave = 0;
     const launch = () => {
       sky.querySelectorAll('.bal').forEach(b => b.remove()); wave++;
@@ -244,11 +244,11 @@ Object.assign(RUN, {
   },
   /* ☁️ 심술 구름 달래기: 글자 6개를 찾을 때마다 구름이 작아지고 무지개가 생김(시간·목숨·실패 없음) */
   cloud(r, id, s, done) {
-    const sky = el('div', 'cloudsky', '<div class="rainbow"></div><div class="grump"><span class="cf">' + artImg('cloud_grump', '😤') + '</span></div><div class="town">🏠🌳🏡</div>');
+    const sky = el('div', 'cloudsky', '<div class="rainbow"></div><div class="grump"><span class="cf">' + artImg('cloud_grump', '') + '</span></div><div class="town"><img alt="" src="assets/pic/map/lm_garden.webp"><img alt="" src="assets/pic/map/lm_train.webp"><img alt="" src="assets/pic/map/lm_hat.webp"></div>');
     const host = el('div', 'qhost'), g = sky.querySelector('.grump'), rb = sky.querySelector('.rainbow');
     s.append(guide('think', '구름이 글자를 숨겼대. 같이 찾자!'), sky, host);
     let k = 0;
-    const draw = () => { const p = k / r.qs.length; g.style.transform = 'scale(' + (1 - 0.6 * p).toFixed(2) + ')'; rb.style.opacity = p.toFixed(2); g.querySelector('.cf').innerHTML = p >= 1 ? artImg('cloud_smile', '😊') : p > 0.5 ? artImg('cloud_surprise', '😐') : artImg('cloud_grump', '😤'); };
+    const draw = () => { const p = k / r.qs.length; g.style.transform = 'scale(' + (1 - 0.6 * p).toFixed(2) + ')'; rb.style.opacity = p.toFixed(2); g.querySelector('.cf').innerHTML = p >= 1 ? artImg('cloud_smile', '') : p > 0.5 ? artImg('cloud_surprise', '') : artImg('cloud_grump', ''); };
     const next = () => {
       if (!alive(id)) return; draw(); host.innerHTML = '';
       if (k >= r.qs.length) { sky.classList.add('happy'); setChar('laugh'); bounce(); (async () => { await say('ui4_cloudok'); if (alive(id)) done(null); })(); return; }
@@ -278,7 +278,7 @@ Object.assign(RUN, {
     const three = shuffle(pool).slice(0, 3);
     s.append(guide('wave', '하고 싶은 놀이를 골라 봐!'));
     const row = el('div', 'pick3');
-    three.forEach(t => { const b = el('button', 'pcard3', '<span class="emo">' + PLAY_ICON[t] + '</span><b>' + CURR.plays[t].kid + '</b>'); b.dataset.t = t; b.addEventListener('click', () => { ding(); done({ chosen: t }); }); row.append(b); });
+    three.forEach(t => { const b = el('button', 'pcard3', '<span class="emo">' + stepIcon(t) + '</span><b>' + CURR.plays[t].kid + '</b>'); b.dataset.t = t; b.addEventListener('click', () => { playSfx('tap'); done({ chosen: t }); }); row.append(b); });
     s.append(row); say('ui4_again');
     setSolve(async () => row.querySelector('.pcard3') && row.querySelector('.pcard3').click());
     if (!three.length) done(null);
@@ -356,7 +356,7 @@ RUN.hidden = function (w, id, s, done) {
    가짜 그림: 1단계 = 글자 모양이 다른 낱말, 2단계부터 = 첫 글자·글자가 겹치는 닮은 낱말(할아버지 ↔ 할머니), 3단계부터·잘하는 아이는 4장.
    맞히면 글자 칸이 한 글자씩 불이 켜지며 읽어 주고 낱말 전체 + 칭찬. 도움 받고 맞힌 건 복습 기록에 넣지 않음(null). */
 if (CURR.plays && CURR.plays.listen) { CURR.plays.listen.kid = '글자 보고 그림 찾기'; CURR.plays.listen.goal = '낱말 글자를 읽고 뜻(그림)과 잇기'; }
-if (typeof PLAY_ICON !== 'undefined') PLAY_ICON.listen = '👀';
+if (typeof PLAY_ICON !== 'undefined') PLAY_ICON.listen = '';
 RUN.listen = function (w, id, s, done) {
   const st = (run.ctx && run.ctx.stage) || 1, syl = [...WORDS[w]];
   const picOk = x => WORDS[x] && (hasPic(x) || PH_EMOJI[x]) && hasA(VOICE.word(x)) && (typeof readCardOk !== 'function' || readCardOk(x, run.ctx));

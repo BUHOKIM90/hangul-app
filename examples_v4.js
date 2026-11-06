@@ -88,7 +88,10 @@ const EX_V4 = [
   { id: 'wang', kr: '왕', emo: '👑', cat: 'people', unit: 26 },
   { id: 'wangja', kr: '왕자', emo: '🤴', cat: 'people', unit: 26 },
   { id: 'jwi', kr: '쥐', emo: '🐭', cat: 'animal', unit: 27 },
-  { id: 'uisa', kr: '의사', emo: '🩺', cat: 'people', unit: 27 }
+  { id: 'uisa', kr: '의사', emo: '🩺', cat: 'people', unit: 27 },
+  { id: 'miso', kr: '미소', emo: '😊', cat: 'people', unit: 7 },
+  { id: 'doma', kr: '도마', emo: '🪵', cat: 'thing', unit: 6 },
+  { id: 'noru', kr: '노루', emo: '🦌', cat: 'animal', unit: 9 }
 ];
 EX_V4.forEach(ex => {
   if (Object.values(WORDS).includes(ex.kr) || WORDS[ex.id]) return;

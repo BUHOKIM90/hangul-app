@@ -124,6 +124,7 @@ function showHome() {
   const toN = L.nodes[Math.min(me.dn, 169)], hd = el('i', 'mghead', '<img alt="" src="assets/map/arrow_next.svg">'); hd.style.left = me.x + '%'; hd.style.top = (me.y - 20) + 'px'; M.append(hd);
   const fixHead = () => { const W = M.clientWidth; if (!W || toN === me) { hd.hidden = true; return; } const ang = Math.atan2(toN.y - me.y, (toN.x - me.x) * W / 100); hd.style.transform = 'translate(-50%,-50%) translate(' + (Math.cos(ang) * 58).toFixed(0) + 'px,' + (Math.sin(ang) * 58).toFixed(0) + 'px) rotate(' + (ang * 180 / Math.PI).toFixed(1) + 'deg)'; };
   if (sea) M.insertAdjacentHTML('beforeend', '<div class="seaTag">' + sea[1] + '</div>');
+  M.insertAdjacentHTML('beforeend', '<img class="homedecor win" alt="" src="assets/pic/items/item_round_window.webp"><img class="homedecor cush" alt="" src="assets/pic/items/item_rest_cushion.webp">');
   wrap.append(M);
   // 위 인사 + 아래 단추
   const head = guide(st === 'done' ? 'sleep' : 'wave', st === 'done' ? '오늘은 여기까지! 내일 또 놀자.' : st === 'soon' || st === 'all' ? '다음 길은 곧 열려요!' : '려원아, 안녕!<small>' + DAYS[Math.min(S.cur, 170) - 1].fun + '</small>');
@@ -325,7 +326,7 @@ function endDay() {
   if (canPlayMore() || canReplayMore()) { moreB = el('button', 'kid-btn next moreBtn', '<span class="dexic">▶</span>더 놀까?'); moreB.id = 'endMore'; moreB.addEventListener('click', playMore); s.insertBefore(el('div', 'dock moredock'), dock).append(moreB); }
   tapHint(moreB || b, 2600);
   if (mode !== 'replay' && S.cur > P.day) showHome.walkFrom = P.day;
-  (async () => { if (sticker) { sparkPop(); ding(); await say('ui_book'); } if (grew && alive(id)) await say('ui4_town'); if (alive(id)) await say(mode === 'replay' ? 'ui_good1' : 'ui4_bye'); if (alive(id) && !timeUp() && mode !== 'replay') say('ui4_free'); })();
+  (async () => { if (sticker) { sparkPop(); playSfx('sticker'); await say('ui_book'); } if (grew && alive(id)) await say('ui4_town'); if (alive(id)) await say(mode === 'replay' ? 'ui4_proc3' : 'ui4_bye'); if (alive(id) && !timeUp() && mode !== 'replay') say('ui4_free'); })();
   if (window.HP) HP.solve = null;
   DR = null;
 }
@@ -355,10 +356,13 @@ function showDex() {
   const met = DEX.filter(j => S.met[j]);
   s.append(guide(met.length ? 'laugh' : 'basic', met.length ? '글자 친구를 많이 만났어!' : '놀이를 하면 글자 친구가 생겨!'));
   const g = el('div', 'dex');
+  const nextJ = DEX.find(j => !S.met[j]);
   DEX.forEach(j => {
-    const on = !!S.met[j], e = JAMO_EX[j], star = known('j:' + j);
-    const c = el('button', 'dx' + (on ? ' on' : ''), on ? (e ? (hasPic(e.lp) ? picHTML(e.lp, e.word) : exPic(j)) : '') + '<span class="g">' + j + '</span><span class="n">' + (JNAME[j] || '') + (star ? ' ★' : '') + '</span>' : '<span class="g">' + j + '</span><span class="n">?</span>');
-    c.dataset.j = j; c.addEventListener('click', () => { if (on && hasA(VOICE.jamo(j))) say(VOICE.jamo(j)); }); g.append(c);
+    const on = !!S.met[j], nxt = j === nextJ;
+    if (!on && !nxt) return;
+    const e = JAMO_EX[j];
+    const c = el('button', 'dx on' + (nxt ? ' next' : ''), (e ? (hasPic(e.lp) ? picHTML(e.lp, e.word) : exPic(j)) : '') + '<span class="g">' + j + '</span><span class="n">' + (JNAME[j] || '') + '</span>');
+    c.dataset.j = j; if (on) c.addEventListener('click', () => { if (hasA(VOICE.jamo(j))) say(VOICE.jamo(j)); }); g.append(c);
   });
   s.append(g);
 }
