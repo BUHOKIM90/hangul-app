@@ -2,46 +2,57 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="theme-color" content="#FBF6EE">
-<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFF9EB">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="한글 놀이">
-<title>한글 놀이 v4</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'">
+<title>한글 놀이</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-512-maskable.png">
-<link rel="preload" href="fonts/Pretendard-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css">
+<link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/char/monggeul_wave.webp" as="image" fetchpriority="high">
+<link rel="stylesheet" href="v5/css/app.css">
 </head>
 <body>
 <div id="app">
   <header id="top">
-    <button id="homeBtn" class="icon-btn" aria-label="처음 화면" hidden><img src="assets/icons/home.svg" alt=""></button>
-    <div class="time" aria-hidden="true"><img src="assets/icons/sun.svg" alt=""><div class="track"><div class="fill"></div><div class="knob"></div></div><img src="assets/icons/moon.svg" alt=""></div>
-    <button id="adultBtn" class="adult" aria-label="어른 메뉴">어른</button>
+    <button type="button" id="homeBtn" class="tap icon" data-tap="go-home" hidden aria-label="처음으로">홈</button>
+    <p id="brand">한글 놀이</p>
+    <button type="button" id="soundBtn" class="tap sound is-on" data-tap="sound" aria-pressed="true" aria-label="소리 켜짐">소리 켜짐</button>
+    <button type="button" id="adultBtn" class="tap icon" data-tap="adult" aria-label="어른 메뉴">어른</button>
   </header>
-  <main id="main"></main>
+  <main id="main" data-screen="home">
+    <section class="home">
+      <div class="hero">
+        <img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp">
+        <div>
+          <h1>안녕!</h1>
+          <p id="bubble" class="bubble">오늘도 같이 놀자</p>
+          <p class="meta" id="home-meta">가족 소리 · 스티커 0/120</p>
+        </div>
+      </div>
+      <div class="home-actions">
+        <button type="button" class="tap xl" data-tap="go-map">마을로 가</button>
+        <button type="button" class="tap" data-tap="stickers">스티커 책</button>
+        <button type="button" class="tap" data-tap="dress">옷 입히기</button>
+      </div>
+      <div class="friend-row" id="friend-row"></div>
+    </section>
+  </main>
 </div>
+<p id="live" class="sr-only" aria-live="polite"></p>
+<div id="fx" aria-hidden="true"></div>
 <div id="gate" hidden></div>
 <div id="parent" hidden></div>
-<script src="audio/lines.js"></script>
-<script src="audio/have.js"></script>
-<script src="assets/art.js"></script>
-<script src="assets/pic_have.js"></script>
-<script src="assets/v5_art.js"></script>
-<script src="hidden_spots.js"></script>
-<script src="hidden_spots_v4.js"></script>
-<script src="data.js"></script>
-<script src="clap_times.js"></script>
-<script src="curriculum_v4.js"></script>
-<script src="words_v4.js"></script>
-<script src="data_v4.js"></script>
-<script src="engine.js"></script>
-<script src="state_v4.js"></script>
-<script src="plan_v4.js"></script>
-<script src="plays_v4.js"></script>
-<script src="app.js"></script>
+<script defer src="audio/lines.js"></script>
+<script defer src="audio/have.js"></script>
+<script defer src="v5/js/content.js"></script>
+<script defer src="v5/js/stickers.js"></script>
+<script defer src="v5/js/engine.js"></script>
+<script defer src="v5/js/plays.js"></script>
+<script defer src="v5/js/app.js"></script>
 </body>
 </html>

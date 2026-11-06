@@ -1,0 +1,130 @@
+{
+  "id": "gureum",
+  "name_ko": "구름",
+  "identity": "구름빛 곰 친구",
+  "canvas": [
+    512,
+    512
+  ],
+  "mode": "RGBA",
+  "origin": "top_left",
+  "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+  "anchors": {
+    "origin": {
+      "px": [
+        0,
+        0
+      ],
+      "normalized": [
+        0.0,
+        0.0
+      ]
+    },
+    "head_center": {
+      "px": [
+        256,
+        162
+      ],
+      "normalized": [
+        0.5,
+        0.31640625
+      ]
+    },
+    "neck": {
+      "px": [
+        256,
+        270
+      ],
+      "normalized": [
+        0.5,
+        0.52734375
+      ]
+    },
+    "torso": {
+      "px": [
+        256,
+        330
+      ],
+      "normalized": [
+        0.5,
+        0.64453125
+      ]
+    },
+    "left_sole": {
+      "px": [
+        216,
+        460
+      ],
+      "normalized": [
+        0.421875,
+        0.8984375
+      ]
+    },
+    "right_sole": {
+      "px": [
+        296,
+        460
+      ],
+      "normalized": [
+        0.578125,
+        0.8984375
+      ]
+    }
+  },
+  "anchor_method": "manually estimated anatomy from generated master, registered with global x-scale and piecewise y remap; not automatic semantic detection",
+  "anchor_accuracy_px": 8,
+  "silhouette_bbox": [
+    141,
+    35,
+    371,
+    461
+  ],
+  "anatomical_fit": "approximate; individual silhouette/ear/shoulder widths differ; use per-character items and these JSONs, not universal garment-fit assertion",
+  "transform": {
+    "source_x_center": 518,
+    "x_scale": 0.4,
+    "source_y_knots": [
+      0,
+      62,
+      310,
+      550,
+      690,
+      943,
+      1023
+    ],
+    "target_y_knots": [
+      0,
+      36,
+      162,
+      270,
+      330,
+      460,
+      511
+    ]
+  },
+  "file": "friends/gureum.webp",
+  "master": "src/gureum_master.jpg",
+  "identity_limitation": "Generated ear-like side lobes remain: visually cloud-colored bear, not an earless pure cloud. No claim of pure-cloud silhouette.",
+  "validation": {
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "transparent_pixels": 187415,
+    "edge_nontransparent_pixels": 0,
+    "dimensions": [
+      512,
+      512
+    ],
+    "webp_lossless": true
+  },
+  "visual_review": {
+    "one_character": true,
+    "front_facing": true,
+    "forward_gaze": true,
+    "two_arms_two_feet": true,
+    "clothing_free": true,
+    "limbs_inside_canvas": true,
+    "soft_mongle_family_style": true,
+    "reviewed_on": "grid.png and anchor_overlay.png",
+    "caveat": "body/head proportions are approximate registrations, not identical anatomy; cloud friend visually reads as bear"
+  }
+}
