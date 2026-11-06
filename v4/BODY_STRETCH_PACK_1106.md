@@ -6,7 +6,7 @@
 
 `assets/pic/pose_*.webp` 20장이 `art.js`에 있다. `poseArtReady()`가 참이면 `body` 칸을 유지한다. 본편은 `assets/pic/stretch/stretch_*.webp` 쉼 카드(앉기/서기)다. 글자 포즈는 옆에만 두고, 모양을 만들라고 하지 않는다. 건너뛰기와 "아프면 그만"이 있다. 점프 몽글이로 대신하지 않는다.
 
-약한 컷(그대로 씀, 나중에 교체): pose_u, m, s, g, k, r, p, stretch_04, stretch_07, stretch_08.
+11/06 재생성으로 pose_u·m·s·g·p, stretch_04·07·08, stn_02를 덮어썼다. pose_k(가운뎃획 근사)·pose_r(직각 지그)는 피자가 잔여 약점이라고 해서 그 파일을 그대로 둔다.
 
 `MORE_MAX`는 5다. FUN_CUSTOM 초안의 1과 다르고, 대표님 11/04 지시대로 5를 유지한다.
 

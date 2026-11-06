@@ -1,17 +1,8 @@
 {
-  "note": "피자 v5. 약한 컷(재생성 예정): pose_u,m,s,g,k,r,p stretch_04/07/08 stn_02. 그래도 출고에 씀.",
+  "note": "피자 v5. 11/06 재생성으로 pose_u·m·s·g·p, stretch_04·07·08, stn_02를 덮어씀. pose_k·pose_r는 잔여 약점(가운뎃획 근사, 직각 지그)이라 피자 파일을 그대로 둠.",
   "weak": [
-    "pose_u",
-    "pose_m",
-    "pose_s",
-    "pose_g",
     "pose_k",
-    "pose_r",
-    "pose_p",
-    "stretch_04",
-    "stretch_07",
-    "stretch_08",
-    "stn_02"
+    "pose_r"
   ],
   "map": [
     "lm_bus.webp",
