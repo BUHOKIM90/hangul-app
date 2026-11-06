@@ -15,8 +15,11 @@ function pruneMs() { const keep = Object.keys(S.todayMs).sort().slice(-40); S.to
 
 /* 11/04 대표님: '더 놀까?' = 오늘 날을 끝낸 뒤 다음 새 날을 바로 엶. 하루(달력)에 새 날은 최대 MORE_MAX개(S.moreDays, 날마다 0으로).
    다 쓰면 '더 놀까?'는 지난 날 다시 하기(스티커는 그대로 받음) + "내일 또 새 놀이가 기다려!". 다음 날 아침엔 가장 멀리 간 날 다음 칸이 보통처럼 열림. */
+/* MORE_MAX=5 (11/04 대표님). FUN_CUSTOM 초안의 1과 다름. 바꾸지 않음. */
 const MORE_MAX = 5;
-const stepIcon = t => '<img class="stepic" alt="" src="assets/map/step_' + t + '.svg">';
+const PLAY_PI = { balloon: 'pi_balloon', body: 'pi_body', chant: 'pi_chant', yesterday: 'pi_chant', listen: 'pi_read', choose: 'pi_read', name: 'pi_read', blend: 'pi_read', same: 'pi_read', pick: 'pi_read', seek: 'pi_read', readword: 'pi_read', sort: 'pi_sort', story: 'pi_story', stickerstory: 'pi_story', map: 'pi_story', cloud: 'pi_story', treasure: 'pi_story', trace: 'pi_trace', copy: 'pi_trace', letter: 'pi_trace', clap: 'pi_chant', block: 'pi_sort', merge: 'pi_sort', train: 'pi_sort' };
+const stepIcon = t => '<img class="stepic" alt="" src="assets/pic/playicon/' + (PLAY_PI[t] || 'pi_story') + '.webp">';
+const MAP_LM = ['lm_garden', 'lm_pond', 'lm_park', 'lm_train', 'lm_hat', 'lm_bus', 'lm_zoo', 'lm_radio', 'lm_pizza'];
 const moreUsed = () => (S.moreDays && S.moreDays.date === today() ? S.moreDays.n : 0);
 const canPlayMore = () => S.cur <= READY_DAYS && S.cur <= 170 && todayState() === 'done' && moreUsed() < MORE_MAX;
 const canReplayMore = () => todayState() === 'done' && Object.keys(S.done).some(d => +d <= READY_DAYS);
@@ -59,10 +62,9 @@ function showHome() {
   WORLDS.forEach(w => {
     const ns = L.nodes.filter(n => n.stage === w.n), y0 = ns[0].y - BAN_H + 10, y1 = ns[ns.length - 1].y + ROW_H - 10;
     const band = el('div', 'world w' + w.n + (ns[0].dn > READY_DAYS ? ' later' : ''));
-    band.style.top = (y0 - 14) + 'px'; if (ARTX('map_w' + w.n)) { band.classList.add('hasbg'); band.style.backgroundImage = 'url(assets/pic/map_w' + w.n + '.webp)'; band.style.backgroundSize = 'cover'; } band.style.height = (y1 - y0 + 24) + 'px';
+    band.style.top = (y0 - 14) + 'px'; band.style.height = (y1 - y0 + 24) + 'px';
     band.innerHTML = '<div class="wban"><span class="wn">' + w.name + '</span>' + (ns[0].dn > READY_DAYS ? '<span class="soonTag">곧 열려요</span>' : '') +
-      (w.n === 1 && (S.town.buildings || S.town.props) ? '<span class="town">' + TOWN_BUILDINGS.slice(0, S.town.buildings).map((e, k) => artImg('town_b' + (k + 1), e, 'tw')).join('') + TOWN_PROPS.slice(0, S.town.props).map((e, k) => artImg('town_p' + (k + 1), e, 'tw')).join('') + '</span>' : '') + '</div>' +
-      w.deco.map((d, k) => '<i class="deco" style="left:' + (6 + (k * 29) % 88) + '%;top:' + (40 + (k * 137) % Math.max(60, y1 - y0 - 40)) + 'px"><img alt="" src="assets/map/' + d + '.svg"></i>').join('');
+      (w.n === 1 && (S.town.buildings || S.town.props) ? '<span class="town">' + TOWN_BUILDINGS.slice(0, S.town.buildings).map((e, k) => artImg('town_b' + (k + 1), e, 'tw')).join('') + TOWN_PROPS.slice(0, S.town.props).map((e, k) => artImg('town_p' + (k + 1), e, 'tw')).join('') + '</span>' : '') + '</div>';
     M.append(band);
   });
   // 길(SVG)
@@ -71,11 +73,10 @@ function showHome() {
   M.insertAdjacentHTML('beforeend', svg);
   // 단원 이정표(장면 그림이 있으면 그걸, 없으면 assets/map/lm_slot.svg)
   UNITS.forEach((u, r) => {
-    const n0 = L.nodes[r * 5], pin = 'lm_' + pad2v(u.n), scene = 'scene_' + pad2v(u.n);
-    const art = ARTX(pin) ? pin : (ARTX(scene) ? scene : '');
-    const t = el('div', 'utag landmark' + (r % 2 ? ' r' : '') + (art ? ' hasart' : ''));
-    t.dataset.slot = pin; t.style.top = (n0.y - 30) + 'px'; if (r % 2 === 0) t.classList.add('r');
-    t.innerHTML = '<span class="lm">' + (art ? '<img alt="" src="assets/pic/' + art + '.webp">' : '<img alt="" src="assets/map/lm_slot.svg">') + '</span><b>' + u.place + '</b>';
+    const n0 = L.nodes[r * 5], lm = MAP_LM[(u.n - 1) % MAP_LM.length];
+    const t = el('div', 'utag landmark hasart' + (r % 2 === 0 ? ' r' : ''));
+    t.dataset.slot = lm; t.style.top = (n0.y - 30) + 'px';
+    t.innerHTML = '<span class="lm"><img alt="" src="assets/pic/map/' + lm + '.webp"></span><b>' + u.place + '</b>';
     M.append(t);
   });
   let todayEl = null;
@@ -83,10 +84,8 @@ function showHome() {
     const d = DAYS[n.dn - 1], ns = nodeState(n.dn), b = el('button', 'stone ' + ns + (d.special ? ' sp sp-' + d.special : ''));
     b.style.left = n.x + '%'; b.style.top = n.y + 'px'; b.dataset.day = n.dn;
     const dn = S.done[n.dn];
-    const mark = d.special ? 'sp_' + d.special : ns === 'today' ? 'mark_star' : 'mark_flower';
-    b.innerHTML = ns === 'past' ? (dn && dn.sticker ? stkImg(dn.sticker) : '<span class="fl"><img class="mk" alt="" src="assets/map/' + mark + '.svg"></span>')
-      : ns === 'today' ? '<span class="fl"><img class="mk" alt="" src="assets/map/' + mark + '.svg"></span>'
-      : '<span class="fl">' + (d.special ? '<img class="mk" alt="" src="assets/map/' + mark + '.svg">' : '') + '</span><span class="cloud"><img alt="" src="assets/map/cloud.svg"></span>';
+    const stoneName = d.special === 'treasure' ? 'stone_treasure' : (d.special === 'adventure' || d.special === 'big') ? 'stone_adventure' : (ns === 'today' || ns === 'tomorrow') ? 'stone_today' : ns === 'past' ? 'stone_done' : 'stone_soon';
+    b.innerHTML = '<img class="stonepic" alt="" src="assets/pic/map/' + stoneName + '.webp">' + (ns === 'past' && dn && dn.sticker ? stkImg(dn.sticker) : '');
     b.setAttribute('aria-label', ns === 'today' ? '오늘의 놀이' : ns === 'past' ? '지난 날 다시 하기' : '앞날');
     b.addEventListener('click', () => {
       if (ns === 'today') return startDay(S.cur, S.pendingExtra ? 'extra' : 'today');
@@ -103,15 +102,22 @@ function showHome() {
   const arrows = [];
   for (let k = 0; k < L.nodes.length - 1; k++) { const a = L.nodes[k], b2 = L.nodes[k + 1]; const ar = el('i', 'parrow' + (b2.dn === focusDn ? ' to-next' : b2.dn <= here ? ' gone' : b2.dn > READY_DAYS ? ' later' : b2.dn <= here + 3 ? ' near' : '')); ar.innerHTML = '<img alt="" src="assets/map/arrow_next.svg">'; ar.style.left = ((a.x + b2.x) / 2) + '%'; ar.style.top = ((a.y + b2.y) / 2 + 30) + 'px'; arrows.push([ar, a, b2]); M.append(ar); }
   const tagAt = (n, cls, txt, side) => { const t = el('div', 'ntag ' + cls + (side ? ' side' : ''), txt); t.style.left = side ? 'calc(' + n.x + '% + 62px)' : n.x + '%'; t.style.top = (side ? n.y - 52 : n.y - 30) + 'px'; M.append(t); };
-  tagAt(L.nodes[0], 'start', '<img class="flag" alt="" src="assets/map/flag_start.svg"><span>출발</span>', 1); tagAt(L.nodes[169], 'goal', '<img class="flag" alt="" src="assets/map/flag_goal.svg"><span>도착</span>');
+  tagAt(L.nodes[0], 'start', '<img class="flag" alt="" src="assets/pic/map/lm_garden.webp"><span>출발</span>', 1); tagAt(L.nodes[169], 'goal', '<img class="flag" alt="" src="assets/pic/map/lm_pizza.webp"><span>도착</span>');
   if (nextDn <= 170 && nextDn !== 1) { const nn = L.nodes[nextDn - 1], t = el('div', 'ntag next below', '다음'); t.style.left = nn.x + '%'; t.style.top = (nn.y + (nextDn === S.cur ? 84 : 70)) + 'px'; M.append(t); }
   const fixArrows = () => { const W = M.clientWidth; if (!W) return; arrows.forEach(([ar, a, b2]) => { ar.style.transform = 'translate(-50%,-50%) rotate(' + (Math.atan2((b2.y - a.y), (b2.x - a.x) * W / 100) * 180 / Math.PI).toFixed(1) + 'deg)'; }); };
   // 몽글이(오늘 돌 위)
-  const accId = WORLDS[DAYS[Math.min(S.cur, 170) - 1].stage - 1].acc;
-  const me = L.nodes[Math.min(S.cur, 170) - 1], mgEl = el('div', 'mapme', '<img alt="몽글이" src="' + CHAR_DIR + (st === 'done' ? 'sleep' : 'wave') + CHAR_EXT + '"><span class="acc"><img alt="" src="assets/map/' + accId + '.svg"></span>');
+  const me = L.nodes[Math.min(S.cur, 170) - 1], mgEl = el('div', 'mapme');
+  const walker = el('img', 'walker'); walker.alt = '몽글이'; walker.src = 'assets/pic/map/mong_walk_' + (st === 'done' ? '1' : '2') + '.webp';
+  const hat = el('img', 'hatslot'); hat.alt = ''; hat.src = 'assets/pic/items/item_beret.webp'; hat.hidden = true;
+  hat.addEventListener('load', () => { hat.hidden = false; }); hat.addEventListener('error', () => hat.remove());
+  mgEl.append(walker, hat);
   const wf = showHome.walkFrom && L.nodes[showHome.walkFrom - 1]; showHome.walkFrom = 0;
   mgEl.style.left = (wf || me).x + '%'; mgEl.style.top = ((wf || me).y - 64) + 'px'; M.append(mgEl);
-  if (wf && wf !== me) requestAnimationFrame(() => requestAnimationFrame(() => { mgEl.classList.add('walk'); mgEl.style.left = me.x + '%'; mgEl.style.top = (me.y - 64) + 'px'; }));
+  if (wf && wf !== me) {
+    playSfx('mapstep'); let frame = 0; const timer = setInterval(() => { frame = (frame + 1) % 3; walker.src = 'assets/pic/map/mong_walk_' + (frame + 1) + '.webp'; }, 180);
+    requestAnimationFrame(() => requestAnimationFrame(() => { mgEl.classList.add('walk'); mgEl.style.left = me.x + '%'; mgEl.style.top = (me.y - 64) + 'px'; }));
+    setTimeout(() => clearInterval(timer), 1400);
+  }
   const nextStone = (st === 'new' || st === 'going' || canPlayMore()) && todayEl && +todayEl.dataset.day === S.cur ? todayEl : null;
   if (nextStone) { const c = nextStone.querySelector('.cloud'); if (c && canPlayMore()) c.remove(); tapHint(nextStone, wf ? 1800 : 2500); if (wf) setTimeout(() => { if (alive(id)) { ding(1.2); say('ui4_tapnext'); setBubble('여기 눌러 볼까?'); } }, 1500); }
   if (window.HP) HP.mapHint = { next: nextStone ? +nextStone.dataset.day : 0, walked: !!wf };
@@ -231,12 +237,14 @@ function segDone(cut) {
 const PIC_STK = ['gorae', 'sangeo', 'ojingeo', 'geobuk', 'haema', 'saeu', 'girin', 'gorilla', 'goyangi', 'gangaji', 'gom', 'kokkiri', 'lion', 'tokki', 'yeou', 'wonsungi', 'nabi', 'ori', 'kkachi', 'dwaeji', 'hama', 'mal', 'so', 'tajo', 'geomi',
   'nunsaram', 'kkot', 'byeol', 'dal', 'pungseon', 'robot', 'yoyo', 'sobangcha', 'gicha', 'beoseu', 'bae', 'cha', 'gita', 'radio', 'keikeu', 'pija', 'ppang', 'satang', 'subak', 'ttalgi', 'sagwa', 'podo', 'banana', 'tomato', 'juseu',
   'gimbap', 'tteok', 'seonmul', 'siso', 'gong', 'moja', 'hwabun', 'namu', 'skin_balloon', 'skin_star', 'skin_fish', 'chest_open', 'cloud_smile', 'town_b1', 'town_b2', 'town_b3', 'town_b4', 'town_b5', 'town_b6'].filter(w => ARTS.pic.includes(w));
-const STK_ALL = STICKER_IDS.concat(PIC_STK.map(w => 'p:' + w));
-const stkSrc = id => typeof id === 'string' && id.startsWith('p:') ? PIC(id.slice(2)) : STICKER(id);
+const STN_IDS = Array.from({ length: 24 }, (_, i) => 'n:' + String(i + 1).padStart(2, '0'));
+const STK_ALL = STICKER_IDS.concat(STN_IDS, PIC_STK.map(w => 'p:' + w));
+const stkSrc = id => typeof id === 'string' && id.startsWith('p:') ? PIC(id.slice(2)) : typeof id === 'string' && id.startsWith('n:') ? 'assets/pic/stickers/stn_' + id.slice(2) + '.webp' : STICKER(id);
 const stkImg = (id, cls = '') => '<img class="stki' + (typeof id === 'string' ? ' pstk' : '') + (cls ? ' ' + cls : '') + '" alt="스티커" src="' + stkSrc(id) + '">';
 function giveSticker(dr) {   // 아직 없는 스티커 중에서 무작위(다 모았으면 아무거나)
   const have = new Set(S.stickers.map(String)), fresh = STK_ALL.filter(x => !have.has(String(x)));
-  const pool = fresh.length ? fresh : STK_ALL, st = pool[Math.floor(Math.random() * pool.length)];
+  const uniq = STICKER_IDS.concat(STN_IDS).filter(x => !have.has(String(x)));
+  const pool = uniq.length ? uniq : (fresh.length ? fresh : STK_ALL), st = pool[Math.floor(Math.random() * pool.length)];
   S.stickers.push(st); dr.got = (dr.got || []).concat(st); dr.gotNew = (dr.gotNew || 0) + (fresh.length ? 1 : 0);
   return st;
 }
@@ -254,7 +262,7 @@ function showStickerPop(st, next) {
   s.append(box, dock);
   requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('show')));
   if (window.HP) { HP.sticker = { id: st, n: S.stickers.length }; HP.solve = async () => go(); }
-  (async () => { ding(); sparkAt(card); surprise(s, true); await wait(300); if (!alive(id)) return; await say(['ui_sticker', 'ui_good' + (1 + rand(3))]); if (alive(id)) setTimeout(go, 1800); })();
+  (async () => { playSfx('sticker'); sparkAt(card); surprise(s, true); await wait(300); if (!alive(id)) return; await say(['ui_sticker', praiseKey()]); if (alive(id)) setTimeout(go, 1800); })();
 }
 function showStep() {   // 칸 사이: 길 위 몽글이가 한 칸 앞으로(짧게)
   const P = DR.plan, [id, s] = screen('step', { home: true });
@@ -370,7 +378,7 @@ function showBook() {   // 첫 화면: 가진 스티커만 크게, 다음에 모
   };
   owned.forEach(id => book.append(slot(id, 'on big')));
   if (next) book.append(slot(next, 'next shimmer'));
-  s.append(book); say('ui_book');
+  s.append(book); playSfx('shelf'); say('ui_book');
   if (window.HP) HP.book = { total: order.length, have: n, next: next ? String(next) : '' };
 }
 function showShelf() {

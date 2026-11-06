@@ -2,11 +2,13 @@
 
 만 4세. 글자 모양을 몸으로 만들라고 시키지 않는다. 앉거나 서서, 아프면 그만, 하기 싫으면 건너뛴다.
 
-## 지금은 하루 놀이에 넣지 않음
+## 그림이 있으면 하루 놀이에 넣음
 
-`assets/pic/pose_*.webp`가 없고 `assets/art.js` 목록에도 없다. 몽글이 점프 그림으로 대신하지 않는다.
+`assets/pic/pose_*.webp` 20장이 `art.js`에 있다. `poseArtReady()`가 참이면 `body` 칸을 유지한다. 본편은 `assets/pic/stretch/stretch_*.webp` 쉼 카드(앉기/서기)다. 글자 포즈는 옆에만 두고, 모양을 만들라고 하지 않는다. 건너뛰기와 "아프면 그만"이 있다. 점프 몽글이로 대신하지 않는다.
 
-`poseArtReady()`가 참일 때만 `body` 칸을 연다. 지금은 거짓이라 `planFor`가 그 칸을 다른 놀이로 바꾼다. `MORE_MAX`(5)와 날 열기 규칙은 그대로다.
+약한 컷(그대로 씀, 나중에 교체): pose_u, m, s, g, k, r, p, stretch_04, stretch_07, stretch_08.
+
+`MORE_MAX`는 5다. FUN_CUSTOM 초안의 1과 다르고, 대표님 11/04 지시대로 5를 유지한다.
 
 포즈 파일을 넣으면 `assets/art.js`의 `pic`에 id를 추가한다. 자리 목록은 `assets/pose/SLOTS.json`.
 

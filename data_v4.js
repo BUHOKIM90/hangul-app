@@ -58,6 +58,18 @@ Object.keys(POSE_HOW).forEach(j => { if (!POSE_SIT[j]) POSE_SIT[j] = '앉아서 
 const POSE_PIC = { 'ㅣ': 'pose_i', 'ㅏ': 'pose_a', 'ㅓ': 'pose_eo', 'ㅗ': 'pose_o', 'ㅜ': 'pose_u', 'ㅡ': 'pose_eu', 'ㅇ': 'pose_ng', 'ㄱ': 'pose_g', 'ㄴ': 'pose_n', 'ㄷ': 'pose_d', 'ㄹ': 'pose_r', 'ㅁ': 'pose_m', 'ㅂ': 'pose_b', 'ㅅ': 'pose_s', 'ㅈ': 'pose_j', 'ㅎ': 'pose_h', 'ㅋ': 'pose_k', 'ㅌ': 'pose_t', 'ㅊ': 'pose_ch', 'ㅍ': 'pose_p' };
 const POSE_PIC_SIT = {};
 function poseArtReady() { return Object.keys(POSE_PIC).some(j => typeof ARTS !== 'undefined' && ARTS.pic.includes(POSE_PIC[j])); }
+/* 몸 쉼 카드. 글자 모양을 시키지 않음. 앉기/서기, 건너뛰기. 그림은 assets/pic/stretch/ */
+const STRETCH_CARDS = [
+  { id: 'stretch_01', where: 'stand', how: '두 팔을 천천히 위로. 아프면 내려요.' },
+  { id: 'stretch_02', where: 'stand', how: '옆으로 살살 기울여요.' },
+  { id: 'stretch_06', where: 'stand', how: '팔을 앞으로 살살 뻗어요.' },
+  { id: 'stretch_11', where: 'stand', how: '팔을 천천히 돌려요.' },
+  { id: 'stretch_04', where: 'sit', how: '앉아서 팔을 앞으로 살살.' },
+  { id: 'stretch_08', where: 'sit', how: '앉아서 몸을 살살 돌려요. 아프면 그만.' },
+  { id: 'stretch_10', where: 'sit', how: '앉아서 나를 살짝 안아요.' },
+  { id: 'stretch_05', where: 'sit', how: '앉아서 손뼉을 살살 쳐요.' }
+];
+const stretchSrc = id => 'assets/pic/stretch/' + id + '.webp';
 /* 헷갈리는 짝(오답 보기 먼저) */
 const CONF = { 'ㅏ': 'ㅓ', 'ㅓ': 'ㅏ', 'ㅗ': 'ㅜ', 'ㅜ': 'ㅗ', 'ㅡ': 'ㅣ', 'ㅣ': 'ㅡ', 'ㄱ': 'ㅋ', 'ㅋ': 'ㄱ', 'ㄷ': 'ㅌ', 'ㅌ': 'ㄷ', 'ㅂ': 'ㅍ', 'ㅍ': 'ㅂ', 'ㅈ': 'ㅊ', 'ㅊ': 'ㅈ', 'ㄴ': 'ㄷ', 'ㅁ': 'ㅂ', 'ㅅ': 'ㅈ', 'ㅎ': 'ㅇ', 'ㅇ': 'ㅎ', 'ㄹ': 'ㄷ' };
 /* 놀이 아이콘(아이 화면, 그림 없을 때) */

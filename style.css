@@ -834,4 +834,32 @@ img.pstk { border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px #fff, 0 3
 .poseopt.on { background: var(--peach-soft); box-shadow: inset 0 0 0 3px var(--peach); }
 .poseopt small, .stretch-friend small { display: block; color: var(--ink-2); font-size: var(--t-xs); }
 .stretch-friend .g { font-size: 56px; color: var(--peach-ink); }
-.stretch-pic img, .stretch-pic .ph { width: 150px; height: 150px; }
+.stretch-pic img, .stretch-pic .ph { width: min(46vh, 220px); height: min(46vh, 220px); object-fit: contain; }
+.stretch-friend-pic { width: 72px; height: 72px; object-fit: contain; }
+.stretch-pose { display: flex; align-items: center; gap: 8px; }
+.stretch-pose img, .stretch-pose .ph { width: 72px; height: 72px; }
+.posealt { min-height: 48px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--ink-2); }
+.piece.plain { color: var(--ink); background: #fff; }
+.trace-stage { flex: 1; min-height: 0; display: flex; align-items: stretch; justify-content: center; }
+.trace-stage .trace { flex: 1; margin: 10px 20px 0; }
+.trace-side { display: none; }
+.trace-stage.tablet { align-items: center; gap: 16px; background: radial-gradient(circle at 18% 78%, #fff4e4, transparent 46%); }
+.trace-stage.tablet .trace { flex: none; width: min(68vw, 280px); height: min(46vh, 400px); max-width: 280px; max-height: 400px; margin: 0; }
+.trace-stage.tablet .trace-side { display: flex; flex-direction: column; gap: 10px; }
+.trace-stage.tablet .trace-side img { width: 108px; height: 108px; object-fit: contain; }
+.trace-stage.tablet .model { font-size: 40px; }
+.map { background: #e7f6df url(assets/pic/map/map_bg_day.webp) center top / cover; }
+.map .world, .map .w1, .map .w2, .map .w3, .map .w4, .map .w5, .map .w6 { background: transparent; }
+.stone { background: transparent; box-shadow: none; overflow: visible; }
+.stone .stonepic { width: 76px; height: 76px; border-radius: 0; object-fit: contain; background: transparent; }
+.stone.today { background: transparent; }
+.stone.today .stonepic { width: 102px; height: 102px; }
+.stone .stki { position: absolute; width: 32px; height: 32px; right: -6px; bottom: -4px; }
+.mapme .walker { width: 84px; height: 84px; }
+.mapme .hatslot { position: absolute; left: 6px; top: -8px; width: 36px; height: 36px; }
+.sky { min-height: 54vh; flex: 1; }
+.bal { width: 132px; height: 168px; }
+.bal .sk { font-size: 0; }
+.bal .sk img { width: 120px; height: 120px; }
+.taphand img { width: 42px; height: 42px; }
+.prompt .eye { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

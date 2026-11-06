@@ -72,8 +72,8 @@ Object.assign(RUN, {
       sky.querySelectorAll('.bal').forEach(b => b.remove()); wave++;
       opts.forEach((g, k) => { const b = el('button', 'bal', '<span class="sk">' + artImg('skin_' + ['balloon', 'fish', 'star'][(run.ctx.dn + run.segIdx) % 3], sk[0]) + '</span><span class="g">' + g + '</span>'); b.dataset.k = g; b.style.left = (8 + k * (84 / opts.length)) + '%'; b.style.animationDelay = (k * 0.35) + 's';
         b.addEventListener('pointerdown', async () => { if (got || !alive(id)) return;
-          if (g === x) { got = true; b.classList.add('pop'); sparkAt(b); if (await reveal(id, x)) done(first); }
-          else { first = false; b.classList.add('wob'); setTimeout(() => b.classList.remove('wob'), 500); setChar('think'); say(glyphVoice(x)); } });
+          if (g === x) { got = true; b.classList.add('pop'); playSfx('balloon'); sparkAt(b); if (await reveal(id, x)) done(first); }
+          else { first = false; playSfx('wrong'); b.classList.add('wob'); setTimeout(() => b.classList.remove('wob'), 500); setChar('think'); say(glyphVoice(x)); } });
         b.addEventListener('animationend', () => { if (!got && alive(id) && k === opts.length - 1) launch(); });
         sky.append(b); });
     };
@@ -103,35 +103,40 @@ Object.assign(RUN, {
     (async () => { if (!(await say('ui4_sort'))) return; for (const g of r.groups) { if (!alive(id)) return; await say(g.voice); } })();
     setSolve(async () => { for (const c of r.cards) { if (c.n.classList.contains('used')) continue; await waitFor(() => !busy); put(c, c.g); await waitFor(() => !busy, 6000); } });
   },
-  /* 쉬어 가기. 글자 모양을 시키지 않음. 포즈 그림이 없으면 칸 자체를 열지 않음(점프 그림으로 대신하지 않음). */
+  /* 몸 쉼. 스트레치 카드가 본편. 글자 포즈는 옆에만. 앉기/서기, 건너뛰기. */
   body(j, id, s, done) {
-    const pic = POSE_PIC[j];
-    if (!pic || !hasPic(pic)) { done(null); return; }
-    let mode = 'sit';
-    s.append(guide('cheer', '몸 잠깐 풀어 볼까?<small>하기 싫으면 안 해도 돼.</small>'));
+    const cards = (typeof STRETCH_CARDS !== 'undefined' && STRETCH_CARDS.length) ? STRETCH_CARDS : [];
+    if (!cards.length) { done(null); return; }
+    let mode = 'sit', idx = 0;
+    const pool = () => cards.filter(c => c.where === mode);
+    s.append(guide('cheer', '몸 잠깐 풀어 볼까?<small>하기 싫으면 안 해도 돼. 아프면 그만.</small>'));
     const how = el('p', 'stretch-how', '');
     const picBox = el('div', 'stretch-pic', '');
+    const friend = el('img', 'stretch-friend-pic'); friend.alt = ''; friend.src = 'assets/pic/friends/jjiuk_hello.webp'; friend.addEventListener('error', () => friend.remove());
+    const pose = (POSE_PIC[j] && hasPic(POSE_PIC[j])) ? el('div', 'stretch-pose', picHTML(POSE_PIC[j]) + '<small>글자 친구. 모양은 안 만들어도 돼.</small>') : el('div', 'stretch-pose', '<small>모양은 안 만들어도 돼.</small>');
     const show = () => {
-      const sidePic = mode === 'sit' && POSE_PIC_SIT[j] && hasPic(POSE_PIC_SIT[j]) ? POSE_PIC_SIT[j] : pic;
-      how.textContent = (mode === 'sit' ? (POSE_SIT[j] || POSE_HOW[j]) : POSE_HOW[j]) || '';
-      picBox.innerHTML = picHTML(sidePic);
+      const list = pool(); const card = list[idx % list.length];
+      how.textContent = card.how;
+      picBox.innerHTML = '<img alt="" src="' + stretchSrc(card.id) + '">';
       sitB.classList.toggle('on', mode === 'sit'); standB.classList.toggle('on', mode === 'stand');
     };
     const sitB = el('button', 'poseopt', '<b>앉아서</b><small>더 편해</small>');
     const standB = el('button', 'poseopt', '<b>서서</b><small>일어나면</small>');
-    sitB.addEventListener('click', () => { mode = 'sit'; show(); });
-    standB.addEventListener('click', () => { mode = 'stand'; show(); });
+    const alt = el('button', 'posealt', '다른 동작');
+    sitB.addEventListener('click', () => { mode = 'sit'; idx = 0; show(); });
+    standB.addEventListener('click', () => { mode = 'stand'; idx = 0; show(); });
+    alt.addEventListener('click', () => { idx++; show(); });
     const box = el('div', 'movebox stretch');
     const opts = el('div', 'poseopts'); opts.append(sitB, standB);
-    box.append(el('div', 'stretch-friend', '<span class="g">' + j + '</span><small>글자 친구야. 모양은 안 만들어도 돼.</small>'), picBox, how, opts);
+    box.append(friend, picBox, how, opts, alt, pose);
     const dock = el('div', 'dock stretch-dock');
     const skip = el('button', 'kid-btn ghost', '오늘은 쉴래'); skip.id = 'moveSkip';
     const b = el('button', 'kid-btn next', '이만큼 했어'); b.id = 'moveDone';
-    skip.addEventListener('click', () => { ding(1); done(null); });
-    b.addEventListener('click', () => { ding(1.3); touch('j:' + j); done(null); });
+    skip.addEventListener('click', () => { playSfx('stretch_end'); done(null); });
+    b.addEventListener('click', () => { playSfx('stretch_end'); touch('j:' + j); done(null); });
     dock.append(skip, b);
     s.append(box, dock);
-    show();
+    show(); playSfx('stretch_start');
     (async () => { if (hasA(VOICE.jamo(j))) await say(VOICE.jamo(j)); if (alive(id)) setChar('cheer'); })();
     setSolve(async () => b.click());
   },
@@ -185,7 +190,7 @@ Object.assign(RUN, {
     const opts = shuffle([ans, ...others(pool, ans, Math.max(2, run.ctx.nopt) - 1)]);
     const prompt = () => pointSay([VOICE.first(f), 'ui_same']);
     const pr = el('div', 'prompt', '<div class="body">' + picHTML(f, WORDS[f], 'hero-pic') + '<div class="syl"><span class="q">' + (run.ctx.stage >= 2 ? a0 : '?') + '</span></div></div>'); pr.append(speakerBtn(prompt));
-    s.append(pr, el('div', 'ask', '같은 소리를 골라 봐'), choiceRound(id, opts.map(picCard), opts.indexOf(ans), done), guide('think', '잘 듣고 골라 봐', true));
+    s.append(pr, el('div', 'ask', '같은 소리, 어느 쪽일까?'), choiceRound(id, opts.map(picCard), opts.indexOf(ans), done), guide('think', '어느 쪽일까?', true));
     s.querySelectorAll('.ch').forEach(c => c.addEventListener('click', () => { if (c.dataset.k === ans) { const q = pr.querySelector('.syl span'); q.textContent = a0; q.classList.replace('q', 'on'); setBubble('<b>' + WORDS[f] + '</b>, <b>' + WORDS[ans] + '</b>!'); say(VOICE.word(ans)); } }));
     prompt(); setSolve(async () => s.querySelector('.ch[data-k="' + ans + '"]').click());
   },
@@ -195,15 +200,16 @@ Object.assign(RUN, {
     if (it.t === 'syl') {
       const sy = it.v, { cho, jung } = splitSyllable(sy), tb = !VERTICAL_VOWELS.includes(jung);
       const pieces = shuffle([{ t: 'c', g: cho }, { t: 'v', g: jung }, { t: 'c', g: confGlyph(cho, run.ctx.cons, 1)[0] || 'ㄴ' }, { t: 'v', g: CONF[jung] || 'ㅓ' }].filter((p, i, A) => A.findIndex(q => q.g === p.g) === i));
-      const frame = el('div', 'frame' + (tb ? ' tb' : '')), sc = el('div', 'slot c'), sv = el('div', 'slot v'); frame.append(sc, sv, el('div', 'whole', sy));
+      const frame = el('div', 'frame' + (tb ? ' tb' : '')), sc = el('div', 'slot c'), sv = el('div', 'slot v'), whole = el('div', 'whole', ''); frame.append(sc, sv, whole);
       const col = el('div', 'pieces blocks'); let filled = 0;
+      const colorOn = S.settings.colorHint === 'on';
       const tryP = async (p, node) => { if (busy || !alive(id)) return; const ok = (p.t === 'c' && p.g === cho && !sc.textContent) || (p.t === 'v' && p.g === jung && !sv.textContent);
         node.style.transform = ''; if (!ok) { first = false; busy = true; await retryFx(id, node); busy = false; return; }
         (p.t === 'c' ? sc : sv).textContent = p.g; (p.t === 'c' ? sc : sv).classList.add('filled'); node.classList.add('used'); ding(1.2); say(glyphVoice(p.g)); filled++;
-        if (filled === 2) { busy = true; await wait(400); frame.classList.add('done'); if (await reveal(id, sy)) done(first); } };
-      pieces.forEach(p => { const n = el('div', 'piece ' + p.t, p.g); n.dataset.k = p.t + p.g; draggable(n, { onTap: () => tryP(p, n), onDrop: (x, y) => { if (!inside(frame, x, y)) return false; tryP(p, n); return true; } }); col.append(n); });
-      const pr = el('div', 'prompt', '<div class="body"><span class="eye">블록으로 <b style="font-size:30px;color:var(--lav-ink)">' + sy + '</b> 만들기</span></div>'); pr.append(speakerBtn(() => say(VOICE.syl(sy))));
-      const wrap = el('div', 'merge'); wrap.append(frame, col); s.append(pr, wrap, guide('think', '블록을 눌러 봐', true));
+        if (filled === 2) { busy = true; whole.textContent = sy; await wait(400); frame.classList.add('done'); if (await reveal(id, sy)) done(first); } };
+      pieces.forEach(p => { const n = el('div', 'piece' + (colorOn ? ' ' + p.t : ' plain'), p.g); n.dataset.k = p.t + p.g; draggable(n, { onTap: () => tryP(p, n), onDrop: (x, y) => { if (!inside(frame, x, y)) return false; tryP(p, n); return true; } }); col.append(n); });
+      const pr = el('div', 'prompt', '<div class="body"><span class="eye">소리를 듣고 만들어 봐</span></div>'); pr.append(speakerBtn(() => say(VOICE.syl(sy))));
+      const wrap = el('div', 'merge'); wrap.append(frame, col); s.append(pr, wrap, guide('think', '소리를 듣고, 블록을 넣어 봐', true));
       (async () => { if (run.i === 0) await say('ui4_block'); if (alive(id)) say(VOICE.syl(sy)); })();
       setSolve(async () => { for (const k of ['c' + cho, 'v' + jung]) { await waitFor(() => !busy); const n = col.querySelector('.piece[data-k="' + k + '"]:not(.used)'); if (n) tapEl(n); await wait(300); } });
     } else {
