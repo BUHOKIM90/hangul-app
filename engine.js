@@ -240,7 +240,7 @@ const RUN = {
     const hint = Math.max(0, (p.hint == null ? 2 : p.hint) - (st >= 2 ? 1 : 0));
     const easy = n <= 3;
     const score = x => (WORDS[x][0] === WORDS[w][0] ? 3 : 0) + (WCAT_OF[x] === WCAT_OF[w] ? 2 : 0) + ([...WORDS[x]].some(c => WORDS[w].includes(c)) ? 1 : 0) + Math.random() * 1.5;
-    const cand = PW_WORDS.filter(x => x !== w && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w));
+    const cand = PW_WORDS.filter(x => x !== w && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w) && (typeof readCardOk !== 'function' || readCardOk(x, run && run.ctx)));
     const dis = easy ? shuffle(cand.filter(x => WCAT_OF[x] !== WCAT_OF[w] && WORDS[x][0] !== WORDS[w][0])).slice(0, n - 1)
       : cand.sort((a, b) => score(b) - score(a)).slice(0, n - 1);
     const sea = WCAT_OF[w] === 'sea' ? shuffle(PW_WORDS.filter(x => x !== w && WCAT_OF[x] === 'sea' && (!SEA_SET.includes(w) || SEA_SET.includes(x)))) : [];   // 바다 친구 판: 가짜도 다 바다 친구(고래·상어·오징어·거북·해마)
@@ -286,7 +286,7 @@ const RUN = {
       });
       row.append(c);
     });
-    s.append(guide('think', '이건 뭘까?'), jar, frame, row);
+    s.append(guide('think', '이거 뭐야?'), jar, frame, row);
     if (window.HP) HP.pw = { target: w, opts, hint, cards: n, colors: opts.map(x => [...row.querySelectorAll('.pwcard')].find(c => c.dataset.k === x).style.background) };
     pointSay('ui_pw');
   },

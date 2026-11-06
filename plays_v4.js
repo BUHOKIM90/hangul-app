@@ -14,7 +14,7 @@ function quiz(q, id, host, onAns, oneShot) {
   let head;
   if (read) head = el('div', 'qhead', '<div class="qword">' + WORDS[q.target] + '</div><span class="eye">어떤 그림일까?</span>');
   else if (build) { const { cho, jung } = splitSyllable(q.target); head = el('div', 'qhead', '<div class="qbuild"><span>' + cho + '</span>+<span>' + jung + '</span>=<span class="q">?</span></div>'); }
-  else head = el('div', 'qhead', '<span class="eye">잘 듣고 골라 봐</span>');
+  else head = el('div', 'qhead', '<span class="eye">어떤 거일까?</span>');
   head.append(speakerBtn(() => (read ? say(VOICE.word(q.target)) : say0())));
   const cards = q.opts.map(x => read ? picCard(x) : glyphCard(x));
   let first = true, locked = false;
@@ -42,7 +42,7 @@ Object.assign(RUN, {
     let lit = -1, taps = 0;
     tiles.forEach((t, k) => t.addEventListener('click', () => { if (k === lit || t.classList.contains('lit')) { t.classList.add('hit'); clapFx(); sparkAt(t); taps++; setTimeout(() => t.classList.remove('hit'), 300); } }));
     const dots = el('div', 'cdots', run.queue.map((_, q) => '<i class="' + (q <= run.i ? 'on' : '') + '"></i>').join(''));
-    s.append(guide('cheer', run.i === 0 ? '몽글이 노래! 빛나는 칸을 톡톡!' : '한 줄 더!'), dots, row);
+    s.append(guide('cheer', run.i === 0 ? '노래하자! 반짝이는 칸을 톡톡!' : '한 줄 더!'), dots, row);
     const go = async () => {
       if (run.i === 0 && !(await say('ui4_chant'))) return;
       setChar('clap'); const ok = await sayGap(line.map(VOICE.syl), 450, k => { lit = k; tiles.forEach((t, i) => t.classList.toggle('lit', i === k)); setChar(k % 2 ? 'clap2' : 'clap'); });
@@ -55,7 +55,7 @@ Object.assign(RUN, {
   yesterday(x, id, s, done) {
     const isW = !!WORDS[x];
     const card = el('div', 'flip', '<div class="fc">' + (isW ? '<span class="qword">' + WORDS[x] + '</span>' : '<span class="g">?</span>') + '</div>');
-    s.append(guide('think', run.i === 0 ? '어제 만난 친구, 누구였지?' : '이 친구는?'), card);
+    s.append(guide('think', run.i === 0 ? '어제 본 친구, 기억나?' : '이 친구는?'), card);
     const n = Math.max(2, run.ctx.nopt);
     const q = isW ? { kind: 'read', target: x, opts: shuffle([x, ...others(run.ctx.knownW.concat(run.ctx.unitW, FAMILY).filter(w => w !== x && wordHasPicOrEmo(w)), x, n - 1)]), i: 1 }
       : { kind: 'hear', target: x, opts: shuffle([x, ...confGlyph(x, glyphPool(run.ctx), n - 1)]) };
@@ -99,18 +99,40 @@ Object.assign(RUN, {
     r.cards.forEach(c => { const n = el('div', 'scard', picHTML(c.w, WORDS[c.w]) + (run.ctx.stage >= 2 ? '<b>' + WORDS[c.w] + '</b>' : '')); n.dataset.w = c.w; c.n = n; cardsEl.append(n);
       draggable(n, { onTap: () => { if (busy) return; cardsEl.querySelectorAll('.scard').forEach(x => x.classList.remove('sel')); n.classList.add('sel'); sel = c; say(VOICE.word(c.w)); },
         onDrop: (x, y) => { const gi = bs.findIndex(b => inside(b, x, y)); if (gi < 0) return false; put(c, gi); return true; } }); });
-    s.append(guide('think', '같은 소리로 시작하는 친구끼리!'), top, cardsEl);
+    s.append(guide('think', '같은 소리 친구끼리 모아 볼까?'), top, cardsEl);
     (async () => { if (!(await say('ui4_sort'))) return; for (const g of r.groups) { if (!alive(id)) return; await say(g.voice); } })();
     setSolve(async () => { for (const c of r.cards) { if (c.n.classList.contains('used')) continue; await waitFor(() => !busy); put(c, c.g); await waitFor(() => !busy, 6000); } });
   },
-  /* 🤸 몸으로 글자: 일어나서 몸으로 글자 모양(판정 없음) */
+  /* 쉬어 가기. 글자 모양을 시키지 않음. 포즈 그림이 없으면 칸 자체를 열지 않음(점프 그림으로 대신하지 않음). */
   body(j, id, s, done) {
-    s.append(guide('jump', '일어나서 몸으로 <b>' + j + '</b> 만들어 볼까?'));
     const pic = POSE_PIC[j];
-    s.append(el('div', 'movebox', (pic && hasPic(pic) ? picHTML(pic) : '<img class="mgbig" alt="몽글이" src="' + CHAR_DIR + 'jump' + CHAR_EXT + '">') + '<div class="g">' + j + '</div><p>' + POSE_HOW[j] + '</p>'));
-    const dock = el('div', 'dock'), b = el('button', 'kid-btn next', '다 했어!<img alt="" src="' + ICON('arrow') + '">'); b.id = 'moveDone';
-    b.addEventListener('click', () => { ding(1.3); touch('j:' + j); done(null); }); dock.append(b); s.append(dock);
-    (async () => { await say(run.i === 0 ? ['ui4_move', VOICE.jamo(j)] : [VOICE.jamo(j)]); if (alive(id)) setChar('cheer'); })();
+    if (!pic || !hasPic(pic)) { done(null); return; }
+    let mode = 'sit';
+    s.append(guide('cheer', '몸 잠깐 풀어 볼까?<small>하기 싫으면 안 해도 돼.</small>'));
+    const how = el('p', 'stretch-how', '');
+    const picBox = el('div', 'stretch-pic', '');
+    const show = () => {
+      const sidePic = mode === 'sit' && POSE_PIC_SIT[j] && hasPic(POSE_PIC_SIT[j]) ? POSE_PIC_SIT[j] : pic;
+      how.textContent = (mode === 'sit' ? (POSE_SIT[j] || POSE_HOW[j]) : POSE_HOW[j]) || '';
+      picBox.innerHTML = picHTML(sidePic);
+      sitB.classList.toggle('on', mode === 'sit'); standB.classList.toggle('on', mode === 'stand');
+    };
+    const sitB = el('button', 'poseopt', '<b>앉아서</b><small>더 편해</small>');
+    const standB = el('button', 'poseopt', '<b>서서</b><small>일어나면</small>');
+    sitB.addEventListener('click', () => { mode = 'sit'; show(); });
+    standB.addEventListener('click', () => { mode = 'stand'; show(); });
+    const box = el('div', 'movebox stretch');
+    const opts = el('div', 'poseopts'); opts.append(sitB, standB);
+    box.append(el('div', 'stretch-friend', '<span class="g">' + j + '</span><small>글자 친구야. 모양은 안 만들어도 돼.</small>'), picBox, how, opts);
+    const dock = el('div', 'dock stretch-dock');
+    const skip = el('button', 'kid-btn ghost', '오늘은 쉴래'); skip.id = 'moveSkip';
+    const b = el('button', 'kid-btn next', '이만큼 했어'); b.id = 'moveDone';
+    skip.addEventListener('click', () => { ding(1); done(null); });
+    b.addEventListener('click', () => { ding(1.3); touch('j:' + j); done(null); });
+    dock.append(skip, b);
+    s.append(box, dock);
+    show();
+    (async () => { if (hasA(VOICE.jamo(j))) await say(VOICE.jamo(j)); if (alive(id)) setChar('cheer'); })();
     setSolve(async () => b.click());
   },
   /* 📖 스티커 이야기: 장면 + 문장 한 줄(빈칸). 맞는 낱말 카드를 끌어 놓으면 그 그림 스티커가 장면에 붙고 문장을 읽어 줌 */
@@ -130,7 +152,7 @@ Object.assign(RUN, {
       await say(hasA(VOICE.st4(pg.u, pg.k)) ? VOICE.st4(pg.u, pg.k) : VOICE.word(w)); if (alive(id) && await reveal(id, w)) done(first);
     };
     opts.forEach(x => { const c = el('div', 'wcard big', WORDS[x]); c.dataset.k = x; row.append(c); draggable(c, { onTap: () => place(x, c), onDrop: (px, py) => { if (!inside(line, px, py) && !inside(sc, px, py)) return false; place(x, c); return true; } }); });
-    s.append(sc, line, row, guide('think', '빈칸에 맞는 낱말은?', true));
+    s.append(sc, line, row, guide('think', '빈칸에 뭐가 들어갈까?', true));
     (async () => { if (run.i === 0 && !(await say('ui4_sticker'))) return; })();
     setSolve(async () => { const c = row.querySelector('.wcard[data-k="' + w + '"]'); if (c) tapEl(c); });
     run.curKey = 'w:' + w;
@@ -204,7 +226,7 @@ Object.assign(RUN, {
     const sk = SKINS.map[(run.ctx.dn + run.segIdx) % 3], qs = r.qs.map(q => Object.assign({}, q, { opts: q.opts.slice(0, 2).includes(q.target) ? q.opts.slice(0, 2) : shuffle([q.target, q.opts.find(o => o !== q.target)]) }));
     const mp = el('div', 'tmap', '<div class="trail">' + qs.map((_, k) => '<i data-k="' + k + '"></i>').join('') + '<b class="chest">🎁</b></div><img class="mgwalk" alt="" src="' + CHAR_DIR + 'basic' + CHAR_EXT + '">');
     mp.classList.add('sk' + (run.ctx.dn % 3)); const host = el('div', 'qhost');
-    s.append(guide('cheer', sk[1] + ' 보물 지도를 따라가 볼까?'), mp, host);
+    s.append(guide('cheer', '보물 찾으러 가자!'), mp, host);
     const walk = k => { const st = mp.querySelectorAll('.trail i'), mw = mp.querySelector('.mgwalk'); const t = k < st.length ? st[k] : mp.querySelector('.chest'); mw.style.left = (t.offsetLeft + t.offsetWidth / 2 - 30) + 'px'; st.forEach((x, q) => x.classList.toggle('on', q < k)); };
     let k = 0;
     const next = () => {
@@ -218,7 +240,7 @@ Object.assign(RUN, {
   cloud(r, id, s, done) {
     const sky = el('div', 'cloudsky', '<div class="rainbow"></div><div class="grump"><span class="cf">' + artImg('cloud_grump', '😤') + '</span></div><div class="town">🏠🌳🏡</div>');
     const host = el('div', 'qhost'), g = sky.querySelector('.grump'), rb = sky.querySelector('.rainbow');
-    s.append(guide('think', '심술 구름이 글자를 숨겼어!'), sky, host);
+    s.append(guide('think', '구름이 글자를 숨겼대. 같이 찾자!'), sky, host);
     let k = 0;
     const draw = () => { const p = k / r.qs.length; g.style.transform = 'scale(' + (1 - 0.6 * p).toFixed(2) + ')'; rb.style.opacity = p.toFixed(2); g.querySelector('.cf').innerHTML = p >= 1 ? artImg('cloud_smile', '😊') : p > 0.5 ? artImg('cloud_surprise', '😐') : artImg('cloud_grump', '😤'); };
     const next = () => {
@@ -331,13 +353,14 @@ if (CURR.plays && CURR.plays.listen) { CURR.plays.listen.kid = '글자 보고 �
 if (typeof PLAY_ICON !== 'undefined') PLAY_ICON.listen = '👀';
 RUN.listen = function (w, id, s, done) {
   const st = (run.ctx && run.ctx.stage) || 1, syl = [...WORDS[w]];
-  const picOk = x => WORDS[x] && (hasPic(x) || PH_EMOJI[x]) && hasA(VOICE.word(x));
+  const picOk = x => WORDS[x] && (hasPic(x) || PH_EMOJI[x]) && hasA(VOICE.word(x)) && (typeof readCardOk !== 'function' || readCardOk(x, run.ctx));
   const n = st >= 3 || S.hard ? 4 : 3;
-  const base = (run.p.items.length >= 6 ? run.p.items : run.p.items.concat(WORD_IDS)).filter(x => x !== w && picOk(x) && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w));
+  const poolIds = Object.keys(WORDS);
+  const base = (run.p.items.length >= 6 ? run.p.items : run.p.items.concat(poolIds)).filter(x => x !== w && picOk(x) && WORDS[x] !== WORDS[w] && !PIC_CLASH(x, w));
   const look = x => { const a = [...WORDS[x]]; return (a[0] === syl[0] ? 3 : 0) + a.filter(c => syl.includes(c)).length * 2 + (a.length === syl.length ? 1 : 0) + (splitSyllable(a[0]).cho === splitSyllable(syl[0]).cho ? 1 : 0) + Math.random(); };
   let dis;
   if (st <= 1 && !S.hard) dis = others(base.filter(x => WORDS[x][0] !== syl[0] && ![...WORDS[x]].some(c => syl.includes(c))), w, n - 1);
-  else { const near = shuffle(base.concat(WORD_IDS.filter(x => x !== w && picOk(x) && !PIC_CLASH(x, w) && WORDS[x] !== WORDS[w]))).sort((a, b) => look(b) - look(a)); dis = others(near.slice(0, 6), w, n - 1); }
+  else { const near = shuffle(base.concat(poolIds.filter(x => x !== w && picOk(x) && !PIC_CLASH(x, w) && WORDS[x] !== WORDS[w]))).sort((a, b) => look(b) - look(a)); dis = others(near.slice(0, 6), w, n - 1); }
   if (dis.length < n - 1) dis = dis.concat(others(base.filter(x => !dis.includes(x)), w, n - 1 - dis.length));
   { const seen = new Set([PIC(w)]); dis = dis.filter(x => { const k = PIC(x); if (seen.has(k)) return false; seen.add(k); return true; }); }   // 같은 그림 두 장 금지
   const opts = shuffle([w, ...dis]);
@@ -369,7 +392,7 @@ RUN.listen = function (w, id, s, done) {
     locked = false;
     if (wrong >= 2) readSlow(); else say('ui_retry');
   }));
-  s.append(pr, el('div', 'ask', '글자를 읽고 그림을 찾아 봐'), row, guide('think', '<b>' + WORDS[w] + '</b>, 어떤 그림일까?', true));
+  s.append(pr, el('div', 'ask', '이 글자, 무슨 그림이야?'), row, guide('think', '<b>' + WORDS[w] + '</b>, 어떤 그림일까?', true));
   const tick = setInterval(() => {
     if (!alive(id)) return clearInterval(tick);
     if (!autoMs || hinted || locked || Date.now() - lastT < autoMs) return;

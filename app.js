@@ -16,6 +16,7 @@ function pruneMs() { const keep = Object.keys(S.todayMs).sort().slice(-40); S.to
 /* 11/04 대표님: '더 놀까?' = 오늘 날을 끝낸 뒤 다음 새 날을 바로 엶. 하루(달력)에 새 날은 최대 MORE_MAX개(S.moreDays, 날마다 0으로).
    다 쓰면 '더 놀까?'는 지난 날 다시 하기(스티커는 그대로 받음) + "내일 또 새 놀이가 기다려!". 다음 날 아침엔 가장 멀리 간 날 다음 칸이 보통처럼 열림. */
 const MORE_MAX = 5;
+const stepIcon = t => '<img class="stepic" alt="" src="assets/map/step_' + t + '.svg">';
 const moreUsed = () => (S.moreDays && S.moreDays.date === today() ? S.moreDays.n : 0);
 const canPlayMore = () => S.cur <= READY_DAYS && S.cur <= 170 && todayState() === 'done' && moreUsed() < MORE_MAX;
 const canReplayMore = () => todayState() === 'done' && Object.keys(S.done).some(d => +d <= READY_DAYS);
@@ -51,31 +52,41 @@ const SP_ICON = { adventure: '🚩', treasure: '🎁', big: '🎈' };
 function showHome() {
   run = null; DR = null; pruneMs();
   const [id, s] = screen('home'); const st = todayState();
+  const focusDn = (st === 'soon' || st === 'all') ? 0 : Math.min(S.cur, READY_DAYS);
   const wrap = el('div', 'mapwrap'), M = el('div', 'map'), L = nodeLayout(); M.style.height = L.h + 'px';
   const sea = seasonNow(); if (sea) M.classList.add('season');
   // 세계 띠(배경은 CSS .w1~.w6, 나중에 그림으로 바꾸기 쉬움)
   WORLDS.forEach(w => {
     const ns = L.nodes.filter(n => n.stage === w.n), y0 = ns[0].y - BAN_H + 10, y1 = ns[ns.length - 1].y + ROW_H - 10;
     const band = el('div', 'world w' + w.n + (ns[0].dn > READY_DAYS ? ' later' : ''));
-    band.style.top = (y0 - 14) + 'px'; if (ARTX('map_w' + w.n)) { band.style.backgroundImage = 'url(assets/pic/map_w' + w.n + '.webp)'; band.style.backgroundSize = 'cover'; } band.style.height = (y1 - y0 + 24) + 'px';
+    band.style.top = (y0 - 14) + 'px'; if (ARTX('map_w' + w.n)) { band.classList.add('hasbg'); band.style.backgroundImage = 'url(assets/pic/map_w' + w.n + '.webp)'; band.style.backgroundSize = 'cover'; } band.style.height = (y1 - y0 + 24) + 'px';
     band.innerHTML = '<div class="wban"><span class="wn">' + w.name + '</span>' + (ns[0].dn > READY_DAYS ? '<span class="soonTag">곧 열려요</span>' : '') +
       (w.n === 1 && (S.town.buildings || S.town.props) ? '<span class="town">' + TOWN_BUILDINGS.slice(0, S.town.buildings).map((e, k) => artImg('town_b' + (k + 1), e, 'tw')).join('') + TOWN_PROPS.slice(0, S.town.props).map((e, k) => artImg('town_p' + (k + 1), e, 'tw')).join('') + '</span>' : '') + '</div>' +
-      w.deco.map((d, k) => '<i class="deco" style="left:' + (6 + (k * 29) % 88) + '%;top:' + (40 + (k * 137) % Math.max(60, y1 - y0 - 40)) + 'px">' + d + '</i>').join('');
+      w.deco.map((d, k) => '<i class="deco" style="left:' + (6 + (k * 29) % 88) + '%;top:' + (40 + (k * 137) % Math.max(60, y1 - y0 - 40)) + 'px"><img alt="" src="assets/map/' + d + '.svg"></i>').join('');
     M.append(band);
   });
   // 길(SVG)
-  const svg = '<svg class="path" viewBox="0 0 100 ' + L.h + '" preserveAspectRatio="none"><polyline vector-effect="non-scaling-stroke" points="' + L.nodes.map(n => n.x + ',' + (n.y + 30)).join(' ') + '"/></svg>';
+  const pts = L.nodes.map(n => n.x + ',' + (n.y + 30)).join(' ');
+  const svg = '<svg class="path" viewBox="0 0 100 ' + L.h + '" preserveAspectRatio="none"><polyline class="pathbed" vector-effect="non-scaling-stroke" points="' + pts + '"/><polyline class="pathdash" vector-effect="non-scaling-stroke" points="' + pts + '"/></svg>';
   M.insertAdjacentHTML('beforeend', svg);
-  // 단원 이름표
-  UNITS.forEach((u, r) => { const n0 = L.nodes[r * 5]; const t = el('div', 'utag' + (r % 2 ? ' r' : ''), u.place); t.style.top = (n0.y + 66) + 'px'; M.append(t); });
+  // 단원 이정표(장면 그림이 있으면 그걸, 없으면 assets/map/lm_slot.svg)
+  UNITS.forEach((u, r) => {
+    const n0 = L.nodes[r * 5], pin = 'lm_' + pad2v(u.n), scene = 'scene_' + pad2v(u.n);
+    const art = ARTX(pin) ? pin : (ARTX(scene) ? scene : '');
+    const t = el('div', 'utag landmark' + (r % 2 ? ' r' : '') + (art ? ' hasart' : ''));
+    t.dataset.slot = pin; t.style.top = (n0.y - 30) + 'px'; if (r % 2 === 0) t.classList.add('r');
+    t.innerHTML = '<span class="lm">' + (art ? '<img alt="" src="assets/pic/' + art + '.webp">' : '<img alt="" src="assets/map/lm_slot.svg">') + '</span><b>' + u.place + '</b>';
+    M.append(t);
+  });
   let todayEl = null;
   L.nodes.forEach(n => {
     const d = DAYS[n.dn - 1], ns = nodeState(n.dn), b = el('button', 'stone ' + ns + (d.special ? ' sp sp-' + d.special : ''));
     b.style.left = n.x + '%'; b.style.top = n.y + 'px'; b.dataset.day = n.dn;
     const dn = S.done[n.dn];
-    b.innerHTML = ns === 'past' ? (dn && dn.sticker ? stkImg(dn.sticker) : '<span class="fl">' + (d.special ? SP_ICON[d.special] : '✿') + '</span>')
-      : ns === 'today' ? '<span class="fl">' + (d.special ? SP_ICON[d.special] : '★') + '</span>'
-      : '<span class="fl">' + (d.special ? SP_ICON[d.special] : '') + '</span><span class="cloud">☁️</span>';
+    const mark = d.special ? 'sp_' + d.special : ns === 'today' ? 'mark_star' : 'mark_flower';
+    b.innerHTML = ns === 'past' ? (dn && dn.sticker ? stkImg(dn.sticker) : '<span class="fl"><img class="mk" alt="" src="assets/map/' + mark + '.svg"></span>')
+      : ns === 'today' ? '<span class="fl"><img class="mk" alt="" src="assets/map/' + mark + '.svg"></span>'
+      : '<span class="fl">' + (d.special ? '<img class="mk" alt="" src="assets/map/' + mark + '.svg">' : '') + '</span><span class="cloud"><img alt="" src="assets/map/cloud.svg"></span>';
     b.setAttribute('aria-label', ns === 'today' ? '오늘의 놀이' : ns === 'past' ? '지난 날 다시 하기' : '앞날');
     b.addEventListener('click', () => {
       if (ns === 'today') return startDay(S.cur, S.pendingExtra ? 'extra' : 'today');
@@ -84,39 +95,41 @@ function showHome() {
       if (ns === 'tomorrow' && canReplayMore()) { setChar('laugh'); bounce(); setBubble('내일 또 새 놀이가 기다려!'); return say('ui4_newtmr'); }
       setChar('laugh'); bounce(); setBubble(ns === 'soon' ? '이 길은 곧 열려요!' : '내일 만나요!'); ding(0.8);
     });
+    if (n.dn === focusDn && (ns === 'today' || ns === 'tomorrow')) b.classList.add('nextup');
     M.append(b); if (n.dn === Math.min(S.cur, 170)) todayEl = b;
   });
   // 11/04 길 방향: 돌 사이 화살표(지난 길은 흐리게, 앞길은 진하게), 출발·도착 깃발, '다음' 표시, 몽글이가 갈 쪽 화살표
   const nextDn = st === 'done' || st === 'soon' || st === 'all' ? S.cur : S.cur + 1, here = Math.min(S.cur, 170);
   const arrows = [];
-  for (let k = 0; k < L.nodes.length - 1; k++) { const a = L.nodes[k], b2 = L.nodes[k + 1]; const ar = el('i', 'parrow' + (b2.dn <= here ? ' gone' : b2.dn > READY_DAYS ? ' later' : b2.dn <= here + 3 ? ' near' : '')); ar.textContent = '➜'; ar.style.left = ((a.x + b2.x) / 2) + '%'; ar.style.top = ((a.y + b2.y) / 2 + 30) + 'px'; arrows.push([ar, a, b2]); M.append(ar); }
+  for (let k = 0; k < L.nodes.length - 1; k++) { const a = L.nodes[k], b2 = L.nodes[k + 1]; const ar = el('i', 'parrow' + (b2.dn === focusDn ? ' to-next' : b2.dn <= here ? ' gone' : b2.dn > READY_DAYS ? ' later' : b2.dn <= here + 3 ? ' near' : '')); ar.innerHTML = '<img alt="" src="assets/map/arrow_next.svg">'; ar.style.left = ((a.x + b2.x) / 2) + '%'; ar.style.top = ((a.y + b2.y) / 2 + 30) + 'px'; arrows.push([ar, a, b2]); M.append(ar); }
   const tagAt = (n, cls, txt, side) => { const t = el('div', 'ntag ' + cls + (side ? ' side' : ''), txt); t.style.left = side ? 'calc(' + n.x + '% + 62px)' : n.x + '%'; t.style.top = (side ? n.y - 52 : n.y - 30) + 'px'; M.append(t); };
-  tagAt(L.nodes[0], 'start', '🚩 출발', 1); tagAt(L.nodes[169], 'goal', '🏁 도착');
+  tagAt(L.nodes[0], 'start', '<img class="flag" alt="" src="assets/map/flag_start.svg"><span>출발</span>', 1); tagAt(L.nodes[169], 'goal', '<img class="flag" alt="" src="assets/map/flag_goal.svg"><span>도착</span>');
   if (nextDn <= 170 && nextDn !== 1) { const nn = L.nodes[nextDn - 1], t = el('div', 'ntag next below', '다음'); t.style.left = nn.x + '%'; t.style.top = (nn.y + (nextDn === S.cur ? 84 : 70)) + 'px'; M.append(t); }
   const fixArrows = () => { const W = M.clientWidth; if (!W) return; arrows.forEach(([ar, a, b2]) => { ar.style.transform = 'translate(-50%,-50%) rotate(' + (Math.atan2((b2.y - a.y), (b2.x - a.x) * W / 100) * 180 / Math.PI).toFixed(1) + 'deg)'; }); };
   // 몽글이(오늘 돌 위)
-  const me = L.nodes[Math.min(S.cur, 170) - 1], mgEl = el('div', 'mapme', '<img alt="몽글이" src="' + CHAR_DIR + (st === 'done' ? 'sleep' : 'wave') + CHAR_EXT + '"><span class="acc">' + WORLDS[DAYS[me.dn - 1].stage - 1].acc + '</span>');
+  const accId = WORLDS[DAYS[Math.min(S.cur, 170) - 1].stage - 1].acc;
+  const me = L.nodes[Math.min(S.cur, 170) - 1], mgEl = el('div', 'mapme', '<img alt="몽글이" src="' + CHAR_DIR + (st === 'done' ? 'sleep' : 'wave') + CHAR_EXT + '"><span class="acc"><img alt="" src="assets/map/' + accId + '.svg"></span>');
   const wf = showHome.walkFrom && L.nodes[showHome.walkFrom - 1]; showHome.walkFrom = 0;
   mgEl.style.left = (wf || me).x + '%'; mgEl.style.top = ((wf || me).y - 64) + 'px'; M.append(mgEl);
   if (wf && wf !== me) requestAnimationFrame(() => requestAnimationFrame(() => { mgEl.classList.add('walk'); mgEl.style.left = me.x + '%'; mgEl.style.top = (me.y - 64) + 'px'; }));
   const nextStone = (st === 'new' || st === 'going' || canPlayMore()) && todayEl && +todayEl.dataset.day === S.cur ? todayEl : null;
   if (nextStone) { const c = nextStone.querySelector('.cloud'); if (c && canPlayMore()) c.remove(); tapHint(nextStone, wf ? 1800 : 2500); if (wf) setTimeout(() => { if (alive(id)) { ding(1.2); say('ui4_tapnext'); setBubble('여기 눌러 볼까?'); } }, 1500); }
   if (window.HP) HP.mapHint = { next: nextStone ? +nextStone.dataset.day : 0, walked: !!wf };
-  const toN = L.nodes[Math.min(me.dn, 169)], hd = el('i', 'mghead', '➜'); hd.style.left = me.x + '%'; hd.style.top = (me.y - 20) + 'px'; M.append(hd);
+  const toN = L.nodes[Math.min(me.dn, 169)], hd = el('i', 'mghead', '<img alt="" src="assets/map/arrow_next.svg">'); hd.style.left = me.x + '%'; hd.style.top = (me.y - 20) + 'px'; M.append(hd);
   const fixHead = () => { const W = M.clientWidth; if (!W || toN === me) { hd.hidden = true; return; } const ang = Math.atan2(toN.y - me.y, (toN.x - me.x) * W / 100); hd.style.transform = 'translate(-50%,-50%) translate(' + (Math.cos(ang) * 58).toFixed(0) + 'px,' + (Math.sin(ang) * 58).toFixed(0) + 'px) rotate(' + (ang * 180 / Math.PI).toFixed(1) + 'deg)'; };
   if (sea) M.insertAdjacentHTML('beforeend', '<div class="seaTag">' + sea[1] + '</div>');
   wrap.append(M);
   // 위 인사 + 아래 단추
-  const head = guide(st === 'done' ? 'sleep' : 'wave', st === 'done' ? '오늘은 여기까지! 내일 또 만나.' : st === 'soon' || st === 'all' ? '다음 길은 곧 열려요!' : '려원아, 안녕!<small>' + DAYS[Math.min(S.cur, 170) - 1].fun + '</small>');
+  const head = guide(st === 'done' ? 'sleep' : 'wave', st === 'done' ? '오늘은 여기까지! 내일 또 놀자.' : st === 'soon' || st === 'all' ? '다음 길은 곧 열려요!' : '려원아, 안녕!<small>' + DAYS[Math.min(S.cur, 170) - 1].fun + '</small>');
   head.classList.add('maphead');
   const dock = el('div', 'dock mapdock');
   if (st === 'new' || st === 'going') { const b = el('button', 'kid-btn next todaygo', '<img alt="" src="' + ICON('play') + '" style="filter:brightness(10)">오늘의 놀이'); b.id = 'todayBtn'; b.addEventListener('click', () => startDay(S.pendingExtra && st === 'new' ? S.cur : (S.session.mode === 'extra' && st === 'going' ? S.cur : S.cur), S.pendingExtra || (st === 'going' && S.session.mode === 'extra') ? 'extra' : 'today')); dock.append(b); }
   else if (canPlayMore() || canReplayMore()) { const b = el('button', 'kid-btn next todaygo', '<span class="dexic">▶</span>더 놀까?'); b.id = 'moreBtn'; b.addEventListener('click', playMore); dock.append(b); }
   else { const b = el('button', 'kid-btn lav', '<img alt="" src="' + ICON('moon') + '">내일 또 만나!'); b.id = 'tomorrowBtn'; b.addEventListener('click', () => { setChar('sleep'); say('ui4_bye'); }); dock.append(b); }
-  const pb = el('button', 'kid-btn', '<span class="dexic">🛝</span>놀이터'); pb.id = 'playBtn'; pb.addEventListener('click', showPlayground);
+  const pb = el('button', 'kid-btn', stepIcon('balloon') + '놀이터'); pb.id = 'playBtn'; pb.addEventListener('click', showPlayground);
   const db = el('button', 'kid-btn', '<span class="dexic">가</span>글자 친구'); db.id = 'dexBtn'; db.addEventListener('click', showDex);
   const sb = el('button', 'kid-btn', '<img alt="" src="' + ICON('sticker') + '">스티커'); sb.id = 'bookBtn'; sb.addEventListener('click', showBook);
-  const kb = el('button', 'kid-btn', '<span class="dexic">📚</span>책장'); kb.id = 'shelfBtn'; kb.addEventListener('click', showShelf);
+  const kb = el('button', 'kid-btn', stepIcon('story') + '책장'); kb.id = 'shelfBtn'; kb.addEventListener('click', showShelf);
   const row2 = el('div', 'dock2'); row2.append(pb, db, sb, kb);
   s.append(head, wrap, dock, row2);
   if (S.migratedFrom && !S.start) s.insertBefore(el('div', 'pnote', '보호자께: v3 기록을 옮겼어요. 어른 메뉴 → 시작 날에서 6일(ㅣㅏ)이나 11일(ㅗㅜ)부터 시작하는 걸 추천해요.'), wrap);
@@ -150,8 +163,8 @@ function showDayIntro() {
   const P = DR.plan, d = DAYS[P.day - 1], U = UNITS[d.unit - 1];
   const [id, s] = screen('dayintro', { home: true });
   const sc = sceneBg(el('div', 'scene tall u' + (U.n % 6), '<div class="place">' + U.place + '</div><div class="ptitle">' + (P.extra ? '한 번 더 놀이 날' : P.fun) + '</div>'), U.n);
-  const steps = el('div', 'steps', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + (PLAY_ICON[g.type] || '⭐') + '</span>').join(''));
-  s.append(guide('wave', DR.segIdx ? '이어서 놀자!' : (d.special === 'big' ? '오늘은 잔치 날이야!' : d.special ? '오늘은 특별한 날!' : '려원아, 오늘의 놀이 시작!')), sc, steps);
+  const steps = el('div', 'steps', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + stepIcon(g.type) + '</span>').join(''));
+  s.append(guide('wave', DR.segIdx ? '이어서 놀자!' : (d.special === 'big' ? '오늘은 잔치 날이야!' : d.special ? '오늘은 특별한 날!' : '려원아, 오늘 놀이 하자!')), sc, steps);
   const dock = el('div', 'dock'), go = el('button', 'kid-btn next', '출발!<img alt="" src="' + ICON('arrow') + '">'); go.id = 'goBtn';
   go.addEventListener('click', () => runSeg(DR.segIdx)); dock.append(go); s.append(dock); tapHint(go, 2200);
   const v = DR.segIdx ? [] : [d.k === 1 || P.extra ? VOICE.unit(d.unit) : 'ui4_today'].concat(d.special === 'big' ? ['ui4_bigday'] : P.extra ? ['ui4_again'] : []);
@@ -171,7 +184,7 @@ function runSeg(i) {
 }
 function showSegCard(seg, go) {
   const [id, s] = screen('segcard', { home: true });
-  const c = el('div', 'segcard', '<span class="emo">' + (PLAY_ICON[seg.type] || '⭐') + '</span><b>' + seg.kid + '</b>');
+  const c = el('div', 'segcard', '<span class="emo">' + stepIcon(seg.type) + '</span><b>' + seg.kid + '</b>');
   s.append(c); ding(1.1); ticking = true;
   const t = setTimeout(() => alive(id) && go(), 1100);
   c.addEventListener('click', () => { clearTimeout(t); go(); });
@@ -245,7 +258,7 @@ function showStickerPop(st, next) {
 }
 function showStep() {   // 칸 사이: 길 위 몽글이가 한 칸 앞으로(짧게)
   const P = DR.plan, [id, s] = screen('step', { home: true });
-  const steps = el('div', 'steps lg', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + (PLAY_ICON[g.type] || '⭐') + '</span>').join(''));
+  const steps = el('div', 'steps lg', P.segs.map((g, k) => '<span class="' + (k < DR.segIdx ? 'on' : k === DR.segIdx ? 'now' : '') + '">' + stepIcon(g.type) + '</span>').join(''));
   s.append(guide(rand(2) ? 'laugh' : 'clap', ['잘했어! 다음 놀이로 가 볼까?', '좋아! 한 칸 더!', '다음은 뭘까?'][rand(3)]), steps);
   const dock = el('div', 'dock'), go = el('button', 'kid-btn next', '다음<img alt="" src="' + ICON('arrow') + '">'); go.id = 'stepNext'; dock.append(go); s.append(dock);
   // 11/04: 몽글이가 지난 칸에서 다음 칸으로 걸어가고, 다음 칸·'다음' 단추가 반짝 + 손가락
@@ -316,7 +329,7 @@ function showPlayground() {
   const types = S.played.filter(t => IMPL.includes(t) && !SPECIAL_ONLY.includes(t) && t !== 'yesterday' && t !== 'pick3');
   s.append(guide('wave', types.length ? '하고 싶은 놀이를 골라 봐!' : '오늘의 놀이를 하면 놀이터에 친구가 생겨!'));
   const g = el('div', 'pgrid');
-  types.forEach(t => { const b = el('button', 'pcard3', '<span class="emo">' + PLAY_ICON[t] + '</span><b>' + CURR.plays[t].kid + '</b>'); b.dataset.t = t; b.addEventListener('click', () => playFree(t)); g.append(b); });
+  types.forEach(t => { const b = el('button', 'pcard3', '<span class="emo">' + stepIcon(t) + '</span><b>' + CURR.plays[t].kid + '</b>'); b.dataset.t = t; if (t === 'body' && typeof poseArtReady === 'function' && !poseArtReady()) b.disabled = true; b.addEventListener('click', () => { if (t === 'body' && typeof poseArtReady === 'function' && !poseArtReady()) return; playFree(t); }); g.append(b); });
   s.append(g); ticking = false;
 }
 function playFree(t) {
@@ -341,22 +354,38 @@ function showDex() {
   });
   s.append(g);
 }
-function showBook() {   // 스티커 모음: 모든 스티커 칸, 모은 건 색깔, 아직 없는 건 흐린 그림자(숫자 없음)
+function showBook() {   // 첫 화면: 가진 스티커만 크게, 다음에 모을 하나 반짝. 빈 칸 벽·물음표 없음.
   const [, s] = screen('bookscr', { scroll: true, home: true });
   const have = new Set(S.stickers.map(String)), n = have.size;
-  s.append(guide(n ? 'laugh' : 'basic', n ? '스티커를 모았어! 그림자 친구도 모아 볼까?' : '놀이를 하나 끝내면 스티커가 와!'));
-  const book = el('div', 'book stkbook');
-  const extra = [...have].filter(x => !STK_ALL.some(y => String(y) === x)).map(x => isNaN(+x) ? x : +x);   // 옛 스티커(목록 밖)도 그대로 보임
-  const last = S.stickers.length ? String(S.stickers[S.stickers.length - 1]) : '';
-  STK_ALL.concat(extra).forEach(id => { const on = have.has(String(id)); const c = el('div', 'slot' + (on ? ' on' : ' off') + (String(id) === last ? ' last' : ''), stkImg(id)); c.dataset.id = String(id); if (on) c.addEventListener('click', () => { c.classList.remove('wig'); void c.offsetWidth; c.classList.add('wig'); ding(1.2); if (typeof id === 'string' && WORDS[id.slice(2)] && hasA(VOICE.word(id.slice(2)))) say(VOICE.word(id.slice(2))); }); book.append(c); });
+  const extra = [...have].filter(x => !STK_ALL.some(y => String(y) === x)).map(x => isNaN(+x) ? x : +x);
+  const order = STK_ALL.concat(extra);
+  const owned = order.filter(id => have.has(String(id)));
+  const next = order.find(id => !have.has(String(id)));
+  s.append(guide(n ? 'laugh' : 'basic', n ? '모은 스티커야!' : '놀이를 하나 끝내면 스티커가 와!'));
+  const book = el('div', 'stkhero');
+  const slot = (id, cls) => {
+    const c = el('div', 'slot ' + cls, stkImg(id)); c.dataset.id = String(id);
+    if (have.has(String(id))) c.addEventListener('click', () => { c.classList.remove('wig'); void c.offsetWidth; c.classList.add('wig'); ding(1.2); if (typeof id === 'string' && id.startsWith('p:') && WORDS[id.slice(2)] && hasA(VOICE.word(id.slice(2)))) say(VOICE.word(id.slice(2))); });
+    return c;
+  };
+  owned.forEach(id => book.append(slot(id, 'on big')));
+  if (next) book.append(slot(next, 'next shimmer'));
   s.append(book); say('ui_book');
-  if (window.HP) HP.book = { total: STK_ALL.length + extra.length, have: n };
+  if (window.HP) HP.book = { total: order.length, have: n, next: next ? String(next) : '' };
 }
 function showShelf() {
   const [, s] = screen('shelf', { scroll: true, home: true });
   s.append(guide('point', S.books.length ? '다 본 이야기책이야. 골라 볼까?' : '이야기를 끝까지 보면 책이 꽂혀!'));
   const g = el('div', 'shelf');
-  UNITS.forEach(u => { const on = S.books.includes(u.n); const b = el('button', 'bk u' + (u.n % 6) + (on ? ' on' : ''), on ? '<b>' + u.title + '</b>' : '<span>?</span>'); if (on) b.addEventListener('click', () => readBook(u.n)); g.append(b); });
+  const nextBook = UNITS.find(u => !S.books.includes(u.n));
+  UNITS.forEach(u => {
+    const on = S.books.includes(u.n), nxt = nextBook && nextBook.n === u.n;
+    if (!on && !nxt) return;
+    const b = el('button', 'bk u' + (u.n % 6) + (on ? ' on' : ' next'), on ? '<b>' + u.title + '</b>' : '<b>' + u.place + '</b>');
+    if (on) b.addEventListener('click', () => readBook(u.n));
+    g.append(b);
+  });
+  if (!S.books.length && !nextBook) g.append(el('p', 'muted', '이야기가 아직 없어요.'));
   s.append(g);
 }
 function readBook(n) {
@@ -403,9 +432,9 @@ function openParent() {
     '<div class="r"><div class="l">려원이 생일(계절 겉모습용)</div><input type="text" id="bday" placeholder="08-01" value="' + (S.settings.birthday || '') + '" maxlength="5"></div>' +
     '<div class="r"><div class="l">진도 내보내기 · 가져오기<small>파일로만 · 인터넷 안 써요</small></div><button class="mini" id="pmExport">내보내기</button><label class="mini">가져오기<input type="file" id="pmImport" accept="application/json" hidden></label></div>' +
     '</div><div class="cap">이 놀이는 무엇을 기르나요</div><div class="sec"><button class="r" id="rGoals"><div class="l">놀이 ' + Object.keys(CURR.plays).length + '개의 숨은 목표</div></button><div class="more" id="mGoals" hidden><ul>' +
-    Object.entries(CURR.plays).map(([k, v]) => '<li><b>' + v.kid + '</b> — ' + v.goal + (IMPL.includes(k) ? '' : ' <span class="muted">(곧)</span>') + '</li>').join('') + '</ul></div></div>' +
+    Object.entries(CURR.plays).map(([k, v]) => '<li><b>' + v.kid + '</b> — ' + v.goal + (IMPL.includes(k) && (k !== 'body' || (typeof poseArtReady === 'function' && poseArtReady())) ? '' : ' <span class="muted">(곧)</span>') + '</li>').join('') + '</ul></div></div>' +
     '<div class="acts"><button class="warn" id="pmReset">처음부터 다시</button></div>' +
-    '<div class="foot">기록은 이 기기에만 저장돼요 · 광고·로그인·수집 없음 · 알림·연속 기록 없음<br>v4 1부: 1~55일(1·2단계)까지 열려 있어요. 56일부터는 그림·음성이 준비되면 열려요.</div></div>';
+    '<div class="foot" id="pmFoot">기록은 이 기기에만 저장돼요 · 광고·로그인·수집 없음 · 알림·연속 기록 없음<br>진도 파일에는 음성이 없어요. audio 폴더의 mp3가 빠지면 출고하면 안 됩니다.<br>v4 1부: 1~55일(1·2단계)까지 열려 있어요. 56일부터는 그림·음성이 준비되면 열려요.</div></div>';
   PM.querySelectorAll('.seg[data-n]').forEach(sg => sg.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return; const v = b.dataset.v; S.settings[sg.dataset.n] = isNaN(+v) ? v : +v; save();
     sg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); drawTime();
@@ -422,6 +451,7 @@ function openParent() {
   let armed = false;
   $('#pmReset').addEventListener('click', e => { if (!armed) { armed = true; e.currentTarget.textContent = '정말 처음부터? 한 번 더 누르세요'; return; } const keep = S.settings; S = fresh4(); S.settings = keep; save(); closeParent(); });
   $('#pmClose').addEventListener('click', closeParent);
+  fetch('audio/ui_hiname.mp3').then(r => { if (r.ok) return; const f = document.querySelector('#pmFoot'); if (f) f.insertAdjacentHTML('afterbegin', '<b>음성 파일이 없어요. audio 복원 전에는 출고하면 안 됩니다.</b><br>'); }).catch(() => { const f = document.querySelector('#pmFoot'); if (f) f.insertAdjacentHTML('afterbegin', '<b>음성 파일을 열 수 없어요. audio 복원 전에는 출고하면 안 됩니다.</b><br>'); });
 }
 function closeParent() { const PM = $('#parent'); PM.hidden = true; PM.innerHTML = ''; run = null; DR = null; showHome(); }
 /* 시작 날 고르기(3.4): 앞 단원 자모·낱말은 복습 상자 2로 */

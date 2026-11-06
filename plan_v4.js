@@ -43,7 +43,7 @@ function checkDay(plan, prev) {
 const hashN = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) % 1000 / 1000; };
 /* 칸 하나 고르기(gen_v4.py wpick과 같은 점수): weight*3 − 최근 벌점 + 해시 */
 function pickType(slot, stage, used, fams, hist, prevFam, nextFam, dn, avoid) {
-  const pool = IMPL.filter(t => !SPECIAL_ONLY.includes(t) && (CURR.plays[t] || { frm: 9 }).frm <= stage && !used.includes(t) && fam(t) !== prevFam && fam(t) !== nextFam && fams.filter(f => f === fam(t)).length < 2
+  const pool = IMPL.filter(t => (t !== 'body' || (typeof poseArtReady === 'function' && poseArtReady())) && !SPECIAL_ONLY.includes(t) && (CURR.plays[t] || { frm: 9 }).frm <= stage && !used.includes(t) && fam(t) !== prevFam && fam(t) !== nextFam && fams.filter(f => f === fam(t)).length < 2
     && (slot === 'W' ? fam(t) === 'write' : slot === 'Z' ? fam(t) === 'story' : slot === 'S' ? fam(t) === 'warm' : !['warm', 'story'].includes(fam(t))));
   const score = t => 3 - (hist[0] && hist[0].includes(t) ? 10 : 0) - (hist[1] && hist[1].includes(t) ? 4 : 0) - (hist[2] && hist[2].includes(t) ? 1.5 : 0) - ((avoid || []).includes(t) ? 10 : 0) + hashN(dn + slot + t);
   return pool.sort((a, b) => score(b) - score(a))[0] || null;
@@ -85,11 +85,33 @@ function fitTimer(plan) {
   if (S.boost && S.boost === plan.unit && plan.k <= 2 && !segs.some(s => s.type === 'yesterday')) segs[0] = segOf('yesterday', 'S');   // 보물 찾기 60% 미만 → 다음 단원 1·2일째 복습 칸
   return Object.assign({}, plan, { segs });
 }
+/* 포즈 그림이 없으면 몸으로 글자 칸을 다른 놀이로 바꿈. 날 열기·MORE_MAX는 그대로. */
+function dropUngatedBody(plan) {
+  if (typeof poseArtReady === 'function' && poseArtReady()) return plan;
+  if (!plan.segs.some(s => s.type === 'body')) return plan;
+  const segs = [];
+  plan.segs.forEach((s, i) => {
+    if (s.type !== 'body') { segs.push(s); return; }
+    const rest = plan.segs.slice(i + 1).filter(x => x.type !== 'body');
+    const used = segs.map(x => x.type).concat(rest.map(x => x.type));
+    const fams = segs.map(x => fam(x.type));
+    const prev = segs.length ? fam(segs[segs.length - 1].type) : null;
+    const t = pickType(s.slot || 'A', plan.stage, used, fams, [[], [], []], prev, rest[0] ? fam(rest[0].type) : null, plan.day + ':body', ['body']);
+    if (t) segs.push(segOf(t, s.slot || 'A'));
+  });
+  return Object.assign({}, plan, { segs, types: segs.map(s => s.type), bodyHeld: true });
+}
 function planFor(dn, mode) {
   let p = mode === 'extra' ? extraPlan(dn) : Object.assign({}, DAYS[dn - 1]);
   const prev = dn > 1 ? DAYS[dn - 2] : null;
   p = repairPlan(p, mode === 'extra' ? DAYS[dn - 1] : prev);
-  return fitTimer(p);
+  return dropUngatedBody(fitTimer(p));
+}
+function mixRead(ctx, n, pred) {
+  const core = wordPool(ctx, pred);
+  let extra = [];
+  try { extra = typeof readExtras === 'function' ? readExtras(ctx, pred).filter(w => !core.includes(w)) : []; } catch (e) { extra = []; }
+  return core.concat(shuffle(extra).slice(0, Math.max(4, n || 4)));
 }
 
 /* ---------- 문항 만들기(2.3) ---------- */
@@ -124,9 +146,9 @@ function glyphPool(ctx) {   // 오늘·이번 단원 글자(자모 + 음절)
 }
 const QB = {
   name: (c, n) => ['ryeowon'].concat(shuffle(FAMILY.filter(x => x !== 'ryeowon'))).slice(0, n),
-  listen: (c, n) => withReview(c, wordPool(c, w => hasA(VOICE.word(w))), n, k => k[0] === 'w' && hasA('w_' + k.slice(2))),
+  listen: (c, n) => withReview(c, mixRead(c, n, w => hasA(VOICE.word(w)) && wordHasPicOrEmo(w)), n, k => k[0] === 'w' && hasA('w_' + k.slice(2))),
   blend: (c, n) => { const ok = w => [...WORDS[w]].every(s => hasA(VOICE.syl(s))) && WORDS[w].length >= 2; const p = wordPool(c, ok); return fill(p.length >= 3 ? p : p.concat(BLEND_WORDS.filter(ok)), n); },
-  choose: (c, n) => withReview(c, wordPool(c, w => hasA(VOICE.word(w)) && hasA(VOICE.hy(w))), n, k => k[0] === 'w' && hasA('hy_' + k.slice(2))),
+  choose: (c, n) => withReview(c, mixRead(c, n, w => hasA(VOICE.word(w)) && hasA(VOICE.hy(w)) && (canDecodeWord(w, c) || c.unitW.includes(w) || c.newW.includes(w))), n, k => k[0] === 'w' && hasA('hy_' + k.slice(2))),
   seek: (c, n) => { const ok = w => HSPOT4[w] && HSPOT4[w].length >= [...WORDS[w]].length && hasA(VOICE.hw(w)) && [...WORDS[w]].every(g => hasA(VOICE.syl(g))); const p = wordPool(c, ok); return fill(p.length >= 2 ? p : p.concat(HID_WORDS.filter(ok)), n); },
   clap: (c, n) => { const p = CLAP_WORDS.filter(w => c.unitW.includes(w) || c.knownW.includes(w)); return fill(p.length >= 3 ? p : CLAP_WORDS, n); },
   same: (c, n) => {
@@ -147,7 +169,7 @@ const QB = {
     const cs = [...new Set(c.unitC.concat(c.cons.slice().reverse()))].slice(0, n); while (cs.length < n) cs.push(cs[cs.length % Math.max(1, cs.length)] || 'ㄱ');
     return cs.map((x, i) => ['ㅏ', 'ㅗ', 'ㅜ', 'ㅣ'].map(v => syl(x, v)).filter(s => hasA(VOICE.syl(s))));
   },
-  body: (c, n) => { const a = [...new Set(c.newJ.concat(c.unitJ))].filter(j => POSE_HOW[j]); return a.concat(shuffle(c.knownJ.filter(j => POSE_HOW[j] && !a.includes(j)))).concat(['ㅣ', 'ㅏ', 'ㅇ']).filter((x, i, A) => A.indexOf(x) === i).slice(0, n); },
+  body: (c, n) => { if (typeof poseArtReady !== 'function' || !poseArtReady()) return []; const has = j => POSE_HOW[j] && POSE_PIC[j] && hasPic(POSE_PIC[j]); const a = [...new Set(c.newJ.concat(c.unitJ))].filter(has); return a.concat(shuffle(c.knownJ.filter(j => has(j) && !a.includes(j)))).filter((x, i, A) => A.indexOf(x) === i).slice(0, n); },
   yesterday: (c, n) => {
     const ok = k => (k[0] === 'w' && hasA('w_' + k.slice(2)) && wordHasPicOrEmo(k.slice(2))) || (k[0] === 'j' && JAMO_EX[k.slice(2)] && hasA('j_' + hex(k.slice(2)))) || (k[0] === 's' && hasA('sy_' + hex(k.slice(2))));
     let ks = dueKeys(ok);
@@ -169,7 +191,7 @@ const QB = {
   },
   stickerstory: (c, n) => { const ks = c.k <= 4 ? Array.from({ length: c.k }, (_, i) => c.k - i) : [1, 2, 3, 4]; return ks.slice(0, Math.min(n, c.k <= 4 ? 2 : 4)).reverse().map(k => ({ u: c.u.n, k })); },
   story: (c, n) => { const kk = Math.min(c.k, 4), ks = Array.from({ length: kk }, (_, i) => i + 1); return ks.slice(-Math.min(n, c.k >= 5 ? 4 : 2)).map(k => ({ u: c.u.n, k })); },
-  block: (c, n) => { const s = sylsOf(c, c.unitC.length ? c.unitC : c.cons.slice(-2)); const w = wordPool(c, x => [...WORDS[x]].every(y => hasA(VOICE.syl(y))) && WORDS[x].length >= 2 && WORDS[x].length <= 3 && wordHasPicOrEmo(x));
+  block: (c, n) => { const s = sylsOf(c, c.unitC.length ? c.unitC : c.cons.slice(-2)); const wpred = x => [...WORDS[x]].every(y => hasA(VOICE.syl(y))) && WORDS[x].length >= 2 && WORDS[x].length <= 3 && wordHasPicOrEmo(x) && (typeof canDecodeWord !== 'function' || canDecodeWord(x, c) || c.unitW.includes(x)); const w = mixRead(c, n, wpred);
     const out = []; for (let i = 0; i < n; i++) out.push(i % 2 === 0 || !w.length ? { t: 'syl', v: s[rand(s.length)], key: null } : { t: 'word', v: w[rand(w.length)], key: null }); out.forEach(o => { o.key = o.t === 'syl' ? 's:' + o.v : 'w:' + o.v; }); return out; },
   map: (c, n) => [{ qs: mixedQs(c, n, ['hear', 'hear', 'read']), key: null }],
   cloud: (c, n) => [{ qs: mixedQs(c, n, ['hear', 'read', 'build']), key: null }],
@@ -180,7 +202,8 @@ const QB = {
 function mixedQs(c, n, kinds, optDelta = 0) {
   const recent = DAYS.slice(Math.max(0, c.dn - 6), c.dn).map(x => ctxOf(x.day));
   const gl = [...new Set(recent.flatMap(x => glyphPool(x)).concat(glyphPool(c)))].filter(x => isSyl(x) ? hasA(VOICE.syl(x)) : hasA(VOICE.jamo(x)));
-  const ws = [...new Set(recent.flatMap(x => x.unitW).concat(c.knownW))].filter(w => hasA(VOICE.word(w)) && wordHasPicOrEmo(w));
+  const wsAll = [...new Set(recent.flatMap(x => x.unitW).concat(c.knownW, typeof readExtras === 'function' ? readExtras(c, w => hasA(VOICE.word(w)) && wordHasPicOrEmo(w)) : []))].filter(w => hasA(VOICE.word(w)) && wordHasPicOrEmo(w));
+  const ws = wsAll.filter(w => typeof canDecodeWord !== 'function' || canDecodeWord(w, c) || c.unitW.includes(w) || c.newW.includes(w));
   const bs = c.stage >= 2 ? [...new Set(recent.flatMap(x => sylsOf(x, x.unitC)))] : [];
   const rv = dueKeys().map(itemOfKey);
   const out = [];
