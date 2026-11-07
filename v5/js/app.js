@@ -56,7 +56,7 @@
   function homeHTML() {
     const S = X().S;
     const lesson = currentLesson();
-    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" src="assets/pic/scene_01.webp"><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp"><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w"><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
   }
   function showHome() {
     X().dropQueue();
@@ -196,12 +196,13 @@
     if (it.paint && it.paint.background) return 'background:' + it.paint.background;
     if (!it.file) return '';
     const b = it.box;
-    if (!b || b[2] > 240 || b[3] > 240) return 'background-image:url(' + it.file + ');background-size:cover;background-position:center';
+    const src = X().itemFile(it);
+    if (!b || b[2] > 240 || b[3] > 240) return 'background-image:url(' + src + ');background-size:cover;background-position:center';
     const side = Math.max(b[2], b[3], 36);
     const scale = 64 / side;
     const left = -((b[0] - (side - b[2]) / 2) * scale);
     const top = -((b[1] - (side - b[3]) / 2) * scale);
-    return 'background-image:url(' + it.file + ');background-repeat:no-repeat;background-size:' + (512 * scale).toFixed(1) + 'px ' + (512 * scale).toFixed(1) + 'px;background-position:' + left.toFixed(1) + 'px ' + top.toFixed(1) + 'px';
+    return 'background-image:url(' + src + ');background-repeat:no-repeat;background-size:' + (512 * scale).toFixed(1) + 'px ' + (512 * scale).toFixed(1) + 'px;background-position:' + left.toFixed(1) + 'px ' + top.toFixed(1) + 'px';
   }
   function showDress() {
     X().dropQueue();

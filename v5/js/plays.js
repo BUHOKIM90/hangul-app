@@ -183,10 +183,12 @@
       ctx.skill = 's:' + lesson.chant.join('');
       ctx.chant = 0;
       const first = lesson.chant[0];
-      host().innerHTML = '<div class="chant-board"><div class="chant-pic"><img id="chantPic" alt="" width="512" height="512" src="' + (C().sylPic(first) || STAR) + '"><span id="chantWord">' + C().sylWord(first) + '</span></div>' + meter(lesson.chant.length) + '<div class="chant">' + lesson.chant.map((s, i) => {
+      const firstPic = C().sylPic(first) || STAR;
+      host().innerHTML = '<div class="chant-board"><div class="chant-pic"><img id="chantPic" alt="" width="512" height="512" src="' + firstPic + '"><span id="chantWord">' + C().sylWord(first) + '</span></div>' + meter(lesson.chant.length) + '<div class="chant">' + lesson.chant.map((s, i) => {
         const key = C().sylKey(s);
         return '<button type="button" class="tap ctile ' + tone(s) + (i === 0 ? ' is-lit' : '') + '" data-tap="tile" data-i="' + i + '" data-audio="' + key + '" aria-label="' + s + '"><img class="tile-pic" alt="" src="' + (C().sylPic(s) || STAR) + '"><b>' + s + '</b></button>';
       }).join('') + '</div></div>';
+      showSyl(first);
       X().say(C().UI.hint, '반짝반짝 빛나는 데를 봐!');
     },
     trace(lesson) {
@@ -221,8 +223,15 @@
   function showSyl(s) {
     const img = host().querySelector('#chantPic');
     const word = host().querySelector('#chantWord');
-    const src = C().sylPic(s);
-    if (img && src) img.src = src;
+    const src = C().sylPic(s) || STAR;
+    const tile = host().querySelector('.ctile[aria-label="' + s + '"] .tile-pic');
+    const same = !!(tile && tile.getAttribute('src') === src);
+    if (img) {
+      img.hidden = same;
+      if (!same) img.src = src;
+    }
+    const card = host().querySelector('.chant-pic');
+    if (card) card.classList.toggle('is-word-only', same);
     if (word) word.textContent = C().sylWord(s);
   }
 

@@ -723,84 +723,244 @@
       "starter": true
     },
     {
-      "id": "monggeul_acc_glasses",
+      "id": "monggeul_hat_cap",
       "character": "monggeul",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/monggeul_acc_glasses.svg",
+      "slot": "hat",
+      "name": "cap",
+      "label": "딸기 베레모",
+      "file": "assets/friends/items/monggeul_hat_cap.webp",
       "box": [
-        200,
-        146,
+        193,
+        17,
+        134,
+        91
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_hat_crown",
+      "character": "monggeul",
+      "slot": "hat",
+      "name": "crown",
+      "label": "작은 왕관",
+      "file": "assets/friends/items/monggeul_hat_crown.webp",
+      "box": [
+        192,
+        17,
+        136,
+        91
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_shirt",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "shirt",
+      "label": "노란 가디건",
+      "file": "assets/friends/items/monggeul_top_shirt.webp",
+      "box": [
+        139,
+        270,
+        242,
+        140
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_vest",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "vest",
+      "label": "초록 멜빵",
+      "file": "assets/friends/items/monggeul_top_vest.webp",
+      "box": [
+        170,
+        270,
+        180,
+        142
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_smock",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "smock",
+      "label": "체크 스모크",
+      "file": "assets/friends/items/monggeul_top_smock.webp",
+      "box": [
+        170,
+        270,
+        180,
+        142
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_chef",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "chef",
+      "label": "요리사 옷",
+      "file": "assets/friends/items/monggeul_top_chef.webp",
+      "box": [
+        130,
+        270,
+        260,
+        151
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_hanbok",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "hanbok",
+      "label": "한복",
+      "file": "assets/friends/items/monggeul_top_hanbok.webp",
+      "box": [
         120,
-        40
+        270,
+        280,
+        165
       ],
-      "extra": "accessory",
+      "real": true,
       "starter": false
     },
     {
-      "id": "monggeul_acc_star",
+      "id": "monggeul_top_pajamas",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "pajamas",
+      "label": "잠옷",
+      "file": "assets/friends/items/monggeul_top_pajamas.webp",
+      "box": [
+        128,
+        270,
+        264,
+        184
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_raincoat",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "raincoat",
+      "label": "비옷",
+      "file": "assets/friends/items/monggeul_top_raincoat.webp",
+      "box": [
+        130,
+        270,
+        260,
+        155
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_spacesuit",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "spacesuit",
+      "label": "우주복",
+      "file": "assets/friends/items/monggeul_top_spacesuit.webp",
+      "box": [
+        128,
+        270,
+        264,
+        184
+      ],
+      "real": true,
+      "starter": false
+    },
+    {
+      "id": "monggeul_acc_brooch",
       "character": "monggeul",
       "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/monggeul_acc_star.svg",
+      "name": "brooch",
+      "label": "잎사귀 브로치",
+      "file": "assets/friends/items/monggeul_acc_brooch.webp",
       "box": [
-        284,
-        310,
-        44,
-        44
+        241,
+        282,
+        38,
+        35
       ],
-      "extra": "accessory",
+      "real": true,
       "starter": false
     },
     {
-      "id": "monggeul_top_peach",
+      "id": "monggeul_acc_bag",
       "character": "monggeul",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/monggeul_top_peach.svg",
+      "slot": "acc",
+      "name": "bag",
+      "label": "크림 가방",
+      "file": "assets/friends/items/monggeul_acc_bag.webp",
       "box": [
-        220,
-        260,
-        80,
-        62
+        365,
+        320,
+        68,
+        101
       ],
-      "extra": "color",
+      "real": true,
       "starter": false
     },
     {
-      "id": "monggeul_top_mint",
+      "id": "monggeul_shoes_boots",
       "character": "monggeul",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/monggeul_top_mint.svg",
+      "slot": "shoes",
+      "name": "boots",
+      "label": "갈색 부츠",
+      "file": "assets/friends/items/monggeul_shoes_boots.webp",
       "box": [
-        220,
-        260,
-        80,
-        62
+        164,
+        415,
+        194,
+        59
       ],
-      "extra": "color",
+      "real": true,
       "starter": false
     },
     {
-      "id": "monggeul_top_sky",
+      "id": "monggeul_shoes_slippers",
       "character": "monggeul",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/monggeul_top_sky.svg",
+      "slot": "shoes",
+      "name": "slippers",
+      "label": "곰 슬리퍼",
+      "file": "assets/friends/items/monggeul_shoes_slippers.webp",
       "box": [
-        220,
-        260,
-        80,
-        62
+        164,
+        416,
+        194,
+        58
       ],
-      "extra": "color",
+      "real": true,
       "starter": false
+    },
+    {
+      "id": "monggeul_bg_vignette",
+      "character": "monggeul",
+      "slot": "bg",
+      "name": "vignette",
+      "label": "버섯 숲",
+      "file": "assets/friends/items/monggeul_bg_vignette.webp",
+      "box": [
+        29,
+        354,
+        454,
+        139
+      ],
+      "real": true,
+      "starter": true
     },
     {
       "id": "bori_acc_glasses",
@@ -1123,54 +1283,6 @@
       "starter": false
     },
     {
-      "id": "monggeul_hat_beret",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "beret",
-      "label": "민트 베레모",
-      "file": "assets/dress/layers/monggeul_hat_beret.svg",
-      "box": [
-        210,
-        66,
-        100,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_hat_crown",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "crown",
-      "label": "작은 왕관",
-      "file": "assets/dress/layers/monggeul_hat_crown.svg",
-      "box": [
-        216,
-        68,
-        88,
-        48
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_shoes_sneakers",
-      "character": "monggeul",
-      "slot": "shoes",
-      "name": "sneakers",
-      "label": "하얀 운동화",
-      "file": "assets/dress/layers/monggeul_shoes_sneakers.svg",
-      "box": [
-        180,
-        447,
-        157,
-        36
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
       "id": "monggeul_bg_peach",
       "character": "monggeul",
       "slot": "bg",
@@ -1181,7 +1293,7 @@
         "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
       },
       "extra": "color",
-      "starter": true
+      "starter": false
     },
     {
       "id": "monggeul_bg_mint",
@@ -1367,6 +1479,20 @@
     }
   ],
   "unlock": [
+    "monggeul_hat_cap",
+    "monggeul_hat_crown",
+    "monggeul_top_shirt",
+    "monggeul_top_vest",
+    "monggeul_top_smock",
+    "monggeul_top_chef",
+    "monggeul_top_hanbok",
+    "monggeul_top_pajamas",
+    "monggeul_top_raincoat",
+    "monggeul_top_spacesuit",
+    "monggeul_acc_brooch",
+    "monggeul_acc_bag",
+    "monggeul_shoes_boots",
+    "monggeul_shoes_slippers",
     "bori_hat_cap",
     "bori_hat_crown",
     "tori_hat_cap",
@@ -1403,11 +1529,6 @@
     "momo_shoes_slippers",
     "gureum_shoes_boots",
     "gureum_shoes_slippers",
-    "monggeul_acc_glasses",
-    "monggeul_acc_star",
-    "monggeul_top_peach",
-    "monggeul_top_mint",
-    "monggeul_top_sky",
     "bori_acc_glasses",
     "bori_acc_star",
     "bori_top_peach",
@@ -1428,9 +1549,7 @@
     "gureum_top_peach",
     "gureum_top_mint",
     "gureum_top_sky",
-    "monggeul_hat_beret",
-    "monggeul_hat_crown",
-    "monggeul_shoes_sneakers",
+    "monggeul_bg_peach",
     "monggeul_bg_mint",
     "monggeul_bg_sky",
     "bori_bg_peach",

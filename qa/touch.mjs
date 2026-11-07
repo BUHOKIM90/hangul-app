@@ -141,6 +141,9 @@ async function runDevice(browser, spec) {
   if (!placed) throw new Error(spec.name + ' sticker did not land in the slot');
   if (shoot) await shot(page, spec.name + '-done');
   await tap(page, page.locator('[data-tap="dress"]'), 'dress');
+  await tap(page, page.locator('[data-tap="who"][data-who="monggeul"]'), 'who-monggeul');
+  const body = await page.locator('.doll img[data-slot="body"]').getAttribute('src');
+  if (!body || body.indexOf('monggeul_basic.webp') < 0) throw new Error(spec.name + ' body is ' + body);
   if (shoot) await shot(page, spec.name + '-dress');
   await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="false"]').first(), 'equip');
   const worn = await page.locator('.doll img[data-slot="hat"], .doll img[data-slot="top"], .doll img[data-slot="acc"], .doll img[data-slot="shoes"]').count();

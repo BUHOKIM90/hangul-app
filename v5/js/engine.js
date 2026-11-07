@@ -67,9 +67,13 @@
     playing = true;
     playKey(job.key, job.g).then(() => { playing = false; pump(); });
   }
-  function say(key, caption) {
+  function say(key, caption, opts) {
     const text = caption || lineOf(key);
-    showLine(text);
+    if (!opts || !opts.keepBubble) showLine(text);
+    else {
+      const live = document.getElementById('live');
+      if (live && text) live.textContent = text;
+    }
     const g = gen;
     if (!playing && !q.length) {
       playing = true;
@@ -166,6 +170,13 @@
   function setDress(d) { DRESS = d; }
   function charBy(id) { return (DRESS.characters || []).find(c => c.id === id); }
   function itemBy(id) { return (DRESS.items || []).find(it => it.id === id); }
+  function itemFile(it) {
+    if (!it || !it.file) return '';
+    if (it.character === 'monggeul' && typeof MONG_WEBP !== 'undefined' && MONG_WEBP.has(it.id)) {
+      return 'assets/friends/items/' + it.id + '.webp';
+    }
+    return it.file;
+  }
   function ensureStarters() {
     if (!DRESS) return;
     (DRESS.items || []).forEach(it => {
@@ -202,7 +213,7 @@
       const it = w[slot] ? itemBy(w[slot]) : null;
       if (!it) return '';
       if (it.paint && it.paint.type === 'css') return '<div class="layer-fill" data-slot="' + slot + '" style="background:' + it.paint.background + '"></div>';
-      return '<img data-slot="' + slot + '" alt="" width="512" height="512" src="' + it.file + '">';
+      return '<img data-slot="' + slot + '" alt="" width="512" height="512" src="' + itemFile(it) + '">';
     }).join('');
   }
 
@@ -232,16 +243,16 @@
     fx.innerHTML = '';
     if (reduce) return;
     const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FF8FB8', '#FFF9EB'];
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < 22; i++) {
       const s = document.createElement('i');
       if (i % 3 === 0) s.className = 'star';
-      s.style.left = (4 + Math.random() * 92) + '%';
+      s.style.left = (6 + Math.random() * 88) + '%';
       s.style.background = colors[i % colors.length];
-      s.style.animationDelay = (Math.random() * 180) + 'ms';
-      s.style.animationDuration = (1.4 + Math.random() * 0.7) + 's';
+      s.style.animationDelay = (Math.random() * 80) + 'ms';
+      s.style.animationDuration = '0.82s';
       fx.appendChild(s);
     }
-    setTimeout(() => { if (fx) fx.innerHTML = ''; }, 2300);
+    setTimeout(() => { if (fx) fx.innerHTML = ''; }, 980);
   }
   let lastPraise = '';
   function praise() {
@@ -272,7 +283,7 @@
       praise.timer = setTimeout(() => { pop.hidden = true; }, 2200);
     }
     confetti();
-    say(p[1], p[0]);
+    say(p[1], p[0], { keepBubble: true });
   }
   function shuffle(a) {
     const b = a.slice();
@@ -285,7 +296,7 @@
 
   window.V5X = {
     get S() { return S; }, save, load, reset, stamp, say, dropQueue, unlock, syncSound, installPointer,
-    setDress, dressData, charBy, itemBy, ensureStarters, isUnlocked, unlockNext, layerHTML,
+    setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, layerHTML,
     bump, hintOn, praise, confetti, shuffle, lineOf
   };
 })();

@@ -19,6 +19,12 @@ const mp3 = fs.readdirSync(audioDir).filter(f => f.endsWith('.mp3')).map(f => f.
 const have = new Set(mp3);
 fs.writeFileSync(path.join(audioDir, 'have.js'), "'use strict';\nconst HAVE_AUDIO = new Set(" + JSON.stringify(mp3) + ");\n");
 
+const itemDir = path.join(root, 'assets/friends/items');
+const mongWebp = fs.existsSync(itemDir)
+  ? fs.readdirSync(itemDir).filter(name => name.startsWith('monggeul_') && name.endsWith('.webp')).map(name => name.slice(0, -5))
+  : [];
+fs.writeFileSync(path.join(root, 'v5/js/mong-webp.js'), "'use strict';\nconst MONG_WEBP = new Set(" + JSON.stringify(mongWebp) + ");\n");
+
 let linesSrc = fs.readFileSync(path.join(root, 'v3/audio/lines.js'), 'utf8');
 const lineCtx = {};
 vm.createContext(lineCtx);
@@ -94,6 +100,8 @@ add('assets/pic/chest_closed.webp');
 add('assets/pic/chest_open.webp');
 [
   'assets/pic/scene_01.webp',
+  'assets/pic/scene_01-800.webp',
+  'assets/char/monggeul_wave-256.webp',
   'assets/pic/map_w1.webp',
   'assets/pic/map/map_bg_day.webp',
   'assets/pic/map/stone_today.webp',

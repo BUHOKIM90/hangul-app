@@ -23,6 +23,7 @@
   --r-md: 16px;
   --font: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --tap: 64px;
+  --head: 84px;
   --tap-adult: 48px;
   color-scheme: light;
 }
@@ -78,6 +79,9 @@ button, [data-tap] { touch-action: manipulation; font: inherit; color: inherit; 
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
+  z-index: 40;
+  background: #FFF9EB;
   padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
 }
 #brand { flex: 1; margin: 0; font-size: 1.25rem; }
@@ -251,7 +255,7 @@ html[data-device="ipad"] .doll { width: min(420px, 46vw); }
 }
 .gear.is-fresh { outline: 4px solid var(--rose); }
 #gate, #parent {
-  position: fixed; inset: 0; z-index: 20;
+  position: fixed; inset: 0; z-index: 50;
   background: rgba(74, 52, 40, 0.28);
   display: grid; place-items: center;
   padding: 16px;
@@ -276,10 +280,10 @@ html[data-device="ipad"] .doll { width: min(420px, 46vw); }
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); clip-path: inset(50%);
 }
-#fx { position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden; }
+#fx { position: fixed; left: 0; right: 0; top: var(--head); bottom: 0; pointer-events: none; z-index: 18; overflow: hidden; }
 #fx i {
-  position: absolute; top: -16px; width: 14px; height: 22px; border-radius: 4px;
-  animation: fall 1.8s ease-in forwards;
+  position: absolute; top: 0; width: 12px; height: 16px; border-radius: 4px;
+  animation: fall 0.82s ease-in forwards;
 }
 @keyframes twinkle { 50% { transform: scale(1.06); } }
 @keyframes wiggle {
@@ -525,17 +529,28 @@ main[data-play="treasure"] { --play: #FFF4D2; }
 }
 .chant-pic img { width: 92px; height: 92px; }
 .chant-pic span { font-size: 1.6rem; }
-.chant { width: 100%; flex: 1; align-items: stretch; justify-content: stretch; }
+.chant { width: 100%; flex: 1; align-items: center; justify-content: center; }
 .ctile {
   flex: 1 1 0;
+  align-self: center;
   width: auto;
   height: auto;
+  aspect-ratio: 1 / 2.05;
   min-width: 84px;
-  min-height: 200px;
+  min-height: 0;
+  max-height: 52vh;
   flex-direction: column;
   padding: 8px;
 }
-.ctile .tile-pic { width: 72px; height: 72px; }
+.ctile .tile-pic {
+  flex: none;
+  width: 82%;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+.chant-pic.is-word-only img { display: none; }
 .ctile b { font-size: 3.2rem; }
 .ctile.is-lit { animation: glow 1s ease-in-out infinite; }
 .ctile.is-hit { filter: saturate(1.1); }
@@ -570,23 +585,25 @@ main[data-play="treasure"] { --play: #FFF4D2; }
 .chest { width: min(42vw, 180px); }
 #praise {
   position: fixed;
-  left: 50%;
-  top: 18%;
-  transform: translateX(-50%);
-  z-index: 28;
+  top: calc(var(--head) + 6px);
+  left: 108px;
+  right: 72px;
+  z-index: 12;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: min(92vw, 460px);
+  width: auto;
+  max-width: 420px;
   pointer-events: none;
   background: #fff;
   border: 3px solid #F3C7A4;
-  border-radius: 24px;
-  padding: 6px 16px 6px 6px;
-  box-shadow: 0 8px 0 rgba(228, 199, 176, 0.8);
+  border-radius: 22px;
+  padding: 4px 12px 4px 4px;
+  box-shadow: 0 4px 0 rgba(228, 199, 176, 0.8);
 }
-#praise img { width: 72px; height: 72px; object-fit: contain; flex: none; }
-#praise p { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+#praise[hidden] { display: none !important; }
+#praise img { width: 52px; height: 52px; object-fit: contain; flex: none; }
+#praise p { margin: 0; font-size: 1.05rem; line-height: 1.2; }
 .stars { display: flex; gap: 6px; justify-content: center; margin: 6px 0; }
 .stars img { width: 32px; height: 32px; }
 .stars img.is-dim { filter: grayscale(1); opacity: 0.4; }
@@ -604,10 +621,21 @@ main[data-screen="done"] .end, main[data-screen="reward"] .end, main[data-screen
 @keyframes dance {
   50% { transform: translateY(-8px) rotate(-3deg); }
 }
-html[data-device="ipad"] .buddy { width: min(44vw, 540px); bottom: 26%; }
-html[data-device="ipad"] .pal { width: 190px; height: 270px; bottom: 28%; }
-html[data-device="ipad"] .pal img { width: 190px; height: 230px; }
-html[data-device="ipad"] .home-say { bottom: 62%; font-size: 1.7rem; }
+html[data-device="ipad"] { --head: 118px; --tap: 76px; }
+html[data-device="ipad"] #top { gap: 14px; padding: 16px 22px 14px; }
+html[data-device="ipad"] #brand { font-size: 2rem; }
+html[data-device="ipad"] #top .tap { min-height: 76px; font-size: 1.45rem; padding: 10px 20px; }
+html[data-device="ipad"] #top .tap.icon { width: 88px; min-width: 88px; }
+html[data-device="ipad"] #top .tap.sound { min-width: 160px; }
+html[data-device="ipad"] .buddy { width: min(56vw, 680px); bottom: 30%; }
+html[data-device="ipad"] .pal { width: 240px; height: 360px; bottom: 32%; }
+html[data-device="ipad"] .pal img { width: 240px; height: 300px; }
+html[data-device="ipad"] .home-say { bottom: 76%; font-size: 2rem; }
+html[data-device="ipad"] .home-dock { left: 18px; right: 18px; bottom: 18px; gap: 14px; }
+html[data-device="ipad"] .play-go, html[data-device="ipad"] .pic-tile { min-height: 128px; font-size: 2rem; border-radius: 28px; }
+html[data-device="ipad"] .play-go img { width: 52px; height: 52px; }
+html[data-device="ipad"] .pic-tile img { width: 96px; height: 96px; }
+html[data-device="ipad"] .pic-tile span { font-size: 1.45rem; }
 html[data-device="ipad"] .pal-0 { left: 3%; }
 html[data-device="ipad"] .pal-1 { left: 16%; }
 html[data-device="ipad"] .pal-2 { right: 16%; }
@@ -616,7 +644,7 @@ html[data-device="ipad"] .world { height: min(58vh, 760px); }
 html[data-device="ipad"] .play-door { min-height: 140px; }
 html[data-device="ipad"] .play-door img { width: 72px; height: 72px; }
 html[data-device="ipad"] .play-door b { font-size: 1.2rem; }
-html[data-device="ipad"] .ctile { min-height: 240px; width: auto; height: auto; }
+html[data-device="ipad"] .ctile { aspect-ratio: 1 / 2.05; min-height: 0; width: auto; height: auto; max-height: 46vh; }
 html[data-device="ipad"] .choice img { max-height: 200px; }
 @media (orientation: landscape) and (max-height: 520px) {
   .buddy { width: 120px; bottom: 8px; }

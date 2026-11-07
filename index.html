@@ -13,8 +13,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-512-maskable.png">
 <link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/pic/scene_01.webp" as="image" fetchpriority="high">
-<link rel="preload" href="assets/char/monggeul_wave.webp" as="image" fetchpriority="high">
+<link rel="preload" as="image" fetchpriority="high" imagesrcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w" imagesizes="100vw">
 <link rel="stylesheet" href="v5/css/app.css">
 </head>
 <body>
@@ -28,9 +27,9 @@
   <main id="main" data-screen="home">
     <section class="home">
       <div class="scene">
-        <img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" src="assets/pic/scene_01.webp">
+        <img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w">
         <div class="cast" id="friend-row"></div>
-        <img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp">
+        <img class="buddy" alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w">
         <p id="bubble" class="home-say">오늘도 같이 놀자</p>
         <p class="meta" id="home-meta">가족 소리 · 스티커 0/120</p>
         <div class="home-dock">
@@ -49,6 +48,7 @@
 <div id="parent" hidden></div>
 <script defer src="audio/lines.js"></script>
 <script defer src="audio/have.js"></script>
+<script defer src="v5/js/mong-webp.js"></script>
 <script defer src="v5/js/content.js"></script>
 <script defer src="v5/js/stickers.js"></script>
 <script defer src="v5/js/engine.js"></script>
