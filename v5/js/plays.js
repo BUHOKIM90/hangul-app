@@ -570,7 +570,6 @@
     ctx.playDone = true;
     ctx.soloStep = false;
     ctx.grades = ['guide'];
-    if (!ctx.hinted && !ctx.revealed && !ctx.misses) payCloth();
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function onTile(el) {
