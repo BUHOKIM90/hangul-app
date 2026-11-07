@@ -67,7 +67,7 @@
   function homeHTML() {
     const S = X().S;
     const lesson = currentLesson();
-    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="scene-top"><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><p id="bubble" class="home-say">오늘도 같이 놀자</p></div><div class="cast" id="friend-row"></div><div class="buddy" id="buddy">' + WAVE + '</div><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><img class="sky-sun" alt="" src="assets/icons/sun.svg"><img class="sky-cloud sky-cloud-a" alt="" src="assets/pic/cloud_smile.webp"><img class="sky-cloud sky-cloud-b" alt="" src="assets/pic/cloud_surprise.webp"><img class="sky-cloud sky-cloud-c" alt="" src="assets/pic/cloud_grump.webp"><div class="scene-top"><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="today-place" id="today-place">' + lesson.place + '</p><div class="today-art" id="today-art"></div></div><div class="cast" id="friend-row"></div><div class="buddy" id="buddy">' + WAVE + '</div><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
   }
   function showHome() {
     X().dropQueue();
@@ -542,9 +542,27 @@
     el.classList.add('is-dressed');
     el.innerHTML = '<span class="pal-doll">' + X().layerHTML('monggeul', { skip: ['bg'] }) + '</span>';
   }
+  function fillToday() {
+    const art = document.getElementById('today-art');
+    const place = document.getElementById('today-place');
+    if (!art) return;
+    const lesson = currentLesson();
+    if (place) place.textContent = lesson.place || '';
+    const bits = [];
+    const word = (lesson.words && lesson.words[0]) || '';
+    const row = word && C().WORDS[word];
+    if (row) bits.push('<figure><img alt="" src="' + assetSrc('assets/pic/' + word + '.webp') + '"><figcaption>' + row[0] + '</figcaption></figure>');
+    (lesson.focus || []).slice(0, 2).forEach(ch => {
+      const st = window.V5Stick && V5Stick.matchAnswer('j:' + ch);
+      if (st) bits.push('<figure><img alt="" src="' + assetSrc(st.file) + '"><figcaption>' + ch + '</figcaption></figure>');
+      else bits.push('<figure><b class="today-letter">' + ch + '</b><figcaption>' + ch + '</figcaption></figure>');
+    });
+    art.innerHTML = bits.join('');
+  }
   function fillHomeExtras() {
     const meta = document.getElementById('home-meta');
     if (meta) meta.textContent = currentLesson().kid + ' · 스티커 ' + X().S.stickers.length + '/' + V5Stick.list.length;
+    fillToday();
     paintBuddy();
     const row = document.getElementById('friend-row');
     if (!row || !X().dressData()) return;
