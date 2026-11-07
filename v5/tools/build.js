@@ -92,6 +92,33 @@ addTree('assets/stickers');
 Object.keys(V5C.WORDS).forEach(id => add('assets/pic/' + id + '.webp'));
 add('assets/pic/chest_closed.webp');
 add('assets/pic/chest_open.webp');
+[
+  'assets/pic/scene_01.webp',
+  'assets/pic/map_w1.webp',
+  'assets/pic/map/map_bg_day.webp',
+  'assets/pic/map/stone_today.webp',
+  'assets/pic/map/stone_done.webp',
+  'assets/pic/map/stone_soon.webp',
+  'assets/pic/map/mong_walk_1.webp',
+  'assets/pic/map/lm_pizza.webp',
+  'assets/pic/map/lm_train.webp',
+  'assets/pic/map/lm_garden.webp',
+  'assets/pic/map/lm_pond.webp',
+  'assets/pic/playicon/pi_chant.webp',
+  'assets/pic/playicon/pi_sort.webp',
+  'assets/pic/playicon/pi_trace.webp',
+  'assets/icons/play.svg',
+  'assets/icons/speaker.svg',
+  'assets/icons/flower.svg',
+  'assets/icons/fruit.svg',
+  'assets/icons/sun.svg',
+  'assets/icons/sprout.svg',
+  'assets/icons/play/ear.svg',
+  'assets/icons/play/seek.svg',
+  'assets/icons/play/block.svg',
+  'assets/icons/play/cards.svg',
+  'assets/icons/play/treasure.svg'
+].forEach(add);
 const keys = V5C.audioKeys().concat(['ui_sticker', 'ui_hello', 'ui_end', 'ui_book']);
 const missingAudio = [];
 keys.forEach(k => {

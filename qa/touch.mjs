@@ -53,13 +53,22 @@ async function tap(page, locator, label) {
   }
 }
 
-async function finishRound(page) {
+async function finishRound(page, correctShot) {
   const type = await page.getAttribute('#main', 'data-play');
   if (type === 'chant') {
     for (let i = 0; i < 6; i++) {
       const lit = page.locator('.ctile.is-lit');
       if (await lit.count() === 0) break;
+      const audio = await lit.getAttribute('data-audio');
+      const label = await lit.getAttribute('aria-label');
+      const expect = 'sy_' + label.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+      if (audio !== expect) throw new Error('chant clip ' + audio + ' does not match ' + label);
       await tap(page, lit, 'chant-' + i);
+      if (correctShot && i === 0) {
+        await page.waitForTimeout(280);
+        await shot(page, correctShot);
+        correctShot = '';
+      }
     }
   } else if (type === 'blocks') {
     await tap(page, page.locator('[data-kind="cho"][data-ok="1"]'), 'cho');
@@ -115,11 +124,11 @@ async function runDevice(browser, spec) {
   for (const play of PLAYS) {
     await tap(page, page.locator('[data-play="' + play + '"]'), 'practice-' + play);
     if (shoot) await shot(page, spec.name + '-play-' + play);
-    await finishRound(page);
+    await finishRound(page, shoot && play === 'chant' ? spec.name + '-correct' : '');
   }
   await tap(page, page.locator('[data-tap="start-lesson"]').first(), 'start-lesson');
   for (let i = 0; i < 8; i++) {
-    await finishRound(page);
+    await finishRound(page, '');
     const screen = await page.getAttribute('#main', 'data-screen');
     if (screen === 'done') break;
   }
@@ -127,6 +136,9 @@ async function runDevice(browser, spec) {
   if (done !== 'done') throw new Error(spec.name + ' lesson ended on ' + done);
   const sticker = await page.getAttribute('#main', 'data-sticker');
   if (!sticker) throw new Error(spec.name + ' no lesson sticker');
+  await page.waitForTimeout(1400);
+  const placed = await page.locator('.peel-slot img').count();
+  if (!placed) throw new Error(spec.name + ' sticker did not land in the slot');
   if (shoot) await shot(page, spec.name + '-done');
   await tap(page, page.locator('[data-tap="dress"]'), 'dress');
   if (shoot) await shot(page, spec.name + '-dress');

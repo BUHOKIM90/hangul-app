@@ -40,14 +40,14 @@
     'ㅣ': [[[50, 10], [50, 90]]]
   };
   const PLAYS = [
-    { id: 'chant', kid: '노래 톡톡', why: '음절 소리를 박자에 맞춰 하나씩 짚어요.' },
-    { id: 'listen', kid: '듣고 고르기', why: '낱말 소리를 듣고 그림과 이어요. 글자보다 소리가 먼저예요.' },
-    { id: 'sparkle', kid: '반짝이 찾기', why: '들은 소리와 같은 글자를 눈으로 찾아요.' },
-    { id: 'blocks', kid: '소리 블록', why: '자음과 모음을 붙여 음절 하나를 만들어요.' },
-    { id: 'match', kid: '그림 낱말', why: '그림을 보고 알맞은 낱말 글자를 고르어요.' },
-    { id: 'memory', kid: '짝 카드', why: '그림과 낱말을 기억해서 짝을 찾아요.' },
-    { id: 'trace', kid: '따라 쓰기', why: '점을 따라 획 순서로 글자 모양을 익혀요.' },
-    { id: 'treasure', kid: '보물 복습', why: '앞에서 만난 소리를 다시 떠올려요.' }
+    { id: 'chant', kid: '노래 톡톡', icon: 'assets/pic/playicon/pi_chant.webp', why: '음절 소리를 박자에 맞춰 하나씩 짚어요.' },
+    { id: 'listen', kid: '듣고 고르기', icon: 'assets/icons/play/ear.svg', why: '낱말 소리를 듣고 그림과 이어요. 글자보다 소리가 먼저예요.' },
+    { id: 'sparkle', kid: '반짝이 찾기', icon: 'assets/icons/play/seek.svg', why: '들은 소리와 같은 글자를 눈으로 찾아요.' },
+    { id: 'blocks', kid: '소리 블록', icon: 'assets/icons/play/block.svg', why: '자음과 모음을 붙여 음절 하나를 만들어요.' },
+    { id: 'match', kid: '그림 낱말', icon: 'assets/icons/play/cards.svg', why: '그림을 보고 알맞은 낱말 글자를 고르어요.' },
+    { id: 'memory', kid: '짝 카드', icon: 'assets/pic/playicon/pi_sort.webp', why: '그림과 낱말을 기억해서 짝을 찾아요.' },
+    { id: 'trace', kid: '따라 쓰기', icon: 'assets/pic/playicon/pi_trace.webp', why: '점을 따라 획 순서로 글자 모양을 익혀요.' },
+    { id: 'treasure', kid: '보물 복습', icon: 'assets/icons/play/treasure.svg', why: '앞에서 만난 소리를 다시 떠올려요.' }
   ];
   const LESSONS = [
     { id: 1, title: '우리 가족', kid: '가족 소리', place: '몽글이 집', goal: '소리부터. 엄마·아빠·아기 소리를 그림과 잇고, 동그라미 ㅇ을 만나요.', words: ['eomma', 'appa', 'agi', 'ryeowon'], jamo: ['ㅇ', 'ㅏ', 'ㅣ'], chant: ['아', '이', '아'], blocks: { c: 'ㅇ', v: 'ㅏ', say: '아', word: 'agi' }, trace: 'ㅇ' },
@@ -59,20 +59,40 @@
     { id: 7, title: 'ㅅ ㅈ ㅎ ㄹ', kid: '사 자 하', place: '동물원', goal: 'ㅅ·ㅈ·ㅎ·ㄹ 소리. 그림 낱말을 소리와 함께 읽기 시작해요.', words: ['lion', 'so', 'jadu', 'hama', 'radio'], jamo: ['ㅅ', 'ㅈ', 'ㅎ', 'ㄹ', 'ㅏ'], chant: ['사', '자', '하'], blocks: { c: 'ㅎ', v: 'ㅏ', say: '하', word: 'hama' }, trace: 'ㅅ' },
     { id: 8, title: '붙여 읽기', kid: '낱말 읽기', place: '도서관', goal: '배운 소리로 받침 없는 낱말을 그림과 함께 읽어요. 보물에서 다시 만나요.', words: ['nabi', 'ori', 'moja', 'hama', 'gicha', 'bada', 'agi', 'eomma'], jamo: ['ㄱ', 'ㄴ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅎ', 'ㅏ', 'ㅗ'], chant: ['나', '비', '오'], blocks: { c: 'ㄴ', v: 'ㅏ', say: '나', word: 'nabi' }, trace: '가' }
   ];
+  /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired. */
   const PRAISE = [
-    ['잘했어!', 'ui_good1'], ['멋져!', 'ui_good2'], ['최고야!', 'ui_good3'], ['찾았다!', 'ui_found'],
-    ['스티커 받았어!', 'ui_sticker'], ['한 단계 올라갔어!', 'ui_levelup'], ['반짝반짝이야!', 'ui_jarfull'],
-    ['같이 해냈어!', 'ui_together'], ['소리가 딱이야!', 'ui_good1'], ['글자 친구가 웃어!', 'ui_good2'],
-    ['손이 용감해!', 'ui_good3'], ['귀가 열렸어!', 'ui_good1'], ['빛이 났어!', 'ui_good2'],
-    ['몽글이가 박수 쳐!', 'ui_good3'], ['하나 더 맞았어!', 'ui_found'], ['포근한 정답!', 'ui_good1'],
-    ['또록또록 좋아!', 'ui_good2'], ['그렇게 하는 거야!', 'ui_good3'], ['소리가 붙었어!', 'ui_good1'],
-    ['그림이랑 똑같아!', 'ui_good2'], ['짝을 찾았어!', 'ui_good3'], ['점을 잘 따라갔어!', 'ui_good1'],
-    ['보물이 반짝여!', 'ui_found'], ['려원이가 해냈어!', 'ui_good3'], ['살금살금 맞았어!', 'ui_good1'],
-    ['별이 좋아해!', 'ui_good2'], ['글자가 살아났어!', 'ui_good3'], ['한 번 더 빛나!', 'ui_good1'],
-    ['친구가 안아 줘!', 'ui_good2'], ['오늘 귀가 최고!', 'ui_good3'], ['짝짝 잘 들었어!', 'ui_good1'],
-    ['블록이 찰칵!', 'ui_good2'], ['노래가 신나!', 'ui_good3'], ['카드가 짝꿍!', 'ui_good1'],
-    ['천천히 해서 멋져!', 'ui_good2'], ['또 맞았어!', 'ui_found'], ['마음까지 따뜻해!', 'ui_good1'],
-    ['오늘 놀이 빛났어!', 'ui_levelup'], ['정말 잘 찾았어!', 'ui_good2'], ['최고로 포근해!', 'ui_good3']
+    ['잘했어!', 'ui_good1'],
+    ['멋져!', 'ui_good2'],
+    ['최고야!', 'ui_good3'],
+    ['찾았다!', 'ui_found'],
+    ['스티커 받았어!', 'ui_sticker'],
+    ['우와, 한 단계 올라갔어!', 'ui_levelup'],
+    ['와, 별 병이 꽉 찼어!', 'ui_jarfull'],
+    ['스티커를 모았어!', 'ui_book'],
+    ['끝까지 들었네', 'ui4_proc1'],
+    ['순서대로 썼네', 'ui4_proc2'],
+    ['끝까지 들었네!', 'ui4_proc5'],
+    ['두 개를 붙여서 글자를 만들었네', 'ui4_proc6'],
+    ['다시 찾아냈어. 포기하지 않았네.', 'ui4_proc7'],
+    ['천천히 끝까지 해냈네', 'ui4_proc11'],
+    ['글자를 하나하나 찾아냈네', 'ui4_proc12'],
+    ['이야기를 끝까지 들었네.', 'ui4_proc13'],
+    ['들은 글자를 쏙 잡았네', 'ui4_proc15'],
+    ['어려웠는데 다시 해봤네', 'ui4_proc16'],
+    ['그림을 보고 잘 생각했네.', 'ui4_proc17'],
+    ['한 글자씩 또박또박 읽었네', 'ui4_proc18']
+  ];
+  const SYL_PIC = {
+    '아': 'agi', '이': 'ima', '오': 'ori', '우': 'ubi', '어': 'eobu',
+    '가': 'gicha', '나': 'nabi', '기': 'gicha', '다': 'dari', '마': 'moja',
+    '바': 'banana', '사': 'lion', '자': 'jadu', '하': 'hama', '모': 'moja', '비': 'nabi'
+  };
+  const PALS = [
+    ['assets/char/monggeul_cheer.webp', '몽글이'],
+    ['assets/friends/bori.webp', '보리'],
+    ['assets/friends/tori.webp', '토리'],
+    ['assets/friends/momo.webp', '모모'],
+    ['assets/friends/gureum.webp', '구름']
   ];
   const FACES = [
     'assets/char/monggeul_laugh.webp', 'assets/char/monggeul_clap.webp', 'assets/char/monggeul_cheer.webp',
@@ -90,6 +110,18 @@
   function wordKey(id) { return 'w_' + id; }
   function ko(id) { return (WORDS[id] || [id])[0]; }
   function pic(id) { return 'assets/pic/' + id + '.webp'; }
+  function wordIdByKo(name) {
+    const ids = Object.keys(WORDS);
+    for (let i = 0; i < ids.length; i++) if (WORDS[ids[i]][0] === name) return ids[i];
+    return '';
+  }
+  function sylPic(ch) { return SYL_PIC[ch] ? pic(SYL_PIC[ch]) : ''; }
+  function sylWord(ch) { return SYL_PIC[ch] ? ko(SYL_PIC[ch]) : ch; }
+  function jamoPic(g) {
+    const name = JAMO[g] && JAMO[g].word;
+    const id = name && wordIdByKo(name);
+    return id ? pic(id) : '';
+  }
   function compose(c, v) {
     return String.fromCharCode(0xAC00 + CHO.indexOf(c) * 588 + JUNG.indexOf(v) * 28);
   }
@@ -148,8 +180,8 @@
   function choiceN(diff) { return diff === 'hard' ? 4 : diff === 'easy' ? 2 : 3; }
 
   root.V5C = {
-    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI,
-    hex, sylKey, jamoKey, wordKey, ko, pic, compose, split, isSyl, sampleStroke, glyphPlan,
+    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS,
+    hex, sylKey, jamoKey, wordKey, ko, pic, sylPic, sylWord, jamoPic, compose, split, isSyl, sampleStroke, glyphPlan,
     lesson, wordsThrough, audioKeys, choiceN
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -231,25 +231,45 @@
     const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     fx.innerHTML = '';
     if (reduce) return;
-    const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FFF9EB'];
-    for (let i = 0; i < 16; i++) {
+    const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FF8FB8', '#FFF9EB'];
+    for (let i = 0; i < 36; i++) {
       const s = document.createElement('i');
-      s.style.left = (8 + Math.random() * 84) + '%';
+      if (i % 3 === 0) s.className = 'star';
+      s.style.left = (4 + Math.random() * 92) + '%';
       s.style.background = colors[i % colors.length];
-      s.style.animationDelay = (Math.random() * 80) + 'ms';
+      s.style.animationDelay = (Math.random() * 180) + 'ms';
+      s.style.animationDuration = (1.4 + Math.random() * 0.7) + 's';
       fx.appendChild(s);
     }
-    setTimeout(() => { if (fx) fx.innerHTML = ''; }, 900);
+    setTimeout(() => { if (fx) fx.innerHTML = ''; }, 2300);
   }
+  let lastPraise = '';
   function praise() {
-    const list = C().PRAISE;
-    const p = list[praiseN % list.length];
+    const all = C().PRAISE.filter(p => window.HAVE_AUDIO && HAVE_AUDIO.has(p[1]));
+    const list = all.length ? all : C().PRAISE;
+    let pool = list.filter(p => p[1] !== lastPraise);
+    if (!pool.length) pool = list;
+    const p = pool[Math.floor(Math.random() * pool.length)];
+    lastPraise = p[1];
     praiseN += 1;
     const m = document.getElementById('mascot');
     if (m) {
-      m.src = C().FACES[praiseN % C().FACES.length];
+      const face = C().FACES[praiseN % C().FACES.length];
+      m.src = praiseN % 2 ? face : 'assets/char/monggeul_jump.webp';
       m.classList.add('pop');
-      setTimeout(() => m.classList.remove('pop'), 280);
+      setTimeout(() => m.classList.remove('pop'), 360);
+    }
+    const pals = C().PALS || [];
+    const pal = pals[Math.floor(Math.random() * pals.length)] || ['assets/char/monggeul_cheer.webp', '몽글이'];
+    const pop = document.getElementById('praise');
+    if (pop) {
+      pop.hidden = false;
+      pop.innerHTML = '<img alt="" width="512" height="512" src="' + pal[0] + '"><p>' + p[0] + '</p>';
+      pop.classList.remove('is-in');
+      void pop.offsetWidth;
+      pop.classList.add('is-in');
+      clearTimeout(praise.timer);
+      praise.timer = setTimeout(() => { pop.hidden = true; }, 2200);
     }
     confetti();
     say(p[1], p[0]);

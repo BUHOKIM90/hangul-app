@@ -13,6 +13,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-512-maskable.png">
 <link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/pic/scene_01.webp" as="image" fetchpriority="high">
 <link rel="preload" href="assets/char/monggeul_wave.webp" as="image" fetchpriority="high">
 <link rel="stylesheet" href="v5/css/app.css">
 </head>
@@ -26,25 +27,24 @@
   </header>
   <main id="main" data-screen="home">
     <section class="home">
-      <div class="hero">
+      <div class="scene">
+        <img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" src="assets/pic/scene_01.webp">
+        <div class="cast" id="friend-row"></div>
         <img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp">
-        <div>
-          <h1>안녕!</h1>
-          <p id="bubble" class="bubble">오늘도 같이 놀자</p>
-          <p class="meta" id="home-meta">가족 소리 · 스티커 0/120</p>
+        <p id="bubble" class="home-say">오늘도 같이 놀자</p>
+        <p class="meta" id="home-meta">가족 소리 · 스티커 0/120</p>
+        <div class="home-dock">
+          <button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button>
+          <button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button>
+          <button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button>
         </div>
       </div>
-      <div class="home-actions">
-        <button type="button" class="tap xl" data-tap="go-map">마을로 가</button>
-        <button type="button" class="tap" data-tap="stickers">스티커 책</button>
-        <button type="button" class="tap" data-tap="dress">옷 입히기</button>
-      </div>
-      <div class="friend-row" id="friend-row"></div>
     </section>
   </main>
 </div>
 <p id="live" class="sr-only" aria-live="polite"></p>
 <div id="fx" aria-hidden="true"></div>
+<div id="praise" hidden></div>
 <div id="gate" hidden></div>
 <div id="parent" hidden></div>
 <script defer src="audio/lines.js"></script>

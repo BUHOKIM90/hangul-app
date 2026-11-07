@@ -27,6 +27,8 @@
     const home = screen === 'home';
     $('#homeBtn').hidden = home;
     X().syncSound();
+    const pop = document.getElementById('praise');
+    if (pop) pop.hidden = true;
     document.dispatchEvent(new CustomEvent('v5-screen'));
     const waiting = window.__swWaiting;
     if (screen === 'home' && waiting) waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -51,19 +53,21 @@
     return '<div class="peel" data-sticker="' + st.id + '"><div class="peel-sheet"></div><div class="peel-slot"></div><div class="peel-bit"><img alt="" width="256" height="256" src="' + assetSrc(st.file) + '"><i class="curl"></i></div></div><p class="st-name">' + st.name + '</p><p class="st-theme">' + st.themeKo + '</p>';
   }
 
+  function homeHTML() {
+    const S = X().S;
+    const lesson = currentLesson();
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" src="assets/pic/scene_01.webp"><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp"><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+  }
   function showHome() {
     X().dropQueue();
     run = null;
-    const S = X().S;
-    const lesson = currentLesson();
-    const friends = (X().dressData().characters || []).filter(c => c.id !== 'monggeul');
     main().dataset.screen = 'home';
-    main().innerHTML = '<section class="home"><div class="hero"><img class="buddy" alt="" width="512" height="512" fetchpriority="high" src="assets/char/monggeul_wave.webp"><div><h1>안녕!</h1><p id="bubble" class="bubble">오늘도 같이 놀자</p><p class="meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p></div></div><div class="home-actions"><button type="button" class="tap xl" data-tap="go-map">마을로 가</button><button type="button" class="tap" data-tap="stickers">스티커 책</button><button type="button" class="tap" data-tap="dress">옷 입히기</button></div><div class="friend-row">' + friends.map(faceBtn).join('') + '</div></section>';
+    main().innerHTML = homeHTML();
+    fillHomeExtras();
     chrome('home');
   }
-  function faceBtn(ch) {
-    const style = faceCrop(ch);
-    return '<button type="button" class="tap face" data-tap="dress" data-who="' + ch.id + '" aria-label="' + ch.name + '" style="' + style + '"><span>' + ch.name + '</span></button>';
+  function faceBtn(ch, i) {
+    return '<button type="button" class="tap pal pal-' + i + '" data-tap="dress" data-who="' + ch.id + '" aria-label="' + ch.name + '"><img alt="" width="512" height="512" src="' + ch.body + '"><span>' + ch.name + '</span></button>';
   }
   function faceCrop(ch) {
     const side = 170;
@@ -76,27 +80,36 @@
   function showMap() {
     X().dropQueue();
     const lesson = currentLesson();
-    const doneN = C().LESSONS.filter(l => X().S.done[l.id]).length;
+    const nodes = [[18, 62], [40, 54], [66, 60], [78, 44], [54, 36], [30, 32], [20, 18], [48, 10]];
+    const pts = nodes.map(p => p[0] + ',' + p[1]).join(' ');
+    const stones = C().LESSONS.map((l, i) => {
+      const did = !!X().S.done[l.id];
+      const today = l.id === lesson.id;
+      const art = did ? 'stone_done' : today ? 'stone_today' : 'stone_soon';
+      const xy = nodes[i] || nodes[nodes.length - 1];
+      return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="left:' + xy[0] + '%;top:' + xy[1] + '%" aria-label="' + l.title + '"><img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b></button>';
+    }).join('');
+    const here = nodes[lesson.id - 1] || nodes[0];
     main().dataset.screen = 'map';
-    main().innerHTML = '<section class="map"><h1>놀이 마을</h1><article class="today"><p class="kicker">' + lesson.place + '</p><h2>' + lesson.title + '</h2><p>' + lesson.kid + ' · 약 10분</p><button type="button" class="tap xl" data-tap="start-lesson" data-id="' + lesson.id + '">오늘 놀이 시작</button></article><h2 class="sec">놀이 여덟 가지</h2><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><b>' + p.kid + '</b></button>').join('') + '</div><h2 class="sec">길 ' + doneN + '/' + C().LESSONS.length + '</h2><div class="path">' + C().LESSONS.map(l => {
-      const on = l.id === lesson.id ? ' is-today' : '';
-      const did = X().S.done[l.id] ? ' is-done' : '';
-      return '<button type="button" class="tap stone' + on + did + '" data-tap="start-lesson" data-id="' + l.id + '" aria-label="' + l.title + '"><b>' + l.id + '</b><span>' + l.kid + '</span></button>';
-    }).join('') + '</div></section>';
+    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:calc(' + here[1] + '% - 18px)"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
     chrome('map');
   }
   function showPlay(spec) {
     X().dropQueue();
     const meta = playMeta(spec.type);
-    const step = spec.mode === 'lesson' && run ? '<p class="step">' + (run.i + 1) + ' / ' + run.steps.length + '</p>' : '';
+    const step = spec.mode === 'lesson' && run
+      ? '<div class="meter step-meter">' + run.steps.map((_, i) => '<i class="' + (i < run.i ? 'is-on' : i === run.i ? 'is-now' : '') + '"></i>').join('') + '</div>'
+      : '';
     main().dataset.screen = 'play';
     main().dataset.play = spec.type;
-    main().innerHTML = '<section class="play"><div class="play-head"><img id="mascot" class="mascot" alt="" width="512" height="512" src="assets/char/monggeul_think.webp"><div><p class="kicker">' + meta.kid + '</p>' + step + '</div><button type="button" class="tap icon" id="replayBtn" data-tap="replay" data-n="0" aria-label="다시 듣기">다시</button></div><p id="bubble" class="bubble">잘 들어 봐</p><div id="stage"></div></section>';
+    main().innerHTML = '<section class="play"><div class="play-head"><img id="mascot" class="mascot" alt="" width="512" height="512" src="assets/char/monggeul_think.webp"><div><p class="kicker">' + meta.kid + '</p>' + step + '</div><button type="button" class="tap icon" id="replayBtn" data-tap="replay" data-n="0" aria-label="다시 듣기"><img alt="" src="assets/icons/speaker.svg"></button></div><p id="bubble" class="bubble">잘 들어 봐</p><div id="stage"></div></section>';
     chrome('play');
     V5Play.mount($('#stage'), spec, afterStep);
   }
-  function afterStep() {
+  function afterStep(helped) {
     if (!run) return showMap();
+    run.stars = run.stars || [];
+    run.stars.push(!helped);
     const st = awardSticker();
     const item = X().unlockNext();
     if (run.mode === 'practice') return showPeel(st, item, 'map');
@@ -114,8 +127,31 @@
     main().dataset.sticker = st ? st.id : '';
     main().innerHTML = '<section class="end"><h1>스티커!</h1>' + peelStage(st) + (item ? '<p class="meta">새 옷 · ' + item.label + '</p>' : '') + '<button type="button" class="tap xl" data-tap="peel-next">' + label + '</button></section>';
     chrome('reward');
+    settlePeel();
     X().say('ui_sticker', '스티커를 받았어!');
     X().confetti();
+  }
+  function settlePeel() {
+    const root = main();
+    const go = () => {
+      const bit = root.querySelector('.peel-bit');
+      const slot = root.querySelector('.peel-slot');
+      if (!bit || !slot || slot.querySelector('img')) return;
+      const img = bit.querySelector('img');
+      if (!img) return;
+      slot.appendChild(img);
+      slot.classList.add('is-filled');
+      bit.classList.add('is-gone');
+      const sheet = root.querySelector('.peel-sheet');
+      if (sheet) sheet.classList.add('is-used');
+    };
+    const bit = root.querySelector('.peel-bit');
+    if (bit) bit.addEventListener('animationend', go);
+    setTimeout(go, 980);
+  }
+  function starsHTML(stars) {
+    const row = stars && stars.length ? stars : [true, true, true, true, true, true, true, true];
+    return '<div class="stars">' + row.map(on => '<img class="' + (on ? 'is-on' : 'is-dim') + '" alt="" src="assets/icons/sun.svg">').join('') + '</div>';
   }
   function afterPeel() {
     if (peelGo === 'step' && run) {
@@ -129,13 +165,15 @@
     showMap();
   }
   function showDone(st, item) {
+    const stars = run && run.stars ? run.stars.slice() : [];
     X().dropQueue();
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end"><img id="mascot" class="mascot big" alt="" width="512" height="512" src="assets/char/monggeul_cheer.webp"><h1>오늘 놀이 끝!</h1><p id="bubble" class="bubble">내일 또 만나자</p>' + peelStage(st) + (item ? '<p class="meta">새 옷 · ' + item.label + '</p>' : '') + '<div class="home-actions"><button type="button" class="tap xl" data-tap="dress">옷 입히기</button><button type="button" class="tap" data-tap="stickers">스티커 책</button><button type="button" class="tap" data-tap="back-map">마을로</button></div></section>';
+    main().innerHTML = '<section class="end festival"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p>' + peelStage(st) + (item ? '<p class="meta">새 옷 · ' + item.label + '</p>' : '') + '<div class="home-dock end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></section>';
     chrome('done');
-    X().say(C().UI.end, '오늘은 여기까지! 내일 또 만나자');
+    settlePeel();
+    X().say(C().UI.end, '오늘은 여기까지! 내일 또 만나요.');
     X().confetti();
   }
   function showStickers() {
@@ -360,7 +398,7 @@
     const row = document.getElementById('friend-row');
     if (!row || !X().dressData()) return;
     const friends = (X().dressData().characters || []).filter(c => c.id !== 'monggeul');
-    row.innerHTML = friends.map(faceBtn).join('');
+    row.innerHTML = friends.map((ch, i) => faceBtn(ch, i)).join('');
   }
   function boot() {
     applyForm();
