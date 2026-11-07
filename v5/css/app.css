@@ -427,15 +427,16 @@ body:has(main[data-screen="home"]) #top {
   main[data-screen="home"] .scene-bg {
     top: auto;
     right: auto;
-    bottom: -28px;
-    left: 0;
-    width: 100%;
-    height: 54%;
+    bottom: 118px;
+    left: -8px;
+    width: 560px;
+    height: 420px;
     max-height: none;
-    transform: scale(1.28);
-    transform-origin: center 80%;
+    transform: none;
     object-fit: cover;
-    object-position: 42% 72%;
+    object-position: left center;
+    clip-path: inset(30% 64% 12% 0);
+    z-index: 0;
   }
   .sky-sun, .sky-cloud {
     display: block;
@@ -500,11 +501,13 @@ body:has(main[data-screen="home"]) #top {
     max-width: 68%;
     justify-self: center;
     align-self: end;
+    margin-bottom: 96px;
     z-index: 2;
   }
   .pal {
     z-index: 4;
     align-self: end;
+    margin-bottom: 96px;
     position: relative;
     overflow: visible;
     min-height: 150px;
