@@ -139,7 +139,10 @@ async function runDevice(browser, spec) {
   await page.waitForTimeout(1400);
   const placed = await page.locator('.peel-slot img').count();
   if (!placed) throw new Error(spec.name + ' sticker did not land in the slot');
-  if (shoot) await shot(page, spec.name + '-done');
+  if (shoot) {
+    await shot(page, spec.name + '-done');
+    await shot(page, spec.name + '-play-done');
+  }
   await tap(page, page.locator('[data-tap="dress"]'), 'dress');
   await tap(page, page.locator('[data-tap="who"][data-who="monggeul"]'), 'who-monggeul');
   const body = await page.locator('.doll img[data-slot="body"]').getAttribute('src');

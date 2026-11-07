@@ -272,15 +272,10 @@
     }
     const pals = C().PALS || [];
     const pal = pals[Math.floor(Math.random() * pals.length)] || ['assets/char/monggeul_cheer.webp', '몽글이'];
-    const pop = document.getElementById('praise');
-    if (pop) {
-      pop.hidden = false;
-      pop.innerHTML = '<img alt="" width="512" height="512" src="' + pal[0] + '"><p>' + p[0] + '</p>';
-      pop.classList.remove('is-in');
-      void pop.offsetWidth;
-      pop.classList.add('is-in');
-      clearTimeout(praise.timer);
-      praise.timer = setTimeout(() => { pop.hidden = true; }, 2200);
+    const row = document.getElementById('bubble');
+    if (row) {
+      row.classList.add('praise-line');
+      row.innerHTML = '<img alt="" width="512" height="512" src="' + pal[0] + '"><span>' + p[0] + '</span>';
     }
     confetti();
     say(p[1], p[0], { keepBubble: true });

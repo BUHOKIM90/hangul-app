@@ -70,8 +70,8 @@
     return '<button type="button" class="tap pal pal-' + i + '" data-tap="dress" data-who="' + ch.id + '" aria-label="' + ch.name + '"><img alt="" width="512" height="512" src="' + ch.body + '"><span>' + ch.name + '</span></button>';
   }
   function faceCrop(ch) {
-    const side = 170;
-    const scale = 72 / side;
+    const side = 250;
+    const scale = 84 / side;
     const x = ch.head[0], y = ch.head[1];
     const left = -((x - side / 2) * scale);
     const top = -((y - side / 2 - 10) * scale);
@@ -195,14 +195,16 @@
   function thumbStyle(it) {
     if (it.paint && it.paint.background) return 'background:' + it.paint.background;
     if (!it.file) return '';
-    const b = it.box;
     const src = X().itemFile(it);
-    if (!b || b[2] > 240 || b[3] > 240) return 'background-image:url(' + src + ');background-size:cover;background-position:center';
-    const side = Math.max(b[2], b[3], 36);
-    const scale = 64 / side;
-    const left = -((b[0] - (side - b[2]) / 2) * scale);
-    const top = -((b[1] - (side - b[3]) / 2) * scale);
-    return 'background-image:url(' + src + ');background-repeat:no-repeat;background-size:' + (512 * scale).toFixed(1) + 'px ' + (512 * scale).toFixed(1) + 'px;background-position:' + left.toFixed(1) + 'px ' + top.toFixed(1) + 'px';
+    const b = it.box;
+    const tile = 88;
+    const target = tile * 0.8;
+    if (!b) return 'background-image:url(' + src + ');background-repeat:no-repeat;background-position:center;background-size:80%';
+    const scale = target / Math.max(b[2], b[3], 1);
+    const left = (tile / 2 - (b[0] + b[2] / 2) * scale).toFixed(1);
+    const top = (tile / 2 - (b[1] + b[3] / 2) * scale).toFixed(1);
+    const size = (512 * scale).toFixed(1);
+    return 'background-image:url(' + src + ');background-repeat:no-repeat;background-size:' + size + 'px ' + size + 'px;background-position:' + left + 'px ' + top + 'px';
   }
   function showDress() {
     X().dropQueue();
@@ -216,7 +218,7 @@
     const labels = data.slot_label || {};
     main().dataset.screen = 'dress';
     main().dataset.who = ch.id;
-    main().innerHTML = '<section class="dress"><h1>옷 입히기</h1><div class="who-row">' + data.characters.map(c => '<button type="button" class="tap who' + (c.id === ch.id ? ' is-on' : '') + '" data-tap="who" data-who="' + c.id + '" aria-label="' + c.name + '"><span class="mini" style="' + faceCrop(c) + '"></span><b>' + c.name + '</b></button>').join('') + '</div><p class="meta">' + ch.blurb + ' · 옷 ' + X().S.unlocks.length + '/' + data.items.length + '</p><div class="doll" data-doll>' + X().layerHTML(ch.id) + '</div><div class="tray">' + slots.map(slot => {
+    main().innerHTML = '<section class="dress"><div class="dress-stage"><h1>옷 입히기</h1><div class="who-row">' + data.characters.map(c => '<button type="button" class="tap who' + (c.id === ch.id ? ' is-on' : '') + '" data-tap="who" data-who="' + c.id + '" aria-label="' + c.name + '"><span class="mini" style="' + faceCrop(c) + '"></span><b>' + c.name + '</b></button>').join('') + '</div><p class="meta">' + ch.blurb + ' · 옷 ' + X().S.unlocks.length + '/' + data.items.length + '</p><div class="doll" data-doll>' + X().layerHTML(ch.id) + '</div></div><div class="tray">' + slots.map(slot => {
       const items = mine.filter(it => it.slot === slot);
       if (!items.length) return '';
       return '<h2>' + (labels[slot] || slot) + '</h2><div class="tray-row">' + items.map(it => {

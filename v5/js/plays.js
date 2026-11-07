@@ -302,7 +302,7 @@
     const key = el.dataset.audio || C().sylKey(s);
     showSyl(s);
     markMeter(ctx.chant);
-    X().say(key, s);
+    X().say(key, s, { keepBubble: true });
     const next = host().querySelector('[data-i="' + (ctx.chant + 1) + '"]');
     ctx.chant += 1;
     if (next) {

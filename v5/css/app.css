@@ -92,6 +92,12 @@ h2 { font-size: 1.25rem; margin: 16px 0 8px; }
 p { margin: 0; }
 .meta, .kicker, .step, .st-theme, .note { color: var(--soft); font-size: 1rem; }
 .bubble { min-height: 1.4em; font-size: 1.25rem; margin: 6px 0; }
+.bubble.praise-line {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 3px solid #F3C7A4; border-radius: 18px;
+  padding: 4px 12px 4px 4px; min-height: 58px;
+}
+.bubble.praise-line img { width: 48px; height: 48px; object-fit: contain; flex: none; }
 .home, .map, .end, .book, .dress { width: min(720px, 100%); margin: 0 auto; }
 .hero { display: flex; gap: 12px; align-items: center; }
 .buddy, .mascot { width: min(42vw, 200px); height: auto; }
@@ -127,7 +133,7 @@ p { margin: 0; }
 .stone { width: 92px; height: 92px; border-radius: 46px; flex-direction: column; }
 .stone.is-today { background: #FFE7A8; }
 .stone.is-done { background: #E7F6EE; }
-.play-head { display: flex; align-items: center; gap: 10px; }
+.play-head { display: flex; align-items: center; gap: 10px; position: relative; z-index: 4; }
 .choices, .pieces { display: grid; grid-template-columns: repeat(2, minmax(64px, 1fr)); gap: 12px; }
 .choice {
   min-height: 112px;
@@ -234,11 +240,13 @@ html[data-device="ipad"] .ghost { font-size: 220px; }
 .sticker.is-ghost img { filter: grayscale(1); opacity: 0.35; }
 .sticker.is-in img { filter: drop-shadow(0 4px 0 rgba(74, 52, 40, 0.12)); }
 .pager { align-items: center; justify-content: space-between; margin-top: 10px; }
-.who { flex-direction: column; min-width: 72px; padding: 6px; }
+.who { flex-direction: column; min-width: 76px; padding: 6px; overflow: hidden; }
 .who .mini {
-  width: 48px; height: 48px; border-radius: 16px; background-color: #fff;
-  display: block;
+  width: 84px; height: 84px; border-radius: 18px; background-color: #fff;
+  display: block; overflow: hidden;
 }
+.who-row { position: relative; z-index: 2; padding-top: 2px; }
+.dress .meta { margin: 10px 0 4px; }
 .doll {
   position: relative;
   width: min(78vw, 340px);
@@ -248,9 +256,9 @@ html[data-device="ipad"] .ghost { font-size: 220px; }
 html[data-device="ipad"] .doll { width: min(420px, 46vw); }
 .doll img, .doll .layer-fill { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .tray h2 { margin-bottom: 6px; }
-.gear { width: 104px; min-height: 108px; flex-direction: column; padding: 6px; font-size: 0.85rem; }
+.gear { width: 112px; min-height: 132px; flex-direction: column; padding: 6px; font-size: 0.85rem; }
 .gear i {
-  width: 64px; height: 64px; border-radius: 14px; display: block;
+  width: 88px; height: 88px; border-radius: 16px; display: block;
   background-color: #FFF6EA; background-repeat: no-repeat;
 }
 .gear.is-fresh { outline: 4px solid var(--rose); }
@@ -280,7 +288,7 @@ html[data-device="ipad"] .doll { width: min(420px, 46vw); }
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); clip-path: inset(50%);
 }
-#fx { position: fixed; left: 0; right: 0; top: var(--head); bottom: 0; pointer-events: none; z-index: 18; overflow: hidden; }
+#fx { position: fixed; left: 0; right: 0; top: var(--head); bottom: 0; pointer-events: none; z-index: 1; overflow: hidden; }
 #fx i {
   position: absolute; top: 0; width: 12px; height: 16px; border-radius: 4px;
   animation: fall 0.82s ease-in forwards;
@@ -505,11 +513,12 @@ main[data-play="match"] { --play: #FFF0E4; }
 main[data-play="memory"] { --play: #F6ECFF; }
 main[data-play="trace"] { --play: #E7F3FF; }
 main[data-play="treasure"] { --play: #FFF4D2; }
-.play { min-height: calc(100dvh - 88px); display: flex; flex-direction: column; }
-#stage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.chant-board { flex: 1; width: 100%; justify-content: space-between; }
-.chant { flex: 1; align-items: stretch; }
-.ctile { flex: 1 1 0; width: auto; height: auto; min-height: 168px; max-width: none; }
+.play { min-height: calc(100dvh - var(--head) - 8px); display: flex; flex-direction: column; position: relative; z-index: 3; }
+#bubble { position: relative; z-index: 4; }
+#stage { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; z-index: 4; }
+.chant-board { flex: 1; width: 100%; justify-content: center; }
+.chant { flex: 1; align-items: stretch; min-height: 46vh; }
+.ctile { flex: 1 1 0; width: auto; height: auto; min-height: 240px; max-width: none; justify-content: center; }
 .choices, .pieces, .mem { flex: 1; align-content: stretch; }
 .choice, .mem-card { min-height: 22vh; }
 .tone-0 { background: #FFB3C7; border-color: #E56B8A; }
@@ -523,31 +532,34 @@ main[data-play="treasure"] { --play: #FFF4D2; }
 .chant-board { display: flex; flex-direction: column; gap: 8px; align-items: stretch; flex: 1; width: 100%; }
 .chant-pic {
   display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.72);
+  position: relative; z-index: 4;
+  background: #fff;
   border-radius: 22px;
   padding: 6px 12px 6px 6px;
 }
 .chant-pic img { width: 92px; height: 92px; }
 .chant-pic span { font-size: 1.6rem; }
-.chant { width: 100%; flex: 1; align-items: center; justify-content: center; }
+.chant { width: 100%; flex: 1; align-items: stretch; justify-content: center; min-height: 46vh; }
 .ctile {
   flex: 1 1 0;
-  align-self: center;
+  align-self: stretch;
   width: auto;
   height: auto;
-  aspect-ratio: 1 / 2.05;
   min-width: 84px;
-  min-height: 0;
-  max-height: 52vh;
+  min-height: 280px;
+  max-height: none;
   flex-direction: column;
+  justify-content: center;
   padding: 8px;
+  position: relative;
+  z-index: 4;
 }
 .ctile .tile-pic {
   flex: none;
-  width: 82%;
+  width: 86%;
   height: auto;
   max-width: none;
-  max-height: none;
+  max-height: 42%;
   object-fit: contain;
 }
 .chant-pic.is-word-only img { display: none; }
@@ -644,7 +656,18 @@ html[data-device="ipad"] .world { height: min(58vh, 760px); }
 html[data-device="ipad"] .play-door { min-height: 140px; }
 html[data-device="ipad"] .play-door img { width: 72px; height: 72px; }
 html[data-device="ipad"] .play-door b { font-size: 1.2rem; }
-html[data-device="ipad"] .ctile { aspect-ratio: 1 / 2.05; min-height: 0; width: auto; height: auto; max-height: 46vh; }
+html[data-device="ipad"] .ctile { min-height: 420px; width: auto; height: auto; max-height: none; }
+html[data-device="ipad"] main[data-screen="dress"] .dress {
+  width: 100%;
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+html[data-device="ipad"] .dress-stage { position: sticky; top: 0; align-self: start; }
+html[data-device="ipad"] .dress-stage .doll { width: min(100%, 360px); }
+html[data-device="ipad"] .who { min-width: 96px; min-height: 120px; }
 html[data-device="ipad"] .choice img { max-height: 200px; }
 @media (orientation: landscape) and (max-height: 520px) {
   .buddy { width: 120px; bottom: 8px; }
@@ -661,7 +684,7 @@ html[data-device="ipad"] .choice img { max-height: 200px; }
   .world { height: calc(100dvh - 150px); }
   .play { min-height: 0; }
   .choice { min-height: 72px; }
-  .ctile { width: 84px; height: 84px; }
+  .ctile { width: 84px; height: 84px; min-height: 84px; max-height: 84px; align-self: center; }
   .trace-board { width: min(70vh, 280px); }
   .mascot { width: 64px; height: 64px; }
   .peel { transform: scale(0.8); transform-origin: top center; }
