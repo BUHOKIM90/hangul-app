@@ -16,6 +16,52 @@
   ];
   const STAR = 'assets/stickers/space_07_별.webp';
 
+  function assetSrc(file) {
+    return String(file || '').split('/').map(encodeURIComponent).join('/');
+  }
+  function deckBack() {
+    const ids = X().S.stickers || [];
+    if (!ids.length || !window.V5Stick) return STAR;
+    const st = V5Stick.list.find(s => s.id === ids[ids.length - 1]);
+    return st && st.file ? st.file : STAR;
+  }
+  function showGain(list) {
+    const h = host();
+    if (!h || !list.length) return;
+    const box = document.createElement('div');
+    box.className = 'gain';
+    list.forEach(st => {
+      const fig = document.createElement('figure');
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = 256;
+      img.height = 256;
+      img.src = assetSrc(st.file);
+      const cap = document.createElement('figcaption');
+      cap.textContent = st.name;
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      box.appendChild(fig);
+    });
+    h.appendChild(box);
+  }
+  function grantStickers() {
+    if (!ctx || ctx.mode !== 'lesson' || !window.V5Stick || !V5Stick.matchAnswer) return [];
+    const keys = ctx.rewardKeys || (ctx.skill ? [ctx.skill] : []);
+    const got = [];
+    keys.forEach(k => {
+      if (got.length) return;
+      const st = V5Stick.matchAnswer(k);
+      if (!st || X().S.stickers.indexOf(st.id) >= 0) return;
+      X().S.stickers.push(st.id);
+      got.push(st);
+    });
+    if (!got.length) return [];
+    X().save();
+    if (window.V5 && V5.noteSticker) got.forEach(st => V5.noteSticker(st));
+    return got;
+  }
+
   function host() { return document.getElementById('stage'); }
   function bubble(t) { const b = document.getElementById('bubble'); if (b) b.textContent = t; }
   function tone(s) { return TONES[(s && s.charCodeAt ? s.charCodeAt(0) : 0) % TONES.length]; }
@@ -33,8 +79,12 @@
     if (over) return;
     over = true;
     const first = !helped && misses === 0;
-    if (!quiet) X().praise();
+    if (!quiet) X().praise({ type: ctx.type, helped: !!helped, focus: ctx.focus || '' });
     if (ctx.skill) X().bump(ctx.skill, helped ? 0 : first ? 2 : 1);
+    if (!quiet && ctx.mode === 'lesson') {
+      const got = grantStickers();
+      if (got.length) showGain(got);
+    }
     ctx.helped = !!helped;
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음');
   }
@@ -56,7 +106,6 @@
     if (correct) correct.classList.add('is-sparkle', 'show-ans');
     bubble('같이 해 보자!');
     X().say(C().UI.together, '같이 해 보자!');
-    X().confetti();
     finish(true, true);
   }
   function take(n, pool, correct) {
@@ -118,6 +167,8 @@
       const n = C().choiceN(X().S.difficulty);
       const opts = take(n, wordPool(lesson), target);
       ctx.skill = 'w:' + target;
+      ctx.focus = C().ko(target);
+      ctx.rewardKeys = ['w:' + target];
       host().innerHTML = '<h1 class="prompt">어떤 그림일까?</h1>' + cardsHTML(opts, id => picCard(id, id === target));
       X().say(C().wordKey(target), C().ko(target));
     },
@@ -127,6 +178,8 @@
       const n = Math.min(C().choiceN(X().S.difficulty), Math.max(2, pool.length));
       const opts = take(n, pool, target);
       ctx.skill = 'j:' + target;
+      ctx.focus = target;
+      ctx.rewardKeys = ['j:' + target];
       host().innerHTML = '<h1 class="prompt">반짝이는 글자를 눌러</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
       const delay = X().S.difficulty === 'easy' ? 180 : X().S.difficulty === 'hard' ? 700 : 360;
       const token = sparkToken;
@@ -141,6 +194,8 @@
       const b = lesson.blocks;
       const syl = b.say;
       ctx.skill = 's:' + syl;
+      ctx.focus = syl;
+      ctx.rewardKeys = ['j:' + b.c, 'j:' + b.v];
       const n = X().S.difficulty === 'easy' ? 1 : 2;
       const cons = [b.c];
       const vows = [b.v];
@@ -158,6 +213,8 @@
       const opts = take(n, wordPool(lesson), target);
       const hint = X().hintOn(target);
       ctx.skill = 'w:' + target;
+      ctx.focus = C().ko(target);
+      ctx.rewardKeys = ['w:' + target];
       host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic' + (hint ? ' hint' : '') + '"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target, hint && id === target)).join('') + '</div>';
       X().say(C().wordKey(target), C().ko(target));
     },
@@ -165,6 +222,9 @@
       const pool = wordPool(lesson).slice();
       const a = pool[0], b = pool[1] || pool[0];
       ctx.skill = 'w:' + a;
+      ctx.focus = a === b ? C().ko(a) : C().ko(a) + ' · ' + C().ko(b);
+      ctx.rewardKeys = a === b ? ['w:' + a] : ['w:' + a, 'w:' + b];
+      const back = deckBack();
       const cards = X().shuffle([
         { pair: a, face: 'pic' }, { pair: a, face: 'word' },
         { pair: b, face: 'pic' }, { pair: b, face: 'word' }
@@ -174,13 +234,15 @@
         const inner = card.face === 'pic'
           ? '<img alt="" width="512" height="512" src="' + C().pic(card.pair) + '">'
           : '<img class="deco" alt="" src="' + DECO[i % DECO.length] + '"><b>' + C().ko(card.pair) + '</b>';
-        return '<button type="button" class="tap mem-card ' + tone(card.pair) + hint + '" data-tap="card" data-pair="' + card.pair + '" data-i="' + i + '" aria-label="카드"><span class="back"><img alt="" src="' + STAR + '"></span><span class="front">' + inner + '</span></button>';
+        return '<button type="button" class="tap mem-card ' + tone(card.pair) + hint + '" data-tap="card" data-pair="' + card.pair + '" data-i="' + i + '" aria-label="카드"><span class="back"><img alt="" src="' + back + '"></span><span class="front">' + inner + '</span></button>';
       }).join('') + '</div>';
       ctx.mem = { open: [] };
       X().say(C().UI.match, '낱말 카드를 그림에 데려다 줄래?');
     },
     chant(lesson) {
       ctx.skill = 's:' + lesson.chant.join('');
+      ctx.focus = lesson.chant.join('·');
+      ctx.rewardKeys = [];
       ctx.chant = 0;
       const first = lesson.chant[0];
       const firstPic = C().sylPic(first) || STAR;
@@ -194,6 +256,11 @@
     trace(lesson) {
       const g = lesson.trace;
       ctx.skill = (g >= '가' && g <= '힣') ? 's:' + g : 'j:' + g;
+      ctx.focus = g;
+      if (C().isSyl(g)) {
+        const p = C().split(g);
+        ctx.rewardKeys = ['j:' + p.cho, 'j:' + p.jung];
+      } else ctx.rewardKeys = ['j:' + g];
       ctx.trace = { plan: C().glyphPlan(g), si: 0, di: 0, glyph: g };
       const pic = C().jamoPic(g) || C().sylPic(g);
       host().innerHTML = '<h1 class="prompt">점을 따라 눌러</h1>' + (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') + '<div class="trace-board" data-letter="' + g + '"><p class="ghost">' + g + '</p><div class="dots"></div></div>';
@@ -205,6 +272,8 @@
       const n = C().choiceN(X().S.difficulty);
       const opts = take(Math.max(2, n), wordPool(lesson), target);
       ctx.skill = 'w:' + target;
+      ctx.focus = C().ko(target);
+      ctx.rewardKeys = ['w:' + target];
       host().innerHTML = '<h1 class="prompt">보물 상자 소리</h1><img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' + cardsHTML(opts, id => picCard(id, id === target));
       X().say(C().wordKey(target), C().ko(target));
     }
@@ -270,7 +339,7 @@
       mem.open = [];
       const done = host().querySelectorAll('.mem-card.is-matched').length === host().querySelectorAll('.mem-card').length;
       if (done) finish(misses > 0);
-      else X().praise();
+      else X().praise({ type: 'memory', beat: true, focus: C().ko(a.dataset.pair) });
       return;
     }
     misses += 1;
@@ -307,7 +376,7 @@
     ctx.chant += 1;
     if (next) {
       next.classList.add('is-lit');
-      X().praise();
+      X().praise({ type: 'chant', beat: true, focus: s });
     } else finish(false);
   }
   function onDot(el) {

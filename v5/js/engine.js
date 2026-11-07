@@ -200,15 +200,21 @@
     S.unlocks.push(id);
     S.freshItem = id;
     const it = itemBy(id);
-    if (it) S.who = it.character;
+    if (it) {
+      S.who = it.character;
+      if (!S.wear[it.character]) S.wear[it.character] = { hat: '', top: '', acc: '', shoes: '', bg: '' };
+      S.wear[it.character][it.slot] = it.id;
+    }
     save();
     return it;
   }
-  function layerHTML(who) {
+  function layerHTML(who, opts) {
     const ch = charBy(who);
     if (!ch) return '';
     const w = S.wear[who] || {};
+    const skip = (opts && opts.skip) || [];
     return (DRESS.stack || []).map(slot => {
+      if (skip.indexOf(slot) >= 0) return '';
       if (slot === 'body') return '<img data-slot="body" alt="" width="512" height="512" src="' + ch.body + '">';
       const it = w[slot] ? itemBy(w[slot]) : null;
       if (!it) return '';
@@ -255,13 +261,33 @@
     setTimeout(() => { if (fx) fx.innerHTML = ''; }, 980);
   }
   let lastPraise = '';
-  function praise() {
-    const all = C().PRAISE.filter(p => window.HAVE_AUDIO && HAVE_AUDIO.has(p[1]));
-    const list = all.length ? all : C().PRAISE;
-    let pool = list.filter(p => p[1] !== lastPraise);
-    if (!pool.length) pool = list;
-    const p = pool[Math.floor(Math.random() * pool.length)];
-    lastPraise = p[1];
+  const bags = {};
+  let palN = 0;
+  function voiced(lines) {
+    if (!lines || !lines.length) return [];
+    if (!window.HAVE_AUDIO) return lines.slice();
+    const hit = lines.filter(p => HAVE_AUDIO.has(p[1]));
+    return hit.length ? hit : lines.slice();
+  }
+  function takeLine(id, lines) {
+    const pool = voiced(lines);
+    if (!pool.length) return ['잘했어!', 'ui_good1'];
+    if (!bags[id] || !bags[id].length) {
+      bags[id] = shuffle(pool);
+      if (bags[id].length > 1 && bags[id][0][1] === lastPraise) bags[id].push(bags[id].shift());
+    }
+    const line = bags[id].shift();
+    lastPraise = line[1];
+    return line;
+  }
+  function praise(opts) {
+    opts = opts || {};
+    const type = opts.type || 'listen';
+    const helped = !!opts.helped;
+    const beat = !!opts.beat;
+    const focus = opts.focus || '';
+    const pool = C().praisePool(beat ? 'beat' : type, !beat && helped);
+    const p = takeLine((beat ? 'beat:' : 'end:') + type + (helped ? ':h' : ''), pool);
     praiseN += 1;
     const m = document.getElementById('mascot');
     if (m) {
@@ -271,13 +297,29 @@
       setTimeout(() => m.classList.remove('pop'), 360);
     }
     const pals = C().PALS || [];
-    const pal = pals[Math.floor(Math.random() * pals.length)] || ['assets/char/monggeul_cheer.webp', '몽글이'];
+    const pal = pals.length ? pals[palN % pals.length] : ['assets/char/monggeul_cheer.webp', '몽글이'];
+    palN += 1;
     const row = document.getElementById('bubble');
     if (row) {
       row.classList.add('praise-line');
-      row.innerHTML = '<img alt="" width="512" height="512" src="' + pal[0] + '"><span>' + p[0] + '</span>';
+      row.replaceChildren();
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = 512;
+      img.height = 512;
+      img.src = pal[0];
+      row.appendChild(img);
+      if (focus) {
+        const mark = document.createElement('b');
+        mark.className = 'who-focus';
+        mark.textContent = focus;
+        row.appendChild(mark);
+      }
+      const span = document.createElement('span');
+      span.textContent = p[0];
+      row.appendChild(span);
     }
-    confetti();
+    if (!beat) confetti();
     say(p[1], p[0], { keepBubble: true });
   }
   function shuffle(a) {

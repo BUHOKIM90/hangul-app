@@ -59,7 +59,8 @@
     { id: 7, title: 'ㅅ ㅈ ㅎ ㄹ', kid: '사 자 하', place: '동물원', goal: 'ㅅ·ㅈ·ㅎ·ㄹ 소리. 그림 낱말을 소리와 함께 읽기 시작해요.', words: ['lion', 'so', 'jadu', 'hama', 'radio'], jamo: ['ㅅ', 'ㅈ', 'ㅎ', 'ㄹ', 'ㅏ'], chant: ['사', '자', '하'], blocks: { c: 'ㅎ', v: 'ㅏ', say: '하', word: 'hama' }, trace: 'ㅅ' },
     { id: 8, title: '붙여 읽기', kid: '낱말 읽기', place: '도서관', goal: '배운 소리로 받침 없는 낱말을 그림과 함께 읽어요. 보물에서 다시 만나요.', words: ['nabi', 'ori', 'moja', 'hama', 'gicha', 'bada', 'agi', 'eomma'], jamo: ['ㄱ', 'ㄴ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅎ', 'ㅏ', 'ㅗ'], chant: ['나', '비', '오'], blocks: { c: 'ㄴ', v: 'ㅏ', say: '나', word: 'nabi' }, trace: '가' }
   ];
-  /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired. */
+  /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired.
+     Reward boasts (level, jar, sticker) are not play praise — they would be untrue mid-lesson. */
   const PRAISE = [
     ['잘했어!', 'ui_good1'],
     ['멋져!', 'ui_good2'],
@@ -82,6 +83,43 @@
     ['그림을 보고 잘 생각했네.', 'ui4_proc17'],
     ['한 글자씩 또박또박 읽었네', 'ui4_proc18']
   ];
+  const PRAISE_BY = {};
+  PRAISE.forEach(p => { PRAISE_BY[p[1]] = p; });
+  const POOL_KEYS = {
+    short: ['ui_good1', 'ui_good2', 'ui_good3', 'ui_found'],
+    any: ['ui_good1', 'ui_good2', 'ui_good3'],
+    picture: ['ui4_proc17', 'ui_found'],
+    find: ['ui_found', 'ui4_proc12', 'ui4_proc15'],
+    blocks: ['ui4_proc6'],
+    trace: ['ui4_proc2', 'ui4_proc11'],
+    chant: ['ui4_proc1', 'ui4_proc5', 'ui4_proc18'],
+    retry: ['ui4_proc7', 'ui4_proc16']
+  };
+  const PLAY_POOL = {
+    beat: ['short'],
+    listen: ['any', 'picture'],
+    match: ['any', 'picture'],
+    treasure: ['any', 'picture'],
+    sparkle: ['any', 'find'],
+    blocks: ['any', 'blocks'],
+    trace: ['any', 'trace'],
+    chant: ['any', 'chant'],
+    memory: ['any', 'picture']
+  };
+  function praisePool(type, helped) {
+    const ids = (PLAY_POOL[type] || PLAY_POOL.listen).slice();
+    if (helped) ids.push('retry');
+    const out = [];
+    const seen = {};
+    ids.forEach(id => {
+      (POOL_KEYS[id] || []).forEach(k => {
+        if (seen[k] || !PRAISE_BY[k]) return;
+        seen[k] = 1;
+        out.push(PRAISE_BY[k]);
+      });
+    });
+    return out;
+  }
   const SYL_PIC = {
     '아': 'agi', '이': 'ima', '오': 'ori', '우': 'ubi', '어': 'eobu',
     '가': 'gicha', '나': 'nabi', '기': 'gicha', '다': 'dari', '마': 'moja',
@@ -180,7 +218,7 @@
   function choiceN(diff) { return diff === 'hard' ? 4 : diff === 'easy' ? 2 : 3; }
 
   root.V5C = {
-    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS,
+    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS, praisePool,
     hex, sylKey, jamoKey, wordKey, ko, pic, sylPic, sylWord, jamoPic, compose, split, isSyl, sampleStroke, glyphPlan,
     lesson, wordsThrough, audioKeys, choiceN
   };
