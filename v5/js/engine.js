@@ -51,6 +51,7 @@
   function playKey(key, g) {
     return new Promise(resolve => {
       if (g !== gen) return resolve();
+      if (key === 'w_i_tooth') key = 'sy_C774';
       if (!S.sound || !window.HAVE_AUDIO || !HAVE_AUDIO.has(key)) return resolve();
       const done = () => { player.onended = player.onerror = null; resolve(); };
       player.onended = done;

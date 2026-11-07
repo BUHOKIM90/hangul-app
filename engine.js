@@ -35,6 +35,7 @@ function speakFallback(key) {
   return new Promise(res => { const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = v.lang; u.rate = 0.9; u.pitch = 1.1; u.volume = S.settings.volume; u.onend = u.onerror = res; pending = res; speechSynthesis.speak(u); });
 }
 function playOne(key, onProgress) {
+  if (key === 'w_i_tooth') key = 'sy_C774';
   if (!S.settings.sound) { syncSoftMuteChip(); const c = document.getElementById('softMute'); if (c) { c.classList.remove('pulse'); void c.offsetWidth; c.classList.add('pulse'); } return wait(250); }
   unlockAudio();
   return new Promise(res => {
@@ -57,7 +58,7 @@ function prefetchAudio(keys) {
       if (!k) return;
       const a = new Audio();
       a.preload = 'auto';
-      a.src = 'audio/' + k + '.mp3';
+      a.src = 'audio/' + (k === 'w_i_tooth' ? 'sy_C774' : k) + '.mp3';
     });
   } catch (e) { /* ignore */ }
 }
