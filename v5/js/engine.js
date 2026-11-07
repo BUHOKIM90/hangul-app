@@ -5,8 +5,8 @@
   const C = () => window.V5C;
   function fresh() {
     return {
-      v: 5, sound: true, colorHints: true, difficulty: 'mid',
-      ms: 0, today: '', todayMs: 0, done: {}, skill: {},
+      v: 5, scoreV: 1, sound: true, colorHints: true, difficulty: 'mid',
+      ms: 0, today: '', todayMs: 0, done: {}, skill: {}, last: null,
       stickers: [], unlocks: [], wear: {}, who: 'monggeul', freshItem: ''
     };
   }
@@ -17,7 +17,11 @@
   function load() {
     try {
       const o = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (o && o.v === 5) S = Object.assign(fresh(), o);
+      if (o && o.v === 5) {
+        const keepBoxes = o.scoreV === 1;
+        S = Object.assign(fresh(), o);
+        if (!keepBoxes) deflateScores();
+      }
     } catch (e) { S = fresh(); }
     const day = stamp();
     if (S.today !== day) { S.today = day; S.todayMs = 0; }
@@ -46,7 +50,10 @@
     const live = document.getElementById('live');
     if (live && text) live.textContent = text;
     const b = document.getElementById('bubble');
-    if (b && text) b.textContent = text;
+    if (b && text) {
+      b.classList.remove('praise-line');
+      b.textContent = text;
+    }
   }
   function playKey(key, g) {
     return new Promise(resolve => {
@@ -219,22 +226,54 @@
 
   /* ---------- skill / praise ---------- */
   let praiseN = 0;
-  function bump(key, q) {
+  function emptySkill() {
+    return { box: 0, due: 0, seen: 0, ok: 0, help: 0, solo: 0, retry: 0 };
+  }
+  /* Old boxes counted hinted and one-tap rounds as known. Drop them once. */
+  function deflateScores() {
+    const next = {};
+    Object.keys(S.skill || {}).forEach(k => {
+      const it = S.skill[k] || {};
+      next[k] = Object.assign(emptySkill(), { seen: it.seen || 0 });
+    });
+    S.skill = next;
+    S.done = {};
+    S.last = null;
+    S.scoreV = 1;
+  }
+  function bump(key, grade) {
     if (!key) return;
-    const it = S.skill[key] || { box: 0, due: 0, seen: 0, ok: 0, help: 0 };
+    if (grade === 2) grade = 'solo';
+    else if (grade === 1) grade = 'retry';
+    else if (grade === 0) grade = 'shown';
+    const it = Object.assign(emptySkill(), S.skill[key] || {});
     it.seen += 1;
-    if (q >= 2) { it.ok += 1; it.box = Math.min(5, it.box + 1); }
-    else if (q === 1) it.ok += 1;
-    else { it.help += 1; it.box = Math.max(0, it.box - 1); }
-    const gaps = [0, 1, 3, 7, 14, 21];
-    it.due = Date.now() + gaps[it.box] * 86400000;
+    const day = 86400000;
+    if (grade === 'solo') {
+      it.ok += 1;
+      it.solo += 1;
+      it.box = Math.min(3, it.box + 1);
+      it.due = Date.now() + (it.box >= 3 ? 3 : 1) * day;
+    } else if (grade === 'retry') {
+      it.ok += 1;
+      it.retry += 1;
+      it.due = Date.now() + day;
+    } else if (grade === 'hint') {
+      it.help += 1;
+      it.due = Date.now();
+    } else if (grade === 'shown') {
+      it.help += 1;
+      it.box = Math.max(0, it.box - 1);
+      it.due = Date.now();
+    }
     S.skill[key] = it;
     save();
   }
-  function hintOn(wordId) {
-    if (!S.colorHints) return false;
-    const sk = S.skill['w:' + wordId];
-    return !(sk && sk.box >= 2);
+  function hintSoon(key) {
+    if (!S.colorHints || !key) return false;
+    const sk = S.skill[key];
+    if (!sk) return false;
+    return (sk.help || 0) > (sk.solo || 0) && (sk.solo || 0) < 3;
   }
   function confetti() {
     const fx = document.getElementById('fx');
@@ -292,6 +331,6 @@
   window.V5X = {
     get S() { return S; }, save, load, reset, stamp, say, dropQueue, unlock, syncSound, installPointer,
     setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, layerHTML,
-    bump, hintOn, praise, confetti, shuffle, lineOf
+    bump, hintSoon, praise, confetti, shuffle, lineOf
   };
 })();

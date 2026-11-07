@@ -95,7 +95,7 @@
     }).join('');
     const here = nodes[lesson.id - 1] || nodes[0];
     main().dataset.screen = 'map';
-    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:calc(' + here[1] + '% - 18px)"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
+    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:calc(' + here[1] + '% - 18px)"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><p class="meta" id="map-note" hidden></p><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
     chrome('map');
   }
   function showPlay(spec) {
@@ -110,16 +110,24 @@
     chrome('play');
     V5Play.mount($('#stage'), spec, afterStep);
   }
-  function afterStep(helped) {
+  function afterStep(result) {
     if (!run) return showMap();
-    run.stars = run.stars || [];
-    run.stars.push(!helped);
+    const solo = !!(result && result.solo);
+    const scored = !!(result && result.scored);
+    if (run.mode === 'lesson' && scored) {
+      run.stars = run.stars || [];
+      run.stars.push(solo);
+    }
     const st = awardSticker();
     const item = X().unlockNext();
     if (run.mode === 'practice') return showPeel(st, item, 'map');
     run.i += 1;
     if (run.i < run.steps.length) return showPeel(st, item, 'step');
-    X().S.done[run.lesson.id] = X().stamp();
+    const stars = run.stars || [];
+    const solos = stars.filter(Boolean).length;
+    const passed = C().passLesson(solos, stars.length);
+    if (passed) X().S.done[run.lesson.id] = X().stamp();
+    X().S.last = { lesson: run.lesson.id, solos: solos, total: stars.length, passed: !!passed, day: X().stamp() };
     X().save();
     showPeel(st, item, 'done');
   }
@@ -154,8 +162,8 @@
     setTimeout(go, 980);
   }
   function starsHTML(stars) {
-    const row = stars && stars.length ? stars : [true, true, true, true, true, true, true, true];
-    return '<div class="stars">' + row.map(on => '<img class="' + (on ? 'is-on' : 'is-dim') + '" alt="" src="assets/icons/sun.svg">').join('') + '</div>';
+    if (!stars || !stars.length) return '<p class="meta">혼자 맞힌 놀이가 없어요</p>';
+    return '<div class="stars" aria-label="혼자 맞힌 놀이 ' + stars.filter(Boolean).length + '/' + stars.length + '">' + stars.map(on => '<img class="' + (on ? 'is-on' : 'is-dim') + '" alt="" src="assets/icons/sun.svg">').join('') + '</div>';
   }
   function afterPeel() {
     if (peelGo === 'step' && run) {
@@ -170,15 +178,21 @@
   }
   function showDone(st, item) {
     const stars = run && run.stars ? run.stars.slice() : [];
+    const solos = stars.filter(Boolean).length;
+    const passed = C().passLesson(solos, stars.length);
+    const guided = run && run.steps && run.steps.some(s => s === 'chant' || s === 'trace');
+    const count = '혼자 맞힌 놀이 ' + solos + '/' + stars.length;
+    const line = passed ? '우와, 한 단계 올라갔어!' : (stars.length ? count + '. 다음에 또 해 보자' : '오늘은 여기까지. 이 길은 다음에 또 해 보자');
     X().dropQueue();
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
+    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
     chrome('done');
     settlePeel();
-    X().say(C().UI.end, '오늘은 여기까지! 내일 또 만나요.');
-    X().confetti();
+    if (passed) X().say('ui_levelup', line);
+    else X().say(C().UI.end, line);
+    if (passed) X().confetti();
   }
   function showStickers() {
     X().dropQueue();
@@ -279,14 +293,17 @@
     const S = X().S;
     const letters = Object.keys(C().JAMO);
     const cell = j => {
-      const sk = S.skill['j:' + j] || S.skill['s:' + j];
+      const sk = S.skill['j:' + j];
       let cls = 'new', lab = '새것';
-      if (sk && sk.box >= 4) { cls = 'known'; lab = '익힘'; }
-      else if (sk && sk.seen) { cls = 'learning'; lab = '배우는 중'; }
+      if (sk && C().mastered(sk)) { cls = 'known'; lab = '익힘'; }
+      else if (sk && sk.solo) { cls = 'learning'; lab = '혼자 ' + sk.solo; }
+      else if (sk && sk.seen) { cls = 'learning'; lab = '도움'; }
       return '<button type="button" class="tap jcell ' + cls + '" data-tap="hear" data-j="' + j + '" aria-label="' + j + ' ' + lab + '"><b>' + j + '</b><small>' + lab + '</small></button>';
     };
     $('#parent').hidden = false;
-    $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
+    const last = S.last;
+    const lastLine = last ? ('최근 길 · 혼자 ' + last.solos + '/' + last.total + (last.passed ? ' · 길 통과' : ' · 다시 할 길')) : '최근 길 기록 없음';
+    $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><p class="meta">' + lastLine + '</p><p class="note">익힘은 힌트 없이 혼자 세 번 맞히고, 힌트보다 혼자 맞힌 횟수가 더 많을 때예요. 길 통과와는 달라요.</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
     paintTime();
   }
   function paintTime() {
@@ -330,8 +347,15 @@
     }
     if (t === 'start-lesson') {
       const lesson = C().lesson(+el.dataset.id || currentLesson().id);
-      run = { mode: 'lesson', lesson, steps: C().PLAYS.map(p => p.id), i: 0 };
-      return showPlay({ mode: 'lesson', type: run.steps[0], lesson });
+      const cur = currentLesson();
+      if (!X().S.done[lesson.id] && lesson.id > cur.id) {
+        const note = document.getElementById('map-note');
+        if (note) { note.hidden = false; note.textContent = '앞에 길을 먼저 가 보자'; }
+        return;
+      }
+      const steps = C().flowFor(lesson, X().S.difficulty);
+      run = { mode: 'lesson', lesson, steps: steps, i: 0, stars: [] };
+      return showPlay({ mode: 'lesson', type: steps[0], lesson });
     }
     if (t === 'replay') return V5Play.replay();
     if (V5Play.tap(el)) return;

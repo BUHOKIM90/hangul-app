@@ -53,7 +53,8 @@ async function tap(page, locator, label) {
   }
 }
 
-async function finishRound(page, correctShot) {
+async function answerOnce(page, correctShot) {
+  if (await page.locator('[data-tap="play-next"]').count()) return;
   const type = await page.getAttribute('#main', 'data-play');
   if (type === 'chant') {
     for (let i = 0; i < 6; i++) {
@@ -70,10 +71,14 @@ async function finishRound(page, correctShot) {
         correctShot = '';
       }
     }
-  } else if (type === 'blocks') {
+    return;
+  }
+  if (type === 'blocks') {
     await tap(page, page.locator('[data-kind="cho"][data-ok="1"]'), 'cho');
     await tap(page, page.locator('[data-kind="jung"][data-ok="1"]'), 'jung');
-  } else if (type === 'memory') {
+    return;
+  }
+  if (type === 'memory') {
     const pairs = await page.$$eval('.mem-card', els => els.map(e => e.getAttribute('data-pair')));
     const seen = {};
     for (let i = 0; i < pairs.length; i++) {
@@ -82,16 +87,29 @@ async function finishRound(page, correctShot) {
       await tap(page, page.locator('.mem-card').nth(seen[id]), 'mem-a');
       await tap(page, page.locator('.mem-card').nth(i), 'mem-b');
     }
-  } else if (type === 'trace') {
-    for (let i = 0; i < 24; i++) {
+    return;
+  }
+  if (type === 'trace') {
+    for (let i = 0; i < 40; i++) {
       if (await page.locator('[data-tap="play-next"]').count()) break;
       const dot = page.locator('.dot.is-next');
       if (await dot.count() === 0) break;
       await tap(page, dot, 'dot-' + i);
     }
-  } else {
-    if (type === 'sparkle') await page.waitForSelector('#stage .is-sparkle', { timeout: 2500 });
-    await tap(page, page.locator('#stage [data-ok="1"]'), type || 'pick');
+    return;
+  }
+  const glowing = await page.locator('#stage .is-sparkle').count();
+  if (type === 'sparkle' && glowing) throw new Error('sparkle showed the answer before a try');
+  await tap(page, page.locator('#stage [data-ok="1"]'), type || 'pick');
+}
+
+async function finishRound(page, correctShot) {
+  for (let guard = 0; guard < 8; guard++) {
+    if (await page.locator('[data-tap="play-next"]').count()) break;
+    await answerOnce(page, correctShot);
+    correctShot = '';
+    const more = page.locator('[data-tap="trial-next"]');
+    if (await more.count()) await tap(page, more, 'trial-next');
   }
   await tap(page, page.locator('[data-tap="play-next"]'), 'play-next');
   await page.waitForSelector('[data-tap="peel-next"]', { timeout: 4000 });
@@ -146,6 +164,10 @@ async function runDevice(browser, spec) {
     await shot(page, spec.name + '-play-done');
   }
   await tap(page, page.locator('[data-tap="dress"]'), 'dress');
+  const bodyNow = await page.locator('.doll img[data-slot="body"]').getAttribute('src');
+  if (bodyNow && bodyNow.indexOf('monggeul_basic.webp') >= 0) {
+    await tap(page, page.locator('[data-tap="who"]').nth(1), 'who-other');
+  }
   await tap(page, page.locator('[data-tap="who"][data-who="monggeul"]'), 'who-monggeul');
   const body = await page.locator('.doll img[data-slot="body"]').getAttribute('src');
   if (!body || body.indexOf('monggeul_basic.webp') < 0) throw new Error(spec.name + ' body is ' + body);
