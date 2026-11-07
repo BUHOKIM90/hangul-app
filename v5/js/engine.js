@@ -42,8 +42,11 @@
   const SILENT = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   const player = new Audio();
   let unlocked = false, q = [], playing = false, gen = 0;
+  /* have.js / lines.js use top-level const. That is a global lexical binding, not a window property. */
+  function hasAudio() { return typeof HAVE_AUDIO !== 'undefined'; }
+  function hasLines() { return typeof LINES !== 'undefined'; }
   function lineOf(key) {
-    if (window.LINES && LINES[key]) return LINES[key];
+    if (hasLines() && LINES[key]) return LINES[key];
     return '';
   }
   function showLine(text) {
@@ -59,7 +62,7 @@
     return new Promise(resolve => {
       if (g !== gen) return resolve();
       if (key === 'w_i_tooth') key = 'sy_C774';
-      if (!S.sound || !window.HAVE_AUDIO || !HAVE_AUDIO.has(key)) return resolve();
+      if (!S.sound || !hasAudio() || !HAVE_AUDIO.has(key)) return resolve();
       const done = () => { player.onended = player.onerror = null; resolve(); };
       player.onended = done;
       player.onerror = done;
@@ -102,10 +105,16 @@
     } catch (e) { /* ignore */ }
     if (unlocked) return;
     try {
-      player.src = SILENT;
+      const cur = player.src || '';
+      const clip = cur.indexOf('data:audio/wav') < 0 && /(?:^|\/)audio\/[^/?#]+\.mp3(?:$|\?)/.test(cur);
+      if (!clip) player.src = SILENT;
       const p = player.play();
-      unlocked = true;
-      if (p && p.then) p.then(() => { if ((player.src || '').indexOf('data:audio/wav') === 0) player.pause(); }).catch(() => {});
+      const mark = () => {
+        unlocked = true;
+        if ((player.src || '').indexOf('data:audio/wav') === 0) player.pause();
+      };
+      if (p && p.then) p.then(mark).catch(() => {});
+      else mark();
     } catch (e) { /* ignore */ }
   }
   function syncSound() {
@@ -169,13 +178,14 @@
       const tol = 12;
       const x = e.clientX, y = e.clientY;
       const inside = x >= r.left - tol && x <= r.right + tol && y >= r.top - tol && y <= r.bottom + tol;
-      if (!inside) return;
+      if (!inside) { unlock(); return; }
       const now = performance.now();
       const last = el.dataset.tapAt ? +el.dataset.tapAt : -1000;
-      if (now - last < 280) return;
+      if (now - last < 280) { unlock(); return; }
       el.dataset.tapAt = String(now);
       playTap();
       if (window.V5 && V5.onTap) V5.onTap(el);
+      unlock();
     };
     const cancel = e => {
       if (!press || e.pointerId !== press.id) return;
@@ -185,6 +195,14 @@
     document.addEventListener('pointerdown', down, { passive: true });
     document.addEventListener('pointerup', up, { passive: true });
     document.addEventListener('pointercancel', cancel, { passive: true });
+    document.addEventListener('click', e => {
+      if (e.button !== 0) return;
+      const gate = document.getElementById('gate');
+      const parent = document.getElementById('parent');
+      const modalOn = (gate && !gate.hidden) || (parent && !parent.hidden);
+      if (modalOn && e.target.closest && e.target.closest('#app')) return;
+      unlock();
+    });
     document.addEventListener('touchmove', e => {
       if (document.documentElement.dataset.adult === '1') return;
       if (e.touches && e.touches.length > 1) e.preventDefault();
@@ -369,7 +387,7 @@
   let palN = 0;
   function voiced(lines) {
     if (!lines || !lines.length) return [];
-    if (!window.HAVE_AUDIO) return lines.slice();
+    if (!hasAudio()) return lines.slice();
     const hit = lines.filter(p => HAVE_AUDIO.has(p[1]));
     return hit.length ? hit : lines.slice();
   }
@@ -415,7 +433,7 @@
     if (typed && C().praisePool) {
       p = takeLine((beat ? 'beat:' : 'end:') + type + (helped ? ':h' : ''), C().praisePool(beat ? 'beat' : type, !beat && helped));
     } else {
-      const all = C().PRAISE.filter(row => window.HAVE_AUDIO && HAVE_AUDIO.has(row[1]));
+      const all = C().PRAISE.filter(row => hasAudio() && HAVE_AUDIO.has(row[1]));
       const list = all.length ? all : C().PRAISE;
       let pool = list.filter(row => row[1] !== lastPraise);
       if (!pool.length) pool = list;
@@ -451,7 +469,7 @@
     palN += 1;
     fillPraise(document.getElementById('bubble'), focus || '', p[0], pal);
     confetti(5);
-    if (p[1] && (!window.HAVE_AUDIO || HAVE_AUDIO.has(p[1]))) say(p[1], p[0], { keepBubble: true });
+    if (p[1] && (!hasAudio() || HAVE_AUDIO.has(p[1]))) say(p[1], p[0], { keepBubble: true });
     else {
       const live = document.getElementById('live');
       if (live) live.textContent = p[0];
