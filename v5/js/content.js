@@ -40,24 +40,26 @@
     'ㅣ': [[[50, 10], [50, 90]]]
   };
   const PLAYS = [
-    { id: 'chant', kid: '노래 톡톡', icon: 'assets/pic/playicon/pi_chant.webp', why: '음절 소리를 박자에 맞춰 하나씩 짚어요.' },
-    { id: 'listen', kid: '듣고 고르기', icon: 'assets/icons/play/ear.svg', why: '낱말 소리를 듣고 그림과 이어요. 글자보다 소리가 먼저예요.' },
-    { id: 'sparkle', kid: '반짝이 찾기', icon: 'assets/icons/play/seek.svg', why: '들은 소리와 같은 글자를 눈으로 찾아요.' },
-    { id: 'blocks', kid: '소리 블록', icon: 'assets/icons/play/block.svg', why: '자음과 모음을 붙여 음절 하나를 만들어요.' },
-    { id: 'match', kid: '그림 낱말', icon: 'assets/icons/play/cards.svg', why: '그림을 보고 알맞은 낱말 글자를 고르어요.' },
-    { id: 'memory', kid: '짝 카드', icon: 'assets/pic/playicon/pi_sort.webp', why: '그림과 낱말을 기억해서 짝을 찾아요.' },
-    { id: 'trace', kid: '따라 쓰기', icon: 'assets/pic/playicon/pi_trace.webp', why: '점을 따라 획 순서로 글자 모양을 익혀요.' },
-    { id: 'treasure', kid: '보물 복습', icon: 'assets/icons/play/treasure.svg', why: '앞에서 만난 소리를 다시 떠올려요.' }
+    { id: 'chant', kid: '노래 톡톡', icon: 'assets/pic/playicon/pi_chant.webp', why: '들은 음절을 칸 순서대로 눌러요. 다음 칸이 켜져 있어서 이 놀이는 점수를 올리지 않아요.' },
+    { id: 'listen', kid: '듣고 고르기', icon: 'assets/icons/play/ear.svg', why: '낱말 소리를 듣고 그림만 고르요. 그림 위에는 글자를 적지 않아요.' },
+    { id: 'sparkle', kid: '글자 찾기', icon: 'assets/icons/play/seek.svg', why: '들은 글자를 모양으로 찾아요. 반짝임은 틀린 뒤에만 나와요.' },
+    { id: 'blocks', kid: '소리 블록', icon: 'assets/icons/play/block.svg', why: '자음과 모음을 골라 음절 하나를 만들어요. 고를 글자가 있어야 점수가 생겨요.' },
+    { id: 'match', kid: '그림 낱말', icon: 'assets/icons/play/cards.svg', why: '배운 소리로 읽을 수 있는 낱말만 글자로 맞춰요. 받침이 있는 낱말은 넣지 않아요.' },
+    { id: 'memory', kid: '짝 카드', icon: 'assets/pic/playicon/pi_sort.webp', why: '그림과 낱말을 짝지어요. 카드 뒷면에 정답을 미리 칠하지 않아요.' },
+    { id: 'trace', kid: '따라 쓰기', icon: 'assets/pic/playicon/pi_trace.webp', why: '점이 다음 자리를 알려 줘요. 따라 그린 것은 글자를 익힌 것으로 세지 않아요.' },
+    { id: 'treasure', kid: '보물 복습', icon: 'assets/icons/play/treasure.svg', why: '힌트가 필요했던 소리나 낱말을 다시 떠올려요.' }
   ];
+  /* hear = picture listening. read = no batchim, only jamo taught by that lesson.
+     sight = whole-word shape, not sounding out. onset = first syllable only. */
   const LESSONS = [
-    { id: 1, title: '우리 가족', kid: '가족 소리', place: '몽글이 집', goal: '소리부터. 엄마·아빠·아기 소리를 그림과 잇고, 동그라미 ㅇ을 만나요.', words: ['eomma', 'appa', 'agi', 'ryeowon'], jamo: ['ㅇ', 'ㅏ', 'ㅣ'], chant: ['아', '이', '아'], blocks: { c: 'ㅇ', v: 'ㅏ', say: '아', word: 'agi' }, trace: 'ㅇ' },
-    { id: 2, title: '아, 이', kid: '아 이', place: '마당', goal: 'ㅏ·ㅣ 모양과 소리. 아·이를 붙여 봐요.', words: ['agi', 'ima', 'oi', 'i_tooth'], jamo: ['ㅏ', 'ㅣ', 'ㅇ'], chant: ['아', '이', '이'], blocks: { c: 'ㅇ', v: 'ㅣ', say: '이', word: 'ima' }, trace: 'ㅣ' },
-    { id: 3, title: '오, 우', kid: '오 우', place: '연못', goal: 'ㅗ·ㅜ 소리. 위아래로 붙는 모음이에요.', words: ['ori', 'ubi', 'uyu', 'eomma'], jamo: ['ㅗ', 'ㅜ', 'ㅏ'], chant: ['오', '우', '오'], blocks: { c: 'ㅇ', v: 'ㅗ', say: '오', word: 'ori' }, trace: 'ㅗ' },
-    { id: 4, title: '어, 으', kid: '어 으', place: '숲길', goal: 'ㅓ·ㅡ 를 ㅏ·ㅣ 와 구별해요.', words: ['eobu', 'lion', 'ori', 'ubi'], jamo: ['ㅓ', 'ㅡ', 'ㅏ', 'ㅣ'], chant: ['어', '으', '어'], blocks: { c: 'ㅇ', v: 'ㅓ', say: '어', word: 'eobu' }, trace: 'ㅓ' },
-    { id: 5, title: 'ㄱ, ㄴ', kid: '기역 니은', place: '기차역', goal: 'ㄱ·ㄴ 이름과 소리. 가·나를 붙여 낱말로 가요.', words: ['gicha', 'nabi', 'namu', 'goguma'], jamo: ['ㄱ', 'ㄴ', 'ㅏ', 'ㅗ'], chant: ['가', '나', '기'], blocks: { c: 'ㄱ', v: 'ㅏ', say: '가', word: 'gicha' }, trace: 'ㄱ' },
-    { id: 6, title: 'ㄷ ㅁ ㅂ', kid: '다 마 바', place: '시장', goal: 'ㄷ·ㅁ·ㅂ 모양을 구별하고 음절을 붙여요.', words: ['dari', 'moja', 'banana', 'dubu', 'bada'], jamo: ['ㄷ', 'ㅁ', 'ㅂ', 'ㅏ', 'ㅗ'], chant: ['다', '마', '바'], blocks: { c: 'ㅁ', v: 'ㅗ', say: '모', word: 'moja' }, trace: 'ㅁ' },
-    { id: 7, title: 'ㅅ ㅈ ㅎ ㄹ', kid: '사 자 하', place: '동물원', goal: 'ㅅ·ㅈ·ㅎ·ㄹ 소리. 그림 낱말을 소리와 함께 읽기 시작해요.', words: ['lion', 'so', 'jadu', 'hama', 'radio'], jamo: ['ㅅ', 'ㅈ', 'ㅎ', 'ㄹ', 'ㅏ'], chant: ['사', '자', '하'], blocks: { c: 'ㅎ', v: 'ㅏ', say: '하', word: 'hama' }, trace: 'ㅅ' },
-    { id: 8, title: '붙여 읽기', kid: '낱말 읽기', place: '도서관', goal: '배운 소리로 받침 없는 낱말을 그림과 함께 읽어요. 보물에서 다시 만나요.', words: ['nabi', 'ori', 'moja', 'hama', 'gicha', 'bada', 'agi', 'eomma'], jamo: ['ㄱ', 'ㄴ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅎ', 'ㅏ', 'ㅗ'], chant: ['나', '비', '오'], blocks: { c: 'ㄴ', v: 'ㅏ', say: '나', word: 'nabi' }, trace: '가' }
+    { id: 1, title: '우리 가족', kid: '가족 소리', place: '몽글이 집', goal: '소리부터. 엄마·아빠·아기 그림을 듣고 고르고, ㅇ과 ㅏ를 만나요. 아직 낱말은 읽지 않아요.', words: ['eomma', 'appa', 'agi', 'ryeowon'], hear: ['eomma', 'appa', 'agi', 'ryeowon'], read: [], sight: [], onset: [], jamo: ['ㅇ', 'ㅏ', 'ㅣ'], focus: ['ㅇ', 'ㅏ'], contrast: { 'ㅇ': 'ㅎ', 'ㅏ': 'ㅣ', 'ㅣ': 'ㅏ' }, chant: ['아', '이', '아'], blocks: { c: 'ㅇ', v: 'ㅏ', say: '아', word: 'agi' }, trace: 'ㅇ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'trace', 'treasure'] } },
+    { id: 2, title: '아, 이', kid: '아 이', place: '마당', goal: 'ㅏ와 ㅣ를 구별하고 이를 붙여요. 이만 소리 내어 읽고, 엄마·아빠는 낱말 모양으로만 맞춰요.', words: ['agi', 'ima', 'oi', 'i_tooth', 'eomma', 'appa'], hear: ['agi', 'ima', 'oi', 'i_tooth'], read: ['i_tooth'], sight: ['eomma', 'appa'], onset: [], jamo: ['ㅏ', 'ㅣ', 'ㅇ'], focus: ['ㅏ', 'ㅣ'], contrast: { 'ㅏ': 'ㅣ', 'ㅣ': 'ㅏ' }, chant: ['아', '이', '이'], blocks: { c: 'ㅇ', v: 'ㅣ', say: '이', word: 'i_tooth' }, trace: 'ㅣ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } },
+    { id: 3, title: '오, 우', kid: '오 우', place: '연못', goal: 'ㅗ·ㅜ를 구별하고 오를 붙여요. 오이는 아는 소리라 글자로 읽어요. 우유·오리는 아직 그림만 들어요.', words: ['ori', 'ubi', 'uyu', 'oi'], hear: ['ori', 'ubi', 'uyu', 'oi'], read: ['oi'], sight: [], onset: [], jamo: ['ㅗ', 'ㅜ', 'ㅏ'], focus: ['ㅗ', 'ㅜ'], contrast: { 'ㅗ': 'ㅜ', 'ㅜ': 'ㅗ' }, chant: ['오', '우', '오'], blocks: { c: 'ㅇ', v: 'ㅗ', say: '오', word: 'ori' }, trace: 'ㅗ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace', 'treasure'] } },
+    { id: 4, title: '어, 으', kid: '어 으', place: '숲길', goal: 'ㅓ·ㅡ를 ㅏ·ㅣ와 구별해요. 자음은 ㄱ 하나만 새로 만나, 가를 붙이고 아기를 읽어요. 사자 글자는 아직 읽지 않아요.', words: ['eobu', 'lion', 'ori', 'ubi', 'agi'], hear: ['eobu', 'lion', 'ori', 'ubi'], read: ['agi'], sight: [], onset: [{ word: 'eobu', syl: '어' }, { word: 'ori', syl: '오' }], jamo: ['ㅓ', 'ㅡ', 'ㄱ', 'ㅏ', 'ㅣ'], focus: ['ㅓ', 'ㅡ'], contrast: { 'ㅓ': 'ㅏ', 'ㅡ': 'ㅣ', 'ㅏ': 'ㅓ', 'ㅣ': 'ㅡ', 'ㄱ': 'ㄴ' }, chant: ['어', '으', '어'], blocks: { c: 'ㄱ', v: 'ㅏ', say: '가', word: 'agi' }, trace: 'ㄱ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace', 'treasure'] } },
+    { id: 5, title: 'ㄴ, ㄷ', kid: '나 다', place: '골목', goal: '오늘은 ㄴ·ㄷ만 새로 만나요. 나를 붙여 누나를 읽어요. 다는 소리로 붙이고, 다리 글자는 아직 읽지 않아요.', words: ['nabi', 'nuna', 'dari', 'gicha', 'agi'], hear: ['nabi', 'nuna', 'dari', 'gicha'], read: ['nuna', 'agi'], sight: [], onset: [], jamo: ['ㄴ', 'ㄷ', 'ㅏ', 'ㅜ'], focus: ['ㄴ', 'ㄷ'], contrast: { 'ㄴ': 'ㄱ', 'ㄷ': 'ㅌ', 'ㄱ': 'ㄴ' }, chant: ['나', '다', '누'], blocks: { c: 'ㄴ', v: 'ㅏ', say: '나', word: 'nabi' }, trace: 'ㄴ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } },
+    { id: 6, title: 'ㅁ, ㅂ', kid: '마 바', place: '시장', goal: '오늘은 ㅁ·ㅂ만 새로 만나요. 아는 소리로 나비·나무·바다·두부를 읽어요.', words: ['bada', 'banana', 'nabi', 'namu', 'dari', 'dubu', 'ima', 'ubi'], hear: ['bada', 'banana', 'nabi', 'namu', 'dari'], read: ['nabi', 'namu', 'ima', 'banana', 'bada', 'dubu', 'ubi'], sight: [], onset: [], jamo: ['ㅁ', 'ㅂ', 'ㅏ', 'ㅗ'], focus: ['ㅁ', 'ㅂ'], contrast: { 'ㅁ': 'ㅂ', 'ㅂ': 'ㅁ' }, chant: ['바', '마', '바'], blocks: { c: 'ㅂ', v: 'ㅏ', say: '바', word: 'bada' }, trace: 'ㅁ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } },
+    { id: 7, title: 'ㅅ, ㅈ', kid: '사 자', place: '동물원', goal: '헷갈리는 ㅅ·ㅈ을 구별하고, 사자·소·자두·모자를 읽어요.', words: ['lion', 'so', 'jadu', 'moja'], hear: ['lion', 'so', 'jadu', 'moja'], read: ['lion', 'so', 'jadu', 'moja'], sight: [], onset: [], jamo: ['ㅅ', 'ㅈ', 'ㅏ', 'ㅗ'], focus: ['ㅅ', 'ㅈ'], contrast: { 'ㅅ': 'ㅈ', 'ㅈ': 'ㅅ' }, chant: ['사', '자', '소'], blocks: { c: 'ㅅ', v: 'ㅏ', say: '사', word: 'lion' }, trace: 'ㅅ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } },
+    { id: 8, title: '붙여 읽기', kid: '낱말 읽기', place: '도서관', goal: 'ㅎ·ㄹ을 만나고, 배운 소리로만 된 낱말을 그림과 읽어요. ㄹ은 찾고, 획이 많은 쓰기는 하지 않아요.', words: ['hama', 'ori', 'radio', 'dari', 'nabi', 'agi', 'moja', 'goguma'], hear: ['hama', 'ori', 'radio', 'dari'], read: ['hama', 'ori', 'radio', 'dari', 'moja', 'nabi', 'agi', 'goguma'], sight: [], onset: [], jamo: ['ㅎ', 'ㄹ', 'ㄱ', 'ㄴ', 'ㅏ', 'ㅗ'], focus: ['ㅎ', 'ㄹ'], contrast: { 'ㅎ': 'ㅇ', 'ㄹ': 'ㄷ' }, chant: ['하', '라', '오'], blocks: { c: 'ㅎ', v: 'ㅏ', say: '하', word: 'hama' }, trace: 'ㅎ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'treasure'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } }
   ];
   /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired. */
   const PRAISE = [
@@ -130,7 +132,7 @@
     return { cho: CHO[Math.floor(n / 588)], jung: JUNG[Math.floor((n % 588) / 28)] };
   }
   function isSyl(s) { return typeof s === 'string' && s.length === 1 && s >= '가' && s <= '힣'; }
-  function sampleStroke(st) {
+  function sampleStroke(st, dense) {
     if (st.c) {
       const cx = st.c[0], cy = st.c[1], r = st.c[2], n = 6, pts = [];
       for (let i = 0; i < n; i++) {
@@ -142,18 +144,62 @@
     const pts = [st[0].slice()];
     for (let i = 1; i < st.length; i++) {
       const a = st[i - 1], b = st[i];
-      if (Math.hypot(b[0] - a[0], b[1] - a[1]) > 40) pts.push([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);
+      if (dense !== false && Math.hypot(b[0] - a[0], b[1] - a[1]) > 40) pts.push([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);
       pts.push(b.slice());
     }
     return pts;
   }
-  function glyphPlan(g) {
-    if (STROKES[g]) return STROKES[g].map(sampleStroke);
+  function glyphPlan(g, dense) {
+    if (STROKES[g]) return STROKES[g].map(st => sampleStroke(st, dense));
     if (isSyl(g)) {
       const p = split(g);
-      return glyphPlan(p.cho).concat(glyphPlan(p.jung));
+      return glyphPlan(p.cho, dense).concat(glyphPlan(p.jung, dense));
     }
     return [];
+  }
+  function hasBatchim(ch) {
+    return isSyl(ch) && ((ch.charCodeAt(0) - 0xAC00) % 28) !== 0;
+  }
+  function jamoThrough(id) {
+    const out = [];
+    LESSONS.forEach(l => {
+      if (l.id <= id) l.jamo.forEach(j => { if (out.indexOf(j) < 0) out.push(j); });
+    });
+    return out;
+  }
+  function hearOf(lesson) {
+    const list = lesson && (lesson.hear || lesson.words) || [];
+    return list.slice();
+  }
+  function wordDecodable(wordId, lessonId) {
+    const name = ko(wordId);
+    if (!name) return false;
+    const known = jamoThrough(lessonId);
+    for (let i = 0; i < name.length; i++) {
+      const ch = name[i];
+      if (!isSyl(ch) || hasBatchim(ch)) return false;
+      const p = split(ch);
+      if (known.indexOf(p.cho) < 0 || known.indexOf(p.jung) < 0) return false;
+    }
+    return true;
+  }
+  function flowFor(lesson, diff) {
+    const table = (lesson && lesson.flow) || {};
+    const d = diff === 'easy' || diff === 'hard' ? diff : 'mid';
+    const steps = table[d] || table.mid || ['listen'];
+    return steps.slice();
+  }
+  /* A path passes only when enough plays were unaided. Letter mastery is separate. */
+  function passLesson(solos, total) {
+    return total >= 3 && solos >= 2 && solos * 2 > total;
+  }
+  /* 익힘: three clean identifications, and more clean hits than hints. */
+  function mastered(sk) {
+    return !!(sk && sk.solo >= 3 && sk.box >= 3 && sk.help < sk.solo);
+  }
+  function confuse(lesson, g) {
+    if (lesson && lesson.contrast && lesson.contrast[g]) return lesson.contrast[g];
+    return CONF[g] || '';
   }
   function lesson(id) { return LESSONS.find(l => l.id === id) || LESSONS[0]; }
   function wordsThrough(id) {
@@ -177,11 +223,12 @@
     });
     return [...keys];
   }
-  function choiceN(diff) { return diff === 'hard' ? 4 : diff === 'easy' ? 2 : 3; }
+  function choiceN(diff) { return diff === 'hard' ? 4 : 3; }
 
   root.V5C = {
     CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS,
     hex, sylKey, jamoKey, wordKey, ko, pic, sylPic, sylWord, jamoPic, compose, split, isSyl, sampleStroke, glyphPlan,
-    lesson, wordsThrough, audioKeys, choiceN
+    lesson, wordsThrough, audioKeys, choiceN, hasBatchim, jamoThrough, hearOf, wordDecodable,
+    flowFor, passLesson, mastered, confuse
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

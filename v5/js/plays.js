@@ -1,14 +1,11 @@
 'use strict';
-/* Eight play types. One question each. Scaffold: retry, hint, then show the answer. */
+/* Plays. Scaffold is retry, then a hint, then the answer.
+   A star-worthy step is a real choice answered with no miss and no hint. */
 (function () {
   const X = () => window.V5X;
   const C = () => window.V5C;
   let ctx = null;
   let onDone = null;
-  let misses = 0;
-  let over = false;
-  let hold = false;
-  let sparkToken = 0;
   const TONES = ['tone-0', 'tone-1', 'tone-2', 'tone-3', 'tone-4', 'tone-5'];
   const DECO = [
     'assets/icons/flower.svg', 'assets/icons/fruit.svg', 'assets/icons/sun.svg',
@@ -17,74 +14,117 @@
   const STAR = 'assets/stickers/space_07_별.webp';
 
   function host() { return document.getElementById('stage'); }
-  function bubble(t) { const b = document.getElementById('bubble'); if (b) b.textContent = t; }
+  function bubble(t) {
+    const b = document.getElementById('bubble');
+    if (!b) return;
+    b.classList.remove('praise-line');
+    b.textContent = t;
+  }
   function tone(s) { return TONES[(s && s.charCodeAt ? s.charCodeAt(0) : 0) % TONES.length]; }
-  function nextBtn(label) {
+  function nextBtn(label, tapName) {
     const h = host();
-    if (!h || h.querySelector('[data-tap="play-next"]')) return;
+    const name = tapName || 'play-next';
+    if (!h || h.querySelector('[data-tap="play-next"]') || h.querySelector('[data-tap="trial-next"]')) return;
     const b = document.createElement('button');
     b.className = 'tap xl play-go';
-    b.dataset.tap = 'play-next';
+    b.dataset.tap = name;
     b.type = 'button';
     b.textContent = label || '다음';
     h.appendChild(b);
   }
-  function finish(helped, quiet) {
-    if (over) return;
-    over = true;
-    const first = !helped && misses === 0;
-    if (!quiet) X().praise();
-    if (ctx.skill) X().bump(ctx.skill, helped ? 0 : first ? 2 : 1);
-    ctx.helped = !!helped;
-    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음');
+  function gradeNow() {
+    if (!ctx.choice) return 'guide';
+    if (ctx.revealed) return 'shown';
+    if (ctx.hinted) return 'hint';
+    if (ctx.misses > 0) return 'retry';
+    return 'solo';
   }
-  function miss(el, correct) {
-    if (over) return;
-    misses += 1;
-    if (el) { el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle'); }
-    if (misses === 1) {
-      bubble('다시 해 볼까?');
-      X().say(C().UI.retry, '다시 해 볼까?');
+  function replayStem() {
+    if (!ctx || !ctx.voice) return;
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function endTrial() {
+    if (!ctx || ctx.trialOver) return;
+    ctx.trialOver = true;
+    let g = gradeNow();
+    if (g === 'solo' && (ctx.wide || 0) < 3) {
+      g = (ctx.skill && X().admitThin(ctx.skill, ctx.occasion)) ? 'solo' : 'thin';
+    }
+    ctx.grades.push(g);
+    if (ctx.skill) X().bump(ctx.skill, g, { occasion: ctx.occasion });
+    if (g === 'solo') X().praise();
+    else if (g === 'thin') bubble('한 번 맞았어. 다음에 또 보자');
+    else if (g === 'retry') bubble('이번엔 맞았어');
+    else if (g === 'hint') bubble('힌트를 보고 골랐어');
+    if (ctx.ti + 1 < ctx.trials.length) {
+      nextBtn('또 하나', 'trial-next');
       return;
     }
-    if (misses === 2) {
-      if (correct) correct.classList.add('hint-glow');
+    const counting = ctx.grades.filter(x => x !== 'thin');
+    ctx.playDone = true;
+    ctx.counted = counting.length > 0;
+    ctx.soloStep = !!ctx.scored && ctx.counted && counting.every(x => x === 'solo');
+    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
+  }
+  function assist(el, correct) {
+    if (!ctx || ctx.trialOver) return;
+    if (el) {
+      el.classList.remove('wiggle');
+      void el.offsetWidth;
+      el.classList.add('wiggle');
+    }
+    ctx.misses += 1;
+    const nodes = (Array.isArray(correct) ? correct : [correct]).filter(Boolean);
+    const soon = ctx.skill && X().hintSoon(ctx.skill);
+    const canHint = !!X().S.colorHints;
+    const wantHint = canHint && !ctx.hinted && nodes.length && (ctx.misses >= 2 || (soon && ctx.misses >= 1));
+    if (wantHint && ctx.misses < 3) {
+      ctx.hinted = true;
+      nodes.forEach(n => n.classList.add('is-sparkle'));
       bubble('반짝이는 데를 봐!');
       X().say(C().UI.hint, '반짝이는 데를 봐!');
       return;
     }
-    if (correct) correct.classList.add('is-sparkle', 'show-ans');
+    if (ctx.misses < 2 && !ctx.hinted) {
+      bubble('다시 해 볼까?');
+      X().say(C().UI.retry, '다시 해 볼까?');
+      replayStem();
+      return;
+    }
+    ctx.revealed = true;
+    nodes.forEach(n => n.classList.add('show-ans'));
     bubble('같이 해 보자!');
     X().say(C().UI.together, '같이 해 보자!');
-    X().confetti();
-    finish(true, true);
+    endTrial();
   }
+  const GLYPHS = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'];
   function take(n, pool, correct) {
     const rest = X().shuffle(pool.filter(x => x !== correct));
     const out = [correct];
-    rest.forEach(x => { if (out.length < n && !out.includes(x)) out.push(x); });
-    let guard = 0;
-    while (out.length < n && guard++ < 8) {
-      const extra = pool[guard % pool.length];
-      if (extra && !out.includes(extra)) out.push(extra);
-    }
+    rest.forEach(x => { if (out.length < n && out.indexOf(x) < 0) out.push(x); });
     return X().shuffle(out);
   }
-  function wordPool(lesson) {
-    const all = C().wordsThrough(lesson.id);
-    return all.length >= 2 ? all : lesson.words.slice();
-  }
-  function lessonWord(lesson) {
-    return lesson.words[Math.floor(Math.random() * lesson.words.length)];
-  }
-  function reviewWord(lesson) {
-    const words = wordPool(lesson);
-    const due = words.filter(w => {
-      const s = X().S.skill['w:' + w];
-      return s && s.due && s.due <= Date.now();
+  function fillTo(list, correct, n, fillers) {
+    const out = list.slice();
+    (fillers || []).forEach(x => {
+      if (out.length >= n) return;
+      if (x !== correct && out.indexOf(x) < 0) out.push(x);
     });
-    const pool = due.length ? due : words;
-    return pool[Math.floor(Math.random() * pool.length)];
+    return X().shuffle(out);
+  }
+  function askN() { return C().choiceN(X().S.difficulty); }
+  function markWide(n) { ctx.wide = n; ctx.choice = n >= 2; }
+  function pickDistinct(pool, n) {
+    const out = [];
+    X().shuffle(pool.slice()).forEach(x => { if (out.length < n && out.indexOf(x) < 0) out.push(x); });
+    return out;
+  }
+  function hearPool(lesson) {
+    const out = [];
+    C().LESSONS.forEach(l => {
+      if (l.id <= lesson.id) C().hearOf(l).forEach(w => { if (out.indexOf(w) < 0) out.push(w); });
+    });
+    return out.length >= 2 ? out : C().hearOf(lesson);
   }
   function artFor(g) {
     return C().jamoPic(g) || C().sylPic(g) || STAR;
@@ -93,14 +133,14 @@
     return '<div class="choices">' + items.map(render).join('') + '</div>';
   }
   function picCard(id, ok) {
-    return '<button type="button" class="tap choice pic-choice ' + tone(id) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + C().ko(id) + '"><img alt="" width="512" height="512" src="' + C().pic(id) + '"><b>' + C().ko(id) + '</b></button>';
+    return '<button type="button" class="tap choice pic-choice ' + tone(id) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="그림"><img alt="" width="512" height="512" src="' + C().pic(id) + '"></button>';
   }
   function glyphCard(g, ok) {
     return '<button type="button" class="tap choice glyph ' + tone(g) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + g + '"><img alt="" src="' + artFor(g) + '"><b>' + g + '</b></button>';
   }
-  function wordCard(id, ok, hint) {
+  function wordCard(id, ok) {
     const deco = DECO[id.length % DECO.length];
-    return '<button type="button" class="tap choice word ' + tone(C().ko(id)) + (hint ? ' hint' : '') + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + C().ko(id) + '"><img class="deco" alt="" src="' + deco + '"><b>' + C().ko(id) + '</b></button>';
+    return '<button type="button" class="tap choice word ' + tone(C().ko(id)) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + C().ko(id) + '"><img class="deco" alt="" src="' + deco + '"><b>' + C().ko(id) + '</b></button>';
   }
   function meter(n) {
     let html = '<div class="meter" id="meter">';
@@ -111,104 +151,211 @@
     const dots = host().querySelectorAll('#meter i');
     if (dots[i]) dots[i].classList.add('is-on');
   }
-
-  const mounts = {
-    listen(lesson) {
-      const target = lessonWord(lesson);
-      const n = C().choiceN(X().S.difficulty);
-      const opts = take(n, wordPool(lesson), target);
-      ctx.skill = 'w:' + target;
-      host().innerHTML = '<h1 class="prompt">어떤 그림일까?</h1>' + cardsHTML(opts, id => picCard(id, id === target));
-      X().say(C().wordKey(target), C().ko(target));
-    },
-    sparkle(lesson) {
-      const target = lesson.jamo[Math.floor(Math.random() * lesson.jamo.length)];
-      const pool = lesson.jamo.concat(C().CONF[target] ? [C().CONF[target]] : []);
-      const n = Math.min(C().choiceN(X().S.difficulty), Math.max(2, pool.length));
-      const opts = take(n, pool, target);
-      ctx.skill = 'j:' + target;
-      host().innerHTML = '<h1 class="prompt">반짝이는 글자를 눌러</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
-      const delay = X().S.difficulty === 'easy' ? 180 : X().S.difficulty === 'hard' ? 700 : 360;
-      const token = sparkToken;
-      setTimeout(() => {
-        if (token !== sparkToken || over) return;
-        const el = host() && host().querySelector('[data-ok="1"]');
-        if (el) el.classList.add('is-sparkle');
-      }, delay);
-      X().say(C().jamoKey(target));
-    },
-    blocks(lesson) {
-      const b = lesson.blocks;
-      const syl = b.say;
-      ctx.skill = 's:' + syl;
-      const n = X().S.difficulty === 'easy' ? 1 : 2;
-      const cons = [b.c];
-      const vows = [b.v];
-      if (n > 1) {
-        cons.push(C().CONF[b.c] || 'ㅇ');
-        vows.push(C().CONF[b.v] || 'ㅏ');
-      }
-      const pieces = X().shuffle(cons.map(g => ({ g, kind: 'cho', ok: g === b.c }))).concat(X().shuffle(vows.map(g => ({ g, kind: 'jung', ok: g === b.v }))));
-      host().innerHTML = '<h1 class="prompt">소리를 붙여 보자</h1><div class="goal-pic"><img alt="" width="512" height="512" src="' + C().pic(b.word) + '"><span>' + C().ko(b.word) + '</span></div><div class="slots"><i data-slot="cho">+</i><i data-slot="jung">+</i><b class="sum" hidden></b></div><div class="choices pieces">' + pieces.map(p => '<button type="button" class="tap choice glyph ' + tone(p.g) + '" data-tap="piece" data-kind="' + p.kind + '" data-ok="' + (p.ok ? '1' : '0') + '" aria-label="' + p.g + '"><img alt="" src="' + artFor(p.g) + '"><b>' + p.g + '</b></button>').join('') + '</div>';
-      X().say(C().UI.merge, '블록을 합쳐서 만들어 볼까?');
-    },
-    match(lesson) {
-      const target = lessonWord(lesson);
-      const n = C().choiceN(X().S.difficulty);
-      const opts = take(n, wordPool(lesson), target);
-      const hint = X().hintOn(target);
-      ctx.skill = 'w:' + target;
-      host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic' + (hint ? ' hint' : '') + '"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target, hint && id === target)).join('') + '</div>';
-      X().say(C().wordKey(target), C().ko(target));
-    },
-    memory(lesson) {
-      const pool = wordPool(lesson).slice();
-      const a = pool[0], b = pool[1] || pool[0];
-      ctx.skill = 'w:' + a;
-      const cards = X().shuffle([
-        { pair: a, face: 'pic' }, { pair: a, face: 'word' },
-        { pair: b, face: 'pic' }, { pair: b, face: 'word' }
-      ]);
-      host().innerHTML = '<h1 class="prompt">같은 짝을 찾아 봐</h1><div class="mem">' + cards.map((card, i) => {
-        const hint = X().hintOn(card.pair) ? ' hint' : '';
-        const inner = card.face === 'pic'
-          ? '<img alt="" width="512" height="512" src="' + C().pic(card.pair) + '">'
-          : '<img class="deco" alt="" src="' + DECO[i % DECO.length] + '"><b>' + C().ko(card.pair) + '</b>';
-        return '<button type="button" class="tap mem-card ' + tone(card.pair) + hint + '" data-tap="card" data-pair="' + card.pair + '" data-i="' + i + '" aria-label="카드"><span class="back"><img alt="" src="' + STAR + '"></span><span class="front">' + inner + '</span></button>';
-      }).join('') + '</div>';
-      ctx.mem = { open: [] };
-      X().say(C().UI.match, '낱말 카드를 그림에 데려다 줄래?');
-    },
-    chant(lesson) {
-      ctx.skill = 's:' + lesson.chant.join('');
-      ctx.chant = 0;
-      const first = lesson.chant[0];
-      const firstPic = C().sylPic(first) || STAR;
-      host().innerHTML = '<div class="chant-board"><div class="chant-pic"><img id="chantPic" alt="" width="512" height="512" src="' + firstPic + '"><span id="chantWord">' + C().sylWord(first) + '</span></div>' + meter(lesson.chant.length) + '<div class="chant">' + lesson.chant.map((s, i) => {
-        const key = C().sylKey(s);
-        return '<button type="button" class="tap ctile ' + tone(s) + (i === 0 ? ' is-lit' : '') + '" data-tap="tile" data-i="' + i + '" data-audio="' + key + '" aria-label="' + s + '"><img class="tile-pic" alt="" src="' + (C().sylPic(s) || STAR) + '"><b>' + s + '</b></button>';
-      }).join('') + '</div></div>';
-      showSyl(first);
-      X().say(C().UI.hint, '반짝반짝 빛나는 데를 봐!');
-    },
-    trace(lesson) {
-      const g = lesson.trace;
-      ctx.skill = (g >= '가' && g <= '힣') ? 's:' + g : 'j:' + g;
-      ctx.trace = { plan: C().glyphPlan(g), si: 0, di: 0, glyph: g };
-      const pic = C().jamoPic(g) || C().sylPic(g);
-      host().innerHTML = '<h1 class="prompt">점을 따라 눌러</h1>' + (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') + '<div class="trace-board" data-letter="' + g + '"><p class="ghost">' + g + '</p><div class="dots"></div></div>';
-      drawDots();
-      X().say(C().UI.trace, '분홍 점을 따라 손가락으로 써 볼까?');
-    },
-    treasure(lesson) {
-      const target = reviewWord(lesson);
-      const n = C().choiceN(X().S.difficulty);
-      const opts = take(Math.max(2, n), wordPool(lesson), target);
-      ctx.skill = 'w:' + target;
-      host().innerHTML = '<h1 class="prompt">보물 상자 소리</h1><img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' + cardsHTML(opts, id => picCard(id, id === target));
-      X().say(C().wordKey(target), C().ko(target));
+  function blockAlts(g, lesson, n) {
+    const out = [];
+    const alt = C().confuse(lesson, g);
+    if (alt && alt !== g) out.push(alt);
+    const vowels = ['ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'];
+    const cons = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ'];
+    const pool = vowels.indexOf(g) >= 0 ? vowels : cons;
+    (lesson.jamo || []).concat(pool).forEach(j => {
+      if (out.length < n && j !== g && out.indexOf(j) < 0) out.push(j);
+    });
+    return out;
+  }
+  function knownSyls(lesson) {
+    const out = [];
+    C().LESSONS.forEach(l => {
+      if (l.id <= lesson.id) (l.chant || []).forEach(s => { if (out.indexOf(s) < 0) out.push(s); });
+    });
+    return out;
+  }
+  function sylChoices(lesson, answer, n) {
+    const out = [answer];
+    knownSyls(lesson).concat(['아', '이', '오', '우', '어', '으']).forEach(s => {
+      if (out.length < n && s !== answer && out.indexOf(s) < 0) out.push(s);
+    });
+    return X().shuffle(out);
+  }
+  function wordChoices(lesson, id, n) {
+    const pool = [];
+    C().LESSONS.forEach(l => {
+      if (l.id > lesson.id) return;
+      (l.read || []).forEach(w => {
+        if (C().wordDecodable(w, lesson.id) && pool.indexOf(w) < 0) pool.push(w);
+      });
+      (l.sight || []).forEach(w => { if (pool.indexOf(w) < 0) pool.push(w); });
+    });
+    if (pool.indexOf(id) < 0) pool.push(id);
+    return take(n, pool, id);
+  }
+  function matchTasks(lesson) {
+    const tasks = [];
+    (lesson.read || []).forEach(id => {
+      if (C().wordDecodable(id, lesson.id)) tasks.push({ kind: 'read', id: id, skill: 'r:' + id });
+    });
+    (lesson.sight || []).forEach(id => tasks.push({ kind: 'sight', id: id, skill: 'sight:' + id }));
+    (lesson.onset || []).forEach(o => tasks.push({ kind: 'onset', word: o.word, syl: o.syl, skill: 's:' + o.syl }));
+    if (tasks.length) return tasks;
+    const known = C().jamoThrough(lesson.id);
+    C().hearOf(lesson).forEach(id => {
+      const ch = C().ko(id).charAt(0);
+      if (!C().isSyl(ch) || C().hasBatchim(ch)) return;
+      const p = C().split(ch);
+      if (known.indexOf(p.cho) < 0 || known.indexOf(p.jung) < 0) return;
+      tasks.push({ kind: 'onset', word: id, syl: ch, skill: 's:' + ch });
+    });
+    if (tasks.length) return tasks;
+    (lesson.chant || []).forEach(s => tasks.push({ kind: 'syl', syl: s, skill: 's:' + s }));
+    return tasks;
+  }
+  function weakerRead(ids) {
+    let best = ids[0];
+    let bestSolo = 99;
+    ids.forEach(id => {
+      const sk = X().S.skill['r:' + id];
+      const solo = sk && sk.solo ? sk.solo : 0;
+      if (solo < bestSolo) { bestSolo = solo; best = id; }
+    });
+    return 'r:' + best;
+  }
+  function memoryPairs(lesson) {
+    const reads = (lesson.read || []).filter(id => C().wordDecodable(id, lesson.id));
+    if (reads.length >= 2) {
+      const pick = X().shuffle(reads).slice(0, 2);
+      return {
+        skill: weakerRead(pick),
+        pairs: pick.map(id => ({ id: id, face: C().ko(id), pic: C().pic(id) }))
+      };
     }
-  };
+    let syls = [];
+    (lesson.chant || []).forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
+    ['아', '이', '오', '우'].forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
+    syls = X().shuffle(syls).slice(0, 2);
+    return {
+      skill: 's:' + syls[0],
+      pairs: syls.map(s => ({ id: s, face: s, pic: C().sylPic(s) || STAR }))
+    };
+  }
+  function weakestKey() {
+    const skills = X().S.skill || {};
+    let best = '';
+    let bestNeed = 0;
+    Object.keys(skills).forEach(k => {
+      if (!/^(j|r|sight|p|s):/.test(k)) return;
+      const it = skills[k];
+      if (!it || !it.seen) return;
+      const due = it.due && it.due <= Date.now();
+      const need = (it.help || 0) * 2 + (due ? 2 : 0) + ((it.solo || 0) === 0 ? 1 : 0) - (it.solo || 0);
+      if (need > bestNeed) { bestNeed = need; best = k; }
+    });
+    return best;
+  }
+
+  function renderListen(item, lesson) {
+    const target = item.id;
+    const n = askN();
+    const opts = take(Math.min(n, Math.max(1, hearPool(lesson).length)), hearPool(lesson), target);
+    const title = ctx.type === 'treasure' ? '보물 상자 소리' : '어떤 그림일까?';
+    markWide(opts.length);
+    ctx.skill = item.skill;
+    ctx.voice = { key: C().wordKey(target), text: title };
+    const chest = ctx.type === 'treasure' ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
+    host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + chest + cardsHTML(opts, id => picCard(id, id === target));
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderSparkle(item, lesson) {
+    const target = item.g;
+    const pool = [target];
+    const alt = C().confuse(lesson, target);
+    if (alt && alt !== target) pool.push(alt);
+    (lesson.focus || []).concat(lesson.jamo || []).forEach(g => { if (pool.indexOf(g) < 0) pool.push(g); });
+    const opts = fillTo(pool, target, askN(), GLYPHS);
+    const title = ctx.type === 'treasure' ? '보물 글자' : '같은 글자를 눌러';
+    markWide(opts.length);
+    ctx.skill = item.skill;
+    ctx.voice = { key: C().jamoKey(target), text: title };
+    host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderBlocks(lesson) {
+    const b = lesson.blocks;
+    const nDist = X().S.difficulty === 'hard' ? 3 : 2;
+    const cons = [b.c].concat(blockAlts(b.c, lesson, nDist));
+    const vows = [b.v].concat(blockAlts(b.v, lesson, nDist));
+    markWide(Math.min(cons.length, vows.length));
+    ctx.skill = 's:' + b.say;
+    ctx.voice = { key: C().sylKey(b.say), text: '소리를 붙여 보자' };
+    const pieces = X().shuffle(cons.map(g => ({ g: g, kind: 'cho', ok: g === b.c }))).concat(
+      X().shuffle(vows.map(g => ({ g: g, kind: 'jung', ok: g === b.v })))
+    );
+    host().innerHTML = '<h1 class="prompt">소리를 붙여 보자</h1><div class="goal-pic"><img alt="" width="512" height="512" src="' + C().pic(b.word) + '"></div><div class="slots"><i data-slot="cho">+</i><i data-slot="jung">+</i><b class="sum" hidden></b></div><div class="choices pieces">' + pieces.map(p => '<button type="button" class="tap choice glyph ' + tone(p.g) + '" data-tap="piece" data-kind="' + p.kind + '" data-ok="' + (p.ok ? '1' : '0') + '" aria-label="' + p.g + '"><img alt="" src="' + artFor(p.g) + '"><b>' + p.g + '</b></button>').join('') + '</div>';
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderWordMatch(item, lesson) {
+    const target = item.id;
+    const opts = wordChoices(lesson, target, askN());
+    markWide(opts.length);
+    ctx.skill = item.skill;
+    ctx.voice = { key: C().wordKey(target), text: '같은 낱말을 골라' };
+    host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target)).join('') + '</div>';
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderOnset(item, lesson) {
+    const answer = item.syl;
+    const opts = sylChoices(lesson, answer, askN());
+    markWide(opts.length);
+    ctx.skill = item.skill;
+    const prompt = '처음 소리를 골라';
+    ctx.voice = { key: item.word ? C().wordKey(item.word) : C().sylKey(answer), text: prompt };
+    const pic = item.word ? C().pic(item.word) : (C().sylPic(answer) || STAR);
+    host().innerHTML = '<h1 class="prompt">' + prompt + '</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + pic + '"></div>' + cardsHTML(opts, g => glyphCard(g, g === answer));
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderMemory(item) {
+    markWide(4);
+    ctx.skill = item.skill;
+    ctx.mem = { open: [] };
+    ctx.voice = { key: C().UI.match, text: '같은 짝을 찾아' };
+    const cards = [];
+    item.pairs.forEach(p => {
+      cards.push({ pair: p.id, face: 'pic', pic: p.pic, word: p.face });
+      cards.push({ pair: p.id, face: 'word', pic: p.pic, word: p.face });
+    });
+    const deck = X().shuffle(cards);
+    host().innerHTML = '<h1 class="prompt">같은 짝을 찾아</h1><div class="mem">' + deck.map((card, i) => {
+      const inner = card.face === 'pic'
+        ? '<img alt="" width="512" height="512" src="' + card.pic + '">'
+        : '<img class="deco" alt="" src="' + DECO[i % DECO.length] + '"><b>' + card.word + '</b>';
+      return '<button type="button" class="tap mem-card ' + tone(card.pair) + '" data-tap="card" data-pair="' + card.pair + '" data-i="' + i + '" aria-label="카드"><span class="back"><img alt="" src="' + STAR + '"></span><span class="front">' + inner + '</span></button>';
+    }).join('') + '</div>';
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderChant(lesson) {
+    ctx.skill = null;
+    ctx.choice = false;
+    ctx.chant = 0;
+    const first = lesson.chant[0];
+    ctx.voice = { key: C().sylKey(first), text: '소리를 따라 눌러' };
+    const firstPic = C().sylPic(first) || STAR;
+    host().innerHTML = '<div class="chant-board"><div class="chant-pic"><img id="chantPic" alt="" width="512" height="512" src="' + firstPic + '"><span id="chantWord">' + C().sylWord(first) + '</span></div>' + meter(lesson.chant.length) + '<div class="chant">' + lesson.chant.map((s, i) => {
+      const key = C().sylKey(s);
+      return '<button type="button" class="tap ctile ' + tone(s) + (i === 0 ? ' is-lit' : '') + '" data-tap="tile" data-i="' + i + '" data-audio="' + key + '" aria-label="' + s + '"><img class="tile-pic" alt="" src="' + (C().sylPic(s) || STAR) + '"><b>' + s + '</b></button>';
+    }).join('') + '</div></div>';
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
+  function renderTrace(lesson) {
+    const g = lesson.trace;
+    ctx.skill = 'm:' + g;
+    ctx.choice = false;
+    const dense = X().S.difficulty !== 'easy';
+    ctx.trace = { plan: C().glyphPlan(g, dense), si: 0, di: 0, glyph: g };
+    const pic = C().jamoPic(g) || C().sylPic(g);
+    ctx.voice = { key: C().UI.trace, text: '점을 따라 눌러' };
+    host().innerHTML = '<h1 class="prompt">점을 따라 눌러</h1>' + (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') + '<div class="trace-board" data-letter="' + g + '"><p class="ghost">' + g + '</p><div class="dots"></div></div>';
+    drawDots();
+    X().say(ctx.voice.key, ctx.voice.text);
+  }
 
   function drawDots() {
     const box = host().querySelector('.dots');
@@ -234,14 +381,27 @@
     if (card) card.classList.toggle('is-word-only', same);
     if (word) word.textContent = C().sylWord(s);
   }
-
+  function fillBlocks() {
+    const b = ctx.lesson.blocks;
+    ['cho', 'jung'].forEach(kind => {
+      const el = host().querySelector('[data-kind="' + kind + '"][data-ok="1"]');
+      const slot = host().querySelector('[data-slot="' + kind + '"]');
+      if (el && slot && el.querySelector('b')) slot.textContent = el.querySelector('b').textContent.trim();
+    });
+    const sum = host().querySelector('.sum');
+    if (sum) { sum.hidden = false; sum.textContent = b.say; }
+  }
   function onPiece(el) {
-    if (over || el.getAttribute('aria-disabled') === 'true') return;
+    if (ctx.trialOver || el.getAttribute('aria-disabled') === 'true') return;
     const ok = el.dataset.ok === '1';
     const kind = el.dataset.kind;
-    if (!ok) return miss(el, host().querySelector('[data-kind="' + kind + '"][data-ok="1"]'));
+    if (!ok) {
+      assist(el, host().querySelector('[data-kind="' + kind + '"][data-ok="1"]'));
+      if (ctx.revealed) fillBlocks();
+      return;
+    }
     const slot = host().querySelector('[data-slot="' + kind + '"]');
-    if (slot) slot.textContent = el.querySelector('b').textContent.trim();
+    if (slot && el.querySelector('b')) slot.textContent = el.querySelector('b').textContent.trim();
     el.setAttribute('aria-disabled', 'true');
     el.classList.add('is-off');
     const cho = host().querySelector('[data-slot="cho"]').textContent.trim();
@@ -252,68 +412,138 @@
       sum.hidden = false;
       sum.textContent = b.say;
       X().say(C().sylKey(b.say), b.say);
-      finish(misses > 0);
-    } else {
-      bubble(kind === 'cho' ? '이제 모음!' : '이제 자음!');
-    }
+      endTrial();
+    } else bubble(kind === 'cho' ? '이제 모음!' : '이제 자음!');
+  }
+  function sparklePair() {
+    const cards = Array.prototype.slice.call(host().querySelectorAll('.mem-card:not(.is-matched)'));
+    if (!cards.length) return;
+    const pair = cards[0].dataset.pair;
+    cards.forEach(c => { if (c.dataset.pair === pair) c.classList.add('is-sparkle'); });
+  }
+  function closeCards(open) {
+    ctx.hold = true;
+    setTimeout(() => {
+      open.forEach(el => el.classList.remove('is-up'));
+      ctx.mem.open = [];
+      ctx.hold = false;
+    }, 700);
   }
   function onCard(el) {
-    if (over || hold || el.classList.contains('is-matched') || el.classList.contains('is-up')) return;
+    if (ctx.trialOver || ctx.hold || el.classList.contains('is-matched') || el.classList.contains('is-up')) return;
     el.classList.add('is-up');
-    const mem = ctx.mem;
-    mem.open.push(el);
-    if (mem.open.length < 2) return;
-    const [a, b] = mem.open;
+    ctx.mem.open.push(el);
+    if (ctx.mem.open.length < 2) return;
+    const a = ctx.mem.open[0];
+    const b = ctx.mem.open[1];
     if (a.dataset.pair === b.dataset.pair) {
       a.classList.add('is-matched');
       b.classList.add('is-matched');
-      mem.open = [];
+      ctx.mem.open = [];
       const done = host().querySelectorAll('.mem-card.is-matched').length === host().querySelectorAll('.mem-card').length;
-      if (done) finish(misses > 0);
-      else X().praise();
+      if (done) endTrial();
       return;
     }
-    misses += 1;
-    hold = true;
-    bubble(misses >= 3 ? '같이 찾았어!' : '다시 한 번!');
-    if (misses >= 3) {
+    const open = ctx.mem.open.slice();
+    ctx.mem.open = [];
+    ctx.misses += 1;
+    const soon = ctx.skill && X().hintSoon(ctx.skill);
+    const canHint = !!X().S.colorHints;
+    if (!ctx.hinted && canHint && (ctx.misses >= 2 || (soon && ctx.misses >= 1)) && ctx.misses < 3) {
+      ctx.hinted = true;
+      sparklePair();
+      bubble('반짝이는 데를 봐!');
+      X().say(C().UI.hint, '반짝이는 데를 봐!');
+      closeCards(open);
+      return;
+    }
+    if (ctx.misses >= 3 || (!canHint && ctx.misses >= 2)) {
+      ctx.revealed = true;
       host().querySelectorAll('.mem-card').forEach(c => c.classList.add('is-up', 'is-matched', 'show-ans'));
-      hold = false;
-      finish(true, true);
+      bubble('같이 해 보자!');
+      X().say(C().UI.together, '같이 해 보자!');
+      ctx.hold = false;
+      endTrial();
       return;
     }
-    setTimeout(() => {
-      a.classList.remove('is-up');
-      b.classList.remove('is-up');
-      mem.open = [];
-      hold = false;
-    }, 480);
+    bubble('다시 해 볼까?');
+    X().say(C().UI.retry, '다시 해 볼까?');
+    closeCards(open);
+  }
+  function finishGuided() {
+    if (ctx.trialOver) return;
+    ctx.trialOver = true;
+    ctx.playDone = true;
+    ctx.soloStep = false;
+    ctx.grades = ['guide'];
+    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function onTile(el) {
-    if (over) return;
+    if (ctx.trialOver) return;
     if (!el.classList.contains('is-lit')) {
+      el.classList.remove('wiggle');
+      void el.offsetWidth;
       el.classList.add('wiggle');
-      bubble('빛나는 칸이야!');
+      ctx.misses += 1;
+      if (ctx.misses >= 2 && X().S.colorHints) {
+        const lit = host().querySelector('.ctile.is-lit');
+        if (lit) lit.classList.add('is-sparkle');
+        ctx.hinted = true;
+      }
+      bubble(ctx.hinted ? '반짝이는 데를 봐!' : '빛나는 칸이야');
       return;
     }
     el.classList.remove('is-lit');
-    el.classList.add('is-hit', 'is-burst');
+    el.classList.add('is-hit');
     const s = ctx.lesson.chant[+el.dataset.i];
-    const key = el.dataset.audio || C().sylKey(s);
     showSyl(s);
     markMeter(ctx.chant);
-    X().say(key, s, { keepBubble: true });
+    X().say(el.dataset.audio || C().sylKey(s), s, { keepBubble: true });
     const next = host().querySelector('[data-i="' + (ctx.chant + 1) + '"]');
     ctx.chant += 1;
     if (next) {
       next.classList.add('is-lit');
-      X().praise();
-    } else finish(false);
+      const ns = ctx.lesson.chant[ctx.chant];
+      ctx.voice = { key: C().sylKey(ns), text: '소리를 따라 눌러' };
+    } else finishGuided();
+  }
+  function endTrace() {
+    if (ctx.trialOver) return;
+    const grade = ctx.revealed ? 'shown' : (ctx.misses ? 'hint' : 'guide');
+    if (ctx.skill) X().bump(ctx.skill, grade);
+    ctx.trialOver = true;
+    ctx.playDone = true;
+    ctx.soloStep = false;
+    ctx.grades = [grade];
+    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function onDot(el) {
-    if (over || !ctx.trace) return;
+    if (ctx.trialOver || !ctx.trace) return;
     const i = +el.dataset.i;
-    if (i !== ctx.trace.di) return miss(el, host().querySelector('.is-next'));
+    if (i !== ctx.trace.di) {
+      ctx.misses += 1;
+      el.classList.remove('wiggle');
+      void el.offsetWidth;
+      el.classList.add('wiggle');
+      if (ctx.misses >= 8) {
+        ctx.revealed = true;
+        bubble('같이 해 보자!');
+        X().say(C().UI.together, '같이 해 보자!');
+        endTrace();
+        return;
+      }
+      if (ctx.misses === 3 && X().S.colorHints) {
+        ctx.hinted = true;
+        const n = host().querySelector('.dot.is-next');
+        if (n) n.classList.add('is-sparkle');
+        bubble('반짝이는 데를 봐!');
+        X().say(C().UI.hint, '반짝이는 데를 봐!');
+        return;
+      }
+      bubble('다시 해 볼까?');
+      X().say(C().UI.retry, '다시 해 볼까?');
+      return;
+    }
     el.classList.remove('is-next');
     el.classList.add('is-done');
     ctx.trace.di += 1;
@@ -330,30 +560,121 @@
       drawDots();
       return;
     }
-    finish(misses > 0);
+    endTrace();
   }
 
+  function listenItems(lesson, n) {
+    return pickDistinct(C().hearOf(lesson), n).map(id => ({ kind: 'listen', id: id, skill: 'p:' + id }));
+  }
+  function sparkleItems(lesson, n) {
+    const focus = (lesson.focus && lesson.focus.length) ? lesson.focus : (lesson.jamo || []);
+    return pickDistinct(focus, n).map(g => ({ kind: 'sparkle', g: g, skill: 'j:' + g }));
+  }
+  function matchItems(lesson, n) {
+    const tasks = matchTasks(lesson);
+    const out = [];
+    const seen = {};
+    X().shuffle(tasks).forEach(t => {
+      if (out.length >= n || seen[t.skill]) return;
+      seen[t.skill] = 1;
+      out.push(t);
+    });
+    if (!out.length && tasks[0]) out.push(tasks[0]);
+    return out;
+  }
+  function treasureItem(lesson) {
+    const key = weakestKey();
+    if (key.indexOf('j:') === 0) return { kind: 'sparkle', g: key.slice(2), skill: key };
+    if (key.indexOf('sight:') === 0) return { kind: 'sight', id: key.slice(6), skill: key };
+    if (key.indexOf('r:') === 0) return { kind: 'read', id: key.slice(2), skill: key };
+    if (key.indexOf('p:') === 0) return { kind: 'listen', id: key.slice(2), skill: key };
+    if (key.indexOf('s:') === 0 && C().isSyl(key.slice(2))) {
+      const p = C().split(key.slice(2));
+      return { kind: 'sparkle', g: p.jung, skill: 'j:' + p.jung };
+    }
+    const pool = hearPool(lesson);
+    const id = pool[Math.floor(Math.random() * pool.length)] || C().hearOf(lesson)[0];
+    return { kind: 'listen', id: id, skill: 'p:' + id };
+  }
+  function buildTrials(spec) {
+    const lesson = spec.lesson;
+    const multi = spec.mode === 'lesson' && (spec.type === 'listen' || spec.type === 'sparkle' || spec.type === 'match');
+    const n = multi ? 2 : 1;
+    if (spec.type === 'listen') return listenItems(lesson, n);
+    if (spec.type === 'sparkle') return sparkleItems(lesson, n);
+    if (spec.type === 'match') return matchItems(lesson, n);
+    if (spec.type === 'treasure') return [treasureItem(lesson)];
+    if (spec.type === 'blocks') return [{ kind: 'blocks' }];
+    if (spec.type === 'memory') return [Object.assign({ kind: 'memory' }, memoryPairs(lesson))];
+    if (spec.type === 'chant') return [{ kind: 'chant' }];
+    if (spec.type === 'trace') return [{ kind: 'trace' }];
+    return listenItems(lesson, 1);
+  }
+  function startTrial() {
+    ctx.misses = 0;
+    ctx.hinted = false;
+    ctx.revealed = false;
+    ctx.trialOver = false;
+    ctx.hold = false;
+    ctx.choice = true;
+    const item = ctx.trials[ctx.ti] || { kind: 'listen', id: C().hearOf(ctx.lesson)[0], skill: '' };
+    const kind = item.kind || ctx.type;
+    if (kind === 'listen') renderListen(item, ctx.lesson);
+    else if (kind === 'sparkle') renderSparkle(item, ctx.lesson);
+    else if (kind === 'blocks') renderBlocks(ctx.lesson);
+    else if (kind === 'read' || kind === 'sight') renderWordMatch(item, ctx.lesson);
+    else if (kind === 'onset' || kind === 'syl') renderOnset(item, ctx.lesson);
+    else if (kind === 'memory') renderMemory(item);
+    else if (kind === 'chant') renderChant(ctx.lesson);
+    else if (kind === 'trace') renderTrace(ctx.lesson);
+    else renderListen(item, ctx.lesson);
+  }
   function mount(stage, spec, done) {
-    sparkToken += 1;
-    ctx = spec;
+    ctx = {
+      mode: spec.mode,
+      type: spec.type,
+      lesson: spec.lesson,
+      trials: buildTrials(spec),
+      ti: 0,
+      grades: [],
+      scored: spec.type !== 'chant' && spec.type !== 'trace',
+      occasion: spec.type + ':' + spec.lesson.id + ':' + Date.now(),
+      wide: 3,
+      counted: false,
+      soloStep: false,
+      playDone: false,
+      voice: null,
+      skill: null,
+      misses: 0,
+      hinted: false,
+      revealed: false,
+      trialOver: false,
+      hold: false,
+      choice: true
+    };
     onDone = done;
-    misses = 0;
-    over = false;
-    hold = false;
-    const fn = mounts[spec.type] || mounts.listen;
-    fn(spec.lesson);
+    if (!ctx.trials.length) ctx.trials = [{ kind: 'listen', id: C().hearOf(spec.lesson)[0], skill: '' }];
+    startTrial();
   }
   function tap(el) {
     const t = el.dataset.tap;
-    if (t === 'play-next') { if (onDone) onDone(!!(ctx && ctx.helped)); return true; }
-    if (over && t !== 'play-next') return false;
+    if (t === 'trial-next') {
+      ctx.ti += 1;
+      startTrial();
+      return true;
+    }
+    if (t === 'play-next') {
+      if (onDone) onDone({ solo: !!ctx.soloStep, scored: !!(ctx.scored && ctx.counted) });
+      return true;
+    }
+    if (!ctx || ctx.trialOver) return false;
     if (t === 'pick') {
       if (el.dataset.ok === '1') {
-        el.classList.add('is-ok', 'is-burst');
+        el.classList.add('is-ok');
         const chest = document.getElementById('chest');
         if (chest) chest.src = 'assets/pic/chest_open.webp';
-        finish(misses > 0);
-      } else miss(el, host().querySelector('[data-ok="1"]'));
+        endTrial();
+      } else assist(el, host().querySelector('[data-ok="1"]'));
       return true;
     }
     if (t === 'piece') { onPiece(el); return true; }
@@ -363,16 +684,7 @@
     return false;
   }
   function replay() {
-    if (!ctx) return;
-    const lesson = ctx.lesson;
-    if (ctx.type === 'listen' || ctx.type === 'match' || ctx.type === 'treasure') {
-      const w = lesson.words[0];
-      X().say(C().wordKey(w), C().ko(w));
-    } else if (ctx.type === 'sparkle') X().say(C().jamoKey(lesson.jamo[0]));
-    else if (ctx.type === 'blocks' || ctx.type === 'chant') {
-      const s = ctx.type === 'blocks' ? lesson.blocks.say : lesson.chant[0];
-      X().say(C().sylKey(s), s);
-    } else X().say(C().UI.together, '같이 해 보자!');
+    replayStem();
     const b = document.getElementById('replayBtn');
     if (b) b.dataset.n = String((+b.dataset.n || 0) + 1);
   }
