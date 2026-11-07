@@ -118,12 +118,14 @@ async function runDevice(browser, spec) {
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('html[data-ready="1"]');
   const shoot = spec.name === 'iphone-port' || spec.name === 'ipad-port';
+  const shootChant = shoot || spec.name === 'ipad-land';
+  const shootDone = shoot || spec.name === 'iphone-land';
   if (shoot) await shot(page, spec.name + '-home');
   await tap(page, page.locator('[data-tap="go-map"]'), 'go-map');
   if (shoot) await shot(page, spec.name + '-map');
   for (const play of PLAYS) {
     await tap(page, page.locator('[data-play="' + play + '"]'), 'practice-' + play);
-    if (shoot) await shot(page, spec.name + '-play-' + play);
+    if (shoot || (shootChant && play === 'chant')) await shot(page, spec.name + '-play-' + play);
     await finishRound(page, shoot && play === 'chant' ? spec.name + '-correct' : '');
   }
   await tap(page, page.locator('[data-tap="start-lesson"]').first(), 'start-lesson');
@@ -139,7 +141,7 @@ async function runDevice(browser, spec) {
   await page.waitForTimeout(1400);
   const placed = await page.locator('.peel-slot img').count();
   if (!placed) throw new Error(spec.name + ' sticker did not land in the slot');
-  if (shoot) {
+  if (shootDone) {
     await shot(page, spec.name + '-done');
     await shot(page, spec.name + '-play-done');
   }

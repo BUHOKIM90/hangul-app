@@ -50,7 +50,11 @@
   }
   function peelStage(st) {
     if (!st) return '<p class="meta">스티커를 다 모았어!</p>';
-    return '<div class="peel" data-sticker="' + st.id + '"><div class="peel-sheet"></div><div class="peel-slot"></div><div class="peel-bit"><img alt="" width="256" height="256" src="' + assetSrc(st.file) + '"><i class="curl"></i></div></div><p class="st-name">' + st.name + '</p><p class="st-theme">' + st.themeKo + '</p>';
+    return '<div class="gift"><p class="gift-kicker">새 스티커!</p><div class="peel" data-sticker="' + st.id + '"><div class="peel-slot"></div><div class="peel-bit"><img alt="" width="256" height="256" src="' + assetSrc(st.file) + '"></div></div><p class="st-name">' + st.name + '</p><p class="st-theme">' + st.themeKo + '</p></div>';
+  }
+  function rewardChip(item) {
+    if (!item) return '';
+    return '<div class="reward-chip"><i style="' + thumbStyle(item) + '"></i><span>새 옷 · ' + item.label + '</span></div>';
   }
 
   function homeHTML() {
@@ -125,7 +129,7 @@
     const label = go === 'map' ? '마을로' : '다음';
     main().dataset.screen = 'reward';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end"><h1>스티커!</h1>' + peelStage(st) + (item ? '<p class="meta">새 옷 · ' + item.label + '</p>' : '') + '<button type="button" class="tap xl" data-tap="peel-next">' + label + '</button></section>';
+    main().innerHTML = '<section class="end"><h1>스티커!</h1>' + peelStage(st) + rewardChip(item) + '<button type="button" class="tap xl" data-tap="peel-next">' + label + '</button></section>';
     chrome('reward');
     settlePeel();
     X().say('ui_sticker', '스티커를 받았어!');
@@ -170,7 +174,7 @@
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end festival"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p>' + peelStage(st) + (item ? '<p class="meta">새 옷 · ' + item.label + '</p>' : '') + '<div class="home-dock end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></section>';
+    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
     chrome('done');
     settlePeel();
     X().say(C().UI.end, '오늘은 여기까지! 내일 또 만나요.');
