@@ -1,0 +1,84 @@
+{
+  "id": "monggeul",
+  "name_ko": "몽글이",
+  "identity": "크림 포근 곰",
+  "canvas": [
+    512,
+    512
+  ],
+  "mode": "RGBA",
+  "origin": "top_left",
+  "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+  "anchors": {
+    "origin": {
+      "px": [
+        0,
+        0
+      ],
+      "normalized": [
+        0.0,
+        0.0
+      ]
+    },
+    "head_center": {
+      "px": [
+        260,
+        158
+      ],
+      "normalized": [
+        0.5078125,
+        0.30859375
+      ]
+    },
+    "neck": {
+      "px": [
+        260,
+        270
+      ],
+      "normalized": [
+        0.5078125,
+        0.52734375
+      ]
+    },
+    "torso": {
+      "px": [
+        260,
+        338
+      ],
+      "normalized": [
+        0.5078125,
+        0.66015625
+      ]
+    },
+    "left_sole": {
+      "px": [
+        210,
+        469
+      ],
+      "normalized": [
+        0.41015625,
+        0.916015625
+      ]
+    },
+    "right_sole": {
+      "px": [
+        307,
+        469
+      ],
+      "normalized": [
+        0.599609375,
+        0.916015625
+      ]
+    }
+  },
+  "anchor_method": "alpha centroid bands of assets/char/monggeul_basic.webp; approximate, about +/-8px",
+  "anchor_accuracy_px": 8,
+  "silhouette_bbox": [
+    112,
+    33,
+    407,
+    473
+  ],
+  "anatomical_fit": "existing neutral pose; per-character items only, no universal garment fit",
+  "file": "assets/char/monggeul_basic.webp"
+}

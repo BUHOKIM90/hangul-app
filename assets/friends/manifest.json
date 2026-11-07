@@ -1,0 +1,2901 @@
+{
+  "stage": 2,
+  "status": "stage2_delivered_40_items_visual_reviewed",
+  "canvas": [
+    512,
+    512
+  ],
+  "slots": [
+    "hat",
+    "top",
+    "acc",
+    "shoes",
+    "bg"
+  ],
+  "item_filename": "캐릭터_슬롯_이름.webp",
+  "composite_contract": "512 canvas at (0,0), no auto trim/resize; per-character garment contours required",
+  "normalization": "divide pixel coordinates by512",
+  "friends": [
+    {
+      "id": "bori",
+      "name_ko": "보리",
+      "identity": "살구 곰",
+      "canvas": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "origin": "top_left",
+      "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+      "anchors": {
+        "origin": {
+          "px": [
+            0,
+            0
+          ],
+          "normalized": [
+            0.0,
+            0.0
+          ]
+        },
+        "head_center": {
+          "px": [
+            256,
+            162
+          ],
+          "normalized": [
+            0.5,
+            0.31640625
+          ]
+        },
+        "neck": {
+          "px": [
+            256,
+            270
+          ],
+          "normalized": [
+            0.5,
+            0.52734375
+          ]
+        },
+        "torso": {
+          "px": [
+            256,
+            330
+          ],
+          "normalized": [
+            0.5,
+            0.64453125
+          ]
+        },
+        "left_sole": {
+          "px": [
+            216,
+            460
+          ],
+          "normalized": [
+            0.421875,
+            0.8984375
+          ]
+        },
+        "right_sole": {
+          "px": [
+            296,
+            460
+          ],
+          "normalized": [
+            0.578125,
+            0.8984375
+          ]
+        }
+      },
+      "anchor_method": "manually estimated anatomy from generated master, registered with global x-scale and piecewise y remap; not automatic semantic detection",
+      "anchor_accuracy_px": 8,
+      "silhouette_bbox": [
+        142,
+        34,
+        371,
+        461
+      ],
+      "anatomical_fit": "approximate; individual silhouette/ear/shoulder widths differ; use per-character items and these JSONs, not universal garment-fit assertion",
+      "transform": {
+        "source_x_center": 518,
+        "x_scale": 0.4,
+        "source_y_knots": [
+          0,
+          75,
+          320,
+          550,
+          685,
+          938,
+          1023
+        ],
+        "target_y_knots": [
+          0,
+          36,
+          162,
+          270,
+          330,
+          460,
+          511
+        ]
+      },
+      "file": "friends/bori.webp",
+      "master": "src/bori_master.jpg",
+      "validation": {
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "transparent_pixels": 186440,
+        "edge_nontransparent_pixels": 0,
+        "dimensions": [
+          512,
+          512
+        ],
+        "webp_lossless": true
+      },
+      "visual_review": {
+        "one_character": true,
+        "front_facing": true,
+        "forward_gaze": true,
+        "two_arms_two_feet": true,
+        "clothing_free": true,
+        "limbs_inside_canvas": true,
+        "soft_mongle_family_style": true,
+        "reviewed_on": "grid.png and anchor_overlay.png",
+        "caveat": "body/head proportions are approximate registrations, not identical anatomy; cloud friend visually reads as bear"
+      }
+    },
+    {
+      "id": "tori",
+      "name_ko": "토리",
+      "identity": "크림 토끼",
+      "canvas": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "origin": "top_left",
+      "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+      "anchors": {
+        "origin": {
+          "px": [
+            0,
+            0
+          ],
+          "normalized": [
+            0.0,
+            0.0
+          ]
+        },
+        "head_center": {
+          "px": [
+            256,
+            162
+          ],
+          "normalized": [
+            0.5,
+            0.31640625
+          ]
+        },
+        "neck": {
+          "px": [
+            256,
+            270
+          ],
+          "normalized": [
+            0.5,
+            0.52734375
+          ]
+        },
+        "torso": {
+          "px": [
+            256,
+            330
+          ],
+          "normalized": [
+            0.5,
+            0.64453125
+          ]
+        },
+        "left_sole": {
+          "px": [
+            216,
+            460
+          ],
+          "normalized": [
+            0.421875,
+            0.8984375
+          ]
+        },
+        "right_sole": {
+          "px": [
+            296,
+            460
+          ],
+          "normalized": [
+            0.578125,
+            0.8984375
+          ]
+        }
+      },
+      "anchor_method": "manually estimated anatomy from generated master, registered with global x-scale and piecewise y remap; not automatic semantic detection",
+      "anchor_accuracy_px": 8,
+      "silhouette_bbox": [
+        153,
+        34,
+        362,
+        462
+      ],
+      "anatomical_fit": "approximate; individual silhouette/ear/shoulder widths differ; use per-character items and these JSONs, not universal garment-fit assertion",
+      "transform": {
+        "source_x_center": 518,
+        "x_scale": 0.4,
+        "source_y_knots": [
+          0,
+          48,
+          376,
+          580,
+          710,
+          948,
+          1023
+        ],
+        "target_y_knots": [
+          0,
+          36,
+          162,
+          270,
+          330,
+          460,
+          511
+        ]
+      },
+      "file": "friends/tori.webp",
+      "master": "src/tori_master.jpg",
+      "validation": {
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "transparent_pixels": 194484,
+        "edge_nontransparent_pixels": 0,
+        "dimensions": [
+          512,
+          512
+        ],
+        "webp_lossless": true
+      },
+      "visual_review": {
+        "one_character": true,
+        "front_facing": true,
+        "forward_gaze": true,
+        "two_arms_two_feet": true,
+        "clothing_free": true,
+        "limbs_inside_canvas": true,
+        "soft_mongle_family_style": true,
+        "reviewed_on": "grid.png and anchor_overlay.png",
+        "caveat": "body/head proportions are approximate registrations, not identical anatomy; cloud friend visually reads as bear"
+      }
+    },
+    {
+      "id": "momo",
+      "name_ko": "모모",
+      "identity": "민트 고양이",
+      "canvas": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "origin": "top_left",
+      "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+      "anchors": {
+        "origin": {
+          "px": [
+            0,
+            0
+          ],
+          "normalized": [
+            0.0,
+            0.0
+          ]
+        },
+        "head_center": {
+          "px": [
+            256,
+            162
+          ],
+          "normalized": [
+            0.5,
+            0.31640625
+          ]
+        },
+        "neck": {
+          "px": [
+            256,
+            270
+          ],
+          "normalized": [
+            0.5,
+            0.52734375
+          ]
+        },
+        "torso": {
+          "px": [
+            256,
+            330
+          ],
+          "normalized": [
+            0.5,
+            0.64453125
+          ]
+        },
+        "left_sole": {
+          "px": [
+            216,
+            460
+          ],
+          "normalized": [
+            0.421875,
+            0.8984375
+          ]
+        },
+        "right_sole": {
+          "px": [
+            296,
+            460
+          ],
+          "normalized": [
+            0.578125,
+            0.8984375
+          ]
+        }
+      },
+      "anchor_method": "manually estimated anatomy from generated master, registered with global x-scale and piecewise y remap; not automatic semantic detection",
+      "anchor_accuracy_px": 8,
+      "silhouette_bbox": [
+        147,
+        35,
+        368,
+        462
+      ],
+      "anatomical_fit": "approximate; individual silhouette/ear/shoulder widths differ; use per-character items and these JSONs, not universal garment-fit assertion",
+      "transform": {
+        "source_x_center": 518,
+        "x_scale": 0.4,
+        "source_y_knots": [
+          0,
+          77,
+          320,
+          550,
+          690,
+          940,
+          1023
+        ],
+        "target_y_knots": [
+          0,
+          36,
+          162,
+          270,
+          330,
+          460,
+          511
+        ]
+      },
+      "file": "friends/momo.webp",
+      "master": "src/momo_master.jpg",
+      "validation": {
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "transparent_pixels": 186027,
+        "edge_nontransparent_pixels": 0,
+        "dimensions": [
+          512,
+          512
+        ],
+        "webp_lossless": true
+      },
+      "visual_review": {
+        "one_character": true,
+        "front_facing": true,
+        "forward_gaze": true,
+        "two_arms_two_feet": true,
+        "clothing_free": true,
+        "limbs_inside_canvas": true,
+        "soft_mongle_family_style": true,
+        "reviewed_on": "grid.png and anchor_overlay.png",
+        "caveat": "body/head proportions are approximate registrations, not identical anatomy; cloud friend visually reads as bear"
+      }
+    },
+    {
+      "id": "gureum",
+      "name_ko": "구름",
+      "identity": "구름빛 곰 친구",
+      "canvas": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "origin": "top_left",
+      "normalization": "x/512,y/512; continuous canvas-edge coordinates",
+      "anchors": {
+        "origin": {
+          "px": [
+            0,
+            0
+          ],
+          "normalized": [
+            0.0,
+            0.0
+          ]
+        },
+        "head_center": {
+          "px": [
+            256,
+            162
+          ],
+          "normalized": [
+            0.5,
+            0.31640625
+          ]
+        },
+        "neck": {
+          "px": [
+            256,
+            270
+          ],
+          "normalized": [
+            0.5,
+            0.52734375
+          ]
+        },
+        "torso": {
+          "px": [
+            256,
+            330
+          ],
+          "normalized": [
+            0.5,
+            0.64453125
+          ]
+        },
+        "left_sole": {
+          "px": [
+            216,
+            460
+          ],
+          "normalized": [
+            0.421875,
+            0.8984375
+          ]
+        },
+        "right_sole": {
+          "px": [
+            296,
+            460
+          ],
+          "normalized": [
+            0.578125,
+            0.8984375
+          ]
+        }
+      },
+      "anchor_method": "manually estimated anatomy from generated master, registered with global x-scale and piecewise y remap; not automatic semantic detection",
+      "anchor_accuracy_px": 8,
+      "silhouette_bbox": [
+        141,
+        35,
+        371,
+        461
+      ],
+      "anatomical_fit": "approximate; individual silhouette/ear/shoulder widths differ; use per-character items and these JSONs, not universal garment-fit assertion",
+      "transform": {
+        "source_x_center": 518,
+        "x_scale": 0.4,
+        "source_y_knots": [
+          0,
+          62,
+          310,
+          550,
+          690,
+          943,
+          1023
+        ],
+        "target_y_knots": [
+          0,
+          36,
+          162,
+          270,
+          330,
+          460,
+          511
+        ]
+      },
+      "file": "friends/gureum.webp",
+      "master": "src/gureum_master.jpg",
+      "identity_limitation": "Generated ear-like side lobes remain: visually cloud-colored bear, not an earless pure cloud. No claim of pure-cloud silhouette.",
+      "validation": {
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "transparent_pixels": 187415,
+        "edge_nontransparent_pixels": 0,
+        "dimensions": [
+          512,
+          512
+        ],
+        "webp_lossless": true
+      },
+      "visual_review": {
+        "one_character": true,
+        "front_facing": true,
+        "forward_gaze": true,
+        "two_arms_two_feet": true,
+        "clothing_free": true,
+        "limbs_inside_canvas": true,
+        "soft_mongle_family_style": true,
+        "reviewed_on": "grid.png and anchor_overlay.png",
+        "caveat": "body/head proportions are approximate registrations, not identical anatomy; cloud friend visually reads as bear"
+      }
+    }
+  ],
+  "limitations": [
+    "Anchors manually estimated +/-8px; torso silhouette and neck width not identical.",
+    "Cloud generation retains ear-like lobes and is delivered truthfully as cloud-colored bear.",
+    "No garment fit proven until stage2 actual overlay tests."
+  ],
+  "visual_review": "Read tool used on original mongle_basic.png, grid.png and anchor_overlay.png. All four full bodies present, forward eyes, front neutral stance, clear limbs and alpha margins.",
+  "files": [
+    {
+      "path": "BRIEF.md",
+      "bytes": 3205,
+      "sha256": "663e9f6636dc7cb81d64f821cbbac9fb0798e5b79d0d47f91262256d9d0dc015"
+    },
+    {
+      "path": "STAGE2_BRIEF.md",
+      "bytes": 2769,
+      "sha256": "47dbd2d3fe5c524fe1b4b97a1ffa7e0577fce89dd9241c206aad6ae53d28a6dd"
+    },
+    {
+      "path": "STAGE2_STYLE.md",
+      "bytes": 702,
+      "sha256": "1bb0c3d2134a08c326f30de7f423b8e956492e3f30130387519d3beecd66941d"
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "bytes": 2058,
+      "sha256": "566ba97ea87ef80fc23e3d36522d65310474275caefcb5d1429ed43ada26fc0c"
+    },
+    {
+      "path": "anchor_overlay.png",
+      "bytes": 313962,
+      "sha256": "15ee5c6c78f00b73884e7c94d1c918049468728c405d11021fa48894e22e0840"
+    },
+    {
+      "path": "anchors/bori.json",
+      "bytes": 2421,
+      "sha256": "233c774f42434420a6bb2c25d48d631e3057c65a0101956c205d1ca44bdbcea7"
+    },
+    {
+      "path": "anchors/gureum.json",
+      "bytes": 2594,
+      "sha256": "58316a36acfffe7fd6b2cb93b6eb44171da0a39bcf5ca9de0a85624c91a796c5"
+    },
+    {
+      "path": "anchors/momo.json",
+      "bytes": 2427,
+      "sha256": "62a8789cf73ada312a9bcc227bd3484d985ce06e23a24c292d7b40820e145b7b"
+    },
+    {
+      "path": "anchors/tori.json",
+      "bytes": 2424,
+      "sha256": "f80c12d6c1be03ad07e13cfeb8221e8ffc8de1660434ac868aa09a7188efdc0c"
+    },
+    {
+      "path": "contact_sheet_items.png",
+      "bytes": 128543,
+      "sha256": "c957b5a2b25772ecc9a43d98a82fbb0edc65186f144e47bdbbfccc0efa413dcd"
+    },
+    {
+      "path": "friends/bori.webp",
+      "bytes": 54348,
+      "sha256": "a051af5523cf72c27573670836566070d7836d9fd8e675f06b4a342893f89cbe"
+    },
+    {
+      "path": "friends/gureum.webp",
+      "bytes": 51682,
+      "sha256": "5f59b3426cfcebf1eb17cb268f94882fbed8981f3b7953f477058772f7f1fe37"
+    },
+    {
+      "path": "friends/momo.webp",
+      "bytes": 50430,
+      "sha256": "c28e19bcc1f80c382c34b67b26414e9f8a73325a66677daf44874d2d6c1cb4a5"
+    },
+    {
+      "path": "friends/tori.webp",
+      "bytes": 50466,
+      "sha256": "59c97d8aa93ecbc6a49c726bd1df717fa2c5e266ea614d05e23e59ed0981b2ea"
+    },
+    {
+      "path": "grid.png",
+      "bytes": 303412,
+      "sha256": "ca3ca396267d6b423440eaee069abd010bf799d659230bc9f8f5a982022d2c89"
+    },
+    {
+      "path": "items/bori_acc_bag.webp",
+      "bytes": 8242,
+      "sha256": "b2dace941f831351a2b9dcff89e8556e7c6c494ce038bed86b7cca3b710bcfd8"
+    },
+    {
+      "path": "items/bori_acc_brooch.webp",
+      "bytes": 2170,
+      "sha256": "93c54678aa727dce837010e8650450e75d01c47cec798ebfa71f508e514ff2b1"
+    },
+    {
+      "path": "items/bori_bg_vignette.webp",
+      "bytes": 51620,
+      "sha256": "4d659a6bb6771fd0fcc50987bc4b008f5199b3a126c19d1a1d344b39ac0db410"
+    },
+    {
+      "path": "items/bori_hat_cap.webp",
+      "bytes": 8142,
+      "sha256": "75212038122c2246f4947f9d2b9f3163ee28a3227e0650d484a3a3c35dc6b8f3"
+    },
+    {
+      "path": "items/bori_hat_crown.webp",
+      "bytes": 7886,
+      "sha256": "ee34fa9a2bf52010fd599cb923578a02b7d54ac2984e5028f98c1c9fdea0bdce"
+    },
+    {
+      "path": "items/bori_shoes_boots.webp",
+      "bytes": 10914,
+      "sha256": "059efa0f2e87ef44d31335feec9706ce6344c4f4231d4cf138649fe27afe09cc"
+    },
+    {
+      "path": "items/bori_shoes_slippers.webp",
+      "bytes": 12012,
+      "sha256": "017a9e54e72ddd52a8ef09a1a900a6547fc9e17cb775b6f1ddb71ac13afd750e"
+    },
+    {
+      "path": "items/bori_top_shirt.webp",
+      "bytes": 23582,
+      "sha256": "4f7c109ac0f60a79270c8b65b3998bd58d4543eb93e92cff11d9c1eb6a2d82d4"
+    },
+    {
+      "path": "items/bori_top_smock.webp",
+      "bytes": 21384,
+      "sha256": "fad8c180fde70e0370f8e720b817d47af975069571178a382b5dc49f827b0a06"
+    },
+    {
+      "path": "items/bori_top_vest.webp",
+      "bytes": 16064,
+      "sha256": "a5b056165f3f77764eb6de6460cf80c207c02eeedf9540dc50ade1a616e2fb09"
+    },
+    {
+      "path": "items/gureum_acc_bag.webp",
+      "bytes": 8810,
+      "sha256": "dbe7e70fcf4343dcfb80cf230c6cb7c1b35c806aeabcd986bda15b715120e441"
+    },
+    {
+      "path": "items/gureum_acc_brooch.webp",
+      "bytes": 1994,
+      "sha256": "9edd71e040a46ccfc4277e4d33780322ac05a2c9ea7b73360e819558bd7d772a"
+    },
+    {
+      "path": "items/gureum_bg_vignette.webp",
+      "bytes": 31330,
+      "sha256": "2b83cb99f441e51bd38e8b489e6c852ff8e87458ac061bee9ae3733ef9597123"
+    },
+    {
+      "path": "items/gureum_hat_cap.webp",
+      "bytes": 7152,
+      "sha256": "cc8b320c5605c3d2dc5822401140f3950bab54b5c0de55b5c2f8eae8981d796e"
+    },
+    {
+      "path": "items/gureum_hat_crown.webp",
+      "bytes": 8746,
+      "sha256": "45b4ae1ca7fda8d8c11df1307cff3943ff92b7c4ebf4883d9e33cb972f3f71f4"
+    },
+    {
+      "path": "items/gureum_shoes_boots.webp",
+      "bytes": 10500,
+      "sha256": "31362ac6569f7374dc6cc3fedcbce8ad0d6327fce1360534cd8e1c6b8a349ae5"
+    },
+    {
+      "path": "items/gureum_shoes_slippers.webp",
+      "bytes": 11172,
+      "sha256": "2946cd36c9c13571a6d3de1f7b19e43d0b1f0cbf96891989964bffdd0b2c886d"
+    },
+    {
+      "path": "items/gureum_top_shirt.webp",
+      "bytes": 25888,
+      "sha256": "c6165d229de51785743d365a5ac4079e0d146cc24facb006720f85300a62da45"
+    },
+    {
+      "path": "items/gureum_top_smock.webp",
+      "bytes": 25658,
+      "sha256": "8c2a8e7c28b0255ffb54f6cc6ab56ae682a234efcb450c371d9ceff1042a0f4a"
+    },
+    {
+      "path": "items/gureum_top_vest.webp",
+      "bytes": 19828,
+      "sha256": "52b47b365404191abd787cd36f4856e23c66d979ce83717d22b2dab8d739bb26"
+    },
+    {
+      "path": "items/momo_acc_bag.webp",
+      "bytes": 9280,
+      "sha256": "e1f96c36c1b518c1e2fdf938286e1a54602aa423dc1cc88a9bfedb936f801f4b"
+    },
+    {
+      "path": "items/momo_acc_brooch.webp",
+      "bytes": 2158,
+      "sha256": "aa63f03bf66150faa4e8fa611e1cc61ac8e31d3e3fd147f2f23d5d1670a99397"
+    },
+    {
+      "path": "items/momo_bg_vignette.webp",
+      "bytes": 46310,
+      "sha256": "7404effce45b198e33a5a6c19a315131d1580d0b3c99b3cf259ae272d6989a0b"
+    },
+    {
+      "path": "items/momo_hat_cap.webp",
+      "bytes": 9064,
+      "sha256": "800b9affbf73ac838493525e601b712c493e91ab29de29dd8b164af6d303f564"
+    },
+    {
+      "path": "items/momo_hat_crown.webp",
+      "bytes": 9640,
+      "sha256": "776185faf7812d1e9a3d0f03135dabae9d94d12eb514a35159f54dd35378a943"
+    },
+    {
+      "path": "items/momo_shoes_boots.webp",
+      "bytes": 9506,
+      "sha256": "39b1fb308fb334d4618c1531a11f29fd8658fef6ecb1c3672a6c5d8de7f256fe"
+    },
+    {
+      "path": "items/momo_shoes_slippers.webp",
+      "bytes": 11840,
+      "sha256": "d1354c64819ca0771d9b80802ce6a9d68c4a147c3df89b99e81adb0cd3613a95"
+    },
+    {
+      "path": "items/momo_top_shirt.webp",
+      "bytes": 27972,
+      "sha256": "d21bf673a489e12d5e2b2e297d7ea22ec59803311a24b2d3176594eee6778001"
+    },
+    {
+      "path": "items/momo_top_smock.webp",
+      "bytes": 24278,
+      "sha256": "01c7f63f05d23ea0cb85c6c96bc75707b621a78acf6903cb82dfa41f014f32cf"
+    },
+    {
+      "path": "items/momo_top_vest.webp",
+      "bytes": 21130,
+      "sha256": "a3733bda9c99c9c9399a80abb47cb609bbdc8d3a7f06c3e50d66cebc5521d464"
+    },
+    {
+      "path": "items/tori_acc_bag.webp",
+      "bytes": 8980,
+      "sha256": "d6e3e12f887c1f34f1f6fd0aaba39aaa76d864504e98185882d4bd775f679bc6"
+    },
+    {
+      "path": "items/tori_acc_brooch.webp",
+      "bytes": 2370,
+      "sha256": "4eb592e8c78eb87e96640ddee2170245fd56d0e544be81be69eee01b60acdf6c"
+    },
+    {
+      "path": "items/tori_bg_vignette.webp",
+      "bytes": 55678,
+      "sha256": "f3a3b095dc7aef824b45342c65223a3bae1828029a0b415fc5a1182a1dd51884"
+    },
+    {
+      "path": "items/tori_hat_cap.webp",
+      "bytes": 5464,
+      "sha256": "58c8cefa2d55031303c7e5dc9fdc1d518ab4bdf232860d192b8d977dd0eb54f2"
+    },
+    {
+      "path": "items/tori_hat_crown.webp",
+      "bytes": 5692,
+      "sha256": "549c6fd842ef3fa6bdc379ee3cb38fb6f5c119137c233068178491eaae5a3d2a"
+    },
+    {
+      "path": "items/tori_shoes_boots.webp",
+      "bytes": 9000,
+      "sha256": "19b6dfc76ad26e620ab0459e61960edce1d85ca0e8a52d66d43d0481ad8a9767"
+    },
+    {
+      "path": "items/tori_shoes_slippers.webp",
+      "bytes": 12258,
+      "sha256": "938460e5b40c169a80cb01d1ea5e4730ceff98e12503d25701c8dad2331bb4c2"
+    },
+    {
+      "path": "items/tori_top_shirt.webp",
+      "bytes": 23032,
+      "sha256": "ca20794ab9d42281615ab61ade52f31c72452d36878a79a9ac2dcd506c37b865"
+    },
+    {
+      "path": "items/tori_top_smock.webp",
+      "bytes": 19826,
+      "sha256": "515e4d7d978004d8eb9039b15599fc92dd6c84e2de22ade583fb8457f9344325"
+    },
+    {
+      "path": "items/tori_top_vest.webp",
+      "bytes": 18732,
+      "sha256": "5d55f0d5d6f49bbc5d7662172e257c3dccc66ba9a6c03b58a781f55238c0418c"
+    },
+    {
+      "path": "palette.png",
+      "bytes": 408,
+      "sha256": "5fd9719aab9ba8163d4d21044a57f4ae1caa5f2bc154b4cd3cf1d85846a41d1a"
+    },
+    {
+      "path": "src/bori_acc_bag_cut.png",
+      "bytes": 41465,
+      "sha256": "0508d8080410f9a9b0cddd5c3981a9fcae725fe55eb4532dec43e71bb4301c24"
+    },
+    {
+      "path": "src/bori_acc_brooch_cut.png",
+      "bytes": 19219,
+      "sha256": "0044677e25521eeceae66d7e2fa56915e9f0f4dc3b0be000e692922d45150e47"
+    },
+    {
+      "path": "src/bori_bg_vignette_cut.png",
+      "bytes": 50698,
+      "sha256": "e1f660a5c7906f103d6bedaccce2bf6942bf4d571348db6a147e1d01e929ba5e"
+    },
+    {
+      "path": "src/bori_hat_cap_cut.png",
+      "bytes": 29691,
+      "sha256": "35a0a0329c529dca63f070c82972c6fec6b0f54363db1bc97e845da4615c6e67"
+    },
+    {
+      "path": "src/bori_hat_crown_cut.png",
+      "bytes": 30437,
+      "sha256": "4075547b14c164c4f92bec3d9f86ab21c159900625d97b255c838fc0259c66ec"
+    },
+    {
+      "path": "src/bori_items_master.jpg",
+      "bytes": 151377,
+      "sha256": "00bc5b064a206e4edfcaeb1b01ff03fd5497f95d90574087c2c8e2aacc9cb2c2"
+    },
+    {
+      "path": "src/bori_master.jpg",
+      "bytes": 104026,
+      "sha256": "525abd41b8085828fdf9db144974ce365285b946adb36b68dab82cbc8fac173b"
+    },
+    {
+      "path": "src/bori_shoes_boots_cut.png",
+      "bytes": 40096,
+      "sha256": "ef1d773cc2997c000c71bf2e96693e938b8dce058d984ec7a8c640758d6ccc97"
+    },
+    {
+      "path": "src/bori_shoes_slippers_cut.png",
+      "bytes": 43656,
+      "sha256": "eabf87a7212451ff52032dcdeed27af747862491a498b527328433ab2d601f7f"
+    },
+    {
+      "path": "src/bori_top_shirt_cut.png",
+      "bytes": 49022,
+      "sha256": "4c38824370f1f0dbb297882e6efec201d20e019215387507637d37f6a2641719"
+    },
+    {
+      "path": "src/bori_top_smock_cut.png",
+      "bytes": 47820,
+      "sha256": "7f78e52babfd9e85f216755a543b629aa0114d3cc73c430d7a999b92dc123550"
+    },
+    {
+      "path": "src/bori_top_vest_cut.png",
+      "bytes": 36208,
+      "sha256": "ead9136db3236b6b96c6db88fd4fb3267f0def160f7d29d417c1bdb681cc3faa"
+    },
+    {
+      "path": "src/gureum_acc_bag_cut.png",
+      "bytes": 43049,
+      "sha256": "b7772cc915eaa81735a4251bfe9784564941ee2b5af9219274025e6edeb2cb5b"
+    },
+    {
+      "path": "src/gureum_acc_brooch_cut.png",
+      "bytes": 20659,
+      "sha256": "1c0fd0dc03d43f9d0c3f76d4931299cc595728456ab276968048e37f4980618b"
+    },
+    {
+      "path": "src/gureum_bg_vignette_cut.png",
+      "bytes": 36043,
+      "sha256": "c5f01748f07022dd1367ef81b92ffc7e96dc0cc4dfa4b04ba8586e594935b2bc"
+    },
+    {
+      "path": "src/gureum_hat_cap_cut.png",
+      "bytes": 35642,
+      "sha256": "5b85d5f4d1006dce3b7e4ec133f74d3096cd88b63e8772fb6a0280f330bbd20e"
+    },
+    {
+      "path": "src/gureum_hat_crown_cut.png",
+      "bytes": 31562,
+      "sha256": "ed231c6df7110146328b6b2c98344541ab6cc6588053722bfb487ca8dcde069b"
+    },
+    {
+      "path": "src/gureum_items_master.jpg",
+      "bytes": 138081,
+      "sha256": "e7a0a5678a6a4631d6e99af0b2e7685c6f6b379c48d68c426726311a6745e253"
+    },
+    {
+      "path": "src/gureum_master.jpg",
+      "bytes": 100553,
+      "sha256": "c0d8113ee9f5d505d9da0c2d0ed14cde040dc3a3c04faba73c8e7e74cece6f32"
+    },
+    {
+      "path": "src/gureum_shoes_boots_cut.png",
+      "bytes": 42023,
+      "sha256": "e92b23f24a6f7f25a08057c3bed670308aa3a1ebc944dfd0011ced85dfdf8241"
+    },
+    {
+      "path": "src/gureum_shoes_slippers_cut.png",
+      "bytes": 46127,
+      "sha256": "2b7e1f5fac14ccdfd162327b809f1035044fd14be9bef355747f78647d2333e6"
+    },
+    {
+      "path": "src/gureum_top_shirt_cut.png",
+      "bytes": 59821,
+      "sha256": "ba6d2d888dd1b6f840ea2d371afa279ee655e55e33db01e29a06c1c5e0cbedb1"
+    },
+    {
+      "path": "src/gureum_top_smock_cut.png",
+      "bytes": 46601,
+      "sha256": "25586758ba4797ebac294b182bdb6bdc245e3468caebdfc6ba9d64533b6bc04f"
+    },
+    {
+      "path": "src/gureum_top_vest_cut.png",
+      "bytes": 45341,
+      "sha256": "fbdeea6a8bb527f86fa7070fa990a3208da35eb96718bbec90051238228e8a40"
+    },
+    {
+      "path": "src/momo_acc_bag_cut.png",
+      "bytes": 40670,
+      "sha256": "b2caeea4f297976cd5f1d3cce45232d6767db69fe2cd2757c68435617e0b1e2c"
+    },
+    {
+      "path": "src/momo_acc_brooch_cut.png",
+      "bytes": 30219,
+      "sha256": "08d5de14457c77ecab535c8f87d586a3368350d7647ee30a367e1c48796dddea"
+    },
+    {
+      "path": "src/momo_bg_vignette_cut.png",
+      "bytes": 40341,
+      "sha256": "7b8ab945e306a6332817560ac3c0e10cb8d75a1aac71a648c88350b118851d3a"
+    },
+    {
+      "path": "src/momo_hat_cap_cut.png",
+      "bytes": 35315,
+      "sha256": "ae92523d9d1449b36f7eb0f102c6a29a6a4ff26ff2a83f2f9c3a9e5603087cf9"
+    },
+    {
+      "path": "src/momo_hat_crown_cut.png",
+      "bytes": 35305,
+      "sha256": "2d328f853ca6eef1b970f1d668d664bb9beba26024c0bab15c50e07d5e1b060f"
+    },
+    {
+      "path": "src/momo_items_master.jpg",
+      "bytes": 142609,
+      "sha256": "71d4ae38f807b6ea33bce2f74c9f8981933de60646276b1a39898cceca5cab47"
+    },
+    {
+      "path": "src/momo_master.jpg",
+      "bytes": 99129,
+      "sha256": "187b59e99d901c0a5bb6cbff3f57a5df84345d78726cf398c407c735a372c469"
+    },
+    {
+      "path": "src/momo_shoes_boots_cut.png",
+      "bytes": 37713,
+      "sha256": "f0f2f14d0223a29fd28b051fed0431c7fcee19a3b63f6de5af797e22261d9c66"
+    },
+    {
+      "path": "src/momo_shoes_slippers_cut.png",
+      "bytes": 48310,
+      "sha256": "4cbae834d433dc5da84fdeedd0bf8a26c902fd1952cda055a4636342b730877c"
+    },
+    {
+      "path": "src/momo_top_shirt_cut.png",
+      "bytes": 54517,
+      "sha256": "424f39b11d1799a285ebf5b244cd3195d1a346f6870143ad8b2bca72e6e27c3d"
+    },
+    {
+      "path": "src/momo_top_smock_cut.png",
+      "bytes": 42044,
+      "sha256": "36c0f33a12780f428b1cf3f618c62aaf49fffc94207f508537444c4c034be427"
+    },
+    {
+      "path": "src/momo_top_vest_cut.png",
+      "bytes": 42485,
+      "sha256": "6e633b23b354b790981f04e9924f9d42d5a00f8ec9be0a8554ca3078b399b586"
+    },
+    {
+      "path": "src/tori_acc_bag_cut.png",
+      "bytes": 50714,
+      "sha256": "30c17adf820d04fb615ecf7793241c43481fbfd1c0e2b9944e0125992fc864b1"
+    },
+    {
+      "path": "src/tori_acc_brooch_cut.png",
+      "bytes": 35372,
+      "sha256": "d5ce2aa0f8b5adfcf8a9e9d436789420a9fdcc544387366e1478c11ca539b0d2"
+    },
+    {
+      "path": "src/tori_bg_vignette_cut.png",
+      "bytes": 61097,
+      "sha256": "8c69a37efe75bc1e2cc59c5fa857f9eebbef90b677bcbb87f8050be09bcd387b"
+    },
+    {
+      "path": "src/tori_hat_cap_cut.png",
+      "bytes": 41472,
+      "sha256": "fa71541585d3ae80892a72124373cb170cfa7c8e58ec6d520d5435a833d860dc"
+    },
+    {
+      "path": "src/tori_hat_crown_cut.png",
+      "bytes": 42134,
+      "sha256": "6b3e633fb59b78b2d574c249e0cc26a825652afad1497117bbcf86beebbb5af3"
+    },
+    {
+      "path": "src/tori_items_master.jpg",
+      "bytes": 152240,
+      "sha256": "ada7f4197ff4ca7a3f3138788f8df975da95277867ddfdde936214d6e5e26b53"
+    },
+    {
+      "path": "src/tori_master.jpg",
+      "bytes": 94676,
+      "sha256": "0b3da540f6d101427d5d3521d11e84dc0de300e8229eb87dcb51508337e69abd"
+    },
+    {
+      "path": "src/tori_shoes_boots_cut.png",
+      "bytes": 36063,
+      "sha256": "5920bade76a7875ea5dd9ae7331d62727dbb7885534950b7aea2604dbb667f11"
+    },
+    {
+      "path": "src/tori_shoes_slippers_cut.png",
+      "bytes": 50898,
+      "sha256": "1ef152643a3fcf01faf4247cd72812d184c3ab57e0f9884765f22ff690dd313c"
+    },
+    {
+      "path": "src/tori_top_shirt_cut.png",
+      "bytes": 45952,
+      "sha256": "faefc3c1c3972147cf967207c29e55c5fee71508e6ce387702f2ffbcb1281caa"
+    },
+    {
+      "path": "src/tori_top_smock_cut.png",
+      "bytes": 44870,
+      "sha256": "3af03ba60f1c94062089d36b2581d0c2b772ea80e52ecb2ba5192b24592eeaab"
+    },
+    {
+      "path": "src/tori_top_vest_cut.png",
+      "bytes": 44411,
+      "sha256": "fc6e6ee0ab80c8fbb82b8e08a4b4a307392a8a2927a638d6220364eef3b159e0"
+    },
+    {
+      "path": "stage2_base_hashes.json",
+      "bytes": 734,
+      "sha256": "d8990b2788e5383f41b5a363d4d44f864b29c1b5cf1e43c8fcf197ebcc7c9b1b"
+    },
+    {
+      "path": "tools/build_items.py",
+      "bytes": 6886,
+      "sha256": "9b526be04a762b4d2968949459abe5c8d5f451a9c383bc0ea7eb9aa2eae673d5"
+    },
+    {
+      "path": "tryon_ensemble_bori.png",
+      "bytes": 180195,
+      "sha256": "01b386425667114b760494ea581fd511ee9322b3e0833b4095573c5bee589c7d"
+    },
+    {
+      "path": "tryon_ensemble_grid.png",
+      "bytes": 183273,
+      "sha256": "39b48276a685e4c11b2392992436e9ff61fc98d5d1fd532437695e2245afcc7c"
+    },
+    {
+      "path": "tryon_ensemble_gureum.png",
+      "bytes": 161822,
+      "sha256": "cf14386a85742e409e837f76ca9b61dc928b9e29c50ac1d48eca1a3e915222cd"
+    },
+    {
+      "path": "tryon_ensemble_momo.png",
+      "bytes": 177522,
+      "sha256": "aa6127dccb35e3bdb1cad2bc7f8df7613a165d719e75e626f255c398fbd02942"
+    },
+    {
+      "path": "tryon_ensemble_tori.png",
+      "bytes": 174568,
+      "sha256": "2db6def623e9111b83092760534ad389e5f20ba7ab5ba3d27ed65f6d74afde97"
+    },
+    {
+      "path": "tryon_grid_bori.png",
+      "bytes": 143215,
+      "sha256": "c4b7762038ae309ab134079dda6990a37ad1923956df42f11aa49df30750a769"
+    },
+    {
+      "path": "tryon_grid_gureum.png",
+      "bytes": 138125,
+      "sha256": "e5368f01e3e10d1c384101e65f9ae3ada7b1be75302f379be552e204067caec8"
+    },
+    {
+      "path": "tryon_grid_momo.png",
+      "bytes": 145049,
+      "sha256": "22d27ba625d4f6941f9c5a24a6c518729ad6828e3cec41d569bb8e701b9a5877"
+    },
+    {
+      "path": "tryon_grid_tori.png",
+      "bytes": 137725,
+      "sha256": "8a7bff35db85e9ed0de7cb56b33d7639e4e767f0aba0381551b1ec476d7a531e"
+    }
+  ],
+  "items": [
+    {
+      "file": "items/bori_hat_cap.webp",
+      "character": "bori",
+      "slot": "hat",
+      "display_name": "딸기 베레모",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "75212038122c2246f4947f9d2b9f3163ee28a3227e0650d484a3a3c35dc6b8f3"
+    },
+    {
+      "file": "items/bori_hat_crown.webp",
+      "character": "bori",
+      "slot": "hat",
+      "display_name": "도토리 모자",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "ee34fa9a2bf52010fd599cb923578a02b7d54ac2984e5028f98c1c9fdea0bdce"
+    },
+    {
+      "file": "items/bori_top_shirt.webp",
+      "character": "bori",
+      "slot": "top",
+      "display_name": "단추 가디건",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        396
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "4f7c109ac0f60a79270c8b65b3998bd58d4543eb93e92cff11d9c1eb6a2d82d4"
+    },
+    {
+      "file": "items/bori_top_vest.webp",
+      "character": "bori",
+      "slot": "top",
+      "display_name": "소풍 멜빵",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        396
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "a5b056165f3f77764eb6de6460cf80c207c02eeedf9540dc50ade1a616e2fb09"
+    },
+    {
+      "file": "items/bori_top_smock.webp",
+      "character": "bori",
+      "slot": "top",
+      "display_name": "체크 스모크",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        400
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        130
+      ],
+      "layer_order": 30,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "fad8c180fde70e0370f8e720b817d47af975069571178a382b5dc49f827b0a06"
+    },
+    {
+      "file": "items/bori_acc_brooch.webp",
+      "character": "bori",
+      "slot": "acc",
+      "display_name": "잎사귀 리본",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        239,
+        279,
+        273,
+        309
+      ],
+      "placement_box": [
+        239,
+        279,
+        34,
+        30
+      ],
+      "layer_order": 40,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "93c54678aa727dce837010e8650450e75d01c47cec798ebfa71f508e514ff2b1"
+    },
+    {
+      "file": "items/bori_acc_bag.webp",
+      "character": "bori",
+      "slot": "acc",
+      "display_name": "소풍 가방",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        329,
+        326,
+        396,
+        415
+      ],
+      "placement_box": [
+        329,
+        326,
+        67,
+        89
+      ],
+      "layer_order": 40,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "b2dace941f831351a2b9dcff89e8556e7c6c494ce038bed86b7cca3b710bcfd8"
+    },
+    {
+      "file": "items/bori_shoes_boots.webp",
+      "character": "bori",
+      "slot": "shoes",
+      "display_name": "갈색 부츠",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "059efa0f2e87ef44d31335feec9706ce6344c4f4231d4cf138649fe27afe09cc"
+    },
+    {
+      "file": "items/bori_shoes_slippers.webp",
+      "character": "bori",
+      "slot": "shoes",
+      "display_name": "노랑 메리제인",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "017a9e54e72ddd52a8ef09a1a900a6547fc9e17cb775b6f1ddb71ac13afd750e"
+    },
+    {
+      "file": "items/bori_bg_vignette.webp",
+      "character": "bori",
+      "slot": "bg",
+      "display_name": "버섯 숲",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        42,
+        351,
+        470,
+        487
+      ],
+      "placement_box": [
+        42,
+        351,
+        428,
+        136
+      ],
+      "layer_order": 0,
+      "source": "src/bori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "4d659a6bb6771fd0fcc50987bc4b008f5199b3a126c19d1a1d344b39ac0db410"
+    },
+    {
+      "file": "items/tori_hat_cap.webp",
+      "character": "tori",
+      "slot": "hat",
+      "display_name": "장미 모자",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        220,
+        103,
+        292,
+        151
+      ],
+      "placement_box": [
+        220,
+        103,
+        72,
+        48
+      ],
+      "layer_order": 50,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "58c8cefa2d55031303c7e5dc9fdc1d518ab4bdf232860d192b8d977dd0eb54f2"
+    },
+    {
+      "file": "items/tori_hat_crown.webp",
+      "character": "tori",
+      "slot": "hat",
+      "display_name": "데이지 캡",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        220,
+        103,
+        292,
+        151
+      ],
+      "placement_box": [
+        220,
+        103,
+        72,
+        48
+      ],
+      "layer_order": 50,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "549c6fd842ef3fa6bdc379ee3cb38fb6f5c119137c233068178491eaae5a3d2a"
+    },
+    {
+      "file": "items/tori_top_shirt.webp",
+      "character": "tori",
+      "slot": "top",
+      "display_name": "퍼프 블라우스",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        396
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "ca20794ab9d42281615ab61ade52f31c72452d36878a79a9ac2dcd506c37b865"
+    },
+    {
+      "file": "items/tori_top_vest.webp",
+      "character": "tori",
+      "slot": "top",
+      "display_name": "꽃 자수 피나포어",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        396
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "5d55f0d5d6f49bbc5d7662172e257c3dccc66ba9a6c03b58a781f55238c0418c"
+    },
+    {
+      "file": "items/tori_top_smock.webp",
+      "character": "tori",
+      "slot": "top",
+      "display_name": "정원 조끼",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        400
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        130
+      ],
+      "layer_order": 30,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "515e4d7d978004d8eb9039b15599fc92dd6c84e2de22ade583fb8457f9344325"
+    },
+    {
+      "file": "items/tori_acc_brooch.webp",
+      "character": "tori",
+      "slot": "acc",
+      "display_name": "나비 리본",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        239,
+        279,
+        273,
+        309
+      ],
+      "placement_box": [
+        239,
+        279,
+        34,
+        30
+      ],
+      "layer_order": 40,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "4eb592e8c78eb87e96640ddee2170245fd56d0e544be81be69eee01b60acdf6c"
+    },
+    {
+      "file": "items/tori_acc_bag.webp",
+      "character": "tori",
+      "slot": "acc",
+      "display_name": "물뿌리개 가방",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        329,
+        326,
+        396,
+        415
+      ],
+      "placement_box": [
+        329,
+        326,
+        67,
+        89
+      ],
+      "layer_order": 40,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "d6e3e12f887c1f34f1f6fd0aaba39aaa76d864504e98185882d4bd775f679bc6"
+    },
+    {
+      "file": "items/tori_shoes_boots.webp",
+      "character": "tori",
+      "slot": "shoes",
+      "display_name": "라일락 장화",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "19b6dfc76ad26e620ab0459e61960edce1d85ca0e8a52d66d43d0481ad8a9767"
+    },
+    {
+      "file": "items/tori_shoes_slippers.webp",
+      "character": "tori",
+      "slot": "shoes",
+      "display_name": "복숭아 리본슈즈",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "938460e5b40c169a80cb01d1ea5e4730ceff98e12503d25701c8dad2331bb4c2"
+    },
+    {
+      "file": "items/tori_bg_vignette.webp",
+      "character": "tori",
+      "slot": "bg",
+      "display_name": "튤립 정원",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        42,
+        351,
+        470,
+        487
+      ],
+      "placement_box": [
+        42,
+        351,
+        428,
+        136
+      ],
+      "layer_order": 0,
+      "source": "src/tori_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "f3a3b095dc7aef824b45342c65223a3bae1828029a0b415fc5a1182a1dd51884"
+    },
+    {
+      "file": "items/momo_hat_cap.webp",
+      "character": "momo",
+      "slot": "hat",
+      "display_name": "조개 선장모",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "800b9affbf73ac838493525e601b712c493e91ab29de29dd8b164af6d303f564"
+    },
+    {
+      "file": "items/momo_hat_crown.webp",
+      "character": "momo",
+      "slot": "hat",
+      "display_name": "조개 왕관",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "776185faf7812d1e9a3d0f03135dabae9d94d12eb514a35159f54dd35378a943"
+    },
+    {
+      "file": "items/momo_top_shirt.webp",
+      "character": "momo",
+      "slot": "top",
+      "display_name": "세일러 셔츠",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        396
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "d21bf673a489e12d5e2b2e297d7ea22ec59803311a24b2d3176594eee6778001"
+    },
+    {
+      "file": "items/momo_top_vest.webp",
+      "character": "momo",
+      "slot": "top",
+      "display_name": "산호 탐험 조끼",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        396
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "a3733bda9c99c9c9399a80abb47cb609bbdc8d3a7f06c3e50d66cebc5521d464"
+    },
+    {
+      "file": "items/momo_top_smock.webp",
+      "character": "momo",
+      "slot": "top",
+      "display_name": "조개 티셔츠",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        400
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        130
+      ],
+      "layer_order": 30,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "01c7f63f05d23ea0cb85c6c96bc75707b621a78acf6903cb82dfa41f014f32cf"
+    },
+    {
+      "file": "items/momo_acc_brooch.webp",
+      "character": "momo",
+      "slot": "acc",
+      "display_name": "불가사리 브로치",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        239,
+        279,
+        273,
+        309
+      ],
+      "placement_box": [
+        239,
+        279,
+        34,
+        30
+      ],
+      "layer_order": 40,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "aa63f03bf66150faa4e8fa611e1cc61ac8e31d3e3fd147f2f23d5d1670a99397"
+    },
+    {
+      "file": "items/momo_acc_bag.webp",
+      "character": "momo",
+      "slot": "acc",
+      "display_name": "조개 가방",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        329,
+        326,
+        396,
+        415
+      ],
+      "placement_box": [
+        329,
+        326,
+        67,
+        89
+      ],
+      "layer_order": 40,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "e1f96c36c1b518c1e2fdf938286e1a54602aa423dc1cc88a9bfedb936f801f4b"
+    },
+    {
+      "file": "items/momo_shoes_boots.webp",
+      "character": "momo",
+      "slot": "shoes",
+      "display_name": "항해 부츠",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "39b1fb308fb334d4618c1531a11f29fd8658fef6ecb1c3672a6c5d8de7f256fe"
+    },
+    {
+      "file": "items/momo_shoes_slippers.webp",
+      "character": "momo",
+      "slot": "shoes",
+      "display_name": "청록 샌들",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "d1354c64819ca0771d9b80802ce6a9d68c4a147c3df89b99e81adb0cd3613a95"
+    },
+    {
+      "file": "items/momo_bg_vignette.webp",
+      "character": "momo",
+      "slot": "bg",
+      "display_name": "조개 해변",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        42,
+        351,
+        470,
+        487
+      ],
+      "placement_box": [
+        42,
+        351,
+        428,
+        136
+      ],
+      "layer_order": 0,
+      "source": "src/momo_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "7404effce45b198e33a5a6c19a315131d1580d0b3c99b3cf259ae272d6989a0b"
+    },
+    {
+      "file": "items/gureum_hat_cap.webp",
+      "character": "gureum",
+      "slot": "hat",
+      "display_name": "별 수면모",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "cc8b320c5605c3d2dc5822401140f3950bab54b5c0de55b5c2f8eae8981d796e"
+    },
+    {
+      "file": "items/gureum_hat_crown.webp",
+      "character": "gureum",
+      "slot": "hat",
+      "display_name": "별 왕관",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        211,
+        22,
+        301,
+        87
+      ],
+      "placement_box": [
+        211,
+        22,
+        90,
+        65
+      ],
+      "layer_order": 50,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "ear_constraint": "front fascinator/crown only; between ears for tori at y103..151, small central hat for others; no rear brim or behind-ear sublayer supported",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "45b4ae1ca7fda8d8c11df1307cff3943ff92b7c4ebf4883d9e33cb972f3f71f4"
+    },
+    {
+      "file": "items/gureum_top_shirt.webp",
+      "character": "gureum",
+      "slot": "top",
+      "display_name": "달 주머니 파자마",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        396
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "c6165d229de51785743d365a5ac4079e0d146cc24facb006720f85300a62da45"
+    },
+    {
+      "file": "items/gureum_top_vest.webp",
+      "character": "gureum",
+      "slot": "top",
+      "display_name": "별빛 퀼트 조끼",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        185,
+        270,
+        327,
+        396
+      ],
+      "placement_box": [
+        185,
+        270,
+        142,
+        126
+      ],
+      "layer_order": 30,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        0
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "52b47b365404191abd787cd36f4856e23c66d979ce83717d22b2dab8d739bb26"
+    },
+    {
+      "file": "items/gureum_top_smock.webp",
+      "character": "gureum",
+      "slot": "top",
+      "display_name": "무지개 판초",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        154,
+        270,
+        358,
+        400
+      ],
+      "placement_box": [
+        154,
+        270,
+        204,
+        130
+      ],
+      "layer_order": 30,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "8c2a8e7c28b0255ffb54f6cc6ab56ae682a234efcb450c371d9ceff1042a0f4a"
+    },
+    {
+      "file": "items/gureum_acc_brooch.webp",
+      "character": "gureum",
+      "slot": "acc",
+      "display_name": "초승달 브로치",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        239,
+        279,
+        273,
+        309
+      ],
+      "placement_box": [
+        239,
+        279,
+        34,
+        30
+      ],
+      "layer_order": 40,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "9edd71e040a46ccfc4277e4d33780322ac05a2c9ea7b73360e819558bd7d772a"
+    },
+    {
+      "file": "items/gureum_acc_bag.webp",
+      "character": "gureum",
+      "slot": "acc",
+      "display_name": "별 장식 가방",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        329,
+        326,
+        396,
+        415
+      ],
+      "placement_box": [
+        329,
+        326,
+        67,
+        89
+      ],
+      "layer_order": 40,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        2,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "dbe7e70fcf4343dcfb80cf230c6cb7c1b35c806aeabcd986bda15b715120e441"
+    },
+    {
+      "file": "items/gureum_shoes_boots.webp",
+      "character": "gureum",
+      "slot": "shoes",
+      "display_name": "구름 슬리퍼",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        3,
+        1
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "31362ac6569f7374dc6cc3fedcbce8ad0d6327fce1360534cd8e1c6b8a349ae5"
+    },
+    {
+      "file": "items/gureum_shoes_slippers.webp",
+      "character": "gureum",
+      "slot": "shoes",
+      "display_name": "달 버클 부츠",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        174,
+        414,
+        338,
+        464
+      ],
+      "placement_box": [
+        174,
+        414,
+        164,
+        50
+      ],
+      "layer_order": 20,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        0,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "pair": "two shoes independently placed on left/right soles; source has mild three-quarter perspective",
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "2946cd36c9c13571a6d3de1f7b19e43d0b1f0cbf96891989964bffdd0b2c886d"
+    },
+    {
+      "file": "items/gureum_bg_vignette.webp",
+      "character": "gureum",
+      "slot": "bg",
+      "display_name": "구름 별빛",
+      "canvas": [
+        512,
+        512
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "bbox": [
+        42,
+        351,
+        470,
+        487
+      ],
+      "placement_box": [
+        42,
+        351,
+        428,
+        136
+      ],
+      "layer_order": 0,
+      "source": "src/gureum_items_master.jpg",
+      "source_cell_0based": [
+        1,
+        2
+      ],
+      "skin_body_face_in_item": false,
+      "validation": {
+        "mode": "RGBA",
+        "lossless": true,
+        "alpha_min": 0,
+        "alpha_max": 255,
+        "edge_nontransparent_pixels": 0,
+        "face_region_overlap_pixels": 0
+      },
+      "visual_review": "Read-confirmed own-character tryon grid and contact sheet; no body/face contamination; no eye obstruction; 2 shoes per footwear set",
+      "sha256": "2b83cb99f441e51bd38e8b489e6c852ff8e87458ac061bee9ae3733ef9597123"
+    }
+  ],
+  "item_count": 40,
+  "item_layer_order": [
+    "bg",
+    "body",
+    "shoes",
+    "top",
+    "acc",
+    "hat"
+  ],
+  "hat_policy": "small front hats / central crowns; not full head fit; no behind-ear layer. Tori hats intentionally sit below ears and above eyes.",
+  "stage2_validation": {
+    "item_count": 40,
+    "per_character": {
+      "bori": 10,
+      "tori": 10,
+      "momo": 10,
+      "gureum": 10
+    },
+    "per_slot": {
+      "hat": 8,
+      "top": 12,
+      "acc": 8,
+      "shoes": 8,
+      "bg": 4
+    },
+    "all_512_rgba_lossless": true,
+    "all_canvas_edges_transparent": true,
+    "all_face_roi_overlap_zero": true,
+    "base_friends_and_anchors_hashes_unchanged": true,
+    "visual_read_review": [
+      "tryon_grid_bori.png",
+      "tryon_grid_tori.png",
+      "tryon_grid_momo.png",
+      "tryon_grid_gureum.png",
+      "contact_sheet_items.png"
+    ],
+    "limits": [
+      "Small front headpiece hats, not full-head or behind-ear hats.",
+      "Shoe source mild three-quarter perspective remains.",
+      "Top sleeves approximate neutral stance only, not rigged animation."
+    ],
+    "tool_note": "One AwaitShell status call returned temporary service unavailable; no retry or fallback to other service. Source generation itself succeeded four times."
+  }
+}
