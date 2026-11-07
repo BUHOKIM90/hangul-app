@@ -13,6 +13,78 @@
   ];
   const STAR = 'assets/stickers/space_07_별.webp';
 
+  function assetSrc(file) {
+    return String(file || '').split('/').map(encodeURIComponent).join('/');
+  }
+  function showGain(list) {
+    const h = host();
+    if (!h || !list.length) return;
+    const box = document.createElement('div');
+    box.className = 'gain';
+    list.forEach(st => {
+      const fig = document.createElement('figure');
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = 256;
+      img.height = 256;
+      img.src = assetSrc(st.file);
+      const cap = document.createElement('figcaption');
+      cap.textContent = st.name;
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      box.appendChild(fig);
+    });
+    h.appendChild(box);
+  }
+  function grantStickers() {
+    if (!ctx || ctx.mode !== 'lesson' || !window.V5Stick || !V5Stick.matchAnswer) return [];
+    const keys = ctx.rewardKeys || (ctx.skill ? [ctx.skill] : []);
+    const got = [];
+    keys.forEach(k => {
+      if (got.length) return;
+      const st = V5Stick.matchAnswer(k);
+      if (!st || X().S.stickers.indexOf(st.id) >= 0) return;
+      X().S.stickers.push(st.id);
+      got.push(st);
+    });
+    if (!got.length) return [];
+    X().save();
+    if (window.V5 && V5.noteSticker) got.forEach(st => V5.noteSticker(st));
+    return got;
+  }
+  function showCloth(item) {
+    const h = host();
+    if (!h || !item) return;
+    const p = document.createElement('p');
+    p.className = 'meta cloth-note';
+    p.textContent = '새 옷 · ' + item.label;
+    h.appendChild(p);
+  }
+  function payAnswer(g) {
+    if (g !== 'solo' && g !== 'retry') return;
+    const got = grantStickers();
+    if (!got.length) return;
+    ctx.earned = (ctx.earned || []).concat(got);
+    showGain(got);
+  }
+  function payCloth() {
+    if (!ctx || ctx.mode !== 'lesson' || ctx.cloth) return;
+    const item = X().markSoloCloth();
+    if (!item) return;
+    ctx.cloth = item;
+    showCloth(item);
+    if (window.V5 && V5.noteCloth) V5.noteCloth(item);
+  }
+  function keysForToken(id) {
+    if (C().WORDS && C().WORDS[id]) return ['w:' + id];
+    if (typeof id === 'string' && C().isSyl(id)) {
+      const p = C().split(id);
+      return ['j:' + p.cho, 'j:' + p.jung];
+    }
+    if (typeof id === 'string' && id.length === 1) return ['j:' + id];
+    return [];
+  }
+
   function host() { return document.getElementById('stage'); }
   function bubble(t) {
     const b = document.getElementById('bubble');
@@ -52,10 +124,12 @@
     }
     ctx.grades.push(g);
     if (ctx.skill) X().bump(ctx.skill, g, { occasion: ctx.occasion });
-    if (g === 'solo') X().praise();
+    if (g === 'hint') X().encourage('hint', ctx.focus || '');
+    else if (g === 'shown') X().encourage('shown', ctx.focus || '');
+    else if (g === 'solo') X().praise({ type: ctx.type, helped: false, focus: ctx.focus || '' });
     else if (g === 'thin') bubble('한 번 맞았어. 다음에 또 보자');
-    else if (g === 'retry') bubble('이번엔 맞았어');
-    else if (g === 'hint') bubble('힌트를 보고 골랐어');
+    else if (g === 'retry') X().praise({ type: ctx.type, helped: true, focus: ctx.focus || '' });
+    payAnswer(g);
     if (ctx.ti + 1 < ctx.trials.length) {
       nextBtn('또 하나', 'trial-next');
       return;
@@ -64,6 +138,7 @@
     ctx.playDone = true;
     ctx.counted = counting.length > 0;
     ctx.soloStep = !!ctx.scored && ctx.counted && counting.every(x => x === 'solo');
+    if (ctx.soloStep) payCloth();
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function assist(el, correct) {
@@ -259,10 +334,13 @@
     const title = ctx.type === 'treasure' ? '보물 상자 소리' : '어떤 그림일까?';
     markWide(opts.length);
     ctx.skill = item.skill;
-    ctx.voice = { key: C().wordKey(target), text: title };
+    ctx.focus = C().ko(target);
+    ctx.rewardKeys = ['w:' + target];
+    ctx.voice = { key: C().wordKey(target), text: '잘 들어 봐' };
     const chest = ctx.type === 'treasure' ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
     host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + chest + cardsHTML(opts, id => picCard(id, id === target));
-    X().say(ctx.voice.key, ctx.voice.text);
+    bubble('잘 들어 봐');
+    X().say(ctx.voice.key, '잘 들어 봐', { keepBubble: true });
   }
   function renderSparkle(item, lesson) {
     const target = item.g;
@@ -274,6 +352,8 @@
     const title = ctx.type === 'treasure' ? '보물 글자' : '같은 글자를 눌러';
     markWide(opts.length);
     ctx.skill = item.skill;
+    ctx.focus = target;
+    ctx.rewardKeys = ['j:' + target];
     ctx.voice = { key: C().jamoKey(target), text: title };
     host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
     X().say(ctx.voice.key, ctx.voice.text);
@@ -285,6 +365,8 @@
     const vows = [b.v].concat(blockAlts(b.v, lesson, nDist));
     markWide(Math.min(cons.length, vows.length));
     ctx.skill = 's:' + b.say;
+    ctx.focus = b.say;
+    ctx.rewardKeys = ['j:' + b.c, 'j:' + b.v];
     ctx.voice = { key: C().sylKey(b.say), text: '소리를 붙여 보자' };
     const pieces = X().shuffle(cons.map(g => ({ g: g, kind: 'cho', ok: g === b.c }))).concat(
       X().shuffle(vows.map(g => ({ g: g, kind: 'jung', ok: g === b.v })))
@@ -297,6 +379,8 @@
     const opts = wordChoices(lesson, target, askN());
     markWide(opts.length);
     ctx.skill = item.skill;
+    ctx.focus = C().ko(target);
+    ctx.rewardKeys = ['w:' + target];
     ctx.voice = { key: C().wordKey(target), text: '같은 낱말을 골라' };
     host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target)).join('') + '</div>';
     X().say(ctx.voice.key, ctx.voice.text);
@@ -306,6 +390,8 @@
     const opts = sylChoices(lesson, answer, askN());
     markWide(opts.length);
     ctx.skill = item.skill;
+    ctx.focus = answer;
+    ctx.rewardKeys = keysForToken(answer);
     const prompt = '처음 소리를 골라';
     ctx.voice = { key: item.word ? C().wordKey(item.word) : C().sylKey(answer), text: prompt };
     const pic = item.word ? C().pic(item.word) : (C().sylPic(answer) || STAR);
@@ -315,6 +401,11 @@
   function renderMemory(item) {
     markWide(4);
     ctx.skill = item.skill;
+    ctx.focus = (item.pairs || []).map(p => p.face).join(' · ');
+    ctx.rewardKeys = [];
+    (item.pairs || []).forEach(p => {
+      keysForToken(p.id).forEach(k => { if (ctx.rewardKeys.indexOf(k) < 0) ctx.rewardKeys.push(k); });
+    });
     ctx.mem = { open: [] };
     ctx.voice = { key: C().UI.match, text: '같은 짝을 찾아' };
     const cards = [];
@@ -334,6 +425,8 @@
   function renderChant(lesson) {
     ctx.skill = null;
     ctx.choice = false;
+    ctx.focus = lesson.chant.join('·');
+    ctx.rewardKeys = [];
     ctx.chant = 0;
     const first = lesson.chant[0];
     ctx.voice = { key: C().sylKey(first), text: '소리를 따라 눌러' };
@@ -348,6 +441,8 @@
     const g = lesson.trace;
     ctx.skill = 'm:' + g;
     ctx.choice = false;
+    ctx.focus = g;
+    ctx.rewardKeys = [];
     const dense = X().S.difficulty !== 'easy';
     ctx.trace = { plan: C().glyphPlan(g, dense), si: 0, di: 0, glyph: g };
     const pic = C().jamoPic(g) || C().sylPic(g);
@@ -476,6 +571,7 @@
     ctx.playDone = true;
     ctx.soloStep = false;
     ctx.grades = ['guide'];
+    if (!ctx.hinted && !ctx.revealed && !ctx.misses) payCloth();
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function onTile(el) {
@@ -511,6 +607,9 @@
     if (ctx.trialOver) return;
     const grade = ctx.revealed ? 'shown' : (ctx.misses ? 'hint' : 'guide');
     if (ctx.skill) X().bump(ctx.skill, grade);
+    if (grade === 'shown') X().encourage('shown', ctx.focus || '');
+    else if (grade === 'hint') X().encourage('hint', ctx.focus || '');
+    else payCloth();
     ctx.trialOver = true;
     ctx.playDone = true;
     ctx.soloStep = false;
@@ -643,6 +742,10 @@
       counted: false,
       soloStep: false,
       playDone: false,
+      earned: [],
+      cloth: null,
+      rewardKeys: [],
+      focus: '',
       voice: null,
       skill: null,
       misses: 0,
@@ -664,7 +767,12 @@
       return true;
     }
     if (t === 'play-next') {
-      if (onDone) onDone({ solo: !!ctx.soloStep, scored: !!(ctx.scored && ctx.counted) });
+      if (onDone) onDone({
+        solo: !!ctx.soloStep,
+        scored: !!(ctx.scored && ctx.counted),
+        earned: (ctx && ctx.earned) || [],
+        cloth: (ctx && ctx.cloth) || null
+      });
       return true;
     }
     if (!ctx || ctx.trialOver) return false;
@@ -684,7 +792,10 @@
     return false;
   }
   function replay() {
-    replayStem();
+    if (ctx && (ctx.type === 'listen' || ctx.type === 'treasure') && ctx.voice) {
+      bubble('잘 들어 봐');
+      X().say(ctx.voice.key, '잘 들어 봐', { keepBubble: true });
+    } else replayStem();
     const b = document.getElementById('replayBtn');
     if (b) b.dataset.n = String((+b.dataset.n || 0) + 1);
   }

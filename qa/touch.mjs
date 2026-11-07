@@ -111,9 +111,50 @@ async function finishRound(page, correctShot) {
     const more = page.locator('[data-tap="trial-next"]');
     if (await more.count()) await tap(page, more, 'trial-next');
   }
+  if (await page.locator('#stage .gain img').count()) {
+    const shotGain = await page.evaluate(() => {
+      if (window.__gainShot) return '';
+      window.__gainShot = 1;
+      const d = document.documentElement.dataset;
+      return d.device + '-' + d.orient;
+    });
+    if (shotGain === 'phone-port') await shot(page, 'iphone-port-gain');
+    if (shotGain === 'ipad-port') await shot(page, 'ipad-port-gain');
+  }
   await tap(page, page.locator('[data-tap="play-next"]'), 'play-next');
-  await page.waitForSelector('[data-tap="peel-next"]', { timeout: 4000 });
-  await tap(page, page.locator('[data-tap="peel-next"]'), 'peel-next');
+  if (await page.locator('[data-tap="peel-next"]').count()) {
+    await tap(page, page.locator('[data-tap="peel-next"]'), 'peel-next');
+  }
+}
+
+async function hintThenCorrect(page) {
+  const before = await page.evaluate(() => (JSON.parse(localStorage.getItem('hangul-v5') || '{"stickers":[],"unlocks":[]}').stickers || []).slice());
+  const unlocksBefore = await page.evaluate(() => (JSON.parse(localStorage.getItem('hangul-v5') || '{"unlocks":[]}').unlocks || []).length);
+  for (let round = 0; round < 4; round++) {
+    if (await page.locator('[data-tap="play-next"]').count()) break;
+    const wrong = page.locator('#stage [data-ok="0"]').first();
+    await tap(page, wrong, 'miss-1');
+    await page.waitForTimeout(320);
+    await tap(page, wrong, 'miss-2');
+    await tap(page, page.locator('#stage [data-ok="1"]'), 'after-hint');
+    const after = await page.evaluate(() => ({
+      stickers: (JSON.parse(localStorage.getItem('hangul-v5')).stickers || []).slice(),
+      unlocks: (JSON.parse(localStorage.getItem('hangul-v5')).unlocks || []).length
+    }));
+    if (after.stickers.length !== before.length) throw new Error('hint granted a sticker');
+    if (after.unlocks !== unlocksBefore) throw new Error('hint unlocked clothes');
+    if (await page.locator('#stage .gain').count()) throw new Error('hint showed a sticker');
+    if (await page.locator('#stage .cloth-note').count()) throw new Error('hint showed clothes');
+    if (await page.locator('[data-tap="trial-next"]').count()) {
+      await tap(page, page.locator('[data-tap="trial-next"]'), 'trial-next-hint');
+      continue;
+    }
+    break;
+  }
+  await tap(page, page.locator('[data-tap="play-next"]'), 'play-next-hint');
+  if (await page.locator('[data-tap="peel-next"]').count()) {
+    await tap(page, page.locator('[data-tap="peel-next"]'), 'peel-hint');
+  }
 }
 
 async function shot(page, name) {
@@ -146,9 +187,21 @@ async function runDevice(browser, spec) {
     if (shoot || (shootChant && play === 'chant')) await shot(page, spec.name + '-play-' + play);
     await finishRound(page, shoot && play === 'chant' ? spec.name + '-correct' : '');
   }
+  const mid = await page.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem('hangul-v5') || '{}');
+    return {
+      stickers: (s.stickers || []).length,
+      done: Object.keys(s.done || {}).length,
+      skill: Object.keys(s.skill || {}).length
+    };
+  });
+  if (mid.stickers || mid.done) throw new Error(spec.name + ' practice granted a prize ' + JSON.stringify(mid));
+  if (!mid.skill) throw new Error(spec.name + ' practice did not record the lesson');
   await tap(page, page.locator('[data-tap="start-lesson"]').first(), 'start-lesson');
   for (let i = 0; i < 8; i++) {
-    await finishRound(page, '');
+    const type = await page.getAttribute('#main', 'data-play');
+    if (type === 'sparkle') await hintThenCorrect(page);
+    else await finishRound(page, '');
     const screen = await page.getAttribute('#main', 'data-screen');
     if (screen === 'done') break;
   }
@@ -156,9 +209,17 @@ async function runDevice(browser, spec) {
   if (done !== 'done') throw new Error(spec.name + ' lesson ended on ' + done);
   const sticker = await page.getAttribute('#main', 'data-sticker');
   if (!sticker) throw new Error(spec.name + ' no lesson sticker');
-  await page.waitForTimeout(1400);
-  const placed = await page.locator('.peel-slot img').count();
-  if (!placed) throw new Error(spec.name + ' sticker did not land in the slot');
+  const thumbs = await page.locator('.gain img').count();
+  if (!thumbs) throw new Error(spec.name + ' sticker did not stay on the lesson end');
+  if (await page.locator('.reward-chip').count() !== 1) throw new Error(spec.name + ' clothes were not earned once');
+  const saved = await page.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem('hangul-v5'));
+    return { stickers: s.stickers, hat: s.wear && s.wear.monggeul && s.wear.monggeul.hat, done: s.done };
+  });
+  if (!saved.done['1']) throw new Error(spec.name + ' lesson was not marked done');
+  if (saved.hat !== 'monggeul_hat_cap') throw new Error(spec.name + ' hat is ' + saved.hat);
+  if (saved.stickers.indexOf('hangul_08_ㅇ친구') < 0) throw new Error(spec.name + ' missing ㅇ sticker ' + saved.stickers.join(','));
+  await page.waitForTimeout(400);
   if (shootDone) {
     await shot(page, spec.name + '-done');
     await shot(page, spec.name + '-play-done');
@@ -168,15 +229,25 @@ async function runDevice(browser, spec) {
   if (bodyNow && bodyNow.indexOf('monggeul_basic.webp') >= 0) {
     await tap(page, page.locator('[data-tap="who"]').nth(1), 'who-other');
   }
-  await tap(page, page.locator('[data-tap="who"][data-who="monggeul"]'), 'who-monggeul');
+  if (await page.locator('[data-tap="who"][data-who="monggeul"].is-on').count() === 0) {
+    await tap(page, page.locator('[data-tap="who"][data-who="monggeul"]'), 'who-monggeul');
+  }
   const body = await page.locator('.doll img[data-slot="body"]').getAttribute('src');
   if (!body || body.indexOf('monggeul_basic.webp') < 0) throw new Error(spec.name + ' body is ' + body);
+  const layers = '.doll img[data-slot="hat"], .doll img[data-slot="top"], .doll img[data-slot="acc"], .doll img[data-slot="shoes"]';
+  const worn = await page.locator(layers).count();
+  if (worn < 2) throw new Error(spec.name + ' expected several clothes, got ' + worn);
   if (shoot) await shot(page, spec.name + '-dress');
-  await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="false"]').first(), 'equip');
-  const worn = await page.locator('.doll img[data-slot="hat"], .doll img[data-slot="top"], .doll img[data-slot="acc"], .doll img[data-slot="shoes"]').count();
-  if (!worn) throw new Error(spec.name + ' dress change did not add a layer');
+  await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="true"]').first(), 'unequip');
+  const left = await page.locator(layers).count();
+  if (left !== worn - 1) throw new Error(spec.name + ' clothes did not come off');
+  await tap(page, page.locator('[data-item="monggeul_hat_cap"]'), 'equip-hat');
+  if (await page.locator('.doll img[data-slot="hat"]').count() < 1) throw new Error(spec.name + ' hat did not go back on');
   if (shoot) await shot(page, spec.name + '-dress-on');
   await tap(page, page.locator('#homeBtn'), 'home-from-dress');
+  if (shoot) await shot(page, spec.name + '-home-dressed');
+  const buddyHat = await page.locator('#buddy img[data-slot="hat"]').count();
+  if (!buddyHat) throw new Error(spec.name + ' home 몽글이 is not wearing the hat');
   await tap(page, page.locator('[data-tap="stickers"]'), 'stickers');
   if (shoot) await shot(page, spec.name + '-stickers');
   await tap(page, page.locator('#adultBtn'), 'adult');

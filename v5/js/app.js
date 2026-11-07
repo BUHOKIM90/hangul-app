@@ -11,6 +11,7 @@
   let gate = null;
   let resetArm = false;
   let bookPage = 0;
+  const WAVE = '<img alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w">';
 
   function applyForm() {
     const w = document.documentElement.clientWidth;
@@ -37,12 +38,14 @@
     return C().LESSONS.find(l => !X().S.done[l.id]) || C().LESSONS[C().LESSONS.length - 1];
   }
   function playMeta(id) { return C().PLAYS.find(p => p.id === id); }
-  function awardSticker() {
-    const next = V5Stick.list.find(s => X().S.stickers.indexOf(s.id) < 0);
-    if (!next) return null;
-    X().S.stickers.push(next.id);
-    X().save();
-    return next;
+  function noteSticker(st) {
+    if (!run || !st) return;
+    if (!run.earned) run.earned = [];
+    if (!run.earned.some(s => s.id === st.id)) run.earned.push(st);
+  }
+  function noteCloth(item) {
+    if (!run || !item) return;
+    run.cloth = item;
   }
   let peelGo = 'map';
   function assetSrc(file) {
@@ -60,7 +63,7 @@
   function homeHTML() {
     const S = X().S;
     const lesson = currentLesson();
-    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w"><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="cast" id="friend-row"></div><div class="buddy" id="buddy">' + WAVE + '</div><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
   }
   function showHome() {
     X().dropQueue();
@@ -118,30 +121,35 @@
       run.stars = run.stars || [];
       run.stars.push(solo);
     }
-    const st = awardSticker();
-    const item = X().unlockNext();
-    if (run.mode === 'practice') return showPeel(st, item, 'map');
+    const earned = (result && result.earned) || [];
+    const item = (result && result.cloth) || null;
+    if (run.mode === 'practice') return showMap();
     run.i += 1;
-    if (run.i < run.steps.length) return showPeel(st, item, 'step');
+    if (run.i < run.steps.length) return showPeel(earned, item, 'step');
     const stars = run.stars || [];
     const solos = stars.filter(Boolean).length;
     const passed = C().passLesson(solos, stars.length);
     if (passed) X().S.done[run.lesson.id] = X().stamp();
     X().S.last = { lesson: run.lesson.id, solos: solos, total: stars.length, passed: !!passed, day: X().stamp() };
     X().save();
-    showPeel(st, item, 'done');
+    showPeel(earned, item, 'done');
   }
-  function showPeel(st, item, go) {
+  function showPeel(earned, item, go) {
     X().dropQueue();
     peelGo = go;
+    const list = earned || [];
+    const st = list[0] || null;
     const label = go === 'map' ? '마을로' : '다음';
     main().dataset.screen = 'reward';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end"><h1>스티커!</h1>' + peelStage(st) + rewardChip(item) + '<button type="button" class="tap xl" data-tap="peel-next">' + label + '</button></section>';
+    const card = st ? peelStage(st) : '<p class="bubble">같이 이어 가자</p>';
+    main().innerHTML = '<section class="end celebrate"><p class="celebrate-title">' + (st ? '잘했어!' : '다음 놀이') + '</p>' + card + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next">' + label + '</button></section>';
     chrome('reward');
     settlePeel();
-    X().say('ui_sticker', '스티커를 받았어!');
-    X().confetti();
+    if (st) {
+      X().say('ui_sticker', '스티커를 받았어!');
+      X().confetti();
+    }
   }
   function settlePeel() {
     const root = main();
@@ -165,19 +173,23 @@
     if (!stars || !stars.length) return '<p class="meta">혼자 맞힌 놀이가 없어요</p>';
     return '<div class="stars" aria-label="혼자 맞힌 놀이 ' + stars.filter(Boolean).length + '/' + stars.length + '">' + stars.map(on => '<img class="' + (on ? 'is-on' : 'is-dim') + '" alt="" src="assets/icons/sun.svg">').join('') + '</div>';
   }
+  function gainHTML(list) {
+    if (!list || !list.length) return '';
+    return '<div class="gain">' + list.map(st => '<figure><img alt="" width="256" height="256" src="' + assetSrc(st.file) + '"><figcaption>' + st.name + '</figcaption></figure>').join('') + '</div>';
+  }
   function afterPeel() {
     if (peelGo === 'step' && run) {
       showPlay({ mode: 'lesson', type: run.steps[run.i], lesson: run.lesson });
       return;
     }
-    if (peelGo === 'done') {
-      showDone(awardSticker(), X().unlockNext());
-      return;
-    }
+    if (peelGo === 'done') return showDone();
     showMap();
   }
-  function showDone(st, item) {
+  function showDone() {
     const stars = run && run.stars ? run.stars.slice() : [];
+    const earned = run && run.earned ? run.earned.slice() : [];
+    const item = run && run.cloth ? run.cloth : null;
+    const st = earned[0] || null;
     const solos = stars.filter(Boolean).length;
     const passed = C().passLesson(solos, stars.length);
     const guided = run && run.steps && run.steps.some(s => s === 'chant' || s === 'trace');
@@ -187,7 +199,7 @@
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
+    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + (st ? peelStage(st) : '') + gainHTML(earned) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
     chrome('done');
     settlePeel();
     if (passed) X().say('ui_levelup', line);
@@ -424,9 +436,23 @@
     }).catch(() => {});
   }
 
+  function paintBuddy() {
+    const el = document.getElementById('buddy');
+    if (!el) return;
+    const wear = (X().S.wear && X().S.wear.monggeul) || {};
+    const dressed = ['hat', 'top', 'acc', 'shoes'].some(slot => wear[slot]);
+    if (!dressed || !X().charBy('monggeul')) {
+      el.classList.remove('is-dressed');
+      el.innerHTML = WAVE;
+      return;
+    }
+    el.classList.add('is-dressed');
+    el.innerHTML = '<span class="pal-doll">' + X().layerHTML('monggeul', { skip: ['bg'] }) + '</span>';
+  }
   function fillHomeExtras() {
     const meta = document.getElementById('home-meta');
     if (meta) meta.textContent = currentLesson().kid + ' · 스티커 ' + X().S.stickers.length + '/' + V5Stick.list.length;
+    paintBuddy();
     const row = document.getElementById('friend-row');
     if (!row || !X().dressData()) return;
     const friends = (X().dressData().characters || []).filter(c => c.id !== 'monggeul');
@@ -438,7 +464,7 @@
     X().setDress({ characters: [], items: [], stack: ['bg', 'body', 'shoes', 'top', 'acc', 'hat'], slots: [], unlock: [], slot_label: {} });
     X().load();
     X().installPointer();
-    window.V5 = { onTap, get S() { return X().S; } };
+    window.V5 = { onTap, noteSticker, noteCloth, get S() { return X().S; } };
     if (main().dataset.screen === 'home' && document.getElementById('friend-row')) fillHomeExtras();
     else showHome();
     document.documentElement.dataset.ready = '1';

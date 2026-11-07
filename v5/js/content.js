@@ -61,7 +61,8 @@
     { id: 7, title: 'ㅅ, ㅈ', kid: '사 자', place: '동물원', goal: '헷갈리는 ㅅ·ㅈ을 구별하고, 사자·소·자두·모자를 읽어요.', words: ['lion', 'so', 'jadu', 'moja'], hear: ['lion', 'so', 'jadu', 'moja'], read: ['lion', 'so', 'jadu', 'moja'], sight: [], onset: [], jamo: ['ㅅ', 'ㅈ', 'ㅏ', 'ㅗ'], focus: ['ㅅ', 'ㅈ'], contrast: { 'ㅅ': 'ㅈ', 'ㅈ': 'ㅅ' }, chant: ['사', '자', '소'], blocks: { c: 'ㅅ', v: 'ㅏ', say: '사', word: 'lion' }, trace: 'ㅅ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'trace'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } },
     { id: 8, title: '붙여 읽기', kid: '낱말 읽기', place: '도서관', goal: 'ㅎ·ㄹ을 만나고, 배운 소리로만 된 낱말을 그림과 읽어요. ㄹ은 찾고, 획이 많은 쓰기는 하지 않아요.', words: ['hama', 'ori', 'radio', 'dari', 'nabi', 'agi', 'moja', 'goguma'], hear: ['hama', 'ori', 'radio', 'dari'], read: ['hama', 'ori', 'radio', 'dari', 'moja', 'nabi', 'agi', 'goguma'], sight: [], onset: [], jamo: ['ㅎ', 'ㄹ', 'ㄱ', 'ㄴ', 'ㅏ', 'ㅗ'], focus: ['ㅎ', 'ㄹ'], contrast: { 'ㅎ': 'ㅇ', 'ㄹ': 'ㄷ' }, chant: ['하', '라', '오'], blocks: { c: 'ㅎ', v: 'ㅏ', say: '하', word: 'hama' }, trace: 'ㅎ', flow: { easy: ['chant', 'listen', 'sparkle', 'blocks'], mid: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'treasure'], hard: ['chant', 'listen', 'sparkle', 'blocks', 'match', 'memory', 'trace', 'treasure'] } }
   ];
-  /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired. */
+  /* Each caption is the line heard on that clip. Unclear ui4_proc takes stay unwired.
+     Reward boasts (level, jar, sticker) are not play praise — they would be untrue mid-lesson. */
   const PRAISE = [
     ['잘했어!', 'ui_good1'],
     ['멋져!', 'ui_good2'],
@@ -84,6 +85,57 @@
     ['그림을 보고 잘 생각했네.', 'ui4_proc17'],
     ['한 글자씩 또박또박 읽었네', 'ui4_proc18']
   ];
+  const PRAISE_BY = {};
+  PRAISE.forEach(p => { PRAISE_BY[p[1]] = p; });
+  const POOL_KEYS = {
+    short: ['ui_good1', 'ui_good2', 'ui_good3', 'ui_found'],
+    any: ['ui_good1', 'ui_good2', 'ui_good3'],
+    picture: ['ui4_proc17', 'ui_found'],
+    find: ['ui_found', 'ui4_proc12', 'ui4_proc15'],
+    blocks: ['ui4_proc6'],
+    trace: ['ui4_proc2', 'ui4_proc11'],
+    chant: ['ui4_proc1', 'ui4_proc5', 'ui4_proc18'],
+    retry: ['ui4_proc7', 'ui4_proc16']
+  };
+  const PLAY_POOL = {
+    beat: ['short'],
+    listen: ['any', 'picture'],
+    match: ['any', 'picture'],
+    treasure: ['any', 'picture'],
+    sparkle: ['any', 'find'],
+    blocks: ['any', 'blocks'],
+    trace: ['any', 'trace'],
+    chant: ['any', 'chant'],
+    memory: ['any', 'picture']
+  };
+  function praisePool(type, helped) {
+    const ids = (PLAY_POOL[type] || PLAY_POOL.listen).slice();
+    if (helped) ids.push('retry');
+    const out = [];
+    const seen = {};
+    ids.forEach(id => {
+      (POOL_KEYS[id] || []).forEach(k => {
+        if (seen[k] || !PRAISE_BY[k]) return;
+        seen[k] = 1;
+        out.push(PRAISE_BY[k]);
+      });
+    });
+    return out;
+  }
+  const ENCOURAGE = {
+    hint: [
+      ['반짝이는 데를 봐!', ''],
+      ['같이 찾았어!', ''],
+      ['빛나는 칸이야!', '']
+    ],
+    shown: [
+      ['같이 해 보자!', 'ui_together'],
+      ['같이 찾았어!', '']
+    ]
+  };
+  function encouragePool(kind) {
+    return (ENCOURAGE[kind] || ENCOURAGE.shown).slice();
+  }
   const SYL_PIC = {
     '아': 'agi', '이': 'ima', '오': 'ori', '우': 'ubi', '어': 'eobu',
     '가': 'gicha', '나': 'nabi', '기': 'gicha', '다': 'dari', '마': 'moja',
@@ -226,7 +278,7 @@
   function choiceN(diff) { return diff === 'hard' ? 4 : 3; }
 
   root.V5C = {
-    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS,
+    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS, praisePool, encouragePool,
     hex, sylKey, jamoKey, wordKey, ko, pic, sylPic, sylWord, jamoPic, compose, split, isSyl, sampleStroke, glyphPlan,
     lesson, wordsThrough, audioKeys, choiceN, hasBatchim, jamoThrough, hearOf, wordDecodable,
     flowFor, passLesson, mastered, confuse
