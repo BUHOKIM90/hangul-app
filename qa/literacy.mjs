@@ -51,7 +51,9 @@ check('아빠 not decodable at 8', !C.wordDecodable('appa', 8));
 check('려원 not decodable at 8', !C.wordDecodable('ryeowon', 8));
 check('우유 not decodable at 8', !C.wordDecodable('uyu', 8));
 check('기차 not decodable at 8', !C.wordDecodable('gicha', 8));
-check('아기 waits for ㄱ', !C.wordDecodable('agi', 4) && C.wordDecodable('agi', 5));
+check('아기 waits for ㄱ', !C.wordDecodable('agi', 3) && C.wordDecodable('agi', 4));
+check('나비 waits for ㅂ', !C.wordDecodable('nabi', 5) && C.wordDecodable('nabi', 6));
+check('바다 waits for ㅂ', !C.wordDecodable('bada', 5) && C.wordDecodable('bada', 6));
 check('오이 from lesson 3', C.wordDecodable('oi', 3));
 check('사자 waits for ㅅㅈ', !C.wordDecodable('lion', 6) && C.wordDecodable('lion', 7));
 check('하마 waits for ㅎ', !C.wordDecodable('hama', 7) && C.wordDecodable('hama', 8));
@@ -61,6 +63,19 @@ check('2 of 4 does not', C.passLesson(2, 4) === false);
 check('1 of 3 does not', C.passLesson(1, 3) === false);
 check('empty does not', C.passLesson(0, 0) === false);
 check('3 of 3 passes', C.passLesson(3, 3) === true);
+check('easy still asks for three choices', C.choiceN('easy') === 3);
+check('hard asks for four', C.choiceN('hard') === 4);
+const CONS = { 'ㄱ': 1, 'ㄴ': 1, 'ㄷ': 1, 'ㄹ': 1, 'ㅁ': 1, 'ㅂ': 1, 'ㅅ': 1, 'ㅇ': 1, 'ㅈ': 1, 'ㅎ': 1 };
+const seenC = {};
+C.LESSONS.forEach(lesson => {
+  const fresh = lesson.jamo.filter(g => CONS[g] && !seenC[g]);
+  fresh.forEach(g => { seenC[g] = lesson.id; });
+  check(lesson.id + ' introduces at most two consonants', fresh.length <= 2);
+  check(lesson.id + ' focus is at most two', (lesson.focus || []).length <= 2);
+});
+check('lesson 6 consonants are ㅁ and ㅂ', seenC['ㅁ'] === 6 && seenC['ㅂ'] === 6 && seenC['ㄷ'] !== 6);
+check('ㄷ is the lesson 5 partner of ㄴ', seenC['ㄴ'] === 5 && seenC['ㄷ'] === 5);
+check('ㄱ arrives with the vowel contrast', seenC['ㄱ'] === 4);
 
 check('two solos are not mastery', C.mastered({ solo: 2, box: 2, help: 0 }) === false);
 check('three solos are mastery', C.mastered({ solo: 3, box: 3, help: 0 }) === true);
@@ -88,13 +103,24 @@ X.bump('j:ㅏ', 'shown');
 sk = X.S.skill['j:ㅏ'];
 check('a revealed answer drops 익힘', sk.box === 2 && C.mastered(sk) === false);
 
+X.bump('j:ㅂ', 'thin', { occasion: 'play-1' });
+sk = X.S.skill['j:ㅂ'];
+check('one two-choice hit does not score', sk.box === 0 && sk.solo === 0 && sk.hold === 1);
+check('same occasion is not a second try', X.admitThin('j:ㅂ', 'play-1') === false);
+X.bump('j:ㅂ', 'thin', { occasion: 'play-1' });
+check('two taps in one play still do not score', X.S.skill['j:ㅂ'].box === 0 && X.S.skill['j:ㅂ'].solo === 0);
+check('a later play can confirm', X.admitThin('j:ㅂ', 'play-2') === true);
+X.bump('j:ㅂ', 'solo');
+sk = X.S.skill['j:ㅂ'];
+check('the later confirmation is one point', sk.solo === 1 && sk.box === 1 && C.mastered(sk) === false);
+
 context.localStorage.store['hangul-v5'] = JSON.stringify({
   v: 5, done: { 1: '2020-01-01' }, skill: { 'j:ㄱ': { box: 5, seen: 4, ok: 4, help: 0 } }
 });
 X.load();
 check('old done flags are cleared', !X.S.done[1]);
 check('old boxes are cleared', !X.S.skill['j:ㄱ'] || X.S.skill['j:ㄱ'].box === 0);
-check('score version is stored', X.S.scoreV === 1);
+check('score version is stored', X.S.scoreV === 2);
 
 if (fail.length) {
   console.error(fail.join('\n'));

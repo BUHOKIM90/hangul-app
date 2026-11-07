@@ -5,7 +5,7 @@
   const C = () => window.V5C;
   function fresh() {
     return {
-      v: 5, scoreV: 1, sound: true, colorHints: true, difficulty: 'mid',
+      v: 5, scoreV: 2, sound: true, colorHints: true, difficulty: 'mid',
       ms: 0, today: '', todayMs: 0, done: {}, skill: {}, last: null,
       stickers: [], unlocks: [], wear: {}, who: 'monggeul', freshItem: ''
     };
@@ -18,7 +18,7 @@
     try {
       const o = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (o && o.v === 5) {
-        const keepBoxes = o.scoreV === 1;
+        const keepBoxes = o.scoreV === 2;
         S = Object.assign(fresh(), o);
         if (!keepBoxes) deflateScores();
       }
@@ -227,7 +227,7 @@
   /* ---------- skill / praise ---------- */
   let praiseN = 0;
   function emptySkill() {
-    return { box: 0, due: 0, seen: 0, ok: 0, help: 0, solo: 0, retry: 0 };
+    return { box: 0, due: 0, seen: 0, ok: 0, help: 0, solo: 0, retry: 0, hold: 0, holdOccasion: '' };
   }
   /* Old boxes counted hinted and one-tap rounds as known. Drop them once. */
   function deflateScores() {
@@ -239,9 +239,14 @@
     S.skill = next;
     S.done = {};
     S.last = null;
-    S.scoreV = 1;
+    S.scoreV = 2;
   }
-  function bump(key, grade) {
+  function admitThin(key, occasion) {
+    if (!key || !occasion) return false;
+    const it = S.skill[key];
+    return !!(it && it.hold > 0 && it.holdOccasion && it.holdOccasion !== occasion);
+  }
+  function bump(key, grade, meta) {
     if (!key) return;
     if (grade === 2) grade = 'solo';
     else if (grade === 1) grade = 'retry';
@@ -249,7 +254,11 @@
     const it = Object.assign(emptySkill(), S.skill[key] || {});
     it.seen += 1;
     const day = 86400000;
-    if (grade === 'solo') {
+    if (grade === 'thin') {
+      it.hold += 1;
+      it.holdOccasion = (meta && meta.occasion) || '';
+      it.due = Date.now();
+    } else if (grade === 'solo') {
       it.ok += 1;
       it.solo += 1;
       it.box = Math.min(3, it.box + 1);
@@ -331,6 +340,6 @@
   window.V5X = {
     get S() { return S; }, save, load, reset, stamp, say, dropQueue, unlock, syncSound, installPointer,
     setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, layerHTML,
-    bump, hintSoon, praise, confetti, shuffle, lineOf
+    bump, admitThin, hintSoon, praise, confetti, shuffle, lineOf
   };
 })();

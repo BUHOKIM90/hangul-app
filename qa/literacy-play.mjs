@@ -89,6 +89,7 @@ const listenTitle = await page.locator('h1.prompt').innerText();
 if (listenTitle !== '어떤 그림일까?') throw new Error('listen title ' + listenTitle);
 const printed = await page.locator('#stage .choice').allInnerTexts();
 if (printed.join('').match(/엄마|아빠|아기|려원/)) throw new Error('listen printed the word ' + printed.join('|'));
+if (printed.length < 3) throw new Error('listen had ' + printed.length + ' pictures');
 const bubble = await page.locator('#bubble').innerText();
 if (/엄마|아빠|아기|려원/.test(bubble)) throw new Error('bubble gave the word ' + bubble);
 await miss(page, 1);
@@ -97,6 +98,7 @@ await tap(page, page.locator('[data-tap="trial-next"]'), 'listen-next');
 await tap(page, page.locator('#stage [data-ok="1"]'), 'listen-2');
 await peel(page);
 
+if (await page.locator('#stage .choice').count() < 3) throw new Error('letter find had fewer than 3 letters');
 if (await page.locator('#stage .is-sparkle').count()) throw new Error('letter was already sparkling');
 const beforeHint = await page.locator('#stage .is-sparkle').count();
 await miss(page, 1);
@@ -110,7 +112,7 @@ await miss(page, 3);
 await peel(page);
 
 if (await page.locator('.goal-pic span').count()) throw new Error('blocks printed the whole word');
-if (await page.locator('[data-kind="cho"]').count() < 2) throw new Error('blocks had no consonant choice');
+if (await page.locator('[data-kind="cho"]').count() < 3) throw new Error('blocks had fewer than 3 consonants');
 await tap(page, page.locator('[data-kind="cho"][data-ok="1"]'), 'cho');
 await tap(page, page.locator('[data-kind="jung"][data-ok="1"]'), 'jung');
 await peel(page);

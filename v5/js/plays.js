@@ -46,18 +46,24 @@
   function endTrial() {
     if (!ctx || ctx.trialOver) return;
     ctx.trialOver = true;
-    const g = gradeNow();
+    let g = gradeNow();
+    if (g === 'solo' && (ctx.wide || 0) < 3) {
+      g = (ctx.skill && X().admitThin(ctx.skill, ctx.occasion)) ? 'solo' : 'thin';
+    }
     ctx.grades.push(g);
-    if (ctx.skill) X().bump(ctx.skill, g);
+    if (ctx.skill) X().bump(ctx.skill, g, { occasion: ctx.occasion });
     if (g === 'solo') X().praise();
+    else if (g === 'thin') bubble('한 번 맞았어. 다음에 또 보자');
     else if (g === 'retry') bubble('이번엔 맞았어');
     else if (g === 'hint') bubble('힌트를 보고 골랐어');
     if (ctx.ti + 1 < ctx.trials.length) {
       nextBtn('또 하나', 'trial-next');
       return;
     }
+    const counting = ctx.grades.filter(x => x !== 'thin');
     ctx.playDone = true;
-    ctx.soloStep = !!ctx.scored && ctx.grades.length > 0 && ctx.grades.every(x => x === 'solo');
+    ctx.counted = counting.length > 0;
+    ctx.soloStep = !!ctx.scored && ctx.counted && counting.every(x => x === 'solo');
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function assist(el, correct) {
@@ -91,12 +97,23 @@
     X().say(C().UI.together, '같이 해 보자!');
     endTrial();
   }
+  const GLYPHS = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'];
   function take(n, pool, correct) {
     const rest = X().shuffle(pool.filter(x => x !== correct));
     const out = [correct];
     rest.forEach(x => { if (out.length < n && out.indexOf(x) < 0) out.push(x); });
     return X().shuffle(out);
   }
+  function fillTo(list, correct, n, fillers) {
+    const out = list.slice();
+    (fillers || []).forEach(x => {
+      if (out.length >= n) return;
+      if (x !== correct && out.indexOf(x) < 0) out.push(x);
+    });
+    return X().shuffle(out);
+  }
+  function askN() { return C().choiceN(X().S.difficulty); }
+  function markWide(n) { ctx.wide = n; ctx.choice = n >= 2; }
   function pickDistinct(pool, n) {
     const out = [];
     X().shuffle(pool.slice()).forEach(x => { if (out.length < n && out.indexOf(x) < 0) out.push(x); });
@@ -237,10 +254,10 @@
 
   function renderListen(item, lesson) {
     const target = item.id;
-    const n = C().choiceN(X().S.difficulty);
-    const opts = take(Math.max(2, n), hearPool(lesson), target);
+    const n = askN();
+    const opts = take(Math.min(n, Math.max(1, hearPool(lesson).length)), hearPool(lesson), target);
     const title = ctx.type === 'treasure' ? '보물 상자 소리' : '어떤 그림일까?';
-    ctx.choice = opts.length >= 2;
+    markWide(opts.length);
     ctx.skill = item.skill;
     ctx.voice = { key: C().wordKey(target), text: title };
     const chest = ctx.type === 'treasure' ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
@@ -253,10 +270,9 @@
     const alt = C().confuse(lesson, target);
     if (alt && alt !== target) pool.push(alt);
     (lesson.focus || []).concat(lesson.jamo || []).forEach(g => { if (pool.indexOf(g) < 0) pool.push(g); });
-    const n = Math.min(C().choiceN(X().S.difficulty), Math.max(2, pool.length));
-    const opts = take(n, pool, target);
+    const opts = fillTo(pool, target, askN(), GLYPHS);
     const title = ctx.type === 'treasure' ? '보물 글자' : '같은 글자를 눌러';
-    ctx.choice = opts.length >= 2;
+    markWide(opts.length);
     ctx.skill = item.skill;
     ctx.voice = { key: C().jamoKey(target), text: title };
     host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
@@ -264,10 +280,10 @@
   }
   function renderBlocks(lesson) {
     const b = lesson.blocks;
-    const nDist = X().S.difficulty === 'hard' ? 2 : 1;
+    const nDist = X().S.difficulty === 'hard' ? 3 : 2;
     const cons = [b.c].concat(blockAlts(b.c, lesson, nDist));
     const vows = [b.v].concat(blockAlts(b.v, lesson, nDist));
-    ctx.choice = cons.length >= 2 && vows.length >= 2;
+    markWide(Math.min(cons.length, vows.length));
     ctx.skill = 's:' + b.say;
     ctx.voice = { key: C().sylKey(b.say), text: '소리를 붙여 보자' };
     const pieces = X().shuffle(cons.map(g => ({ g: g, kind: 'cho', ok: g === b.c }))).concat(
@@ -278,9 +294,8 @@
   }
   function renderWordMatch(item, lesson) {
     const target = item.id;
-    const n = C().choiceN(X().S.difficulty);
-    const opts = wordChoices(lesson, target, n);
-    ctx.choice = opts.filter(id => id !== target).length >= 1 && opts.length >= 2;
+    const opts = wordChoices(lesson, target, askN());
+    markWide(opts.length);
     ctx.skill = item.skill;
     ctx.voice = { key: C().wordKey(target), text: '같은 낱말을 골라' };
     host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target)).join('') + '</div>';
@@ -288,9 +303,8 @@
   }
   function renderOnset(item, lesson) {
     const answer = item.syl;
-    const n = C().choiceN(X().S.difficulty);
-    const opts = sylChoices(lesson, answer, Math.max(2, n));
-    ctx.choice = opts.length >= 2;
+    const opts = sylChoices(lesson, answer, askN());
+    markWide(opts.length);
     ctx.skill = item.skill;
     const prompt = '처음 소리를 골라';
     ctx.voice = { key: item.word ? C().wordKey(item.word) : C().sylKey(answer), text: prompt };
@@ -299,7 +313,7 @@
     X().say(ctx.voice.key, ctx.voice.text);
   }
   function renderMemory(item) {
-    ctx.choice = true;
+    markWide(4);
     ctx.skill = item.skill;
     ctx.mem = { open: [] };
     ctx.voice = { key: C().UI.match, text: '같은 짝을 찾아' };
@@ -624,6 +638,9 @@
       ti: 0,
       grades: [],
       scored: spec.type !== 'chant' && spec.type !== 'trace',
+      occasion: spec.type + ':' + spec.lesson.id + ':' + Date.now(),
+      wide: 3,
+      counted: false,
       soloStep: false,
       playDone: false,
       voice: null,
@@ -647,7 +664,7 @@
       return true;
     }
     if (t === 'play-next') {
-      if (onDone) onDone({ solo: !!ctx.soloStep, scored: !!ctx.scored });
+      if (onDone) onDone({ solo: !!ctx.soloStep, scored: !!(ctx.scored && ctx.counted) });
       return true;
     }
     if (!ctx || ctx.trialOver) return false;
