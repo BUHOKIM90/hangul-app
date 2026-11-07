@@ -4,7 +4,7 @@
   const X = () => window.V5X;
   const C = () => window.V5C;
   const main = () => $('#main');
-  const VP_KID = 'width=device-width, initial-scale=1, viewport-fit=cover';
+  const VP_KID = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
   const VP_ADULT = 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover';
   let run = null;
   let greeted = false;
@@ -15,7 +15,6 @@
   function applyForm() {
     const w = document.documentElement.clientWidth;
     const h = document.documentElement.clientHeight;
-    document.documentElement.dataset.device = Math.min(w, h) >= 700 ? 'ipad' : 'phone';
     document.documentElement.dataset.orient = w > h ? 'land' : 'port';
   }
   function setZoom(on) {
@@ -25,7 +24,12 @@
   }
   function chrome(screen) {
     const home = screen === 'home';
-    $('#homeBtn').hidden = home;
+    const back = $('#homeBtn');
+    const lesson = screen === 'play' || (screen === 'reward' && run && run.mode === 'lesson');
+    back.hidden = home;
+    back.dataset.tap = lesson ? 'go-map' : 'go-home';
+    back.textContent = lesson ? '마을' : '홈';
+    back.setAttribute('aria-label', lesson ? '마을로 가기' : '처음으로');
     X().syncSound();
     const pop = document.getElementById('praise');
     if (pop) pop.hidden = true;
@@ -60,7 +64,7 @@
   function homeHTML() {
     const S = X().S;
     const lesson = currentLesson();
-    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w"><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="scene-top"><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><p id="bubble" class="home-say">오늘도 같이 놀자</p></div><div class="cast" id="friend-row"></div><img class="buddy" alt="" width="512" height="512" sizes="(min-width: 800px) 28vw, 42vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w"><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
   }
   function showHome() {
     X().dropQueue();
@@ -75,28 +79,92 @@
   }
   function faceCrop(ch) {
     const side = 250;
-    const scale = 84 / side;
+    const scale = 56 / side;
     const x = ch.head[0], y = ch.head[1];
     const left = -((x - side / 2) * scale);
     const top = -((y - side / 2 - 10) * scale);
     return 'background-image:url(' + ch.body + ');background-repeat:no-repeat;background-size:' + (512 * scale) + 'px ' + (512 * scale) + 'px;background-position:' + left.toFixed(1) + 'px ' + top.toFixed(1) + 'px';
   }
+  function stoneSpots(w, h) {
+    const size = 64, minGap = 8, m = size / 2 + 6;
+    const iw = Math.max(size, w - m * 2);
+    const ih = Math.max(size, h - m * 2);
+    let cols = w >= h * 1.05 ? 4 : 3;
+    while (cols > 2 && cols * size + (cols - 1) * minGap > iw) cols -= 1;
+    let rows = Math.ceil(8 / cols);
+    while (rows * size + (rows - 1) * minGap > ih && cols < 8) {
+      cols += 1;
+      rows = Math.ceil(8 / cols);
+    }
+    const colGap = cols === 1 ? 0 : (iw - cols * size) / (cols - 1);
+    const rowGap = rows === 1 ? 0 : (ih - rows * size) / (rows - 1);
+    const spots = [];
+    for (let i = 0; i < 8; i++) {
+      const r = Math.floor(i / cols);
+      const rowCount = Math.min(cols, 8 - r * cols);
+      const c0 = i - r * cols;
+      const c = (r % 2) ? (rowCount - 1 - c0) : c0;
+      const rowWidth = rowCount * size + (rowCount - 1) * colGap;
+      const x0 = m + (iw - rowWidth) / 2;
+      spots.push([
+        x0 + c * (size + colGap) + size / 2,
+        m + ih - r * (size + rowGap) - size / 2
+      ]);
+    }
+    return spots;
+  }
+  function layoutMap() {
+    const world = document.querySelector('.world');
+    if (!world || main().dataset.screen !== 'map') return;
+    const w = world.clientWidth;
+    const h = world.clientHeight;
+    if (w < 80 || h < 80) return;
+    const btn = document.querySelector('.map-go');
+    let boxH = h;
+    if (btn) {
+      const wr = world.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      if (br.top < wr.bottom - 4 && br.bottom > wr.top && br.left < wr.right - 8 && br.right > wr.left + 8) {
+        boxH = Math.max(120, h - (wr.bottom - br.top) - 8);
+      }
+    }
+    const spots = stoneSpots(w, boxH);
+    const btns = world.querySelectorAll('.stone-btn');
+    btns.forEach((el, i) => {
+      const p = spots[i];
+      if (!p) return;
+      el.style.left = (p[0] / w * 100) + '%';
+      el.style.top = (p[1] / h * 100) + '%';
+    });
+    const poly = world.querySelector('.trail polyline');
+    if (poly) poly.setAttribute('points', spots.map(p => (p[0] / w * 100).toFixed(1) + ',' + (p[1] / h * 100).toFixed(1)).join(' '));
+    const walker = world.querySelector('.walker');
+    const today = world.querySelector('.stone-btn.is-today');
+    if (walker && today) {
+      walker.style.left = today.style.left;
+      walker.style.top = today.style.top;
+    }
+  }
   function showMap() {
     X().dropQueue();
     const lesson = currentLesson();
-    const nodes = [[18, 62], [40, 54], [66, 60], [78, 44], [54, 36], [30, 32], [20, 18], [48, 10]];
+    const nodes = [[22, 58], [40, 48], [62, 56], [78, 42], [56, 34], [34, 30], [22, 20], [48, 16]];
     const pts = nodes.map(p => p[0] + ',' + p[1]).join(' ');
     const stones = C().LESSONS.map((l, i) => {
       const did = !!X().S.done[l.id];
       const today = l.id === lesson.id;
       const art = did ? 'stone_done' : today ? 'stone_today' : 'stone_soon';
       const xy = nodes[i] || nodes[nodes.length - 1];
-      return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="left:' + xy[0] + '%;top:' + xy[1] + '%" aria-label="' + l.title + '"><img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b></button>';
+      const pos = 'left:' + xy[0] + '%;top:' + xy[1] + '%';
+      const inner = '<img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b>';
+      if (!did && !today) return '<button type="button" class="tap stone-btn is-soon" data-tap="later" style="' + pos + '" aria-label="' + l.title + ' 아직">' + inner + '</button>';
+      return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="' + pos + '" aria-label="' + l.title + '">' + inner + '</button>';
     }).join('');
     const here = nodes[lesson.id - 1] || nodes[0];
     main().dataset.screen = 'map';
-    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:calc(' + here[1] + '% - 18px)"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
+    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:' + here[1] + '%"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
     chrome('map');
+    requestAnimationFrame(() => { layoutMap(); requestAnimationFrame(layoutMap); });
   }
   function showPlay(spec) {
     X().dropQueue();
@@ -315,6 +383,12 @@
     if (t === 'diff') { X().S.difficulty = el.dataset.v; X().save(); openParent(); return; }
     if (t === 'hear') { X().say(C().jamoKey(el.dataset.j)); return; }
     if (t === 'reset') return doReset(el);
+    if (t === 'later') {
+      el.classList.remove('wiggle');
+      void el.offsetWidth;
+      el.classList.add('wiggle');
+      return;
+    }
     if (t === 'go-map' || t === 'back-map') return showMap();
     if (t === 'go-home') return showHome();
     if (t === 'stickers') return showStickers();
@@ -409,7 +483,8 @@
   }
   function boot() {
     applyForm();
-    window.addEventListener('resize', applyForm);
+    setZoom(false);
+    window.addEventListener('resize', () => { applyForm(); layoutMap(); });
     X().setDress({ characters: [], items: [], stack: ['bg', 'body', 'shoes', 'top', 'acc', 'hat'], slots: [], unlock: [], slot_label: {} });
     X().load();
     X().installPointer();
