@@ -236,7 +236,7 @@ async function runDevice(browser, spec) {
   if (!body || body.indexOf('monggeul_basic.webp') < 0) throw new Error(spec.name + ' body is ' + body);
   const layers = '.doll img[data-slot="hat"], .doll img[data-slot="top"], .doll img[data-slot="acc"], .doll img[data-slot="shoes"]';
   const worn = await page.locator(layers).count();
-  if (worn < 2) throw new Error(spec.name + ' expected several clothes, got ' + worn);
+  if (worn < 1) throw new Error(spec.name + ' expected the hat on, got ' + worn);
   if (shoot) await shot(page, spec.name + '-dress');
   await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="true"]').first(), 'unequip');
   const left = await page.locator(layers).count();

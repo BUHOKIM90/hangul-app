@@ -184,31 +184,39 @@
     const earned = (result && result.earned) || [];
     const item = (result && result.cloth) || null;
     if (run.mode === 'practice') return showMap();
+    const played = run.steps[run.i];
     run.i += 1;
-    if (run.i < run.steps.length) return showPeel(earned, item, 'step');
+    if (run.i < run.steps.length) return showPeel(earned, item, 'step', played);
     const stars = run.stars || [];
     const solos = stars.filter(Boolean).length;
     const passed = C().passLesson(solos, stars.length);
     if (passed) X().S.done[run.lesson.id] = X().stamp();
     X().S.last = { lesson: run.lesson.id, solos: solos, total: stars.length, passed: !!passed, day: X().stamp() };
     X().save();
-    showPeel(earned, item, 'done');
+    showPeel(earned, item, 'done', played);
   }
-  function showPeel(earned, item, go) {
+  function showPeel(earned, item, go, playType) {
     X().dropQueue();
     peelGo = go;
     const list = earned || [];
     const st = list[0] || null;
     const label = go === 'map' ? '마을로' : '다음';
+    const songBare = playType === 'chant' && !st && !item;
     main().dataset.screen = 'reward';
     main().dataset.sticker = st ? st.id : '';
-    const card = st ? peelStage(st) : '<p class="bubble">같이 이어 가자</p>';
-    main().innerHTML = '<section class="end celebrate"><p class="celebrate-title">' + (st ? '잘했어!' : '다음 놀이') + '</p>' + card + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next">' + label + '</button></section>';
+    const title = st ? '잘했어!' : (songBare ? '노래 잘 불렀어!' : '다음 놀이');
+    const card = st ? peelStage(st) : (songBare
+      ? '<div class="song-praise"><img class="mascot dance" alt="" width="512" height="512" src="assets/char/monggeul_clap.webp"><p class="bubble">목소리가 반짝반짝했어.</p><p class="meta">같이 이어 가자</p></div>'
+      : '<p class="bubble">같이 이어 가자</p>');
+    main().innerHTML = '<section class="end celebrate"><p class="celebrate-title">' + title + '</p>' + card + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next">' + label + '</button></section>';
     chrome('reward');
     settlePeel();
     if (st) {
       X().say('ui_sticker', '스티커를 받았어!');
       X().confetti();
+    } else if (songBare) {
+      X().say('ui_good1', '노래 잘 불렀어! 목소리가 반짝반짝했어.', { keepBubble: true });
+      X().confetti(5);
     }
   }
   function settlePeel() {

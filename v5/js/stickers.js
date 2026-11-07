@@ -10,6 +10,20 @@
     ['goguma', '고구마'], ['dari', '다리'], ['moja', '모자'], ['dubu', '두부'],
     ['bada', '바다'], ['so', '소'], ['jadu', '자두'], ['hama', '하마'], ['radio', '라디오']
   ];
+  [
+    ['ㅣ', 'assets/stickers/hangul_21_ㅣ친구.webp'],
+    ['ㅜ', 'assets/stickers/hangul_22_ㅜ친구.webp'],
+    ['ㅡ', 'assets/stickers/hangul_23_ㅡ친구.webp']
+  ].forEach(function (row) {
+    list.push({
+      id: 'hangul_' + row[0] + '친구',
+      file: row[1],
+      theme: 'hangul',
+      themeKo: '글자 친구',
+      n: list.length + 1,
+      name: row[0] + '친구'
+    });
+  });
   LESSON_PICS.forEach(function (row) {
     const name = row[1];
     for (let i = 0; i < list.length; i++) if (list[i].name === name) return;
