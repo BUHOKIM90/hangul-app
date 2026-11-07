@@ -506,23 +506,23 @@ main[data-screen="map"] { display: flex; flex-direction: column; overflow: hidde
   .map {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(250px, 0.85fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: 8px;
     height: 100%;
   }
   .world { grid-column: 1; grid-row: 1; height: 100%; min-height: 0; }
   .map-go {
     grid-column: 1;
-    grid-row: 1;
-    align-self: end;
+    grid-row: 2;
+    align-self: stretch;
     z-index: 4;
-    width: calc(100% - 16px);
-    margin: 0 8px 8px;
+    width: 100%;
+    margin: 0;
     min-height: 64px;
   }
   .play-grid {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 2;
     grid-template-columns: 1fr 1fr;
     align-content: stretch;
     overflow: auto;
@@ -598,6 +598,10 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   gap: 4px;
 }
 .choice img, .tile-pic { width: 100%; max-height: 120px; object-fit: contain; }
+@media (max-width: 520px) and (min-height: 700px) {
+  .pieces .choice, .choices .choice { flex-grow: 0; min-height: 112px; }
+  .pieces .choice img, .choices .choice img { max-height: 72px; }
+}
 .choice b, .word b, .ctile b, .sum {
   font-size: clamp(1.8rem, 7vw, 2.8rem);
   line-height: 1;
@@ -716,6 +720,8 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   position: relative;
   width: min(94vw, calc(100dvh - 210px), 560px);
   aspect-ratio: 1;
+  flex: none;
+  align-self: center;
   margin: 4px auto;
   background:
     radial-gradient(circle at 50% 46%, rgba(255, 248, 230, 0.4), transparent 62%),
@@ -802,10 +808,16 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   .ctile b { font-size: 1.8rem; }
   .chant-pic img { width: 48px; height: 48px; }
   .goal-pic img, .goal-pic.slim img { width: 48px; height: 48px; }
+  main[data-play="trace"] .play-head { display: none; }
+  main[data-play="trace"] .goal-pic { display: none; }
+  main[data-play="trace"] .prompt { margin: 0; }
+  main[data-play="trace"] #stage { align-items: center; justify-content: center; }
   main[data-play="trace"] .trace-board {
     position: relative;
-    width: min(78vw, calc(100dvh - 88px));
+    flex: none;
+    width: min(300px, calc(100dvh - 108px), 92vw);
     height: auto;
+    aspect-ratio: 1;
     margin: 0 auto;
   }
 }
@@ -954,7 +966,7 @@ main[data-screen="done"] .tap.xl { flex: none; }
   main[data-screen="done"] .end.festival {
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(220px, 1fr);
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     align-items: center;
     align-content: center;
     gap: 6px 10px;
@@ -994,7 +1006,14 @@ main[data-screen="done"] .tap.xl { flex: none; }
   main[data-screen="done"] .reward-chip i { width: 56px; height: 56px; }
   main[data-screen="done"] .reward-chip span { white-space: normal; }
   main[data-screen="done"] .tap.xl { grid-column: 2; grid-row: 2; width: 100%; min-height: 64px; }
-  main[data-screen="done"] .end-dock-quiet { display: none; }
+  main[data-screen="done"] .end-dock-quiet {
+    display: grid;
+    grid-column: 2;
+    grid-row: 3;
+    width: 100%;
+    min-height: 64px;
+  }
+  main[data-screen="done"] .end-dock-quiet .pic-tile { min-height: 64px; }
   main[data-screen="done"] .done-hero { grid-column: 1; grid-row: 1 / span 3; }
 }
 
