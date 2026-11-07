@@ -119,7 +119,7 @@
       const opts = take(n, wordPool(lesson), target);
       ctx.skill = 'w:' + target;
       host().innerHTML = '<h1 class="prompt">어떤 그림일까?</h1>' + cardsHTML(opts, id => picCard(id, id === target));
-      X().say(C().wordKey(target), C().ko(target));
+      X().say(C().wordKey(target), '잘 들어 봐', { keepBubble: true });
     },
     sparkle(lesson) {
       const target = lesson.jamo[Math.floor(Math.random() * lesson.jamo.length)];
@@ -365,7 +365,10 @@
   function replay() {
     if (!ctx) return;
     const lesson = ctx.lesson;
-    if (ctx.type === 'listen' || ctx.type === 'match' || ctx.type === 'treasure') {
+    if (ctx.type === 'listen') {
+      const id = (ctx.skill || '').replace(/^w:/, '');
+      X().say(C().wordKey(id), '잘 들어 봐', { keepBubble: true });
+    } else if (ctx.type === 'match' || ctx.type === 'treasure') {
       const w = lesson.words[0];
       X().say(C().wordKey(w), C().ko(w));
     } else if (ctx.type === 'sparkle') X().say(C().jamoKey(lesson.jamo[0]));

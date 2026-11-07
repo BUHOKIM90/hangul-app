@@ -157,7 +157,7 @@
       const xy = nodes[i] || nodes[nodes.length - 1];
       const pos = 'left:' + xy[0] + '%;top:' + xy[1] + '%';
       const inner = '<img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b>';
-      if (!did && !today) return '<button type="button" class="tap stone-btn is-soon" data-tap="later" style="' + pos + '" aria-label="' + l.title + ' 아직">' + inner + '</button>';
+      if (!did && !today) return '<button type="button" class="tap stone-btn is-soon" data-tap="later" style="' + pos + '" aria-label="아직 잠겨 있어">' + inner + '<span class="lock-tag">잠김</span></button>';
       return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="' + pos + '" aria-label="' + l.title + '">' + inner + '</button>';
     }).join('');
     const here = nodes[lesson.id - 1] || nodes[0];
@@ -197,7 +197,7 @@
     const label = go === 'map' ? '마을로' : '다음';
     main().dataset.screen = 'reward';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end"><h1>스티커!</h1>' + peelStage(st) + rewardChip(item) + '<button type="button" class="tap xl" data-tap="peel-next">' + label + '</button></section>';
+    main().innerHTML = '<section class="end celebrate"><p class="celebrate-title">잘했어!</p>' + peelStage(st) + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next">' + label + '</button></section>';
     chrome('reward');
     settlePeel();
     X().say('ui_sticker', '스티커를 받았어!');
@@ -242,7 +242,7 @@
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
+    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + '<p id="bubble" class="bubble">오늘은 여기까지! 내일 또 만나요.</p></div><div class="done-reward">' + peelStage(st) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
     chrome('done');
     settlePeel();
     X().say(C().UI.end, '오늘은 여기까지! 내일 또 만나요.');
@@ -326,12 +326,18 @@
     showDress();
   }
 
+  function holdApp(on) {
+    const app = document.getElementById('app');
+    if (!app) return;
+    app.inert = !!on;
+  }
   function openGate() {
     X().dropQueue();
     setZoom(false);
     gate = { a: 6 + Math.floor(Math.random() * 4), b: 6 + Math.floor(Math.random() * 4), typed: '' };
     const g = $('#gate');
     g.hidden = false;
+    holdApp(true);
     drawGate();
   }
   function drawGate() {
@@ -339,7 +345,12 @@
     const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0];
     g.innerHTML = '<div class="sheet" role="dialog" aria-label="어른 확인"><h1>어른 확인</h1><p>답을 눌러 주세요</p><p class="sum-line"><span>' + gate.a + ' + ' + gate.b + ' =</span> <b id="gateAns">' + (gate.typed || '?') + '</b></p><div class="keys">' + keys.map(n => '<button type="button" class="tap" data-tap="gate-key" data-n="' + (n === '지움' ? 'del' : n) + '">' + n + '</button>').join('') + '</div><button type="button" class="tap" data-tap="gate-close">닫기</button></div>';
   }
-  function closeGate() { $('#gate').hidden = true; $('#gate').innerHTML = ''; gate = null; }
+  function closeGate() {
+    $('#gate').hidden = true;
+    $('#gate').innerHTML = '';
+    gate = null;
+    if ($('#parent').hidden) holdApp(false);
+  }
   function openParent() {
     closeGate();
     setZoom(true);
@@ -354,6 +365,7 @@
       return '<button type="button" class="tap jcell ' + cls + '" data-tap="hear" data-j="' + j + '" aria-label="' + j + ' ' + lab + '"><b>' + j + '</b><small>' + lab + '</small></button>';
     };
     $('#parent').hidden = false;
+    holdApp(true);
     $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
     paintTime();
   }
@@ -367,6 +379,7 @@
     setZoom(false);
     $('#parent').hidden = true;
     $('#parent').innerHTML = '';
+    holdApp(false);
     const screen = main().dataset.screen;
     if (screen === 'home') showHome();
   }
@@ -384,9 +397,15 @@
     if (t === 'hear') { X().say(C().jamoKey(el.dataset.j)); return; }
     if (t === 'reset') return doReset(el);
     if (t === 'later') {
-      el.classList.remove('wiggle');
-      void el.offsetWidth;
-      el.classList.add('wiggle');
+      const world = el.closest('.world');
+      if (!world) return;
+      let note = world.querySelector('.map-lock');
+      if (!note) {
+        note = document.createElement('p');
+        note.className = 'map-lock';
+        world.appendChild(note);
+      }
+      note.textContent = '아직 잠겨 있어';
       return;
     }
     if (t === 'go-map' || t === 'back-map') return showMap();

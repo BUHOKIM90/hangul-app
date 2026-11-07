@@ -140,6 +140,10 @@
   function installPointer() {
     const down = e => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      const gate = document.getElementById('gate');
+      const parent = document.getElementById('parent');
+      const modalOn = (gate && !gate.hidden) || (parent && !parent.hidden);
+      if (modalOn && e.target.closest && e.target.closest('#app')) return;
       unlock();
       armTap();
       const el = e.target.closest && e.target.closest('[data-tap]');
