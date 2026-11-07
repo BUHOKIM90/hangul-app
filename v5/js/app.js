@@ -4,19 +4,18 @@
   const X = () => window.V5X;
   const C = () => window.V5C;
   const main = () => $('#main');
-  const VP_KID = 'width=device-width, initial-scale=1, viewport-fit=cover';
+  const VP_KID = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
   const VP_ADULT = 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover';
   let run = null;
   let greeted = false;
   let gate = null;
   let resetArm = false;
   let bookPage = 0;
-  const WAVE = '<img alt="" width="512" height="512" sizes="(min-width: 700px) 46vw, 52vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w">';
+  const WAVE = '<img alt="" width="512" height="512" sizes="(min-width: 800px) 28vw, 42vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w">';
 
   function applyForm() {
     const w = document.documentElement.clientWidth;
     const h = document.documentElement.clientHeight;
-    document.documentElement.dataset.device = Math.min(w, h) >= 700 ? 'ipad' : 'phone';
     document.documentElement.dataset.orient = w > h ? 'land' : 'port';
   }
   function setZoom(on) {
@@ -26,7 +25,12 @@
   }
   function chrome(screen) {
     const home = screen === 'home';
-    $('#homeBtn').hidden = home;
+    const back = $('#homeBtn');
+    const lesson = screen === 'play' || (screen === 'reward' && run && run.mode === 'lesson');
+    back.hidden = home;
+    back.dataset.tap = lesson ? 'go-map' : 'go-home';
+    back.textContent = lesson ? '마을' : '홈';
+    back.setAttribute('aria-label', lesson ? '마을로 가기' : '처음으로');
     X().syncSound();
     const pop = document.getElementById('praise');
     if (pop) pop.hidden = true;
@@ -63,7 +67,7 @@
   function homeHTML() {
     const S = X().S;
     const lesson = currentLesson();
-    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="cast" id="friend-row"></div><div class="buddy" id="buddy">' + WAVE + '</div><p id="bubble" class="home-say">오늘도 같이 놀자</p><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
+    return '<section class="home"><div class="scene"><img class="scene-bg" alt="" width="1024" height="768" fetchpriority="high" sizes="100vw" src="assets/pic/scene_01-800.webp" srcset="assets/pic/scene_01-800.webp 800w, assets/pic/scene_01.webp 1024w"><div class="scene-top"><p class="meta" id="home-meta">' + lesson.kid + ' · 스티커 ' + S.stickers.length + '/' + V5Stick.list.length + '</p><p id="bubble" class="home-say">오늘도 같이 놀자</p></div><div class="cast" id="friend-row"></div><div class="buddy" id="buddy">' + WAVE + '</div><div class="home-dock"><button type="button" class="tap play-go" data-tap="go-map"><img alt="" src="assets/icons/play.svg"><span>놀자</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/tori.webp"><span>옷</span></button></div></div></section>';
   }
   function showHome() {
     X().dropQueue();
@@ -76,30 +80,86 @@
   function faceBtn(ch, i) {
     return '<button type="button" class="tap pal pal-' + i + '" data-tap="dress" data-who="' + ch.id + '" aria-label="' + ch.name + '"><img alt="" width="512" height="512" src="' + ch.body + '"><span>' + ch.name + '</span></button>';
   }
-  function faceCrop(ch) {
-    const side = 250;
-    const scale = 84 / side;
-    const x = ch.head[0], y = ch.head[1];
-    const left = -((x - side / 2) * scale);
-    const top = -((y - side / 2 - 10) * scale);
-    return 'background-image:url(' + ch.body + ');background-repeat:no-repeat;background-size:' + (512 * scale) + 'px ' + (512 * scale) + 'px;background-position:' + left.toFixed(1) + 'px ' + top.toFixed(1) + 'px';
+  function stoneSpots(w, h) {
+    const size = 64, minGap = 8, m = size / 2 + 6;
+    const iw = Math.max(size, w - m * 2);
+    const ih = Math.max(size, h - m * 2);
+    let cols = w >= h * 1.05 ? 4 : 3;
+    while (cols > 2 && cols * size + (cols - 1) * minGap > iw) cols -= 1;
+    let rows = Math.ceil(8 / cols);
+    while (rows * size + (rows - 1) * minGap > ih && cols < 8) {
+      cols += 1;
+      rows = Math.ceil(8 / cols);
+    }
+    const colGap = cols === 1 ? 0 : (iw - cols * size) / (cols - 1);
+    const rowGap = rows === 1 ? 0 : (ih - rows * size) / (rows - 1);
+    const spots = [];
+    for (let i = 0; i < 8; i++) {
+      const r = Math.floor(i / cols);
+      const rowCount = Math.min(cols, 8 - r * cols);
+      const c0 = i - r * cols;
+      const c = (r % 2) ? (rowCount - 1 - c0) : c0;
+      const rowWidth = rowCount * size + (rowCount - 1) * colGap;
+      const x0 = m + (iw - rowWidth) / 2;
+      spots.push([
+        x0 + c * (size + colGap) + size / 2,
+        m + ih - r * (size + rowGap) - size / 2
+      ]);
+    }
+    return spots;
+  }
+  function layoutMap() {
+    const world = document.querySelector('.world');
+    if (!world || main().dataset.screen !== 'map') return;
+    const w = world.clientWidth;
+    const h = world.clientHeight;
+    if (w < 80 || h < 80) return;
+    const btn = document.querySelector('.map-go');
+    let boxH = h;
+    if (btn) {
+      const wr = world.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      if (br.top < wr.bottom - 4 && br.bottom > wr.top && br.left < wr.right - 8 && br.right > wr.left + 8) {
+        boxH = Math.max(120, h - (wr.bottom - br.top) - 8);
+      }
+    }
+    const spots = stoneSpots(w, boxH);
+    const btns = world.querySelectorAll('.stone-btn');
+    btns.forEach((el, i) => {
+      const p = spots[i];
+      if (!p) return;
+      el.style.left = (p[0] / w * 100) + '%';
+      el.style.top = (p[1] / h * 100) + '%';
+    });
+    const poly = world.querySelector('.trail polyline');
+    if (poly) poly.setAttribute('points', spots.map(p => (p[0] / w * 100).toFixed(1) + ',' + (p[1] / h * 100).toFixed(1)).join(' '));
+    const walker = world.querySelector('.walker');
+    const today = world.querySelector('.stone-btn.is-today');
+    if (walker && today) {
+      walker.style.left = today.style.left;
+      walker.style.top = today.style.top;
+    }
   }
   function showMap() {
     X().dropQueue();
     const lesson = currentLesson();
-    const nodes = [[18, 62], [40, 54], [66, 60], [78, 44], [54, 36], [30, 32], [20, 18], [48, 10]];
+    const nodes = [[22, 58], [40, 48], [62, 56], [78, 42], [56, 34], [34, 30], [22, 20], [48, 16]];
     const pts = nodes.map(p => p[0] + ',' + p[1]).join(' ');
     const stones = C().LESSONS.map((l, i) => {
       const did = !!X().S.done[l.id];
       const today = l.id === lesson.id;
       const art = did ? 'stone_done' : today ? 'stone_today' : 'stone_soon';
       const xy = nodes[i] || nodes[nodes.length - 1];
-      return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="left:' + xy[0] + '%;top:' + xy[1] + '%" aria-label="' + l.title + '"><img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b></button>';
+      const pos = 'left:' + xy[0] + '%;top:' + xy[1] + '%';
+      const inner = '<img alt="" src="assets/pic/map/' + art + '.webp"><b>' + l.id + '</b>';
+      if (!did && !today) return '<button type="button" class="tap stone-btn is-soon" data-tap="later" style="' + pos + '" aria-label="아직 잠겨 있어">' + inner + '<span class="lock-tag">잠김</span></button>';
+      return '<button type="button" class="tap stone-btn' + (today ? ' is-today' : '') + (did ? ' is-done' : '') + '" data-tap="start-lesson" data-id="' + l.id + '" style="' + pos + '" aria-label="' + l.title + '">' + inner + '</button>';
     }).join('');
     const here = nodes[lesson.id - 1] || nodes[0];
     main().dataset.screen = 'map';
-    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:calc(' + here[1] + '% - 18px)"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><p class="meta" id="map-note" hidden></p><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
+    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:' + here[1] + '%"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
     chrome('map');
+    requestAnimationFrame(() => { layoutMap(); requestAnimationFrame(layoutMap); });
   }
   function showPlay(spec) {
     X().dropQueue();
@@ -199,7 +259,7 @@
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + (st ? peelStage(st) : '') + gainHTML(earned) + rewardChip(item) + '<div class="end-dock"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button><button type="button" class="tap play-go" data-tap="back-map"><img alt="" src="assets/icons/play.svg"><span>마을로</span></button></div></div></section>';
+    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + (st ? peelStage(st) : '') + gainHTML(earned) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
     chrome('done');
     settlePeel();
     if (passed) X().say('ui_levelup', line);
@@ -248,7 +308,7 @@
     const labels = data.slot_label || {};
     main().dataset.screen = 'dress';
     main().dataset.who = ch.id;
-    main().innerHTML = '<section class="dress"><div class="dress-stage"><h1>옷 입히기</h1><div class="who-row">' + data.characters.map(c => '<button type="button" class="tap who' + (c.id === ch.id ? ' is-on' : '') + '" data-tap="who" data-who="' + c.id + '" aria-label="' + c.name + '"><span class="mini" style="' + faceCrop(c) + '"></span><b>' + c.name + '</b></button>').join('') + '</div><p class="meta">' + ch.blurb + ' · 옷 ' + X().S.unlocks.length + '/' + data.items.length + '</p><div class="doll" data-doll>' + X().layerHTML(ch.id) + '</div></div><div class="tray">' + slots.map(slot => {
+    main().innerHTML = '<section class="dress"><div class="dress-stage"><h1>옷 입히기</h1><div class="who-row">' + data.characters.map(c => '<button type="button" class="tap who' + (c.id === ch.id ? ' is-on' : '') + '" data-tap="who" data-who="' + c.id + '" aria-label="' + c.name + '"><img class="mini" alt="" width="512" height="512" src="' + c.body + '"><b>' + c.name + '</b></button>').join('') + '</div><p class="meta">' + ch.blurb + ' · 옷 ' + X().S.unlocks.length + '/' + data.items.length + '</p><div class="doll" data-doll>' + X().layerHTML(ch.id) + '</div></div><div class="tray">' + slots.map(slot => {
       const items = mine.filter(it => it.slot === slot);
       if (!items.length) return '';
       return '<h2>' + (labels[slot] || slot) + '</h2><div class="tray-row">' + items.map(it => {
@@ -284,12 +344,18 @@
     showDress();
   }
 
+  function holdApp(on) {
+    const app = document.getElementById('app');
+    if (!app) return;
+    app.inert = !!on;
+  }
   function openGate() {
     X().dropQueue();
     setZoom(false);
     gate = { a: 6 + Math.floor(Math.random() * 4), b: 6 + Math.floor(Math.random() * 4), typed: '' };
     const g = $('#gate');
     g.hidden = false;
+    holdApp(true);
     drawGate();
   }
   function drawGate() {
@@ -297,7 +363,12 @@
     const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0];
     g.innerHTML = '<div class="sheet" role="dialog" aria-label="어른 확인"><h1>어른 확인</h1><p>답을 눌러 주세요</p><p class="sum-line"><span>' + gate.a + ' + ' + gate.b + ' =</span> <b id="gateAns">' + (gate.typed || '?') + '</b></p><div class="keys">' + keys.map(n => '<button type="button" class="tap" data-tap="gate-key" data-n="' + (n === '지움' ? 'del' : n) + '">' + n + '</button>').join('') + '</div><button type="button" class="tap" data-tap="gate-close">닫기</button></div>';
   }
-  function closeGate() { $('#gate').hidden = true; $('#gate').innerHTML = ''; gate = null; }
+  function closeGate() {
+    $('#gate').hidden = true;
+    $('#gate').innerHTML = '';
+    gate = null;
+    if ($('#parent').hidden) holdApp(false);
+  }
   function openParent() {
     closeGate();
     setZoom(true);
@@ -314,6 +385,7 @@
       return '<button type="button" class="tap jcell ' + cls + '" data-tap="hear" data-j="' + j + '" aria-label="' + j + ' ' + lab + '"><b>' + j + '</b><small>' + lab + '</small></button>';
     };
     $('#parent').hidden = false;
+    holdApp(true);
     const last = S.last;
     const lastLine = last ? ('최근 길 · 혼자 ' + last.solos + '/' + last.total + (last.passed ? ' · 길 통과' : ' · 다시 할 길')) : '최근 길 기록 없음';
     $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><p class="meta">' + lastLine + '</p><p class="note">익힘은 힌트 없이 혼자 세 번 맞히고, 힌트보다 혼자 맞힌 횟수가 더 많을 때예요. 길 통과와는 달라요. 보기가 두 개뿐이면 다음에 또 혼자 맞혀야 점수가 돼요.</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
@@ -329,6 +401,7 @@
     setZoom(false);
     $('#parent').hidden = true;
     $('#parent').innerHTML = '';
+    holdApp(false);
     const screen = main().dataset.screen;
     if (screen === 'home') showHome();
   }
@@ -345,6 +418,18 @@
     if (t === 'diff') { X().S.difficulty = el.dataset.v; X().save(); openParent(); return; }
     if (t === 'hear') { X().say(C().jamoKey(el.dataset.j)); return; }
     if (t === 'reset') return doReset(el);
+    if (t === 'later') {
+      const world = el.closest('.world');
+      if (!world) return;
+      let note = world.querySelector('.map-lock');
+      if (!note) {
+        note = document.createElement('p');
+        note.className = 'map-lock';
+        world.appendChild(note);
+      }
+      note.textContent = '아직 잠겨 있어';
+      return;
+    }
     if (t === 'go-map' || t === 'back-map') return showMap();
     if (t === 'go-home') return showHome();
     if (t === 'stickers') return showStickers();
@@ -460,7 +545,8 @@
   }
   function boot() {
     applyForm();
-    window.addEventListener('resize', applyForm);
+    setZoom(false);
+    window.addEventListener('resize', () => { applyForm(); layoutMap(); });
     X().setDress({ characters: [], items: [], stack: ['bg', 'body', 'shoes', 'top', 'acc', 'hat'], slots: [], unlock: [], slot_label: {} });
     X().load();
     X().installPointer();

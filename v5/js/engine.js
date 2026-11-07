@@ -115,7 +115,32 @@
     b.classList.toggle('is-on', on);
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.setAttribute('aria-label', on ? '소리 켜짐' : '소리 꺼짐');
-    b.textContent = on ? '소리 켜짐' : '소리 꺼짐';
+    if (!b.querySelector('img')) b.innerHTML = '<img alt="" src="assets/icons/speaker.svg">';
+  }
+  let tapCtx = null;
+  function armTap() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    if (!tapCtx) tapCtx = new Ctx();
+    if (tapCtx.state === 'suspended') tapCtx.resume();
+  }
+  function playTap() {
+    if (!S.sound || !tapCtx) return;
+    try {
+      const t = tapCtx.currentTime;
+      const o = tapCtx.createOscillator();
+      const g = tapCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(720, t);
+      o.frequency.exponentialRampToValueAtTime(440, t + 0.06);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.045, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+      o.connect(g);
+      g.connect(tapCtx.destination);
+      o.start(t);
+      o.stop(t + 0.08);
+    } catch (e) { /* ignore */ }
   }
 
   /* ---------- pointer ---------- */
@@ -123,7 +148,12 @@
   function installPointer() {
     const down = e => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      const gate = document.getElementById('gate');
+      const parent = document.getElementById('parent');
+      const modalOn = (gate && !gate.hidden) || (parent && !parent.hidden);
+      if (modalOn && e.target.closest && e.target.closest('#app')) return;
       unlock();
+      armTap();
       const el = e.target.closest && e.target.closest('[data-tap]');
       if (!el || el.closest('[hidden]')) return;
       if (press) return;
@@ -136,7 +166,7 @@
       el.classList.remove('is-pressed');
       press = null;
       const r = el.getBoundingClientRect();
-      const tol = 28;
+      const tol = 12;
       const x = e.clientX, y = e.clientY;
       const inside = x >= r.left - tol && x <= r.right + tol && y >= r.top - tol && y <= r.bottom + tol;
       if (!inside) return;
@@ -144,6 +174,7 @@
       const last = el.dataset.tapAt ? +el.dataset.tapAt : -1000;
       if (now - last < 280) return;
       el.dataset.tapAt = String(now);
+      playTap();
       if (window.V5 && V5.onTap) V5.onTap(el);
     };
     const cancel = e => {
@@ -168,6 +199,7 @@
       const el = document.activeElement;
       if (!el || !el.dataset || !el.dataset.tap) return;
       e.preventDefault();
+      playTap();
       if (window.V5 && V5.onTap) V5.onTap(el);
     });
   }
@@ -323,7 +355,8 @@
     for (let i = 0; i < count; i++) {
       const s = document.createElement('i');
       if (i % 3 === 0) s.className = 'star';
-      s.style.left = (6 + Math.random() * 88) + '%';
+      const lane = i % 2 === 0 ? 2 + Math.random() * 8 : 90 + Math.random() * 8;
+      s.style.left = lane + '%';
       s.style.background = colors[i % colors.length];
       s.style.animationDelay = (Math.random() * 80) + 'ms';
       s.style.animationDuration = '0.82s';

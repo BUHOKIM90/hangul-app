@@ -301,8 +301,7 @@
       return {
         skill: weakerRead(pick),
         pairs: pick.map(id => ({ id: id, face: C().ko(id), pic: C().pic(id) }))
-      };
-    }
+      };    }
     let syls = [];
     (lesson.chant || []).forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
     ['아', '이', '오', '우'].forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
@@ -795,8 +794,7 @@
     if (ctx && (ctx.type === 'listen' || ctx.type === 'treasure') && ctx.voice) {
       bubble('잘 들어 봐');
       X().say(ctx.voice.key, '잘 들어 봐', { keepBubble: true });
-    } else replayStem();
-    const b = document.getElementById('replayBtn');
+    } else replayStem();    const b = document.getElementById('replayBtn');
     if (b) b.dataset.n = String((+b.dataset.n || 0) + 1);
   }
   window.V5Play = { mount, tap, replay };
