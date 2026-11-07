@@ -75,17 +75,38 @@
     b.textContent = label || '다음';
     h.appendChild(b);
   }
+  function showCloth(item) {
+    const h = host();
+    if (!h || !item) return;
+    const p = document.createElement('p');
+    p.className = 'meta cloth-note';
+    p.textContent = '새 옷 · ' + item.label;
+    h.appendChild(p);
+  }
   function finish(helped, quiet) {
     if (over) return;
     over = true;
+    const hinted = !!ctx.hinted;
+    const revealed = !!quiet || !!ctx.revealed;
     const first = !helped && misses === 0;
-    if (!quiet) X().praise({ type: ctx.type, helped: !!helped, focus: ctx.focus || '' });
+    const solo = first && !hinted && !revealed;
+    if (revealed) X().encourage('shown', ctx.focus || '');
+    else if (hinted) X().encourage('hint', ctx.focus || '');
+    else X().praise({ type: ctx.type, helped: !solo, focus: ctx.focus || '' });
     if (ctx.skill) X().bump(ctx.skill, helped ? 0 : first ? 2 : 1);
-    if (!quiet && ctx.mode === 'lesson') {
+    if (!revealed && !hinted && ctx.mode === 'lesson') {
       const got = grantStickers();
       if (got.length) showGain(got);
+      if (solo) {
+        const item = X().markSoloCloth();
+        if (item) {
+          showCloth(item);
+          if (window.V5 && V5.noteCloth) V5.noteCloth(item);
+        }
+      }
     }
     ctx.helped = !!helped;
+    ctx.solo = solo;
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음');
   }
   function miss(el, correct) {
@@ -98,11 +119,13 @@
       return;
     }
     if (misses === 2) {
+      ctx.hinted = true;
       if (correct) correct.classList.add('hint-glow');
       bubble('반짝이는 데를 봐!');
       X().say(C().UI.hint, '반짝이는 데를 봐!');
       return;
     }
+    ctx.revealed = true;
     if (correct) correct.classList.add('is-sparkle', 'show-ans');
     bubble('같이 해 보자!');
     X().say(C().UI.together, '같이 해 보자!');
@@ -346,6 +369,7 @@
     hold = true;
     bubble(misses >= 3 ? '같이 찾았어!' : '다시 한 번!');
     if (misses >= 3) {
+      ctx.revealed = true;
       host().querySelectorAll('.mem-card').forEach(c => c.classList.add('is-up', 'is-matched', 'show-ans'));
       hold = false;
       finish(true, true);
@@ -361,6 +385,7 @@
   function onTile(el) {
     if (over) return;
     if (!el.classList.contains('is-lit')) {
+      ctx.hinted = true;
       el.classList.add('wiggle');
       bubble('빛나는 칸이야!');
       return;

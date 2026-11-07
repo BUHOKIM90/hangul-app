@@ -7,7 +7,7 @@
     return {
       v: 5, sound: true, colorHints: true, difficulty: 'mid',
       ms: 0, today: '', todayMs: 0, done: {}, skill: {},
-      stickers: [], unlocks: [], wear: {}, who: 'monggeul', freshItem: ''
+      stickers: [], unlocks: [], wear: {}, who: 'monggeul', freshItem: '', soloN: 0
     };
   }
   let S = fresh();
@@ -193,6 +193,31 @@
     save();
   }
   function isUnlocked(it) { return S.unlocks.indexOf(it.id) >= 0; }
+  const MONG_PACE = [
+    'monggeul_hat_cap', 'monggeul_top_shirt', 'monggeul_acc_brooch', 'monggeul_shoes_boots',
+    'monggeul_hat_crown', 'monggeul_top_vest', 'monggeul_acc_bag', 'monggeul_shoes_slippers',
+    'monggeul_top_smock', 'monggeul_acc_glasses', 'monggeul_top_chef', 'monggeul_acc_star',
+    'monggeul_top_hanbok', 'monggeul_hat_beret', 'monggeul_top_pajamas', 'monggeul_shoes_sneakers',
+    'monggeul_top_raincoat', 'monggeul_top_peach', 'monggeul_top_spacesuit', 'monggeul_top_mint',
+    'monggeul_top_sky', 'monggeul_hat_linecrown', 'monggeul_bg_peach', 'monggeul_bg_mint', 'monggeul_bg_sky'
+  ];
+  function markSoloCloth() {
+    if (!DRESS) return null;
+    S.soloN = (S.soloN || 0) + 1;
+    if (S.soloN % 2 !== 0) { save(); return null; }
+    const id = MONG_PACE.find(k => S.unlocks.indexOf(k) < 0);
+    if (!id) { save(); return null; }
+    S.unlocks.push(id);
+    S.freshItem = id;
+    const it = itemBy(id);
+    if (it) {
+      S.who = it.character;
+      if (!S.wear[it.character]) S.wear[it.character] = { hat: '', top: '', acc: '', shoes: '', bg: '' };
+      if (!S.wear[it.character][it.slot]) S.wear[it.character][it.slot] = it.id;
+    }
+    save();
+    return it || null;
+  }
   function unlockNext() {
     if (!DRESS) return null;
     const id = (DRESS.unlock || []).find(k => S.unlocks.indexOf(k) < 0);
@@ -242,14 +267,15 @@
     const sk = S.skill['w:' + wordId];
     return !(sk && sk.box >= 2);
   }
-  function confetti() {
+  function confetti(n) {
     const fx = document.getElementById('fx');
     if (!fx) return;
     const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     fx.innerHTML = '';
     if (reduce) return;
     const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FF8FB8', '#FFF9EB'];
-    for (let i = 0; i < 22; i++) {
+    const count = n || 22;
+    for (let i = 0; i < count; i++) {
       const s = document.createElement('i');
       if (i % 3 === 0) s.className = 'star';
       s.style.left = (6 + Math.random() * 88) + '%';
@@ -322,6 +348,45 @@
     if (!beat) confetti();
     say(p[1], p[0], { keepBubble: true });
   }
+  function takeAny(id, lines) {
+    const pool = lines && lines.length ? lines.slice() : [];
+    if (!pool.length) return ['같이 해 보자!', 'ui_together'];
+    if (!bags[id] || !bags[id].length) bags[id] = shuffle(pool);
+    return bags[id].shift();
+  }
+  function fillPraise(row, focus, text, pal) {
+    if (!row) return;
+    row.classList.add('praise-line');
+    row.replaceChildren();
+    const img = document.createElement('img');
+    img.alt = '';
+    img.width = 512;
+    img.height = 512;
+    img.src = pal[0];
+    row.appendChild(img);
+    if (focus) {
+      const mark = document.createElement('b');
+      mark.className = 'who-focus';
+      mark.textContent = focus;
+      row.appendChild(mark);
+    }
+    const span = document.createElement('span');
+    span.textContent = text;
+    row.appendChild(span);
+  }
+  function encourage(kind, focus) {
+    const p = takeAny('enc:' + (kind || 'shown'), C().encouragePool(kind));
+    const pals = C().PALS || [];
+    const pal = pals.length ? pals[palN % pals.length] : ['assets/char/monggeul_cheer.webp', '몽글이'];
+    palN += 1;
+    fillPraise(document.getElementById('bubble'), focus || '', p[0], pal);
+    confetti(5);
+    if (p[1] && (!window.HAVE_AUDIO || HAVE_AUDIO.has(p[1]))) say(p[1], p[0], { keepBubble: true });
+    else {
+      const live = document.getElementById('live');
+      if (live) live.textContent = p[0];
+    }
+  }
   function shuffle(a) {
     const b = a.slice();
     for (let i = b.length - 1; i > 0; i--) {
@@ -333,7 +398,7 @@
 
   window.V5X = {
     get S() { return S; }, save, load, reset, stamp, say, dropQueue, unlock, syncSound, installPointer,
-    setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, layerHTML,
-    bump, hintOn, praise, confetti, shuffle, lineOf
+    setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, markSoloCloth, layerHTML,
+    bump, hintOn, praise, encourage, confetti, shuffle, lineOf
   };
 })();

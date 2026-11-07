@@ -120,6 +120,20 @@
     });
     return out;
   }
+  const ENCOURAGE = {
+    hint: [
+      ['반짝이는 데를 봐!', ''],
+      ['같이 찾았어!', ''],
+      ['빛나는 칸이야!', '']
+    ],
+    shown: [
+      ['같이 해 보자!', 'ui_together'],
+      ['같이 찾았어!', '']
+    ]
+  };
+  function encouragePool(kind) {
+    return (ENCOURAGE[kind] || ENCOURAGE.shown).slice();
+  }
   const SYL_PIC = {
     '아': 'agi', '이': 'ima', '오': 'ori', '우': 'ubi', '어': 'eobu',
     '가': 'gicha', '나': 'nabi', '기': 'gicha', '다': 'dari', '마': 'moja',
@@ -218,7 +232,7 @@
   function choiceN(diff) { return diff === 'hard' ? 4 : diff === 'easy' ? 2 : 3; }
 
   root.V5C = {
-    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS, praisePool,
+    CHO, JUNG, CONF, JAMO, WORDS, STROKES, PLAYS, LESSONS, PRAISE, FACES, UI, PALS, praisePool, encouragePool,
     hex, sylKey, jamoKey, wordKey, ko, pic, sylPic, sylWord, jamoPic, compose, split, isSyl, sampleStroke, glyphPlan,
     lesson, wordsThrough, audioKeys, choiceN
   };

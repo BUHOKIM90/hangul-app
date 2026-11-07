@@ -1322,6 +1322,118 @@
       "starter": false
     },
     {
+      "id": "monggeul_acc_glasses",
+      "character": "monggeul",
+      "slot": "acc",
+      "name": "glasses",
+      "label": "동글 안경",
+      "file": "assets/dress/layers/monggeul_acc_glasses.svg",
+      "box": [
+        196,
+        150,
+        120,
+        40
+      ],
+      "extra": "accessory",
+      "starter": false
+    },
+    {
+      "id": "monggeul_acc_star",
+      "character": "monggeul",
+      "slot": "acc",
+      "name": "star",
+      "label": "노란 별핀",
+      "file": "assets/dress/layers/monggeul_acc_star.svg",
+      "box": [
+        280,
+        302,
+        44,
+        44
+      ],
+      "extra": "accessory",
+      "starter": false
+    },
+    {
+      "id": "monggeul_hat_beret",
+      "character": "monggeul",
+      "slot": "hat",
+      "name": "beret",
+      "label": "작은 베레모",
+      "file": "assets/dress/layers/monggeul_hat_beret.svg",
+      "box": [
+        193,
+        17,
+        134,
+        91
+      ],
+      "extra": "accessory",
+      "starter": false
+    },
+    {
+      "id": "monggeul_shoes_sneakers",
+      "character": "monggeul",
+      "slot": "shoes",
+      "name": "sneakers",
+      "label": "노란 신발",
+      "file": "assets/dress/layers/monggeul_shoes_sneakers.svg",
+      "box": [
+        164,
+        415,
+        194,
+        59
+      ],
+      "extra": "accessory",
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_peach",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "peach",
+      "label": "복숭아 목도리",
+      "file": "assets/dress/layers/monggeul_top_peach.svg",
+      "box": [
+        216,
+        260,
+        80,
+        62
+      ],
+      "extra": "color",
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_mint",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "mint",
+      "label": "민트 목도리",
+      "file": "assets/dress/layers/monggeul_top_mint.svg",
+      "box": [
+        216,
+        260,
+        80,
+        62
+      ],
+      "extra": "color",
+      "starter": false
+    },
+    {
+      "id": "monggeul_top_sky",
+      "character": "monggeul",
+      "slot": "top",
+      "name": "sky",
+      "label": "하늘 목도리",
+      "file": "assets/dress/layers/monggeul_top_sky.svg",
+      "box": [
+        216,
+        260,
+        80,
+        62
+      ],
+      "extra": "color",
+      "starter": false
+    },
+    {
       "id": "bori_bg_peach",
       "character": "bori",
       "slot": "bg",
@@ -1475,6 +1587,22 @@
         "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
       },
       "extra": "color",
+      "starter": false
+    },
+    {
+      "id": "monggeul_hat_linecrown",
+      "character": "monggeul",
+      "slot": "hat",
+      "name": "linecrown",
+      "label": "동글 왕관",
+      "file": "assets/dress/layers/monggeul_hat_crown.svg",
+      "box": [
+        192,
+        17,
+        136,
+        91
+      ],
+      "extra": "accessory",
       "starter": false
     }
   ],

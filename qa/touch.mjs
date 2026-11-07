@@ -106,6 +106,25 @@ async function finishRound(page, correctShot) {
   await tap(page, page.locator('[data-tap="play-next"]'), 'play-next');
 }
 
+async function hintThenCorrect(page) {
+  const before = await page.evaluate(() => (JSON.parse(localStorage.getItem('hangul-v5') || '{"stickers":[],"unlocks":[]}').stickers || []).slice());
+  const unlocksBefore = await page.evaluate(() => (JSON.parse(localStorage.getItem('hangul-v5') || '{"unlocks":[]}').unlocks || []).length);
+  const wrong = page.locator('#stage [data-ok="0"]').first();
+  await tap(page, wrong, 'miss-1');
+  await page.waitForTimeout(320);
+  await tap(page, wrong, 'miss-2');
+  await tap(page, page.locator('#stage [data-ok="1"]'), 'after-hint');
+  const after = await page.evaluate(() => ({
+    stickers: (JSON.parse(localStorage.getItem('hangul-v5')).stickers || []).slice(),
+    unlocks: (JSON.parse(localStorage.getItem('hangul-v5')).unlocks || []).length
+  }));
+  if (after.stickers.length !== before.length) throw new Error('hint granted a sticker');
+  if (after.unlocks !== unlocksBefore) throw new Error('hint unlocked clothes');
+  if (await page.locator('#stage .gain').count()) throw new Error('hint showed a sticker');
+  if (await page.locator('#stage .cloth-note').count()) throw new Error('hint showed clothes');
+  await tap(page, page.locator('[data-tap="play-next"]'), 'play-next-hint');
+}
+
 async function shot(page, name) {
   await page.screenshot({ path: OUT + '/' + name + '.png', fullPage: false });
 }
@@ -148,7 +167,9 @@ async function runDevice(browser, spec) {
   if (!mid.skill) throw new Error(spec.name + ' practice did not record the lesson');
   await tap(page, page.locator('[data-tap="start-lesson"]').first(), 'start-lesson');
   for (let i = 0; i < 8; i++) {
-    await finishRound(page, '');
+    const type = await page.getAttribute('#main', 'data-play');
+    if (type === 'sparkle') await hintThenCorrect(page);
+    else await finishRound(page, '');
     const screen = await page.getAttribute('#main', 'data-screen');
     if (screen === 'done') break;
   }
@@ -179,12 +200,13 @@ async function runDevice(browser, spec) {
   if (!body || body.indexOf('monggeul_basic.webp') < 0) throw new Error(spec.name + ' body is ' + body);
   const layers = '.doll img[data-slot="hat"], .doll img[data-slot="top"], .doll img[data-slot="acc"], .doll img[data-slot="shoes"]';
   const worn = await page.locator(layers).count();
-  if (!worn) throw new Error(spec.name + ' earned clothes were not on 몽글이');
+  if (worn < 2) throw new Error(spec.name + ' expected several clothes, got ' + worn);
   if (shoot) await shot(page, spec.name + '-dress');
   await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="true"]').first(), 'unequip');
-  if (await page.locator(layers).count() !== 0) throw new Error(spec.name + ' clothes did not come off');
-  await tap(page, page.locator('[data-tap="equip"][data-unlocked="1"][aria-pressed="false"]').first(), 'equip');
-  if (await page.locator(layers).count() < 1) throw new Error(spec.name + ' dress change did not add a layer');
+  const left = await page.locator(layers).count();
+  if (left !== worn - 1) throw new Error(spec.name + ' clothes did not come off');
+  await tap(page, page.locator('[data-item="monggeul_hat_cap"]'), 'equip-hat');
+  if (await page.locator('.doll img[data-slot="hat"]').count() < 1) throw new Error(spec.name + ' hat did not go back on');
   if (shoot) await shot(page, spec.name + '-dress-on');
   await tap(page, page.locator('#homeBtn'), 'home-from-dress');
   if (shoot) await shot(page, spec.name + '-home-dressed');

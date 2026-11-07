@@ -47,6 +47,10 @@
     if (!run.earned) run.earned = [];
     if (!run.earned.some(s => s.id === st.id)) run.earned.push(st);
   }
+  function noteCloth(item) {
+    if (!run || !item) return;
+    run.cloth = item;
+  }
   function assetSrc(file) {
     return String(file || '').split('/').map(encodeURIComponent).join('/');
   }
@@ -129,10 +133,10 @@
       showPlay({ mode: 'lesson', type: run.steps[run.i], lesson: run.lesson });
       return;
     }
-    const firstClear = !X().S.done[run.lesson.id];
+    const cloth = run.cloth || null;
     X().S.done[run.lesson.id] = X().stamp();
     X().save();
-    showDone(firstClear ? X().unlockNext() : null);
+    showDone(cloth);
   }
   function starsHTML(stars) {
     const row = stars && stars.length ? stars : [true, true, true, true, true, true, true, true];
@@ -388,7 +392,7 @@
     X().setDress({ characters: [], items: [], stack: ['bg', 'body', 'shoes', 'top', 'acc', 'hat'], slots: [], unlock: [], slot_label: {} });
     X().load();
     X().installPointer();
-    window.V5 = { onTap, noteSticker, get S() { return X().S; } };
+    window.V5 = { onTap, noteSticker, noteCloth, get S() { return X().S; } };
     if (main().dataset.screen === 'home' && document.getElementById('friend-row')) fillHomeExtras();
     else showHome();
     document.documentElement.dataset.ready = '1';
