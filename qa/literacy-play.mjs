@@ -4,6 +4,41 @@ const { chromium } = pw;
 
 const BASE = process.env.BASE || 'http://127.0.0.1:4173/';
 
+async function dragTrace(page) {
+  for (let guard = 0; guard < 8; guard++) {
+    if (await page.locator('[data-tap="play-next"]').count()) return;
+    const pts = await page.evaluate(() => {
+      const svg = document.querySelector('.trace-board svg');
+      if (!svg) return null;
+      const guide = JSON.parse(svg.getAttribute('data-guide') || '[]');
+      if (!guide.length) return [];
+      const box = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal;
+      const out = [];
+      guide.forEach(p => {
+        const x = box.x + ((p[0] - vb.x) / vb.width) * box.width;
+        const y = box.y + ((p[1] - vb.y) / vb.height) * box.height;
+        const prev = out[out.length - 1];
+        if (!prev) { out.push({ x, y }); return; }
+        const n = Math.max(1, Math.ceil(Math.hypot(x - prev.x, y - prev.y) / 4));
+        for (let k = 1; k <= n; k++) out.push({ x: prev.x + (x - prev.x) * k / n, y: prev.y + (y - prev.y) * k / n });
+      });
+      return out;
+    });
+    if (!pts || !pts.length) throw new Error('trace has no pink guide');
+    const cdp = await page.context().newCDPSession(page);
+    const send = (type, x, y) => cdp.send('Input.dispatchTouchEvent', {
+      type,
+      touchPoints: type === 'touchEnd' ? [] : [{ x: Math.round(x), y: Math.round(y) }]
+    });
+    await send('touchStart', pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) await send('touchMove', pts[i].x, pts[i].y);
+    await send('touchEnd', 0, 0);
+    await page.waitForTimeout(60);
+  }
+  if (!(await page.locator('[data-tap="play-next"]').count())) throw new Error('trace drag did not finish');
+}
+
 function kidMin(page) {
   return page.evaluate(() => {
     const g = document.getElementById('gate');
@@ -117,12 +152,7 @@ await tap(page, page.locator('[data-kind="cho"][data-ok="1"]'), 'cho');
 await tap(page, page.locator('[data-kind="jung"][data-ok="1"]'), 'jung');
 await peel(page);
 
-for (let i = 0; i < 40; i++) {
-  if (await page.locator('[data-tap="play-next"]').count()) break;
-  const dot = page.locator('.dot.is-next');
-  if (await dot.count() === 0) break;
-  await tap(page, dot, 'dot-' + i);
-}
+await dragTrace(page);
 await peel(page);
 
 if (await page.getAttribute('#main', 'data-screen') !== 'done') throw new Error('lesson did not finish');
@@ -169,9 +199,7 @@ for (let guard = 0; guard < 8; guard++) {
       continue;
     }
     if (type === 'trace') {
-      const dot = pass.locator('.dot.is-next');
-      if (await dot.count() === 0) break;
-      await tap(pass, dot, 'clean-dot');
+      await dragTrace(pass);
       continue;
     }
     await tap(pass, pass.locator('#stage [data-ok="1"]'), 'clean-pick');

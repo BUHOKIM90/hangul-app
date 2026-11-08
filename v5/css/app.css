@@ -907,6 +907,9 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   flex: none;
   align-self: center;
   margin: 4px auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   background:
     radial-gradient(circle at 50% 46%, rgba(255, 248, 230, 0.4), transparent 62%),
     #fffaf3;
@@ -941,6 +944,12 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   padding: 0;
   box-shadow: 0 4px 0 #E7B89A;
 }
+.trace-board svg { position: absolute; inset: 5%; width: 90%; height: 90%; touch-action: none; overflow: visible; }
+.trace-board path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.trace-board .stroke-rest { stroke: #E7D3C4; stroke-width: 9; }
+.trace-board .stroke-done { stroke: #F4A3C2; stroke-width: 8; }
+.trace-board .stroke-now { stroke: #F27BA6; stroke-width: 7; }
+.trace-board .stroke-ink { stroke: #F47B58; stroke-width: 5.5; }
 .dot.is-next { background: #FFE07A; border-color: #E3B83A; animation: glow 1s ease-in-out infinite; }
 .dot.is-done { background: #B7E4CB; border-color: #7EBEA2; box-shadow: none; }
 .dot.is-pressed { transform: translate(-50%, -50%) scale(0.94); }

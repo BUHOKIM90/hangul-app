@@ -41,7 +41,10 @@
   /* ---------- voice ---------- */
   const SILENT = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
   const player = new Audio();
-  let unlocked = false, q = [], playing = false, gen = 0;
+  let unlocked = false, q = [], playing = false, gen = 0, playToken = 0, playTimer = 0;
+  function clearPlayTimer() {
+    if (playTimer) { clearTimeout(playTimer); playTimer = 0; }
+  }
   /* have.js / lines.js use top-level const. That is a global lexical binding, not a window property. */
   function hasAudio() { return typeof HAVE_AUDIO !== 'undefined'; }
   function hasLines() { return typeof LINES !== 'undefined'; }
@@ -62,13 +65,31 @@
     return new Promise(resolve => {
       if (g !== gen) return resolve();
       if (key === 'w_i_tooth') key = 'sy_C774';
-      if (!S.sound || !hasAudio() || !HAVE_AUDIO.has(key)) return resolve();
-      const done = () => { player.onended = player.onerror = null; resolve(); };
-      player.onended = done;
-      player.onerror = done;
+      if (!S.sound || !hasAudio() || !key || !HAVE_AUDIO.has(key)) return resolve();
+      const token = ++playToken;
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        if (token === playToken) clearPlayTimer();
+        if (g === gen && token === playToken) player.onended = player.onerror = null;
+        resolve();
+      };
+      const arm = () => {
+        if (token !== playToken) return;
+        const dur = player.duration;
+        const ms = dur && isFinite(dur) ? Math.min(12000, Math.max(1600, dur * 1000 + 700)) : 6000;
+        clearPlayTimer();
+        playTimer = setTimeout(finish, ms);
+      };
+      player.onended = finish;
+      player.onerror = finish;
       player.src = 'audio/' + key + '.mp3';
+      arm();
+      player.addEventListener('loadedmetadata', arm, { once: true });
       const p = player.play();
-      if (p && p.catch) p.catch(() => done());
+      if (p && p.then) p.then(() => { unlocked = true; }).catch(() => finish());
+      else unlocked = true;
     });
   }
   function pump() {
@@ -76,7 +97,8 @@
     const job = q.shift();
     if (!job) return;
     playing = true;
-    playKey(job.key, job.g).then(() => { playing = false; pump(); });
+    const g = job.g;
+    playKey(job.key, g).then(() => { if (g !== gen) return; playing = false; pump(); });
   }
   function say(key, caption, opts) {
     const text = caption || lineOf(key);
@@ -85,14 +107,29 @@
       const live = document.getElementById('live');
       if (live && text) live.textContent = text;
     }
+    if (opts && opts.now) {
+      gen++;
+      q = [];
+      playToken++;
+      clearPlayTimer();
+      try { player.pause(); } catch (e) { /* ignore */ }
+      player.onended = player.onerror = null;
+      playing = false;
+    }
     const g = gen;
     if (!playing && !q.length) {
       playing = true;
-      playKey(key, g).then(() => { playing = false; pump(); });
+      playKey(key, g).then(() => { if (g !== gen) return; playing = false; pump(); });
     } else q.push({ key, g });
   }
-  function dropQueue() { gen++; q = []; }
-  function unlock() {
+  function dropQueue() {
+    gen++;
+    q = [];
+    playToken++;
+    clearPlayTimer();
+    playing = false;
+  }
+  function primeAudio() {
     try {
       if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
     } catch (e) { /* ignore */ }
@@ -103,11 +140,15 @@
         if (unlock.ctx.state !== 'running') unlock.ctx.resume().catch(() => {});
       }
     } catch (e) { /* ignore */ }
+  }
+  function unlock() {
+    primeAudio();
     if (unlocked) return;
     try {
       const cur = player.src || '';
       const clip = cur.indexOf('data:audio/wav') < 0 && /(?:^|\/)audio\/[^/?#]+\.mp3(?:$|\?)/.test(cur);
-      if (!clip) player.src = SILENT;
+      if (clip) return;
+      player.src = SILENT;
       const p = player.play();
       const mark = () => {
         unlocked = true;
@@ -161,7 +202,7 @@
       const parent = document.getElementById('parent');
       const modalOn = (gate && !gate.hidden) || (parent && !parent.hidden);
       if (modalOn && e.target.closest && e.target.closest('#app')) return;
-      unlock();
+      primeAudio();
       armTap();
       const el = e.target.closest && e.target.closest('[data-tap]');
       if (!el || el.closest('[hidden]')) return;

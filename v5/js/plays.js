@@ -434,32 +434,123 @@
       const key = C().sylKey(s);
       return '<button type="button" class="tap ctile ' + tone(s) + (i === 0 ? ' is-lit' : '') + '" data-tap="tile" data-i="' + i + '" data-audio="' + key + '" aria-label="' + s + '"><img class="tile-pic" alt="" src="' + (C().sylPic(s) || STAR) + '"><b>' + s + '</b></button>';
     }).join('') + '</div></div>';
-    X().say(ctx.voice.key, ctx.voice.text);
+    X().say(ctx.voice.key, ctx.voice.text, { now: true });
+  }
+  function guideStrokes(g) {
+    const raw = C().STROKES && C().STROKES[g];
+    const one = st => {
+      if (st.c) {
+        const cx = st.c[0], cy = st.c[1], r = st.c[2], n = 48, pts = [];
+        for (let i = 0; i <= n; i++) {
+          const t = -i / n * Math.PI * 2;
+          pts.push([+(cx + r * Math.sin(t)).toFixed(1), +(cy - r * Math.cos(t)).toFixed(1)]);
+        }
+        return pts;
+      }
+      const pts = [];
+      for (let i = 0; i < st.length; i++) {
+        if (!i) { pts.push([st[0][0], st[0][1]]); continue; }
+        const a = st[i - 1], b = st[i];
+        const steps = Math.max(1, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / 5));
+        for (let k = 1; k <= steps; k++) pts.push([+(a[0] + (b[0] - a[0]) * k / steps).toFixed(1), +(a[1] + (b[1] - a[1]) * k / steps).toFixed(1)]);
+      }
+      return pts;
+    };
+    if (raw && raw.length) return raw.map(one);
+    return C().glyphPlan(g, true);
+  }
+  function dAttr(pts) {
+    if (!pts || !pts.length) return '';
+    return pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ');
   }
   function renderTrace(lesson) {
     const g = lesson.trace;
+    const line = '분홍 선을 따라 손가락으로 써 볼까';
     ctx.skill = 'm:' + g;
     ctx.choice = false;
     ctx.focus = g;
     ctx.rewardKeys = [];
-    const dense = X().S.difficulty !== 'easy';
-    ctx.trace = { plan: C().glyphPlan(g, dense), si: 0, di: 0, glyph: g };
+    ctx.trace = { strokes: guideStrokes(g), si: 0, ink: [], pointer: null, glyph: g };
+    ctx.voice = { key: '', text: line };
     const pic = C().jamoPic(g) || C().sylPic(g);
-    ctx.voice = { key: C().UI.trace, text: '점을 따라 눌러' };
-    host().innerHTML = '<h1 class="prompt">점을 따라 눌러</h1>' + (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') + '<div class="trace-board" data-letter="' + g + '"><p class="ghost">' + g + '</p><div class="dots"></div></div>';
-    drawDots();
-    X().say(ctx.voice.key, ctx.voice.text);
+    host().innerHTML = '<h1 class="prompt">' + line + '</h1>' + (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') +
+      '<div class="trace-board" data-letter="' + g + '"><svg viewBox="-8 -8 116 116" preserveAspectRatio="xMidYMid meet" data-guide="[]">' +
+      '<path class="stroke-rest"/><path class="stroke-done"/><path class="stroke-now"/><path class="stroke-ink"/></svg></div>';
+    bubble(line);
+    drawTrace();
+    bindTrace(host().querySelector('.trace-board'));
   }
-
-  function drawDots() {
-    const box = host().querySelector('.dots');
-    if (!box || !ctx.trace) return;
-    const pts = ctx.trace.plan[ctx.trace.si] || [];
-    box.innerHTML = pts.map((p, i) => {
-      const on = i === ctx.trace.di ? ' is-next' : '';
-      const done = i < ctx.trace.di ? ' is-done' : '';
-      return '<button type="button" class="tap dot' + on + done + '" data-tap="dot" data-i="' + i + '" style="left:' + p[0] + '%;top:' + p[1] + '%" aria-label="점"></button>';
-    }).join('');
+  function drawTrace() {
+    const svg = host().querySelector('.trace-board svg');
+    if (!svg || !ctx || !ctx.trace) return;
+    const tr = ctx.trace;
+    const cur = tr.strokes[tr.si] || [];
+    svg.querySelector('.stroke-done').setAttribute('d', tr.strokes.slice(0, tr.si).map(dAttr).join(' '));
+    svg.querySelector('.stroke-rest').setAttribute('d', tr.strokes.slice(tr.si + 1).map(dAttr).join(' '));
+    svg.querySelector('.stroke-now').setAttribute('d', dAttr(cur));
+    svg.querySelector('.stroke-ink').setAttribute('d', dAttr(tr.ink));
+    svg.setAttribute('data-guide', JSON.stringify(cur));
+    svg.setAttribute('data-left', String(Math.max(0, tr.strokes.length - tr.si)));
+  }
+  function nearPts(p, ink, tol) {
+    const t2 = tol * tol;
+    for (let i = 0; i < ink.length; i++) {
+      const dx = ink[i][0] - p[0], dy = ink[i][1] - p[1];
+      if (dx * dx + dy * dy <= t2) return true;
+    }
+    return false;
+  }
+  function strokeDone(guide, ink) {
+    if (!guide.length || ink.length < 2) return false;
+    const tol = 18;
+    let hit = 0;
+    for (let i = 0; i < guide.length; i++) if (nearPts(guide[i], ink, tol)) hit++;
+    return hit / guide.length >= 0.7 && nearPts(guide[0], ink, tol) && nearPts(guide[guide.length - 1], ink, tol);
+  }
+  function bindTrace(board) {
+    const svg = board.querySelector('svg');
+    const local = e => {
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      const m = svg.getScreenCTM();
+      if (!m) return null;
+      const p = pt.matrixTransform(m.inverse());
+      return [p.x, p.y];
+    };
+    board.addEventListener('pointerdown', e => {
+      if (!ctx || !ctx.trace || ctx.trialOver || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (e.cancelable) e.preventDefault();
+      try { board.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      const p = local(e);
+      if (!p) return;
+      ctx.trace.pointer = e.pointerId;
+      ctx.trace.ink = [p];
+      drawTrace();
+    });
+    board.addEventListener('pointermove', e => {
+      if (!ctx || !ctx.trace || ctx.trace.pointer !== e.pointerId) return;
+      const p = local(e);
+      if (!p) return;
+      ctx.trace.ink.push(p);
+      drawTrace();
+    });
+    const end = e => {
+      if (!ctx || !ctx.trace || ctx.trace.pointer !== e.pointerId) return;
+      ctx.trace.pointer = null;
+      const guide = ctx.trace.strokes[ctx.trace.si] || [];
+      if (strokeDone(guide, ctx.trace.ink)) {
+        ctx.trace.si += 1;
+        ctx.trace.ink = [];
+        drawTrace();
+        if (ctx.trace.si >= ctx.trace.strokes.length) finishTrace();
+        return;
+      }
+      ctx.trace.ink = [];
+      drawTrace();
+    };
+    board.addEventListener('pointerup', end);
+    board.addEventListener('pointercancel', end);
   }
   function showSyl(s) {
     const img = host().querySelector('#chantPic');
@@ -584,7 +675,12 @@
         if (lit) lit.classList.add('is-sparkle');
         ctx.hinted = true;
       }
+      const lit = host().querySelector('.ctile.is-lit');
       bubble(ctx.hinted ? '반짝이는 데를 봐!' : '빛나는 칸이야');
+      if (lit) {
+        const syl = ctx.lesson.chant[+lit.dataset.i];
+        X().say(lit.dataset.audio || C().sylKey(syl), lit.getAttribute('aria-label') || syl, { keepBubble: true, now: true });
+      }
       return;
     }
     el.classList.remove('is-lit');
@@ -592,7 +688,7 @@
     const s = ctx.lesson.chant[+el.dataset.i];
     showSyl(s);
     markMeter(ctx.chant);
-    X().say(el.dataset.audio || C().sylKey(s), s, { keepBubble: true });
+    X().say(el.dataset.audio || C().sylKey(s), s, { keepBubble: true, now: true });
     const next = host().querySelector('[data-i="' + (ctx.chant + 1) + '"]');
     ctx.chant += 1;
     if (next) {
@@ -601,63 +697,16 @@
       ctx.voice = { key: C().sylKey(ns), text: '소리를 따라 눌러' };
     } else finishGuided();
   }
-  function endTrace() {
-    if (ctx.trialOver) return;
-    const grade = ctx.revealed ? 'shown' : (ctx.misses ? 'hint' : 'guide');
-    if (ctx.skill) X().bump(ctx.skill, grade);
-    if (grade === 'shown') X().encourage('shown', ctx.focus || '');
-    else if (grade === 'hint') X().encourage('hint', ctx.focus || '');
-    else payCloth();
+  function finishTrace() {
+    if (!ctx || ctx.trialOver) return;
     ctx.trialOver = true;
     ctx.playDone = true;
     ctx.soloStep = false;
-    ctx.grades = [grade];
+    ctx.grades = ['guide'];
+    if (ctx.skill) X().bump(ctx.skill, 'guide');
+    payCloth();
+    X().praise({ type: 'trace', helped: false, focus: ctx.focus || '' });
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
-  }
-  function onDot(el) {
-    if (ctx.trialOver || !ctx.trace) return;
-    const i = +el.dataset.i;
-    if (i !== ctx.trace.di) {
-      ctx.misses += 1;
-      el.classList.remove('wiggle');
-      void el.offsetWidth;
-      el.classList.add('wiggle');
-      if (ctx.misses >= 8) {
-        ctx.revealed = true;
-        bubble('같이 해 보자!');
-        X().say(C().UI.together, '같이 해 보자!');
-        endTrace();
-        return;
-      }
-      if (ctx.misses === 3 && X().S.colorHints) {
-        ctx.hinted = true;
-        const n = host().querySelector('.dot.is-next');
-        if (n) n.classList.add('is-sparkle');
-        bubble('반짝이는 데를 봐!');
-        X().say(C().UI.hint, '반짝이는 데를 봐!');
-        return;
-      }
-      bubble('다시 해 볼까?');
-      X().say(C().UI.retry, '다시 해 볼까?');
-      return;
-    }
-    el.classList.remove('is-next');
-    el.classList.add('is-done');
-    ctx.trace.di += 1;
-    const pts = ctx.trace.plan[ctx.trace.si] || [];
-    if (ctx.trace.di < pts.length) {
-      const n = host().querySelector('[data-i="' + ctx.trace.di + '"]');
-      if (n) n.classList.add('is-next');
-      return;
-    }
-    ctx.trace.si += 1;
-    ctx.trace.di = 0;
-    if (ctx.trace.si < ctx.trace.plan.length) {
-      bubble('다음 획!');
-      drawDots();
-      return;
-    }
-    endTrace();
   }
 
   function listenItems(lesson, n) {
@@ -786,7 +835,6 @@
     if (t === 'piece') { onPiece(el); return true; }
     if (t === 'card') { onCard(el); return true; }
     if (t === 'tile') { onTile(el); return true; }
-    if (t === 'dot') { onDot(el); return true; }
     return false;
   }
   function replay() {
