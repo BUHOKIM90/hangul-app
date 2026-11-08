@@ -1703,3 +1703,10 @@ main[data-screen="done"] .gain { display: flex; flex-wrap: wrap; justify-content
 main[data-screen="done"] .gain figure { margin: 0; width: 56px; }
 main[data-screen="done"] .gain figure img { width: 48px; height: 48px; }
 main[data-screen="done"] .gain figcaption { font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+main[data-screen="stickers"] { display: flex; overflow: hidden; }
+main[data-screen="stickers"] .book { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+main[data-screen="stickers"] .book-grid { flex: 1; min-height: 0; overflow: auto; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); padding: 4px 2px 8px; align-content: start; }
+main[data-screen="stickers"] .pager { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 8px; }
+@media (max-width: 700px) and (min-height: 640px) {
+  main[data-screen="home"] .scene { background: linear-gradient(180deg, #d7eef8 0%, #e6f5fb 50%, #e3f2d2 62%, #cfe7b8 100%); }
+}

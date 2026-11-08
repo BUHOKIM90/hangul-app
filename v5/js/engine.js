@@ -430,11 +430,12 @@
     'monggeul_top_raincoat', 'monggeul_top_peach', 'monggeul_top_spacesuit', 'monggeul_top_mint',
     'monggeul_top_sky', 'monggeul_hat_linecrown', 'monggeul_bg_peach', 'monggeul_bg_mint', 'monggeul_bg_sky'
   ];
+  /* One new piece of clothing per perfect step and per finished lesson: 몽글이 first, then every friend. */
   function markSoloCloth() {
     if (!DRESS) return null;
     S.soloN = (S.soloN || 0) + 1;
-    if (S.soloN % 2 !== 0) { save(); return null; }
-    const id = MONG_PACE.find(k => S.unlocks.indexOf(k) < 0);
+    const pool = MONG_PACE.concat(DRESS.unlock || []);
+    const id = pool.find(k => S.unlocks.indexOf(k) < 0 && itemBy(k));
     if (!id) { save(); return null; }
     S.unlocks.push(id);
     S.freshItem = id;

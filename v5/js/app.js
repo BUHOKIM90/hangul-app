@@ -237,13 +237,16 @@
     const played = run.steps[run.i];
     run.i += 1;
     if (run.i < run.steps.length) return showPeel(earned, item, 'step', played);
+    /* finishing a lesson always gives a piece of clothing */
+    let cloth = item;
+    if (!cloth) { cloth = X().markSoloCloth(); if (cloth) noteCloth(cloth); }
     const stars = run.stars || [];
     const solos = stars.filter(Boolean).length;
     const passed = C().passLesson(solos, stars.length);
     if (passed) X().S.done[run.lesson.id] = X().stamp();
     X().S.last = { lesson: run.lesson.id, solos: solos, total: stars.length, passed: !!passed, day: X().stamp() };
     X().save();
-    showPeel(earned, item, 'done', played);
+    showPeel(earned, cloth, 'done', played);
   }
   function showPeel(earned, item, go, playType) {
     X().dropQueue();
@@ -323,7 +326,7 @@
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><p id="bubble" class="bubble">' + line + '</p>' + starsHTML(stars) + '<p class="meta">' + count + (guided ? ' · 노래·쓰기는 점수 밖' : '') + '</p></div><div class="done-reward">' + (st ? peelStage(st) : '') + gainHTML(earned) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
+    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><p id="bubble" class="bubble">' + line + '</p>' + starsHTML(stars) + '<p class="meta">' + count + (guided ? ' · 노래·쓰기는 점수 밖' : '') + '</p></div><div class="done-reward">' + gainHTML(earned.slice(-12)) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
     chrome('done');
     settlePeel();
     if (passed) { X().say('ui_levelup', line); X().confetti(40); X().cheer(line, true); }
