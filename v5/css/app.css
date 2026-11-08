@@ -915,38 +915,26 @@ main[data-play="treasure"] { --play: #FFF4D2; }
   box-shadow: 0 8px 0 var(--shadow);
   container-type: size;
 }
-.ghost {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  font-size: 68cqmin;
-  line-height: 1;
-  color: rgba(74, 52, 40, 0.14);
-  pointer-events: none;
-}
-.dots { position: absolute; }
-.dots, .ghost { inset: 4%; }
-.dot {
-  position: absolute;
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  min-height: 64px;
-  border-radius: 32px;
-  transform: translate(-50%, -50%);
-  background: #FFB38A;
-  border-color: #E07A4A;
-  padding: 0;
-  box-shadow: 0 4px 0 #E7B89A;
-}
-.dot.is-next { background: #FFE07A; border-color: #E3B83A; animation: glow 1s ease-in-out infinite; }
-.dot.is-done { background: #B7E4CB; border-color: #7EBEA2; box-shadow: none; }
-.dot.is-pressed { transform: translate(-50%, -50%) scale(0.94); }
-@media (min-width: 768px) and (min-height: 700px) {
-  .trace-board { width: min(440px, calc(100dvh - 250px)); margin-inline: auto; }
-}
+.trace-board { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overscroll-behavior: contain; }
+.trace-board svg { position: absolute; inset: 6%; width: 88%; height: 88%; overflow: visible; touch-action: none; pointer-events: none; }
+.trace-board path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.trace-board .st-rest { stroke: #EFE2D6; stroke-width: 11; }
+.trace-board .st-done { stroke: #F7A8C6; stroke-width: 11; }
+.trace-board .st-guide { stroke: #FFE1EC; stroke-width: 12; }
+.trace-board .st-dot { fill: #F27BA6; }
+.trace-board .st-dot.is-passed { fill: #fff; opacity: .85; }
+.trace-board .st-ink { stroke: #E2558A; stroke-width: 8.5; }
+.trace-board .st-arrow path { fill: none; stroke: #C2416F; stroke-width: 1.8; }
+.trace-board .st-head { fill: #fff; stroke: #E2558A; stroke-width: 2.2; }
+.trace-board .st-head.is-sparkle { fill: #FFF4C8; stroke: #F2C14E; animation: headGlow 0.9s ease-in-out infinite; }
+.trace-board .st-num { font-size: 6.2px; text-anchor: middle; fill: #C2416F; font-family: inherit; }
+.trace-board.is-drawing .st-head { fill: #FFE1EC; }
+.trace-board.is-complete { border-color: #7EBEA2; box-shadow: 0 0 0 6px #CFEFE0, 0 8px 0 var(--shadow); }
+.trace-board.is-complete .st-done { stroke: #E2558A; }
+.trace-count { position: absolute; right: 12px; top: 8px; margin: 0; font-size: 1rem; color: #A07A63; pointer-events: none; }
+@keyframes headGlow { 50% { stroke-width: 3.6; } }
+html[data-form="phone"] .trace-board { width: min(94vw, calc(100dvh - 250px), 520px); }
+html[data-form="tablet"] .trace-board { width: min(440px, 56vw, calc(100dvh - 330px)); }
 @media (min-width: 768px) {
   .choice { min-height: 150px; }
   .choice img { max-height: 150px; }

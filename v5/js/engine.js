@@ -58,26 +58,73 @@
       b.textContent = text;
     }
   }
+  /* One <audio>. A job owns the player until it ends, errors, times out or is stopped.
+     dropQueue() stops the clip now, so a new screen never waits behind an old line. */
+  let cur = null, runId = 0;
+  player.preload = 'auto';
+  player.addEventListener('ended', () => { if (cur) cur.finish(); });
+  player.addEventListener('error', () => { if (cur && (player.src || '').indexOf('data:') !== 0) cur.finish(); });
+  player.addEventListener('loadedmetadata', () => { if (cur) cur.arm(); });
+  function fileKey(key) {
+    if (key === 'w_i_tooth') return 'sy_C774';
+    return key;
+  }
+  function canPlay(key) {
+    return !!(key && S.sound && hasAudio() && HAVE_AUDIO.has(fileKey(key)));
+  }
   function playKey(key, g) {
     return new Promise(resolve => {
       if (g !== gen) return resolve();
-      if (key === 'w_i_tooth') key = 'sy_C774';
-      if (!S.sound || !hasAudio() || !HAVE_AUDIO.has(key)) return resolve();
-      const done = () => { player.onended = player.onerror = null; resolve(); };
-      player.onended = done;
-      player.onerror = done;
+      key = fileKey(key);
+      if (!canPlay(key)) return resolve();
+      let over = false, timer = 0;
+      const job = {
+        key,
+        finish() {
+          if (over) return;
+          over = true;
+          clearTimeout(timer);
+          if (cur === job) cur = null;
+          resolve();
+        },
+        arm() {
+          if (over) return;
+          const d = player.duration;
+          clearTimeout(timer);
+          timer = setTimeout(job.finish, d && isFinite(d) ? Math.min(15000, d * 1000 + 1200) : 9000);
+        }
+      };
+      cur = job;
+      timer = setTimeout(job.finish, 9000);
       player.src = 'audio/' + key + '.mp3';
-      const p = player.play();
-      if (p && p.catch) p.catch(() => done());
+      let p;
+      try { p = player.play(); } catch (e) { job.finish(); return; }
+      if (p && p.then) p.then(() => { unlocked = true; }).catch(() => job.finish());
+      else unlocked = true;
+    });
+  }
+  function stopNow() {
+    const c = cur;
+    cur = null;
+    if (c) c.finish();
+    try { if (!player.paused) player.pause(); } catch (e) { /* ignore */ }
+  }
+  function run(job) {
+    playing = true;
+    const me = ++runId;
+    playKey(job.key, job.g).then(() => {
+      if (me !== runId) return;
+      playing = false;
+      pump();
     });
   }
   function pump() {
     if (playing) return;
     const job = q.shift();
     if (!job) return;
-    playing = true;
-    playKey(job.key, job.g).then(() => { playing = false; pump(); });
+    run(job);
   }
+  /* opts.now: cut whatever is speaking and say this at once (tap feedback, new prompt). */
   function say(key, caption, opts) {
     const text = caption || lineOf(key);
     if (!opts || !opts.keepBubble) showLine(text);
@@ -85,13 +132,19 @@
       const live = document.getElementById('live');
       if (live && text) live.textContent = text;
     }
-    const g = gen;
-    if (!playing && !q.length) {
-      playing = true;
-      playKey(key, g).then(() => { playing = false; pump(); });
-    } else q.push({ key, g });
+    if (opts && opts.now) dropQueue();
+    const job = { key, g: gen };
+    if (!playing && !q.length) run(job);
+    else q.push(job);
   }
-  function dropQueue() { gen++; q = []; }
+  function dropQueue() {
+    gen++;
+    q = [];
+    runId++;
+    playing = false;
+    stopNow();
+  }
+  function busy() { return playing || q.length > 0; }
   function unlock() {
     try {
       if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
@@ -103,18 +156,13 @@
         if (unlock.ctx.state !== 'running') unlock.ctx.resume().catch(() => {});
       }
     } catch (e) { /* ignore */ }
-    if (unlocked) return;
+    /* Never touch the player while a line owns it: replaying its clip was the "아, 아" bug. */
+    if (unlocked || playing || cur) return;
     try {
-      const cur = player.src || '';
-      const clip = cur.indexOf('data:audio/wav') < 0 && /(?:^|\/)audio\/[^/?#]+\.mp3(?:$|\?)/.test(cur);
-      if (!clip) player.src = SILENT;
+      player.src = SILENT;
       const p = player.play();
-      const mark = () => {
-        unlocked = true;
-        if ((player.src || '').indexOf('data:audio/wav') === 0) player.pause();
-      };
-      if (p && p.then) p.then(mark).catch(() => {});
-      else mark();
+      if (p && p.then) p.then(() => { if (!cur) unlocked = true; }).catch(() => {});
+      else unlocked = true;
     } catch (e) { /* ignore */ }
   }
   function syncSound() {
@@ -149,6 +197,30 @@
       g.connect(tapCtx.destination);
       o.start(t);
       o.stop(t + 0.08);
+    } catch (e) { /* ignore */ }
+  }
+
+  /* Small rising ding for a finished stroke / step. Not speech, never blocks the voice queue. */
+  function chime(step) {
+    if (!S.sound) return;
+    armTap();
+    if (!tapCtx) return;
+    try {
+      const t = tapCtx.currentTime;
+      const base = [523, 659, 784, 1047][Math.max(0, (step || 1) - 1) % 4];
+      [0, 0.09].forEach((dt, i) => {
+        const o = tapCtx.createOscillator();
+        const g = tapCtx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(base * (i ? 1.5 : 1), t + dt);
+        g.gain.setValueAtTime(0.0001, t + dt);
+        g.gain.exponentialRampToValueAtTime(0.06, t + dt + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.22);
+        o.connect(g);
+        g.connect(tapCtx.destination);
+        o.start(t + dt);
+        o.stop(t + dt + 0.25);
+      });
     } catch (e) { /* ignore */ }
   }
 
@@ -485,8 +557,8 @@
   }
 
   window.V5X = {
-    get S() { return S; }, save, load, reset, stamp, say, dropQueue, unlock, syncSound, installPointer,
+    get S() { return S; }, save, load, reset, stamp, say, dropQueue, busy, canPlay, unlock, syncSound, installPointer,
     setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, markSoloCloth, layerHTML,
-    bump, admitThin, hintSoon, praise, encourage, confetti, shuffle, lineOf
+    bump, admitThin, hintSoon, chime, praise, encourage, confetti, shuffle, lineOf
   };
 })();

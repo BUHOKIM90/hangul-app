@@ -17,6 +17,9 @@
     const w = document.documentElement.clientWidth;
     const h = document.documentElement.clientHeight;
     document.documentElement.dataset.orient = w > h ? 'land' : 'port';
+    /* iPad vs phone: the shorter screen side decides, so rotation does not flip it. */
+    const sw = Math.min(screen.width || w, screen.height || h, Math.max(w, h));
+    document.documentElement.dataset.form = Math.min(w, h, sw) >= 700 ? 'tablet' : 'phone';
   }
   function setZoom(on) {
     const m = document.querySelector('meta[name="viewport"]');
@@ -415,9 +418,16 @@
   }
 
   function onTap(el) {
-    if (!greeted) { greeted = true; X().say(C().UI.hello, '안녕! 오늘도 같이 놀자'); }
     const t = el.dataset.tap;
-    if (t === 'sound') { X().S.sound = !X().S.sound; X().save(); X().syncSound(); if ($('#parent') && !$('#parent').hidden) openParent(); return; }
+    handleTap(el, t);
+    /* First tap greets once, but never over a line the tap itself started. */
+    if (!greeted) {
+      greeted = true;
+      if (!X().busy() && $('#gate').hidden && $('#parent').hidden) X().say(C().UI.hello);
+    }
+  }
+  function handleTap(el, t) {
+    if (t === 'sound') { X().S.sound = !X().S.sound; if (!X().S.sound) X().dropQueue(); X().save(); X().syncSound(); if ($('#parent') && !$('#parent').hidden) openParent(); return; }
     if (t === 'adult') return openGate();
     if (t === 'gate-close') return closeGate();
     if (t === 'gate-key') return gateKey(el.dataset.n);
