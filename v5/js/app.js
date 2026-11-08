@@ -11,12 +11,16 @@
   let gate = null;
   let resetArm = false;
   let bookPage = 0;
+  let mapSaid = 0;
   const WAVE = '<img alt="" width="512" height="512" sizes="(min-width: 800px) 28vw, 42vw" src="assets/char/monggeul_wave-256.webp" srcset="assets/char/monggeul_wave-256.webp 256w, assets/char/monggeul_wave.webp 512w">';
 
   function applyForm() {
     const w = document.documentElement.clientWidth;
     const h = document.documentElement.clientHeight;
     document.documentElement.dataset.orient = w > h ? 'land' : 'port';
+    /* iPad vs phone: the shorter screen side decides, so rotation does not flip it. */
+    const sw = Math.min(screen.width || w, screen.height || h, Math.max(w, h));
+    document.documentElement.dataset.form = Math.min(w, h, sw) >= 700 ? 'tablet' : 'phone';
   }
   function setZoom(on) {
     const m = document.querySelector('meta[name="viewport"]');
@@ -34,6 +38,8 @@
     X().syncSound();
     const pop = document.getElementById('praise');
     if (pop) pop.hidden = true;
+    document.querySelectorAll('#fx .cheer').forEach(c => c.remove());
+    X().hideHand();
     document.dispatchEvent(new CustomEvent('v5-screen'));
     const waiting = window.__swWaiting;
     if (screen === 'home' && waiting) waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -76,6 +82,28 @@
     main().innerHTML = homeHTML();
     fillHomeExtras();
     chrome('home');
+    homeIdle();
+  }
+  function homeIdle() {
+    X().setIdle({
+      delay: 7000,
+      run: () => { X().say(C().UI.tapnext, '', { now: true }); X().showHand(main().querySelector('[data-tap="go-map"]')); }
+    });
+  }
+  function closeSplash() {
+    const sp = $('#splash');
+    if (!sp || sp.hidden) return;
+    sp.classList.add('is-gone');
+    setTimeout(() => { sp.hidden = true; }, 380);
+    X().say(C().UI.hello);
+    if (!X().S.onboarded) {
+      /* First launch: point at 놀자 right after the hello. */
+      X().S.onboarded = true;
+      X().save();
+      X().say(C().UI.tapnext, '', { keepBubble: false });
+      setTimeout(() => X().showHand(main().querySelector('[data-tap="go-map"]')), 2600);
+    }
+    homeIdle();
   }
   function faceBtn(ch, i) {
     return '<button type="button" class="tap pal pal-' + i + '" data-tap="dress" data-who="' + ch.id + '" aria-label="' + ch.name + '"><img alt="" width="512" height="512" src="' + ch.body + '"><span>' + ch.name + '</span></button>';
@@ -157,9 +185,16 @@
     }).join('');
     const here = nodes[lesson.id - 1] || nodes[0];
     main().dataset.screen = 'map';
-    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:' + here[1] + '%"></div><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
+    main().innerHTML = '<section class="map"><div class="world"><img class="world-bg" alt="" src="assets/pic/map_w1.webp"><img class="landmark lm-a" alt="" src="assets/pic/map/lm_pizza.webp"><img class="landmark lm-b" alt="" src="assets/pic/map/lm_train.webp"><img class="landmark lm-c" alt="" src="assets/pic/map/lm_garden.webp"><img class="landmark lm-d" alt="" src="assets/pic/map/lm_pond.webp"><svg class="trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '"/></svg>' + stones + '<img class="walker" alt="" src="assets/pic/map/mong_walk_1.webp" style="left:' + here[0] + '%;top:' + here[1] + '%"></div><p id="bubble" class="bubble map-bubble">' + lesson.place + '</p><button type="button" class="tap play-go map-go" data-tap="start-lesson" data-id="' + lesson.id + '"><img alt="" src="assets/icons/play.svg"><span>' + lesson.kid + ' 놀자</span></button><div class="play-grid">' + C().PLAYS.map(p => '<button type="button" class="tap play-door" data-tap="practice" data-play="' + p.id + '"><img alt="" src="' + p.icon + '"><b>' + p.kid + '</b></button>').join('') + '</div></section>';
     chrome('map');
     requestAnimationFrame(() => { layoutMap(); requestAnimationFrame(layoutMap); });
+    const intro = lesson.intro && X().canPlay(lesson.intro) ? lesson.intro : '';
+    if (intro && mapSaid !== lesson.id) { mapSaid = lesson.id; X().say(intro); }
+    else X().say(C().UI.tapnext);
+    X().setIdle({
+      delay: 6000,
+      run: () => { X().say(C().UI.tapnext, '', { now: true }); X().showHand(main().querySelector('.map-go')); }
+    });
   }
   function showPlay(spec) {
     X().dropQueue();
@@ -169,7 +204,9 @@
       : '';
     main().dataset.screen = 'play';
     main().dataset.play = spec.type;
-    main().innerHTML = '<section class="play"><div class="play-head"><img id="mascot" class="mascot" alt="" width="512" height="512" src="assets/char/monggeul_think.webp"><div><p class="kicker">' + meta.kid + '</p>' + step + '</div><button type="button" class="tap icon" id="replayBtn" data-tap="replay" data-n="0" aria-label="다시 듣기"><img alt="" src="assets/icons/speaker.svg"></button></div><p id="bubble" class="bubble">잘 들어 봐</p><div id="stage"></div></section>';
+    const scene = spec.lesson && spec.lesson.scene ? spec.lesson.scene : '';
+    main().style.setProperty('--scene', scene ? 'url("' + new URL(scene, location.href).href + '")' : 'none');
+    main().innerHTML = '<section class="play"><div class="play-head"><img id="mascot" class="mascot" alt="" width="512" height="512" src="assets/char/monggeul_think.webp"><div class="play-title"><p class="kicker">' + meta.kid + '</p>' + step + '<div class="meter trial-dots"></div></div><button type="button" class="tap replay-big" id="replayBtn" data-tap="replay" data-n="0" aria-label="다시 듣기"><img alt="" src="assets/icons/speaker.svg"></button></div><p id="bubble" class="bubble">&nbsp;</p><div id="stage"></div></section>';
     chrome('play');
     V5Play.mount($('#stage'), spec, afterStep);
   }
@@ -181,19 +218,35 @@
       run.stars = run.stars || [];
       run.stars.push(solo);
     }
-    const earned = (result && result.earned) || [];
+    const earned = ((result && result.earned) || []).slice();
     const item = (result && result.cloth) || null;
+    const grades = (result && result.grades) || [];
+    /* adaptive difficulty: clean steps push options up, struggles bring them down */
+    if (grades.length && run.mode === 'lesson') {
+      const S = X().S;
+      const clean = grades.every(g => g === 'solo' || g === 'guide');
+      const hard = grades.some(g => g === 'shown' || g === 'hint');
+      S.adapt = Math.max(-4, Math.min(4, (S.adapt || 0) + (clean ? 1 : hard ? -1 : 0)));
+    }
+    /* Every finished lesson step pays one sticker: the word/letter one if new, else a surprise from the book. */
+    if (run.mode === 'lesson' && !earned.length && !grades.every(g => g === 'shown')) {
+      const st = V5Stick.nextSurprise(X().S.stickers);
+      if (st) { X().S.stickers.push(st.id); X().save(); earned.push(st); noteSticker(st); }
+    }
     if (run.mode === 'practice') return showMap();
     const played = run.steps[run.i];
     run.i += 1;
     if (run.i < run.steps.length) return showPeel(earned, item, 'step', played);
+    /* finishing a lesson always gives a piece of clothing */
+    let cloth = item;
+    if (!cloth) { cloth = X().markSoloCloth(); if (cloth) noteCloth(cloth); }
     const stars = run.stars || [];
     const solos = stars.filter(Boolean).length;
     const passed = C().passLesson(solos, stars.length);
     if (passed) X().S.done[run.lesson.id] = X().stamp();
     X().S.last = { lesson: run.lesson.id, solos: solos, total: stars.length, passed: !!passed, day: X().stamp() };
     X().save();
-    showPeel(earned, item, 'done', played);
+    showPeel(earned, cloth, 'done', played);
   }
   function showPeel(earned, item, go, playType) {
     X().dropQueue();
@@ -204,20 +257,26 @@
     const songBare = playType === 'chant' && !st && !item;
     main().dataset.screen = 'reward';
     main().dataset.sticker = st ? st.id : '';
-    const title = st ? '잘했어!' : (songBare ? '노래 잘 불렀어!' : '다음 놀이');
+    const title = st ? '스티커 받았어!' : (songBare ? '잘했어!' : '다음 놀이');
     const card = st ? peelStage(st) : (songBare
-      ? '<div class="song-praise"><img class="mascot dance" alt="" width="512" height="512" src="assets/char/monggeul_clap.webp"><p class="bubble">목소리가 반짝반짝했어.</p><p class="meta">같이 이어 가자</p></div>'
-      : '<p class="bubble">같이 이어 가자</p>');
-    main().innerHTML = '<section class="end celebrate"><p class="celebrate-title">' + title + '</p>' + card + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next">' + label + '</button></section>';
+      ? '<div class="song-praise"><img class="mascot dance" alt="" width="512" height="512" src="assets/char/monggeul_clap.webp"></div>'
+      : '<div class="song-praise"><img class="mascot dance" alt="" width="512" height="512" src="assets/char/monggeul_cheer.webp"></div>');
+    main().innerHTML = '<section class="end celebrate"><p id="bubble" class="celebrate-title">' + title + '</p>' + card + rewardChip(item) + '<button type="button" class="tap xl play-go" data-tap="peel-next"><span>' + label + '</span><img alt="" src="assets/icons/arrow.svg"></button></section>';
     chrome('reward');
     settlePeel();
     if (st) {
-      X().say('ui_sticker', '스티커를 받았어!');
-      X().confetti();
+      X().say('ui_sticker');
+      const w = V5Stick.wordKey(st);
+      if (w && X().canPlay(w)) X().say(w, st.name);
+      X().confetti(30);
     } else if (songBare) {
-      X().say('ui_good1', '노래 잘 불렀어! 목소리가 반짝반짝했어.', { keepBubble: true });
-      X().confetti(5);
+      X().say('ui_good1');
+      X().confetti(12);
     }
+    X().setIdle({
+      delay: 5000,
+      run: () => { X().say(C().UI.tapnext, '', { now: true }); X().showHand(main().querySelector('[data-tap="peel-next"]')); }
+    });
   }
   function settlePeel() {
     const root = main();
@@ -262,33 +321,46 @@
     const passed = C().passLesson(solos, stars.length);
     const guided = run && run.steps && run.steps.some(s => s === 'chant' || s === 'trace');
     const count = '혼자 맞힌 놀이 ' + solos + '/' + stars.length;
-    const line = passed ? '우와, 한 단계 올라갔어!' : (stars.length ? count + '. 다음에 또 해 보자' : '오늘은 여기까지. 이 길은 다음에 또 해 보자');
+    const line = passed ? X().lineOf('ui_levelup') : X().lineOf(C().UI.end);
     X().dropQueue();
     run = null;
     main().dataset.screen = 'done';
     main().dataset.sticker = st ? st.id : '';
-    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><h1>오늘 놀이 끝!</h1>' + starsHTML(stars) + (guided ? '<p class="meta">노래랑 따라 쓰기는 점수에 없어요</p>' : '') + '<p class="meta">' + count + '</p><p id="bubble" class="bubble">' + line + '</p></div><div class="done-reward">' + (st ? peelStage(st) : '') + gainHTML(earned) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
+    main().innerHTML = '<section class="end celebrate festival"><div class="done-hero"><img id="mascot" class="mascot big dance" alt="" width="512" height="512" src="assets/char/monggeul_jump.webp"><p id="bubble" class="bubble">' + line + '</p>' + starsHTML(stars) + '<p class="meta">' + count + (guided ? ' · 노래·쓰기는 점수 밖' : '') + '</p></div><div class="done-reward">' + gainHTML(earned.slice(-12)) + rewardChip(item) + '</div><button type="button" class="tap xl play-go" data-tap="back-map">마을로</button><div class="end-dock end-dock-quiet"><button type="button" class="tap pic-tile" data-tap="dress"><img alt="" src="assets/friends/bori.webp"><span>옷</span></button><button type="button" class="tap pic-tile" data-tap="stickers"><img alt="" src="assets/stickers/animal_04_곰.webp"><span>스티커</span></button></div></section>';
     chrome('done');
     settlePeel();
-    if (passed) X().say('ui_levelup', line);
+    if (passed) { X().say('ui_levelup', line); X().confetti(40); X().cheer(line, true); }
     else X().say(C().UI.end, line);
-    if (passed) X().confetti();
+    X().setIdle({
+      delay: 7000,
+      run: () => { X().say(C().UI.tapnext, '', { now: true }); X().showHand(main().querySelector('[data-tap="back-map"]')); }
+    });
   }
   function showStickers() {
     X().dropQueue();
-    const themes = V5Stick.ORDER;
-    if (bookPage >= themes.length) bookPage = 0;
+    X().setIdle(null);
+    const pages = bookPages();
+    if (bookPage >= pages.length) bookPage = 0;
     if (bookPage < 0) bookPage = 0;
-    const theme = themes[bookPage];
-    const slice = V5Stick.list.filter(s => s.theme === theme);
+    const theme = pages[bookPage].theme;
+    const slice = pages[bookPage].items;
+    const themes = pages;
     const owned = X().S.stickers;
     main().dataset.screen = 'stickers';
     main().dataset.theme = theme;
     main().innerHTML = '<section class="book"><h1>스티커 책</h1><p class="meta">' + owned.length + ' / ' + V5Stick.list.length + ' · ' + V5Stick.THEME_KO[theme] + '</p><div class="book-grid">' + slice.map(st => {
       const has = owned.indexOf(st.id) >= 0;
-      return '<figure class="sticker' + (has ? ' is-in' : ' is-ghost') + '"><img alt="" width="256" height="256" src="' + assetSrc(st.file) + '"><figcaption>' + st.name + '</figcaption></figure>';
+      return '<button type="button" class="tap sticker' + (has ? ' is-in' : ' is-ghost') + '" data-tap="sticker-say" data-id="' + st.id + '" aria-label="' + (has ? st.name : '아직') + '"><img alt="" width="256" height="256" loading="lazy" src="' + assetSrc(st.file) + '"><span>' + (has ? st.name : '?') + '</span></button>';
     }).join('') + '</div><div class="pager"><button type="button" class="tap" data-tap="book-prev" aria-label="이전 쪽">이전</button><span>' + (bookPage + 1) + ' / ' + themes.length + '</span><button type="button" class="tap" data-tap="book-next" aria-label="다음 쪽">다음</button></div></section>';
     chrome('stickers');
+  }
+  function bookPages() {
+    const out = [];
+    V5Stick.ORDER.forEach(theme => {
+      const all = V5Stick.list.filter(s => s.theme === theme);
+      for (let i = 0; i < all.length; i += 24) out.push({ theme, items: all.slice(i, i + 24) });
+    });
+    return out;
   }
   function thumbStyle(it) {
     if (it.paint && it.paint.background) return 'background:' + it.paint.background;
@@ -306,6 +378,7 @@
   }
   function showDress() {
     X().dropQueue();
+    X().setIdle(null);
     const data = X().dressData();
     const who = X().S.who || 'monggeul';
     const ch = X().charBy(who) || data.characters[0];
@@ -350,6 +423,9 @@
     if (X().S.freshItem === it.id) X().S.freshItem = '';
     X().save();
     showDress();
+    X().chime(w[it.slot] ? 3 : 1);
+    const doll = main().querySelector('.doll');
+    if (doll && w[it.slot]) { doll.classList.add('is-burst'); X().confetti(10, 'hearts'); }
   }
 
   function holdApp(on) {
@@ -359,6 +435,7 @@
   }
   function openGate() {
     X().dropQueue();
+    X().hideHand();
     setZoom(false);
     gate = { a: 6 + Math.floor(Math.random() * 4), b: 6 + Math.floor(Math.random() * 4), typed: '' };
     const g = $('#gate');
@@ -396,7 +473,12 @@
     holdApp(true);
     const last = S.last;
     const lastLine = last ? ('최근 길 · 혼자 ' + last.solos + '/' + last.total + (last.passed ? ' · 길 통과' : ' · 다시 할 길')) : '최근 길 기록 없음';
-    $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><p class="meta">' + lastLine + '</p><p class="note">익힘은 힌트 없이 혼자 세 번 맞히고, 힌트보다 혼자 맞힌 횟수가 더 많을 때예요. 길 통과와는 달라요. 보기가 두 개뿐이면 다음에 또 혼자 맞혀야 점수가 돼요.</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
+    $('#parent').innerHTML = '<div class="sheet adult" role="dialog" aria-label="어른 메뉴"><div class="adult-head"><h1>어른 메뉴</h1><button type="button" class="tap" data-tap="close-parent" aria-label="닫기">닫기</button></div><p class="note">이 창이 열린 동안만 화면을 확대할 수 있어요.</p><h2>오늘</h2><p id="timeUsed" class="meta"></p><p class="meta">오늘 길 · ' + currentLesson().title + '</p><p class="goal">' + currentLesson().goal + '</p><p class="meta">' + lastLine + '</p><p class="note">익힘은 힌트 없이 혼자 세 번 맞히고, 힌트보다 혼자 맞힌 횟수가 더 많을 때예요. 길 통과와는 달라요. 보기가 두 개뿐이면 다음에 또 혼자 맞혀야 점수가 돼요.</p><h2>배움 길</h2><ol class="path-list">' + C().LESSONS.map(l => {
+      const did = !!S.done[l.id];
+      const now = !did && l.id === currentLesson().id;
+      const w = (l.write || []).map(g => { const sk = S.skill['m:' + g]; return g + (sk && sk.seen ? '✓' : ''); }).join(' ');
+      return '<li class="' + (did ? 'is-done' : now ? 'is-now' : '') + '"><b>' + l.id + '. ' + l.title + '</b> <span>' + (did ? '통과' : now ? '지금' : '다음') + '</span><small>읽기 ' + (l.focus || []).join('·') + ' · 쓰기 ' + w + ((l.phrases || []).length ? ' · 짧은 글 ' + l.phrases.length : '') + '</small></li>';
+    }).join('') + '</ol><p class="note">순서: 소리 듣기 → 글자 모양 → 자음+모음 블록 → 낱말 읽기 → 짧은 글. 틀렸던 것은 다음 길의 듣기·글자 찾기·보물 복습에 다시 나와요. 혼자 맞힌 놀이가 절반을 넘어야 길을 통과해요.</p><h2>글자</h2><div class="jgrid">' + letters.map(cell).join('') + '</div><h2>설정</h2><div class="row"><span>소리</span><button type="button" class="tap" data-tap="sound">' + (S.sound ? '켜짐' : '꺼짐') + '</button></div><div class="row"><span>색 힌트</span><button type="button" class="tap" data-tap="hint-toggle">' + (S.colorHints ? '켜짐' : '꺼짐') + '</button></div><div class="row diffs"><span>난이도</span><button type="button" class="tap' + (S.difficulty === 'easy' ? ' is-on' : '') + '" data-tap="diff" data-v="easy">쉬움</button><button type="button" class="tap' + (S.difficulty === 'mid' ? ' is-on' : '') + '" data-tap="diff" data-v="mid">보통</button><button type="button" class="tap' + (S.difficulty === 'hard' ? ' is-on' : '') + '" data-tap="diff" data-v="hard">도전</button></div><h2>이 놀이</h2><ul class="why">' + C().PLAYS.map(p => '<li><b>' + p.kid + '</b> ' + p.why + '</li>').join('') + '</ul><button type="button" class="tap warn" id="resetBtn" data-tap="reset">처음부터</button><p class="note">기록은 이 기기에만 있어요. 광고·로그인 없음.</p></div>';
     paintTime();
   }
   function paintTime() {
@@ -415,9 +497,27 @@
   }
 
   function onTap(el) {
-    if (!greeted) { greeted = true; X().say(C().UI.hello, '안녕! 오늘도 같이 놀자'); }
     const t = el.dataset.tap;
-    if (t === 'sound') { X().S.sound = !X().S.sound; X().save(); X().syncSound(); if ($('#parent') && !$('#parent').hidden) openParent(); return; }
+    handleTap(el, t);
+    /* First tap greets once, but never over a line the tap itself started. */
+    if (!greeted) {
+      greeted = true;
+      if (!X().busy() && $('#gate').hidden && $('#parent').hidden) X().say(C().UI.hello);
+    }
+  }
+  function handleTap(el, t) {
+    if (t === 'sound') { X().S.sound = !X().S.sound; if (!X().S.sound) X().dropQueue(); X().save(); X().syncSound(); if ($('#parent') && !$('#parent').hidden) openParent(); return; }
+    if (t === 'start') return closeSplash();
+    if (t === 'sticker-say') {
+      const st = V5Stick.list.find(x => x.id === el.dataset.id);
+      el.classList.remove('is-burst'); void el.offsetWidth; el.classList.add('is-burst');
+      if (st && X().S.stickers.indexOf(st.id) >= 0) {
+        const w = V5Stick.wordKey(st);
+        if (w && X().canPlay(w)) X().say(w, st.name, { now: true });
+        else X().chime(3);
+      }
+      return;
+    }
     if (t === 'adult') return openGate();
     if (t === 'gate-close') return closeGate();
     if (t === 'gate-key') return gateKey(el.dataset.n);
@@ -436,13 +536,15 @@
         world.appendChild(note);
       }
       note.textContent = '아직 잠겨 있어';
+      X().say(C().UI.tapnext, '', { now: true });
+      X().showHand(main().querySelector('.stone-btn.is-today') || main().querySelector('.map-go'));
       return;
     }
     if (t === 'go-map' || t === 'back-map') return showMap();
     if (t === 'go-home') return showHome();
     if (t === 'stickers') return showStickers();
-    if (t === 'book-prev') { bookPage = (bookPage + V5Stick.ORDER.length - 1) % V5Stick.ORDER.length; return showStickers(); }
-    if (t === 'book-next') { bookPage = (bookPage + 1) % V5Stick.ORDER.length; return showStickers(); }
+    if (t === 'book-prev') { const n = bookPages().length; bookPage = (bookPage + n - 1) % n; return showStickers(); }
+    if (t === 'book-next') { bookPage = (bookPage + 1) % bookPages().length; return showStickers(); }
     if (t === 'peel-next') return afterPeel();
     if (t === 'dress') { if (el.dataset.who) X().S.who = el.dataset.who; return showDress(); }
     if (t === 'who') { X().S.who = el.dataset.who; return showDress(); }
@@ -576,6 +678,7 @@
     X().setDress({ characters: [], items: [], stack: ['bg', 'body', 'shoes', 'top', 'acc', 'hat'], slots: [], unlock: [], slot_label: {} });
     X().load();
     X().installPointer();
+    X().startIdle();
     window.V5 = { onTap, noteSticker, noteCloth, get S() { return X().S; } };
     if (main().dataset.screen === 'home' && document.getElementById('friend-row')) fillHomeExtras();
     else showHome();

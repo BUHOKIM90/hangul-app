@@ -25,7 +25,8 @@ const mongWebp = fs.existsSync(itemDir)
   : [];
 fs.writeFileSync(path.join(root, 'v5/js/mong-webp.js'), "'use strict';\nconst MONG_WEBP = new Set(" + JSON.stringify(mongWebp) + ");\n");
 
-let linesSrc = fs.readFileSync(path.join(root, 'v3/audio/lines.js'), 'utf8');
+/* audio/lines.js is the curated catalog: re-read it and only add missing word/syllable captions. */
+let linesSrc = fs.readFileSync(path.join(audioDir, 'lines.js'), 'utf8');
 const lineCtx = {};
 vm.createContext(lineCtx);
 vm.runInContext(linesSrc.replace('const LINES', 'globalThis.LINES'), lineCtx);
@@ -63,16 +64,22 @@ function walk(p) {
 });
 eat('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 eat(' .,!?:;+-=()/·…“”‘’~%');
-const textFile = '/tmp/jua-chars.txt';
+const textFile = path.join(require('os').tmpdir(), 'jua-chars.txt');
 fs.writeFileSync(textFile, [...chars].join(''));
-const py = process.env.HOME + '/.local/bin/pyftsubset';
-execFileSync(py, [
-  '/tmp/fonts/Jua-Regular.ttf',
-  '--text-file=' + textFile,
-  '--flavor=woff2',
-  '--output-file=' + path.join(root, 'fonts/Jua-Regular.woff2')
-], { stdio: 'inherit' });
-fs.copyFileSync('/tmp/fonts/OFL.txt', path.join(root, 'fonts/Jua-OFL.txt'));
+const juaSrc = [process.env.JUA_TTF, '/tmp/fonts/Jua-Regular.ttf', '/usr/share/fonts/truetype/sand-box/google/Jua/Jua-Regular.ttf']
+  .find(p => p && fs.existsSync(p));
+if (juaSrc) {
+  /* PYFTSUBSET may be "python -m fontTools.subset" from an env that has brotli. */
+  const cmd = (process.env.PYFTSUBSET || (process.env.HOME + '/.local/bin/pyftsubset')).split(' ');
+  execFileSync(cmd[0], cmd.slice(1).concat([
+    juaSrc,
+    '--text-file=' + textFile,
+    '--flavor=woff2',
+    '--output-file=' + path.join(root, 'fonts/Jua-Regular.woff2')
+  ]), { stdio: 'inherit' });
+  const ofl = path.join(path.dirname(juaSrc), 'OFL.txt');
+  if (fs.existsSync(ofl)) fs.copyFileSync(ofl, path.join(root, 'fonts/Jua-OFL.txt'));
+} else console.log('Jua source missing: font subset NOT rebuilt');
 
 const files = new Set(['./', 'index.html', 'manifest.json', 'audio/have.js', 'audio/lines.js', 'fonts/Jua-Regular.woff2', 'fonts/Jua-OFL.txt']);
 function add(relPath) {
@@ -94,7 +101,17 @@ addTree('icons');
 addTree('assets/dress');
 addTree('assets/friends');
 addTree('assets/stickers');
-['monggeul_basic', 'monggeul_wave', 'monggeul_think', 'monggeul_laugh', 'monggeul_clap', 'monggeul_cheer', 'monggeul_jump'].forEach(id => add('assets/char/' + id + '.webp'));
+addTree('assets/char');
+addTree('assets/icons');
+/* Every literal asset path in the app code, CSS and shell. */
+['v5/js', 'v5/css'].forEach(dir => fs.readdirSync(path.join(root, dir)).forEach(name => scanAssets(fs.readFileSync(path.join(root, dir, name), 'utf8'))));
+scanAssets(fs.readFileSync(path.join(root, 'index.html'), 'utf8'));
+function scanAssets(src) {
+  (src.match(/assets\/[A-Za-z0-9_\-\/.%가-힣ㄱ-ㅣ]+\.(?:webp|svg|png|json)/g) || []).forEach(p => {
+    const clean = decodeURIComponent(p.replace(/^.*?(assets\/)/, '$1'));
+    if (fs.existsSync(path.join(root, clean))) files.add(clean);
+  });
+}
 Object.keys(V5C.WORDS).forEach(id => add('assets/pic/' + id + '.webp'));
 add('assets/pic/chest_closed.webp');
 add('assets/pic/chest_open.webp');
@@ -128,6 +145,14 @@ add('assets/pic/chest_open.webp');
   'assets/icons/play/treasure.svg'
 ].forEach(add);
 const keys = V5C.audioKeys().concat(['ui_sticker', 'ui_hello', 'ui_end', 'ui_book']);
+/* Any literal audio key in the app code is cached too, so offline never goes silent. */
+fs.readdirSync(path.join(root, 'v5/js')).forEach(name => {
+  const src = fs.readFileSync(path.join(root, 'v5/js', name), 'utf8');
+  (src.match(/['"]((?:ui4?|u|hw|hy|dy|fy|st|s|c|w|sy|j)_[A-Za-z0-9_]+)['"]/g) || []).forEach(m => {
+    const k = m.slice(1, -1);
+    if (have.has(k) && keys.indexOf(k) < 0) keys.push(k);
+  });
+});
 const missingAudio = [];
 keys.forEach(k => {
   if (have.has(k)) add('audio/' + k + '.mp3');

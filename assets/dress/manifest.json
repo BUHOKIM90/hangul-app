@@ -1,1696 +1,2306 @@
 {
-  "canvas": 512,
-  "origin": "top_left",
-  "composite": "Stack layers in `stack` order. Each image is a full 512 canvas placed at (0,0) with no offset, trim, or scale. CSS color layers also fill the same stage.",
-  "stack": [
-    "bg",
-    "body",
-    "shoes",
-    "top",
-    "acc",
-    "hat"
-  ],
-  "slots": [
-    "hat",
-    "top",
-    "acc",
-    "shoes",
-    "bg"
-  ],
-  "slot_label": {
-    "hat": "모자",
-    "top": "옷",
-    "acc": "소품",
-    "shoes": "신발",
-    "bg": "배경"
+ "canvas": 512,
+ "origin": "top_left",
+ "composite": "Stack layers in `stack` order. Each image is a full 512 canvas placed at (0,0) with no offset, trim, or scale. CSS color layers also fill the same stage.",
+ "stack": [
+  "bg",
+  "body",
+  "shoes",
+  "top",
+  "acc",
+  "hat"
+ ],
+ "slots": [
+  "hat",
+  "top",
+  "acc",
+  "shoes",
+  "bg"
+ ],
+ "slot_label": {
+  "hat": "모자",
+  "top": "옷",
+  "acc": "소품",
+  "shoes": "신발",
+  "bg": "배경"
+ },
+ "characters": [
+  {
+   "id": "monggeul",
+   "name": "몽글이",
+   "blurb": "포근한 곰",
+   "body": "assets/char/monggeul_basic.webp",
+   "anchors": "assets/friends/anchors/monggeul.json",
+   "head": [
+    260,
+    158
+   ]
   },
-  "characters": [
-    {
-      "id": "monggeul",
-      "name": "몽글이",
-      "blurb": "포근한 곰",
-      "body": "assets/char/monggeul_basic.webp",
-      "anchors": "assets/friends/anchors/monggeul.json",
-      "head": [
-        260,
-        158
-      ]
-    },
-    {
-      "id": "bori",
-      "name": "보리",
-      "blurb": "살구 곰",
-      "body": "assets/friends/bori.webp",
-      "anchors": "assets/friends/anchors/bori.json",
-      "head": [
-        256,
-        162
-      ]
-    },
-    {
-      "id": "tori",
-      "name": "토리",
-      "blurb": "크림 토끼",
-      "body": "assets/friends/tori.webp",
-      "anchors": "assets/friends/anchors/tori.json",
-      "head": [
-        256,
-        162
-      ]
-    },
-    {
-      "id": "momo",
-      "name": "모모",
-      "blurb": "민트 고양이",
-      "body": "assets/friends/momo.webp",
-      "anchors": "assets/friends/anchors/momo.json",
-      "head": [
-        256,
-        162
-      ]
-    },
-    {
-      "id": "gureum",
-      "name": "구름",
-      "blurb": "구름빛 곰",
-      "body": "assets/friends/gureum.webp",
-      "anchors": "assets/friends/anchors/gureum.json",
-      "head": [
-        256,
-        162
-      ]
-    }
-  ],
-  "items": [
-    {
-      "id": "bori_hat_cap",
-      "character": "bori",
-      "slot": "hat",
-      "name": "cap",
-      "label": "딸기 베레모",
-      "file": "assets/friends/items/bori_hat_cap.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_hat_crown",
-      "character": "bori",
-      "slot": "hat",
-      "name": "crown",
-      "label": "도토리 모자",
-      "file": "assets/friends/items/bori_hat_crown.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_top_shirt",
-      "character": "bori",
-      "slot": "top",
-      "name": "shirt",
-      "label": "단추 가디건",
-      "file": "assets/friends/items/bori_top_shirt.webp",
-      "box": [
-        154,
-        270,
-        204,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_top_vest",
-      "character": "bori",
-      "slot": "top",
-      "name": "vest",
-      "label": "소풍 멜빵",
-      "file": "assets/friends/items/bori_top_vest.webp",
-      "box": [
-        185,
-        270,
-        142,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_top_smock",
-      "character": "bori",
-      "slot": "top",
-      "name": "smock",
-      "label": "체크 스모크",
-      "file": "assets/friends/items/bori_top_smock.webp",
-      "box": [
-        185,
-        270,
-        142,
-        130
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_acc_brooch",
-      "character": "bori",
-      "slot": "acc",
-      "name": "brooch",
-      "label": "잎사귀 리본",
-      "file": "assets/friends/items/bori_acc_brooch.webp",
-      "box": [
-        239,
-        279,
-        34,
-        30
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_acc_bag",
-      "character": "bori",
-      "slot": "acc",
-      "name": "bag",
-      "label": "소풍 가방",
-      "file": "assets/friends/items/bori_acc_bag.webp",
-      "box": [
-        329,
-        326,
-        67,
-        89
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_shoes_boots",
-      "character": "bori",
-      "slot": "shoes",
-      "name": "boots",
-      "label": "갈색 부츠",
-      "file": "assets/friends/items/bori_shoes_boots.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_shoes_slippers",
-      "character": "bori",
-      "slot": "shoes",
-      "name": "slippers",
-      "label": "노랑 메리제인",
-      "file": "assets/friends/items/bori_shoes_slippers.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "bori_bg_vignette",
-      "character": "bori",
-      "slot": "bg",
-      "name": "vignette",
-      "label": "버섯 숲",
-      "file": "assets/friends/items/bori_bg_vignette.webp",
-      "box": [
-        42,
-        351,
-        428,
-        136
-      ],
-      "real": true,
-      "starter": true
-    },
-    {
-      "id": "tori_hat_cap",
-      "character": "tori",
-      "slot": "hat",
-      "name": "cap",
-      "label": "장미 모자",
-      "file": "assets/friends/items/tori_hat_cap.webp",
-      "box": [
-        220,
-        103,
-        72,
-        48
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_hat_crown",
-      "character": "tori",
-      "slot": "hat",
-      "name": "crown",
-      "label": "데이지 캡",
-      "file": "assets/friends/items/tori_hat_crown.webp",
-      "box": [
-        220,
-        103,
-        72,
-        48
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_top_shirt",
-      "character": "tori",
-      "slot": "top",
-      "name": "shirt",
-      "label": "퍼프 블라우스",
-      "file": "assets/friends/items/tori_top_shirt.webp",
-      "box": [
-        154,
-        270,
-        204,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_top_vest",
-      "character": "tori",
-      "slot": "top",
-      "name": "vest",
-      "label": "꽃 자수 피나포어",
-      "file": "assets/friends/items/tori_top_vest.webp",
-      "box": [
-        185,
-        270,
-        142,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_top_smock",
-      "character": "tori",
-      "slot": "top",
-      "name": "smock",
-      "label": "정원 조끼",
-      "file": "assets/friends/items/tori_top_smock.webp",
-      "box": [
-        185,
-        270,
-        142,
-        130
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_acc_brooch",
-      "character": "tori",
-      "slot": "acc",
-      "name": "brooch",
-      "label": "나비 리본",
-      "file": "assets/friends/items/tori_acc_brooch.webp",
-      "box": [
-        239,
-        279,
-        34,
-        30
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_acc_bag",
-      "character": "tori",
-      "slot": "acc",
-      "name": "bag",
-      "label": "물뿌리개 가방",
-      "file": "assets/friends/items/tori_acc_bag.webp",
-      "box": [
-        329,
-        326,
-        67,
-        89
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_shoes_boots",
-      "character": "tori",
-      "slot": "shoes",
-      "name": "boots",
-      "label": "라일락 장화",
-      "file": "assets/friends/items/tori_shoes_boots.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_shoes_slippers",
-      "character": "tori",
-      "slot": "shoes",
-      "name": "slippers",
-      "label": "복숭아 리본슈즈",
-      "file": "assets/friends/items/tori_shoes_slippers.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "tori_bg_vignette",
-      "character": "tori",
-      "slot": "bg",
-      "name": "vignette",
-      "label": "튤립 정원",
-      "file": "assets/friends/items/tori_bg_vignette.webp",
-      "box": [
-        42,
-        351,
-        428,
-        136
-      ],
-      "real": true,
-      "starter": true
-    },
-    {
-      "id": "momo_hat_cap",
-      "character": "momo",
-      "slot": "hat",
-      "name": "cap",
-      "label": "조개 선장모",
-      "file": "assets/friends/items/momo_hat_cap.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_hat_crown",
-      "character": "momo",
-      "slot": "hat",
-      "name": "crown",
-      "label": "조개 왕관",
-      "file": "assets/friends/items/momo_hat_crown.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_top_shirt",
-      "character": "momo",
-      "slot": "top",
-      "name": "shirt",
-      "label": "세일러 셔츠",
-      "file": "assets/friends/items/momo_top_shirt.webp",
-      "box": [
-        154,
-        270,
-        204,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_top_vest",
-      "character": "momo",
-      "slot": "top",
-      "name": "vest",
-      "label": "산호 탐험 조끼",
-      "file": "assets/friends/items/momo_top_vest.webp",
-      "box": [
-        185,
-        270,
-        142,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_top_smock",
-      "character": "momo",
-      "slot": "top",
-      "name": "smock",
-      "label": "조개 티셔츠",
-      "file": "assets/friends/items/momo_top_smock.webp",
-      "box": [
-        154,
-        270,
-        204,
-        130
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_acc_brooch",
-      "character": "momo",
-      "slot": "acc",
-      "name": "brooch",
-      "label": "불가사리 브로치",
-      "file": "assets/friends/items/momo_acc_brooch.webp",
-      "box": [
-        239,
-        279,
-        34,
-        30
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_acc_bag",
-      "character": "momo",
-      "slot": "acc",
-      "name": "bag",
-      "label": "조개 가방",
-      "file": "assets/friends/items/momo_acc_bag.webp",
-      "box": [
-        329,
-        326,
-        67,
-        89
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_shoes_boots",
-      "character": "momo",
-      "slot": "shoes",
-      "name": "boots",
-      "label": "항해 부츠",
-      "file": "assets/friends/items/momo_shoes_boots.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_shoes_slippers",
-      "character": "momo",
-      "slot": "shoes",
-      "name": "slippers",
-      "label": "청록 샌들",
-      "file": "assets/friends/items/momo_shoes_slippers.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "momo_bg_vignette",
-      "character": "momo",
-      "slot": "bg",
-      "name": "vignette",
-      "label": "조개 해변",
-      "file": "assets/friends/items/momo_bg_vignette.webp",
-      "box": [
-        42,
-        351,
-        428,
-        136
-      ],
-      "real": true,
-      "starter": true
-    },
-    {
-      "id": "gureum_hat_cap",
-      "character": "gureum",
-      "slot": "hat",
-      "name": "cap",
-      "label": "별 수면모",
-      "file": "assets/friends/items/gureum_hat_cap.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_hat_crown",
-      "character": "gureum",
-      "slot": "hat",
-      "name": "crown",
-      "label": "별 왕관",
-      "file": "assets/friends/items/gureum_hat_crown.webp",
-      "box": [
-        211,
-        22,
-        90,
-        65
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_top_shirt",
-      "character": "gureum",
-      "slot": "top",
-      "name": "shirt",
-      "label": "달 주머니 파자마",
-      "file": "assets/friends/items/gureum_top_shirt.webp",
-      "box": [
-        154,
-        270,
-        204,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_top_vest",
-      "character": "gureum",
-      "slot": "top",
-      "name": "vest",
-      "label": "별빛 퀼트 조끼",
-      "file": "assets/friends/items/gureum_top_vest.webp",
-      "box": [
-        185,
-        270,
-        142,
-        126
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_top_smock",
-      "character": "gureum",
-      "slot": "top",
-      "name": "smock",
-      "label": "무지개 판초",
-      "file": "assets/friends/items/gureum_top_smock.webp",
-      "box": [
-        154,
-        270,
-        204,
-        130
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_acc_brooch",
-      "character": "gureum",
-      "slot": "acc",
-      "name": "brooch",
-      "label": "초승달 브로치",
-      "file": "assets/friends/items/gureum_acc_brooch.webp",
-      "box": [
-        239,
-        279,
-        34,
-        30
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_acc_bag",
-      "character": "gureum",
-      "slot": "acc",
-      "name": "bag",
-      "label": "별 장식 가방",
-      "file": "assets/friends/items/gureum_acc_bag.webp",
-      "box": [
-        329,
-        326,
-        67,
-        89
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_shoes_boots",
-      "character": "gureum",
-      "slot": "shoes",
-      "name": "boots",
-      "label": "구름 슬리퍼",
-      "file": "assets/friends/items/gureum_shoes_boots.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_shoes_slippers",
-      "character": "gureum",
-      "slot": "shoes",
-      "name": "slippers",
-      "label": "달 버클 부츠",
-      "file": "assets/friends/items/gureum_shoes_slippers.webp",
-      "box": [
-        174,
-        414,
-        164,
-        50
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "gureum_bg_vignette",
-      "character": "gureum",
-      "slot": "bg",
-      "name": "vignette",
-      "label": "구름 별빛",
-      "file": "assets/friends/items/gureum_bg_vignette.webp",
-      "box": [
-        42,
-        351,
-        428,
-        136
-      ],
-      "real": true,
-      "starter": true
-    },
-    {
-      "id": "monggeul_hat_cap",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "cap",
-      "label": "딸기 베레모",
-      "file": "assets/friends/items/monggeul_hat_cap.webp",
-      "box": [
-        193,
-        17,
-        134,
-        91
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_hat_crown",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "crown",
-      "label": "작은 왕관",
-      "file": "assets/friends/items/monggeul_hat_crown.webp",
-      "box": [
-        192,
-        17,
-        136,
-        91
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_shirt",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "shirt",
-      "label": "노란 가디건",
-      "file": "assets/friends/items/monggeul_top_shirt.webp",
-      "box": [
-        139,
-        270,
-        242,
-        140
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_vest",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "vest",
-      "label": "초록 멜빵",
-      "file": "assets/friends/items/monggeul_top_vest.webp",
-      "box": [
-        170,
-        270,
-        180,
-        142
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_smock",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "smock",
-      "label": "체크 스모크",
-      "file": "assets/friends/items/monggeul_top_smock.webp",
-      "box": [
-        170,
-        270,
-        180,
-        142
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_chef",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "chef",
-      "label": "요리사 옷",
-      "file": "assets/friends/items/monggeul_top_chef.webp",
-      "box": [
-        130,
-        270,
-        260,
-        151
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_hanbok",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "hanbok",
-      "label": "한복",
-      "file": "assets/friends/items/monggeul_top_hanbok.webp",
-      "box": [
-        120,
-        270,
-        280,
-        165
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_pajamas",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "pajamas",
-      "label": "잠옷",
-      "file": "assets/friends/items/monggeul_top_pajamas.webp",
-      "box": [
-        128,
-        270,
-        264,
-        184
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_raincoat",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "raincoat",
-      "label": "비옷",
-      "file": "assets/friends/items/monggeul_top_raincoat.webp",
-      "box": [
-        130,
-        270,
-        260,
-        155
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_spacesuit",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "spacesuit",
-      "label": "우주복",
-      "file": "assets/friends/items/monggeul_top_spacesuit.webp",
-      "box": [
-        128,
-        270,
-        264,
-        184
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_acc_brooch",
-      "character": "monggeul",
-      "slot": "acc",
-      "name": "brooch",
-      "label": "잎사귀 브로치",
-      "file": "assets/friends/items/monggeul_acc_brooch.webp",
-      "box": [
-        241,
-        282,
-        38,
-        35
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_acc_bag",
-      "character": "monggeul",
-      "slot": "acc",
-      "name": "bag",
-      "label": "크림 가방",
-      "file": "assets/friends/items/monggeul_acc_bag.webp",
-      "box": [
-        365,
-        320,
-        68,
-        101
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_shoes_boots",
-      "character": "monggeul",
-      "slot": "shoes",
-      "name": "boots",
-      "label": "갈색 부츠",
-      "file": "assets/friends/items/monggeul_shoes_boots.webp",
-      "box": [
-        164,
-        415,
-        194,
-        59
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_shoes_slippers",
-      "character": "monggeul",
-      "slot": "shoes",
-      "name": "slippers",
-      "label": "곰 슬리퍼",
-      "file": "assets/friends/items/monggeul_shoes_slippers.webp",
-      "box": [
-        164,
-        416,
-        194,
-        58
-      ],
-      "real": true,
-      "starter": false
-    },
-    {
-      "id": "monggeul_bg_vignette",
-      "character": "monggeul",
-      "slot": "bg",
-      "name": "vignette",
-      "label": "버섯 숲",
-      "file": "assets/friends/items/monggeul_bg_vignette.webp",
-      "box": [
-        29,
-        354,
-        454,
-        139
-      ],
-      "real": true,
-      "starter": true
-    },
-    {
-      "id": "bori_acc_glasses",
-      "character": "bori",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/bori_acc_glasses.svg",
-      "box": [
-        196,
-        150,
-        120,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "bori_acc_star",
-      "character": "bori",
-      "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/bori_acc_star.svg",
-      "box": [
-        280,
-        302,
-        44,
-        44
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "bori_top_peach",
-      "character": "bori",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/bori_top_peach.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "bori_top_mint",
-      "character": "bori",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/bori_top_mint.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "bori_top_sky",
-      "character": "bori",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/bori_top_sky.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_acc_glasses",
-      "character": "tori",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/tori_acc_glasses.svg",
-      "box": [
-        196,
-        150,
-        120,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "tori_acc_star",
-      "character": "tori",
-      "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/tori_acc_star.svg",
-      "box": [
-        280,
-        302,
-        44,
-        44
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "tori_top_peach",
-      "character": "tori",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/tori_top_peach.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_top_mint",
-      "character": "tori",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/tori_top_mint.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_top_sky",
-      "character": "tori",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/tori_top_sky.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_acc_glasses",
-      "character": "momo",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/momo_acc_glasses.svg",
-      "box": [
-        196,
-        150,
-        120,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "momo_acc_star",
-      "character": "momo",
-      "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/momo_acc_star.svg",
-      "box": [
-        280,
-        302,
-        44,
-        44
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "momo_top_peach",
-      "character": "momo",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/momo_top_peach.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_top_mint",
-      "character": "momo",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/momo_top_mint.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_top_sky",
-      "character": "momo",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/momo_top_sky.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_acc_glasses",
-      "character": "gureum",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/gureum_acc_glasses.svg",
-      "box": [
-        196,
-        150,
-        120,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "gureum_acc_star",
-      "character": "gureum",
-      "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/gureum_acc_star.svg",
-      "box": [
-        280,
-        302,
-        44,
-        44
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "gureum_top_peach",
-      "character": "gureum",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/gureum_top_peach.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_top_mint",
-      "character": "gureum",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/gureum_top_mint.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_top_sky",
-      "character": "gureum",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/gureum_top_sky.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_bg_peach",
-      "character": "monggeul",
-      "slot": "bg",
-      "name": "peach",
-      "label": "복숭아 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_bg_mint",
-      "character": "monggeul",
-      "slot": "bg",
-      "name": "mint",
-      "label": "민트 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_bg_sky",
-      "character": "monggeul",
-      "slot": "bg",
-      "name": "sky",
-      "label": "하늘 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_acc_glasses",
-      "character": "monggeul",
-      "slot": "acc",
-      "name": "glasses",
-      "label": "동글 안경",
-      "file": "assets/dress/layers/monggeul_acc_glasses.svg",
-      "box": [
-        196,
-        150,
-        120,
-        40
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_acc_star",
-      "character": "monggeul",
-      "slot": "acc",
-      "name": "star",
-      "label": "노란 별핀",
-      "file": "assets/dress/layers/monggeul_acc_star.svg",
-      "box": [
-        280,
-        302,
-        44,
-        44
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_hat_beret",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "beret",
-      "label": "작은 베레모",
-      "file": "assets/dress/layers/monggeul_hat_beret.svg",
-      "box": [
-        193,
-        17,
-        134,
-        91
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_shoes_sneakers",
-      "character": "monggeul",
-      "slot": "shoes",
-      "name": "sneakers",
-      "label": "노란 신발",
-      "file": "assets/dress/layers/monggeul_shoes_sneakers.svg",
-      "box": [
-        164,
-        415,
-        194,
-        59
-      ],
-      "extra": "accessory",
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_peach",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "peach",
-      "label": "복숭아 목도리",
-      "file": "assets/dress/layers/monggeul_top_peach.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_mint",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "mint",
-      "label": "민트 목도리",
-      "file": "assets/dress/layers/monggeul_top_mint.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_top_sky",
-      "character": "monggeul",
-      "slot": "top",
-      "name": "sky",
-      "label": "하늘 목도리",
-      "file": "assets/dress/layers/monggeul_top_sky.svg",
-      "box": [
-        216,
-        260,
-        80,
-        62
-      ],
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "bori_bg_peach",
-      "character": "bori",
-      "slot": "bg",
-      "name": "peach",
-      "label": "복숭아 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "bori_bg_mint",
-      "character": "bori",
-      "slot": "bg",
-      "name": "mint",
-      "label": "민트 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "bori_bg_sky",
-      "character": "bori",
-      "slot": "bg",
-      "name": "sky",
-      "label": "하늘 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_bg_peach",
-      "character": "tori",
-      "slot": "bg",
-      "name": "peach",
-      "label": "복숭아 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_bg_mint",
-      "character": "tori",
-      "slot": "bg",
-      "name": "mint",
-      "label": "민트 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "tori_bg_sky",
-      "character": "tori",
-      "slot": "bg",
-      "name": "sky",
-      "label": "하늘 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_bg_peach",
-      "character": "momo",
-      "slot": "bg",
-      "name": "peach",
-      "label": "복숭아 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_bg_mint",
-      "character": "momo",
-      "slot": "bg",
-      "name": "mint",
-      "label": "민트 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "momo_bg_sky",
-      "character": "momo",
-      "slot": "bg",
-      "name": "sky",
-      "label": "하늘 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_bg_peach",
-      "character": "gureum",
-      "slot": "bg",
-      "name": "peach",
-      "label": "복숭아 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_bg_mint",
-      "character": "gureum",
-      "slot": "bg",
-      "name": "mint",
-      "label": "민트 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "gureum_bg_sky",
-      "character": "gureum",
-      "slot": "bg",
-      "name": "sky",
-      "label": "하늘 빛",
-      "paint": {
-        "type": "css",
-        "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
-      },
-      "extra": "color",
-      "starter": false
-    },
-    {
-      "id": "monggeul_hat_linecrown",
-      "character": "monggeul",
-      "slot": "hat",
-      "name": "linecrown",
-      "label": "동글 왕관",
-      "file": "assets/dress/layers/monggeul_hat_crown.svg",
-      "box": [
-        192,
-        17,
-        136,
-        91
-      ],
-      "extra": "accessory",
-      "starter": false
-    }
-  ],
-  "unlock": [
-    "monggeul_hat_cap",
-    "monggeul_hat_crown",
-    "monggeul_top_shirt",
-    "monggeul_top_vest",
-    "monggeul_top_smock",
-    "monggeul_top_chef",
-    "monggeul_top_hanbok",
-    "monggeul_top_pajamas",
-    "monggeul_top_raincoat",
-    "monggeul_top_spacesuit",
-    "monggeul_acc_brooch",
-    "monggeul_acc_bag",
-    "monggeul_shoes_boots",
-    "monggeul_shoes_slippers",
-    "bori_hat_cap",
-    "bori_hat_crown",
-    "tori_hat_cap",
-    "tori_hat_crown",
-    "momo_hat_cap",
-    "momo_hat_crown",
-    "gureum_hat_cap",
-    "gureum_hat_crown",
-    "bori_top_shirt",
-    "bori_top_vest",
-    "bori_top_smock",
-    "tori_top_shirt",
-    "tori_top_vest",
-    "tori_top_smock",
-    "momo_top_shirt",
-    "momo_top_vest",
-    "momo_top_smock",
-    "gureum_top_shirt",
-    "gureum_top_vest",
-    "gureum_top_smock",
-    "bori_acc_brooch",
-    "bori_acc_bag",
-    "tori_acc_brooch",
-    "tori_acc_bag",
-    "momo_acc_brooch",
-    "momo_acc_bag",
-    "gureum_acc_brooch",
-    "gureum_acc_bag",
-    "bori_shoes_boots",
-    "bori_shoes_slippers",
-    "tori_shoes_boots",
-    "tori_shoes_slippers",
-    "momo_shoes_boots",
-    "momo_shoes_slippers",
-    "gureum_shoes_boots",
-    "gureum_shoes_slippers",
-    "bori_acc_glasses",
-    "bori_acc_star",
-    "bori_top_peach",
-    "bori_top_mint",
-    "bori_top_sky",
-    "tori_acc_glasses",
-    "tori_acc_star",
-    "tori_top_peach",
-    "tori_top_mint",
-    "tori_top_sky",
-    "momo_acc_glasses",
-    "momo_acc_star",
-    "momo_top_peach",
-    "momo_top_mint",
-    "momo_top_sky",
-    "gureum_acc_glasses",
-    "gureum_acc_star",
-    "gureum_top_peach",
-    "gureum_top_mint",
-    "gureum_top_sky",
-    "monggeul_bg_peach",
-    "monggeul_bg_mint",
-    "monggeul_bg_sky",
-    "bori_bg_peach",
-    "bori_bg_mint",
-    "bori_bg_sky",
-    "tori_bg_peach",
-    "tori_bg_mint",
-    "tori_bg_sky",
-    "momo_bg_peach",
-    "momo_bg_mint",
-    "momo_bg_sky",
-    "gureum_bg_peach",
-    "gureum_bg_mint",
-    "gureum_bg_sky"
-  ]
+  {
+   "id": "bori",
+   "name": "보리",
+   "blurb": "살구 곰",
+   "body": "assets/friends/bori.webp",
+   "anchors": "assets/friends/anchors/bori.json",
+   "head": [
+    256,
+    162
+   ]
+  },
+  {
+   "id": "tori",
+   "name": "토리",
+   "blurb": "크림 토끼",
+   "body": "assets/friends/tori.webp",
+   "anchors": "assets/friends/anchors/tori.json",
+   "head": [
+    256,
+    162
+   ]
+  },
+  {
+   "id": "momo",
+   "name": "모모",
+   "blurb": "민트 고양이",
+   "body": "assets/friends/momo.webp",
+   "anchors": "assets/friends/anchors/momo.json",
+   "head": [
+    256,
+    162
+   ]
+  },
+  {
+   "id": "gureum",
+   "name": "구름",
+   "blurb": "구름빛 곰",
+   "body": "assets/friends/gureum.webp",
+   "anchors": "assets/friends/anchors/gureum.json",
+   "head": [
+    256,
+    162
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "bori_hat_cap",
+   "character": "bori",
+   "slot": "hat",
+   "name": "cap",
+   "label": "딸기 베레모",
+   "file": "assets/friends/items/bori_hat_cap.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_hat_crown",
+   "character": "bori",
+   "slot": "hat",
+   "name": "crown",
+   "label": "도토리 모자",
+   "file": "assets/friends/items/bori_hat_crown.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_top_shirt",
+   "character": "bori",
+   "slot": "top",
+   "name": "shirt",
+   "label": "단추 가디건",
+   "file": "assets/friends/items/bori_top_shirt.webp",
+   "box": [
+    154,
+    270,
+    204,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_top_vest",
+   "character": "bori",
+   "slot": "top",
+   "name": "vest",
+   "label": "소풍 멜빵",
+   "file": "assets/friends/items/bori_top_vest.webp",
+   "box": [
+    185,
+    270,
+    142,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_top_smock",
+   "character": "bori",
+   "slot": "top",
+   "name": "smock",
+   "label": "체크 스모크",
+   "file": "assets/friends/items/bori_top_smock.webp",
+   "box": [
+    185,
+    270,
+    142,
+    130
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_acc_brooch",
+   "character": "bori",
+   "slot": "acc",
+   "name": "brooch",
+   "label": "잎사귀 리본",
+   "file": "assets/friends/items/bori_acc_brooch.webp",
+   "box": [
+    239,
+    279,
+    34,
+    30
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_acc_bag",
+   "character": "bori",
+   "slot": "acc",
+   "name": "bag",
+   "label": "소풍 가방",
+   "file": "assets/friends/items/bori_acc_bag.webp",
+   "box": [
+    329,
+    326,
+    67,
+    89
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_shoes_boots",
+   "character": "bori",
+   "slot": "shoes",
+   "name": "boots",
+   "label": "갈색 부츠",
+   "file": "assets/friends/items/bori_shoes_boots.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_shoes_slippers",
+   "character": "bori",
+   "slot": "shoes",
+   "name": "slippers",
+   "label": "노랑 메리제인",
+   "file": "assets/friends/items/bori_shoes_slippers.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "bori_bg_vignette",
+   "character": "bori",
+   "slot": "bg",
+   "name": "vignette",
+   "label": "버섯 숲",
+   "file": "assets/friends/items/bori_bg_vignette.webp",
+   "box": [
+    42,
+    351,
+    428,
+    136
+   ],
+   "real": true,
+   "starter": true
+  },
+  {
+   "id": "tori_hat_cap",
+   "character": "tori",
+   "slot": "hat",
+   "name": "cap",
+   "label": "장미 모자",
+   "file": "assets/friends/items/tori_hat_cap.webp",
+   "box": [
+    220,
+    103,
+    72,
+    48
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_hat_crown",
+   "character": "tori",
+   "slot": "hat",
+   "name": "crown",
+   "label": "데이지 캡",
+   "file": "assets/friends/items/tori_hat_crown.webp",
+   "box": [
+    220,
+    103,
+    72,
+    48
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_top_shirt",
+   "character": "tori",
+   "slot": "top",
+   "name": "shirt",
+   "label": "퍼프 블라우스",
+   "file": "assets/friends/items/tori_top_shirt.webp",
+   "box": [
+    154,
+    270,
+    204,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_top_vest",
+   "character": "tori",
+   "slot": "top",
+   "name": "vest",
+   "label": "꽃 자수 피나포어",
+   "file": "assets/friends/items/tori_top_vest.webp",
+   "box": [
+    185,
+    270,
+    142,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_top_smock",
+   "character": "tori",
+   "slot": "top",
+   "name": "smock",
+   "label": "정원 조끼",
+   "file": "assets/friends/items/tori_top_smock.webp",
+   "box": [
+    185,
+    270,
+    142,
+    130
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_acc_brooch",
+   "character": "tori",
+   "slot": "acc",
+   "name": "brooch",
+   "label": "나비 리본",
+   "file": "assets/friends/items/tori_acc_brooch.webp",
+   "box": [
+    239,
+    279,
+    34,
+    30
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_acc_bag",
+   "character": "tori",
+   "slot": "acc",
+   "name": "bag",
+   "label": "물뿌리개 가방",
+   "file": "assets/friends/items/tori_acc_bag.webp",
+   "box": [
+    329,
+    326,
+    67,
+    89
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_shoes_boots",
+   "character": "tori",
+   "slot": "shoes",
+   "name": "boots",
+   "label": "라일락 장화",
+   "file": "assets/friends/items/tori_shoes_boots.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_shoes_slippers",
+   "character": "tori",
+   "slot": "shoes",
+   "name": "slippers",
+   "label": "복숭아 리본슈즈",
+   "file": "assets/friends/items/tori_shoes_slippers.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "tori_bg_vignette",
+   "character": "tori",
+   "slot": "bg",
+   "name": "vignette",
+   "label": "튤립 정원",
+   "file": "assets/friends/items/tori_bg_vignette.webp",
+   "box": [
+    42,
+    351,
+    428,
+    136
+   ],
+   "real": true,
+   "starter": true
+  },
+  {
+   "id": "momo_hat_cap",
+   "character": "momo",
+   "slot": "hat",
+   "name": "cap",
+   "label": "조개 선장모",
+   "file": "assets/friends/items/momo_hat_cap.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_hat_crown",
+   "character": "momo",
+   "slot": "hat",
+   "name": "crown",
+   "label": "조개 왕관",
+   "file": "assets/friends/items/momo_hat_crown.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_top_shirt",
+   "character": "momo",
+   "slot": "top",
+   "name": "shirt",
+   "label": "세일러 셔츠",
+   "file": "assets/friends/items/momo_top_shirt.webp",
+   "box": [
+    154,
+    270,
+    204,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_top_vest",
+   "character": "momo",
+   "slot": "top",
+   "name": "vest",
+   "label": "산호 탐험 조끼",
+   "file": "assets/friends/items/momo_top_vest.webp",
+   "box": [
+    185,
+    270,
+    142,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_top_smock",
+   "character": "momo",
+   "slot": "top",
+   "name": "smock",
+   "label": "조개 티셔츠",
+   "file": "assets/friends/items/momo_top_smock.webp",
+   "box": [
+    154,
+    270,
+    204,
+    130
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_acc_brooch",
+   "character": "momo",
+   "slot": "acc",
+   "name": "brooch",
+   "label": "불가사리 브로치",
+   "file": "assets/friends/items/momo_acc_brooch.webp",
+   "box": [
+    239,
+    279,
+    34,
+    30
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_acc_bag",
+   "character": "momo",
+   "slot": "acc",
+   "name": "bag",
+   "label": "조개 가방",
+   "file": "assets/friends/items/momo_acc_bag.webp",
+   "box": [
+    329,
+    326,
+    67,
+    89
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_shoes_boots",
+   "character": "momo",
+   "slot": "shoes",
+   "name": "boots",
+   "label": "항해 부츠",
+   "file": "assets/friends/items/momo_shoes_boots.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_shoes_slippers",
+   "character": "momo",
+   "slot": "shoes",
+   "name": "slippers",
+   "label": "청록 샌들",
+   "file": "assets/friends/items/momo_shoes_slippers.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "momo_bg_vignette",
+   "character": "momo",
+   "slot": "bg",
+   "name": "vignette",
+   "label": "조개 해변",
+   "file": "assets/friends/items/momo_bg_vignette.webp",
+   "box": [
+    42,
+    351,
+    428,
+    136
+   ],
+   "real": true,
+   "starter": true
+  },
+  {
+   "id": "gureum_hat_cap",
+   "character": "gureum",
+   "slot": "hat",
+   "name": "cap",
+   "label": "별 수면모",
+   "file": "assets/friends/items/gureum_hat_cap.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_hat_crown",
+   "character": "gureum",
+   "slot": "hat",
+   "name": "crown",
+   "label": "별 왕관",
+   "file": "assets/friends/items/gureum_hat_crown.webp",
+   "box": [
+    211,
+    22,
+    90,
+    65
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_top_shirt",
+   "character": "gureum",
+   "slot": "top",
+   "name": "shirt",
+   "label": "달 주머니 파자마",
+   "file": "assets/friends/items/gureum_top_shirt.webp",
+   "box": [
+    154,
+    270,
+    204,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_top_vest",
+   "character": "gureum",
+   "slot": "top",
+   "name": "vest",
+   "label": "별빛 퀼트 조끼",
+   "file": "assets/friends/items/gureum_top_vest.webp",
+   "box": [
+    185,
+    270,
+    142,
+    126
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_top_smock",
+   "character": "gureum",
+   "slot": "top",
+   "name": "smock",
+   "label": "무지개 판초",
+   "file": "assets/friends/items/gureum_top_smock.webp",
+   "box": [
+    154,
+    270,
+    204,
+    130
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_acc_brooch",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "brooch",
+   "label": "초승달 브로치",
+   "file": "assets/friends/items/gureum_acc_brooch.webp",
+   "box": [
+    239,
+    279,
+    34,
+    30
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_acc_bag",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "bag",
+   "label": "별 장식 가방",
+   "file": "assets/friends/items/gureum_acc_bag.webp",
+   "box": [
+    329,
+    326,
+    67,
+    89
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_shoes_boots",
+   "character": "gureum",
+   "slot": "shoes",
+   "name": "boots",
+   "label": "구름 슬리퍼",
+   "file": "assets/friends/items/gureum_shoes_boots.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_shoes_slippers",
+   "character": "gureum",
+   "slot": "shoes",
+   "name": "slippers",
+   "label": "달 버클 부츠",
+   "file": "assets/friends/items/gureum_shoes_slippers.webp",
+   "box": [
+    174,
+    414,
+    164,
+    50
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_vignette",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "vignette",
+   "label": "구름 별빛",
+   "file": "assets/friends/items/gureum_bg_vignette.webp",
+   "box": [
+    42,
+    351,
+    428,
+    136
+   ],
+   "real": true,
+   "starter": true
+  },
+  {
+   "id": "monggeul_hat_cap",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "cap",
+   "label": "딸기 베레모",
+   "file": "assets/friends/items/monggeul_hat_cap.webp",
+   "box": [
+    193,
+    17,
+    134,
+    91
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_hat_crown",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "crown",
+   "label": "작은 왕관",
+   "file": "assets/friends/items/monggeul_hat_crown.webp",
+   "box": [
+    192,
+    17,
+    136,
+    91
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_shirt",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "shirt",
+   "label": "노란 가디건",
+   "file": "assets/friends/items/monggeul_top_shirt.webp",
+   "box": [
+    139,
+    270,
+    242,
+    140
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_vest",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "vest",
+   "label": "초록 멜빵",
+   "file": "assets/friends/items/monggeul_top_vest.webp",
+   "box": [
+    170,
+    270,
+    180,
+    142
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_smock",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "smock",
+   "label": "체크 스모크",
+   "file": "assets/friends/items/monggeul_top_smock.webp",
+   "box": [
+    170,
+    270,
+    180,
+    142
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_chef",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "chef",
+   "label": "요리사 옷",
+   "file": "assets/friends/items/monggeul_top_chef.webp",
+   "box": [
+    130,
+    270,
+    260,
+    151
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_hanbok",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "hanbok",
+   "label": "한복",
+   "file": "assets/friends/items/monggeul_top_hanbok.webp",
+   "box": [
+    120,
+    270,
+    280,
+    165
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_pajamas",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "pajamas",
+   "label": "잠옷",
+   "file": "assets/friends/items/monggeul_top_pajamas.webp",
+   "box": [
+    128,
+    270,
+    264,
+    184
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_raincoat",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "raincoat",
+   "label": "비옷",
+   "file": "assets/friends/items/monggeul_top_raincoat.webp",
+   "box": [
+    130,
+    270,
+    260,
+    155
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_spacesuit",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "spacesuit",
+   "label": "우주복",
+   "file": "assets/friends/items/monggeul_top_spacesuit.webp",
+   "box": [
+    128,
+    270,
+    264,
+    184
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_acc_brooch",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "brooch",
+   "label": "잎사귀 브로치",
+   "file": "assets/friends/items/monggeul_acc_brooch.webp",
+   "box": [
+    241,
+    282,
+    38,
+    35
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_acc_bag",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "bag",
+   "label": "크림 가방",
+   "file": "assets/friends/items/monggeul_acc_bag.webp",
+   "box": [
+    365,
+    320,
+    68,
+    101
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_shoes_boots",
+   "character": "monggeul",
+   "slot": "shoes",
+   "name": "boots",
+   "label": "갈색 부츠",
+   "file": "assets/friends/items/monggeul_shoes_boots.webp",
+   "box": [
+    164,
+    415,
+    194,
+    59
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_shoes_slippers",
+   "character": "monggeul",
+   "slot": "shoes",
+   "name": "slippers",
+   "label": "곰 슬리퍼",
+   "file": "assets/friends/items/monggeul_shoes_slippers.webp",
+   "box": [
+    164,
+    416,
+    194,
+    58
+   ],
+   "real": true,
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_vignette",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "vignette",
+   "label": "버섯 숲",
+   "file": "assets/friends/items/monggeul_bg_vignette.webp",
+   "box": [
+    29,
+    354,
+    454,
+    139
+   ],
+   "real": true,
+   "starter": true
+  },
+  {
+   "id": "bori_acc_glasses",
+   "character": "bori",
+   "slot": "acc",
+   "name": "glasses",
+   "label": "동글 안경",
+   "file": "assets/dress/layers/bori_acc_glasses.svg",
+   "box": [
+    196,
+    150,
+    120,
+    40
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "bori_acc_star",
+   "character": "bori",
+   "slot": "acc",
+   "name": "star",
+   "label": "노란 별핀",
+   "file": "assets/dress/layers/bori_acc_star.svg",
+   "box": [
+    280,
+    302,
+    44,
+    44
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "bori_top_peach",
+   "character": "bori",
+   "slot": "top",
+   "name": "peach",
+   "label": "복숭아 목도리",
+   "file": "assets/dress/layers/bori_top_peach.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_top_mint",
+   "character": "bori",
+   "slot": "top",
+   "name": "mint",
+   "label": "민트 목도리",
+   "file": "assets/dress/layers/bori_top_mint.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_top_sky",
+   "character": "bori",
+   "slot": "top",
+   "name": "sky",
+   "label": "하늘 목도리",
+   "file": "assets/dress/layers/bori_top_sky.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_acc_glasses",
+   "character": "tori",
+   "slot": "acc",
+   "name": "glasses",
+   "label": "동글 안경",
+   "file": "assets/dress/layers/tori_acc_glasses.svg",
+   "box": [
+    196,
+    150,
+    120,
+    40
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "tori_acc_star",
+   "character": "tori",
+   "slot": "acc",
+   "name": "star",
+   "label": "노란 별핀",
+   "file": "assets/dress/layers/tori_acc_star.svg",
+   "box": [
+    280,
+    302,
+    44,
+    44
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "tori_top_peach",
+   "character": "tori",
+   "slot": "top",
+   "name": "peach",
+   "label": "복숭아 목도리",
+   "file": "assets/dress/layers/tori_top_peach.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_top_mint",
+   "character": "tori",
+   "slot": "top",
+   "name": "mint",
+   "label": "민트 목도리",
+   "file": "assets/dress/layers/tori_top_mint.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_top_sky",
+   "character": "tori",
+   "slot": "top",
+   "name": "sky",
+   "label": "하늘 목도리",
+   "file": "assets/dress/layers/tori_top_sky.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_acc_glasses",
+   "character": "momo",
+   "slot": "acc",
+   "name": "glasses",
+   "label": "동글 안경",
+   "file": "assets/dress/layers/momo_acc_glasses.svg",
+   "box": [
+    196,
+    150,
+    120,
+    40
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "momo_acc_star",
+   "character": "momo",
+   "slot": "acc",
+   "name": "star",
+   "label": "노란 별핀",
+   "file": "assets/dress/layers/momo_acc_star.svg",
+   "box": [
+    280,
+    302,
+    44,
+    44
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "momo_top_peach",
+   "character": "momo",
+   "slot": "top",
+   "name": "peach",
+   "label": "복숭아 목도리",
+   "file": "assets/dress/layers/momo_top_peach.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_top_mint",
+   "character": "momo",
+   "slot": "top",
+   "name": "mint",
+   "label": "민트 목도리",
+   "file": "assets/dress/layers/momo_top_mint.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_top_sky",
+   "character": "momo",
+   "slot": "top",
+   "name": "sky",
+   "label": "하늘 목도리",
+   "file": "assets/dress/layers/momo_top_sky.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_acc_glasses",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "glasses",
+   "label": "동글 안경",
+   "file": "assets/dress/layers/gureum_acc_glasses.svg",
+   "box": [
+    196,
+    150,
+    120,
+    40
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "gureum_acc_star",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "star",
+   "label": "노란 별핀",
+   "file": "assets/dress/layers/gureum_acc_star.svg",
+   "box": [
+    280,
+    302,
+    44,
+    44
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "gureum_top_peach",
+   "character": "gureum",
+   "slot": "top",
+   "name": "peach",
+   "label": "복숭아 목도리",
+   "file": "assets/dress/layers/gureum_top_peach.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_top_mint",
+   "character": "gureum",
+   "slot": "top",
+   "name": "mint",
+   "label": "민트 목도리",
+   "file": "assets/dress/layers/gureum_top_mint.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_top_sky",
+   "character": "gureum",
+   "slot": "top",
+   "name": "sky",
+   "label": "하늘 목도리",
+   "file": "assets/dress/layers/gureum_top_sky.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_peach",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "peach",
+   "label": "복숭아 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_mint",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "mint",
+   "label": "민트 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_sky",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "sky",
+   "label": "하늘 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_acc_glasses",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "glasses",
+   "label": "동글 안경",
+   "file": "assets/dress/layers/monggeul_acc_glasses.svg",
+   "box": [
+    196,
+    150,
+    120,
+    40
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "monggeul_acc_star",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "star",
+   "label": "노란 별핀",
+   "file": "assets/dress/layers/monggeul_acc_star.svg",
+   "box": [
+    280,
+    302,
+    44,
+    44
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "monggeul_hat_beret",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "beret",
+   "label": "작은 베레모",
+   "file": "assets/dress/layers/monggeul_hat_beret.svg",
+   "box": [
+    193,
+    17,
+    134,
+    91
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "monggeul_shoes_sneakers",
+   "character": "monggeul",
+   "slot": "shoes",
+   "name": "sneakers",
+   "label": "노란 신발",
+   "file": "assets/dress/layers/monggeul_shoes_sneakers.svg",
+   "box": [
+    164,
+    415,
+    194,
+    59
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_peach",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "peach",
+   "label": "복숭아 목도리",
+   "file": "assets/dress/layers/monggeul_top_peach.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_mint",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "mint",
+   "label": "민트 목도리",
+   "file": "assets/dress/layers/monggeul_top_mint.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_top_sky",
+   "character": "monggeul",
+   "slot": "top",
+   "name": "sky",
+   "label": "하늘 목도리",
+   "file": "assets/dress/layers/monggeul_top_sky.svg",
+   "box": [
+    216,
+    260,
+    80,
+    62
+   ],
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_peach",
+   "character": "bori",
+   "slot": "bg",
+   "name": "peach",
+   "label": "복숭아 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_mint",
+   "character": "bori",
+   "slot": "bg",
+   "name": "mint",
+   "label": "민트 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_sky",
+   "character": "bori",
+   "slot": "bg",
+   "name": "sky",
+   "label": "하늘 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_peach",
+   "character": "tori",
+   "slot": "bg",
+   "name": "peach",
+   "label": "복숭아 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_mint",
+   "character": "tori",
+   "slot": "bg",
+   "name": "mint",
+   "label": "민트 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_sky",
+   "character": "tori",
+   "slot": "bg",
+   "name": "sky",
+   "label": "하늘 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_peach",
+   "character": "momo",
+   "slot": "bg",
+   "name": "peach",
+   "label": "복숭아 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_mint",
+   "character": "momo",
+   "slot": "bg",
+   "name": "mint",
+   "label": "민트 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_sky",
+   "character": "momo",
+   "slot": "bg",
+   "name": "sky",
+   "label": "하늘 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_peach",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "peach",
+   "label": "복숭아 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #FFF6E8 0%, #F8C9B4 55%, #E7A88E 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_mint",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "mint",
+   "label": "민트 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 42%, #F4FFF8 0%, #C9E6D4 58%, #8FCBB0 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_sky",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "sky",
+   "label": "하늘 빛",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 38%, #F7FBFF 0%, #C5DDF5 55%, #8EB4DE 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_hat_linecrown",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "linecrown",
+   "label": "동글 왕관",
+   "file": "assets/dress/layers/monggeul_hat_crown.svg",
+   "box": [
+    192,
+    17,
+    136,
+    91
+   ],
+   "extra": "accessory",
+   "starter": false
+  },
+  {
+   "id": "monggeul_hat_ribbon",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "ribbon",
+   "label": "리본 머리띠",
+   "file": "assets/dress/layers/monggeul_hat_ribbon.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_hat_flowers",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "flowers",
+   "label": "꽃 화관",
+   "file": "assets/dress/layers/monggeul_hat_flowers.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_hat_party",
+   "character": "monggeul",
+   "slot": "hat",
+   "name": "party",
+   "label": "고깔모자",
+   "file": "assets/dress/layers/monggeul_hat_party.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_acc_heart",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "heart",
+   "label": "하트 목걸이",
+   "file": "assets/dress/layers/monggeul_acc_heart.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_acc_scarf",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "scarf",
+   "label": "줄무늬 목도리",
+   "file": "assets/dress/layers/monggeul_acc_scarf.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_acc_bowtie",
+   "character": "monggeul",
+   "slot": "acc",
+   "name": "bowtie",
+   "label": "나비넥타이",
+   "file": "assets/dress/layers/monggeul_acc_bowtie.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "monggeul_bg_night",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "night",
+   "label": "별밤",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 20% 22%, #FFF4C8 0 2%, transparent 3%), radial-gradient(circle at 78% 30%, #FFF4C8 0 1.6%, transparent 2.6%), radial-gradient(circle at 60% 12%, #FFF 0 1.2%, transparent 2%), linear-gradient(180deg, #5B6FB8 0%, #8EA6E0 70%, #C9D6F4 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_rainbow",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "rainbow",
+   "label": "무지개",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 100%, transparent 0 34%, #B9A4E8 34% 38%, #8EB7E0 38% 42%, #8FCBB0 42% 46%, #F2C14E 46% 50%, #F4B59A 50% 54%, transparent 54%), linear-gradient(180deg, #E6F5FF, #FFF8EC)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_sea",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "sea",
+   "label": "바닷가",
+   "paint": {
+    "type": "css",
+    "background": "linear-gradient(180deg, #D5EBFF 0 48%, #8EC8E8 48% 70%, #F6E2B8 70% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "monggeul_bg_garden",
+   "character": "monggeul",
+   "slot": "bg",
+   "name": "garden",
+   "label": "꽃밭",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 18% 82%, #FFD0E0 0 4%, transparent 5%), radial-gradient(circle at 80% 86%, #FFF4C8 0 4%, transparent 5%), radial-gradient(circle at 50% 92%, #F0E4FF 0 4%, transparent 5%), linear-gradient(180deg, #F4FFF8 0 62%, #BFE3B0 62% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_hat_ribbon",
+   "character": "bori",
+   "slot": "hat",
+   "name": "ribbon",
+   "label": "리본 머리띠",
+   "file": "assets/dress/layers/bori_hat_ribbon.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_hat_flowers",
+   "character": "bori",
+   "slot": "hat",
+   "name": "flowers",
+   "label": "꽃 화관",
+   "file": "assets/dress/layers/bori_hat_flowers.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_hat_party",
+   "character": "bori",
+   "slot": "hat",
+   "name": "party",
+   "label": "고깔모자",
+   "file": "assets/dress/layers/bori_hat_party.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_acc_heart",
+   "character": "bori",
+   "slot": "acc",
+   "name": "heart",
+   "label": "하트 목걸이",
+   "file": "assets/dress/layers/bori_acc_heart.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_acc_scarf",
+   "character": "bori",
+   "slot": "acc",
+   "name": "scarf",
+   "label": "줄무늬 목도리",
+   "file": "assets/dress/layers/bori_acc_scarf.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_acc_bowtie",
+   "character": "bori",
+   "slot": "acc",
+   "name": "bowtie",
+   "label": "나비넥타이",
+   "file": "assets/dress/layers/bori_acc_bowtie.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "bori_bg_night",
+   "character": "bori",
+   "slot": "bg",
+   "name": "night",
+   "label": "별밤",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 20% 22%, #FFF4C8 0 2%, transparent 3%), radial-gradient(circle at 78% 30%, #FFF4C8 0 1.6%, transparent 2.6%), radial-gradient(circle at 60% 12%, #FFF 0 1.2%, transparent 2%), linear-gradient(180deg, #5B6FB8 0%, #8EA6E0 70%, #C9D6F4 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_rainbow",
+   "character": "bori",
+   "slot": "bg",
+   "name": "rainbow",
+   "label": "무지개",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 100%, transparent 0 34%, #B9A4E8 34% 38%, #8EB7E0 38% 42%, #8FCBB0 42% 46%, #F2C14E 46% 50%, #F4B59A 50% 54%, transparent 54%), linear-gradient(180deg, #E6F5FF, #FFF8EC)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_sea",
+   "character": "bori",
+   "slot": "bg",
+   "name": "sea",
+   "label": "바닷가",
+   "paint": {
+    "type": "css",
+    "background": "linear-gradient(180deg, #D5EBFF 0 48%, #8EC8E8 48% 70%, #F6E2B8 70% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "bori_bg_garden",
+   "character": "bori",
+   "slot": "bg",
+   "name": "garden",
+   "label": "꽃밭",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 18% 82%, #FFD0E0 0 4%, transparent 5%), radial-gradient(circle at 80% 86%, #FFF4C8 0 4%, transparent 5%), radial-gradient(circle at 50% 92%, #F0E4FF 0 4%, transparent 5%), linear-gradient(180deg, #F4FFF8 0 62%, #BFE3B0 62% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_hat_ribbon",
+   "character": "tori",
+   "slot": "hat",
+   "name": "ribbon",
+   "label": "리본 머리띠",
+   "file": "assets/dress/layers/tori_hat_ribbon.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_hat_flowers",
+   "character": "tori",
+   "slot": "hat",
+   "name": "flowers",
+   "label": "꽃 화관",
+   "file": "assets/dress/layers/tori_hat_flowers.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_hat_party",
+   "character": "tori",
+   "slot": "hat",
+   "name": "party",
+   "label": "고깔모자",
+   "file": "assets/dress/layers/tori_hat_party.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_acc_heart",
+   "character": "tori",
+   "slot": "acc",
+   "name": "heart",
+   "label": "하트 목걸이",
+   "file": "assets/dress/layers/tori_acc_heart.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_acc_scarf",
+   "character": "tori",
+   "slot": "acc",
+   "name": "scarf",
+   "label": "줄무늬 목도리",
+   "file": "assets/dress/layers/tori_acc_scarf.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_acc_bowtie",
+   "character": "tori",
+   "slot": "acc",
+   "name": "bowtie",
+   "label": "나비넥타이",
+   "file": "assets/dress/layers/tori_acc_bowtie.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "tori_bg_night",
+   "character": "tori",
+   "slot": "bg",
+   "name": "night",
+   "label": "별밤",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 20% 22%, #FFF4C8 0 2%, transparent 3%), radial-gradient(circle at 78% 30%, #FFF4C8 0 1.6%, transparent 2.6%), radial-gradient(circle at 60% 12%, #FFF 0 1.2%, transparent 2%), linear-gradient(180deg, #5B6FB8 0%, #8EA6E0 70%, #C9D6F4 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_rainbow",
+   "character": "tori",
+   "slot": "bg",
+   "name": "rainbow",
+   "label": "무지개",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 100%, transparent 0 34%, #B9A4E8 34% 38%, #8EB7E0 38% 42%, #8FCBB0 42% 46%, #F2C14E 46% 50%, #F4B59A 50% 54%, transparent 54%), linear-gradient(180deg, #E6F5FF, #FFF8EC)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_sea",
+   "character": "tori",
+   "slot": "bg",
+   "name": "sea",
+   "label": "바닷가",
+   "paint": {
+    "type": "css",
+    "background": "linear-gradient(180deg, #D5EBFF 0 48%, #8EC8E8 48% 70%, #F6E2B8 70% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "tori_bg_garden",
+   "character": "tori",
+   "slot": "bg",
+   "name": "garden",
+   "label": "꽃밭",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 18% 82%, #FFD0E0 0 4%, transparent 5%), radial-gradient(circle at 80% 86%, #FFF4C8 0 4%, transparent 5%), radial-gradient(circle at 50% 92%, #F0E4FF 0 4%, transparent 5%), linear-gradient(180deg, #F4FFF8 0 62%, #BFE3B0 62% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_hat_ribbon",
+   "character": "momo",
+   "slot": "hat",
+   "name": "ribbon",
+   "label": "리본 머리띠",
+   "file": "assets/dress/layers/momo_hat_ribbon.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_hat_flowers",
+   "character": "momo",
+   "slot": "hat",
+   "name": "flowers",
+   "label": "꽃 화관",
+   "file": "assets/dress/layers/momo_hat_flowers.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_hat_party",
+   "character": "momo",
+   "slot": "hat",
+   "name": "party",
+   "label": "고깔모자",
+   "file": "assets/dress/layers/momo_hat_party.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_acc_heart",
+   "character": "momo",
+   "slot": "acc",
+   "name": "heart",
+   "label": "하트 목걸이",
+   "file": "assets/dress/layers/momo_acc_heart.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_acc_scarf",
+   "character": "momo",
+   "slot": "acc",
+   "name": "scarf",
+   "label": "줄무늬 목도리",
+   "file": "assets/dress/layers/momo_acc_scarf.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_acc_bowtie",
+   "character": "momo",
+   "slot": "acc",
+   "name": "bowtie",
+   "label": "나비넥타이",
+   "file": "assets/dress/layers/momo_acc_bowtie.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "momo_bg_night",
+   "character": "momo",
+   "slot": "bg",
+   "name": "night",
+   "label": "별밤",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 20% 22%, #FFF4C8 0 2%, transparent 3%), radial-gradient(circle at 78% 30%, #FFF4C8 0 1.6%, transparent 2.6%), radial-gradient(circle at 60% 12%, #FFF 0 1.2%, transparent 2%), linear-gradient(180deg, #5B6FB8 0%, #8EA6E0 70%, #C9D6F4 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_rainbow",
+   "character": "momo",
+   "slot": "bg",
+   "name": "rainbow",
+   "label": "무지개",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 100%, transparent 0 34%, #B9A4E8 34% 38%, #8EB7E0 38% 42%, #8FCBB0 42% 46%, #F2C14E 46% 50%, #F4B59A 50% 54%, transparent 54%), linear-gradient(180deg, #E6F5FF, #FFF8EC)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_sea",
+   "character": "momo",
+   "slot": "bg",
+   "name": "sea",
+   "label": "바닷가",
+   "paint": {
+    "type": "css",
+    "background": "linear-gradient(180deg, #D5EBFF 0 48%, #8EC8E8 48% 70%, #F6E2B8 70% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "momo_bg_garden",
+   "character": "momo",
+   "slot": "bg",
+   "name": "garden",
+   "label": "꽃밭",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 18% 82%, #FFD0E0 0 4%, transparent 5%), radial-gradient(circle at 80% 86%, #FFF4C8 0 4%, transparent 5%), radial-gradient(circle at 50% 92%, #F0E4FF 0 4%, transparent 5%), linear-gradient(180deg, #F4FFF8 0 62%, #BFE3B0 62% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_hat_ribbon",
+   "character": "gureum",
+   "slot": "hat",
+   "name": "ribbon",
+   "label": "리본 머리띠",
+   "file": "assets/dress/layers/gureum_hat_ribbon.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_hat_flowers",
+   "character": "gureum",
+   "slot": "hat",
+   "name": "flowers",
+   "label": "꽃 화관",
+   "file": "assets/dress/layers/gureum_hat_flowers.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_hat_party",
+   "character": "gureum",
+   "slot": "hat",
+   "name": "party",
+   "label": "고깔모자",
+   "file": "assets/dress/layers/gureum_hat_party.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_acc_heart",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "heart",
+   "label": "하트 목걸이",
+   "file": "assets/dress/layers/gureum_acc_heart.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_acc_scarf",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "scarf",
+   "label": "줄무늬 목도리",
+   "file": "assets/dress/layers/gureum_acc_scarf.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_acc_bowtie",
+   "character": "gureum",
+   "slot": "acc",
+   "name": "bowtie",
+   "label": "나비넥타이",
+   "file": "assets/dress/layers/gureum_acc_bowtie.svg",
+   "starter": false,
+   "extra": "svg"
+  },
+  {
+   "id": "gureum_bg_night",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "night",
+   "label": "별밤",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 20% 22%, #FFF4C8 0 2%, transparent 3%), radial-gradient(circle at 78% 30%, #FFF4C8 0 1.6%, transparent 2.6%), radial-gradient(circle at 60% 12%, #FFF 0 1.2%, transparent 2%), linear-gradient(180deg, #5B6FB8 0%, #8EA6E0 70%, #C9D6F4 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_rainbow",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "rainbow",
+   "label": "무지개",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 50% 100%, transparent 0 34%, #B9A4E8 34% 38%, #8EB7E0 38% 42%, #8FCBB0 42% 46%, #F2C14E 46% 50%, #F4B59A 50% 54%, transparent 54%), linear-gradient(180deg, #E6F5FF, #FFF8EC)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_sea",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "sea",
+   "label": "바닷가",
+   "paint": {
+    "type": "css",
+    "background": "linear-gradient(180deg, #D5EBFF 0 48%, #8EC8E8 48% 70%, #F6E2B8 70% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  },
+  {
+   "id": "gureum_bg_garden",
+   "character": "gureum",
+   "slot": "bg",
+   "name": "garden",
+   "label": "꽃밭",
+   "paint": {
+    "type": "css",
+    "background": "radial-gradient(circle at 18% 82%, #FFD0E0 0 4%, transparent 5%), radial-gradient(circle at 80% 86%, #FFF4C8 0 4%, transparent 5%), radial-gradient(circle at 50% 92%, #F0E4FF 0 4%, transparent 5%), linear-gradient(180deg, #F4FFF8 0 62%, #BFE3B0 62% 100%)"
+   },
+   "extra": "color",
+   "starter": false
+  }
+ ],
+ "unlock": [
+  "monggeul_hat_cap",
+  "monggeul_hat_crown",
+  "monggeul_top_shirt",
+  "monggeul_top_vest",
+  "monggeul_top_smock",
+  "monggeul_top_chef",
+  "monggeul_top_hanbok",
+  "monggeul_top_pajamas",
+  "monggeul_top_raincoat",
+  "monggeul_top_spacesuit",
+  "monggeul_acc_brooch",
+  "monggeul_acc_bag",
+  "monggeul_shoes_boots",
+  "monggeul_shoes_slippers",
+  "bori_hat_cap",
+  "bori_hat_crown",
+  "tori_hat_cap",
+  "tori_hat_crown",
+  "momo_hat_cap",
+  "momo_hat_crown",
+  "gureum_hat_cap",
+  "gureum_hat_crown",
+  "bori_top_shirt",
+  "bori_top_vest",
+  "bori_top_smock",
+  "tori_top_shirt",
+  "tori_top_vest",
+  "tori_top_smock",
+  "momo_top_shirt",
+  "momo_top_vest",
+  "momo_top_smock",
+  "gureum_top_shirt",
+  "gureum_top_vest",
+  "gureum_top_smock",
+  "bori_acc_brooch",
+  "bori_acc_bag",
+  "tori_acc_brooch",
+  "tori_acc_bag",
+  "momo_acc_brooch",
+  "momo_acc_bag",
+  "gureum_acc_brooch",
+  "gureum_acc_bag",
+  "bori_shoes_boots",
+  "bori_shoes_slippers",
+  "tori_shoes_boots",
+  "tori_shoes_slippers",
+  "momo_shoes_boots",
+  "momo_shoes_slippers",
+  "gureum_shoes_boots",
+  "gureum_shoes_slippers",
+  "bori_acc_glasses",
+  "bori_acc_star",
+  "bori_top_peach",
+  "bori_top_mint",
+  "bori_top_sky",
+  "tori_acc_glasses",
+  "tori_acc_star",
+  "tori_top_peach",
+  "tori_top_mint",
+  "tori_top_sky",
+  "momo_acc_glasses",
+  "momo_acc_star",
+  "momo_top_peach",
+  "momo_top_mint",
+  "momo_top_sky",
+  "gureum_acc_glasses",
+  "gureum_acc_star",
+  "gureum_top_peach",
+  "gureum_top_mint",
+  "gureum_top_sky",
+  "monggeul_bg_peach",
+  "monggeul_bg_mint",
+  "monggeul_bg_sky",
+  "bori_bg_peach",
+  "bori_bg_mint",
+  "bori_bg_sky",
+  "tori_bg_peach",
+  "tori_bg_mint",
+  "tori_bg_sky",
+  "momo_bg_peach",
+  "momo_bg_mint",
+  "momo_bg_sky",
+  "gureum_bg_peach",
+  "gureum_bg_mint",
+  "gureum_bg_sky",
+  "bori_hat_ribbon",
+  "bori_hat_flowers",
+  "bori_hat_party",
+  "gureum_hat_ribbon",
+  "gureum_hat_flowers",
+  "gureum_hat_party",
+  "momo_hat_ribbon",
+  "momo_hat_flowers",
+  "momo_hat_party",
+  "monggeul_hat_ribbon",
+  "monggeul_hat_flowers",
+  "monggeul_hat_party",
+  "tori_hat_ribbon",
+  "tori_hat_flowers",
+  "tori_hat_party",
+  "bori_acc_heart",
+  "bori_acc_scarf",
+  "bori_acc_bowtie",
+  "gureum_acc_heart",
+  "gureum_acc_scarf",
+  "gureum_acc_bowtie",
+  "momo_acc_heart",
+  "momo_acc_scarf",
+  "momo_acc_bowtie",
+  "monggeul_acc_heart",
+  "monggeul_acc_scarf",
+  "monggeul_acc_bowtie",
+  "tori_acc_heart",
+  "tori_acc_scarf",
+  "tori_acc_bowtie",
+  "bori_bg_night",
+  "bori_bg_rainbow",
+  "bori_bg_sea",
+  "bori_bg_garden",
+  "gureum_bg_night",
+  "gureum_bg_rainbow",
+  "gureum_bg_sea",
+  "gureum_bg_garden",
+  "momo_bg_night",
+  "momo_bg_rainbow",
+  "momo_bg_sea",
+  "momo_bg_garden",
+  "monggeul_bg_night",
+  "monggeul_bg_rainbow",
+  "monggeul_bg_sea",
+  "monggeul_bg_garden",
+  "tori_bg_night",
+  "tori_bg_rainbow",
+  "tori_bg_sea",
+  "tori_bg_garden"
+ ]
 }
