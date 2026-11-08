@@ -1715,3 +1715,10 @@ main[data-screen="stickers"] .pager { flex: none; display: flex; align-items: ce
 .path-list li small { grid-column: 1 / -1; color: var(--soft); font-size: .9rem; }
 .path-list li.is-done { border-color: var(--mint); background: #F1FBF5; }
 .path-list li.is-now { border-color: var(--sun-deep); background: #FFF8DD; }
+/* in-play reward badges: the reward screen shows them right after, so keep the play area clean */
+#stage > .gain, #stage > .cloth-note { display: none; }
+.next-go { margin-top: auto; }
+html[data-form="tablet"] .choices { max-height: min(62dvh, 760px); width: min(100%, 760px); }
+html[data-form="tablet"] .choices.glyphs { max-height: min(56dvh, 640px); }
+html[data-form="tablet"] .choices.words { grid-auto-rows: minmax(110px, 150px); }
+html[data-form="tablet"] .choice.glyph b { font-size: clamp(4rem, 10vw, 7rem); }
