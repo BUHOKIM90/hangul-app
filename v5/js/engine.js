@@ -45,9 +45,14 @@
   /* have.js / lines.js use top-level const. That is a global lexical binding, not a window property. */
   function hasAudio() { return typeof HAVE_AUDIO !== 'undefined'; }
   function hasLines() { return typeof LINES !== 'undefined'; }
+  /* Caption = what the clip really says. V5C.CAPTION corrects lines.js where the recording differs. */
   function lineOf(key) {
+    const fix = C() && C().CAPTION;
+    if (fix && Object.prototype.hasOwnProperty.call(fix, key)) return fix[key];
+    if (key === 'w_i_tooth') key = 'sy_C774';
     if (hasLines() && LINES[key]) return LINES[key];
-    return '';
+    const row = C() && C().PRAISE && C().PRAISE.find(p => p[1] === key);
+    return row ? row[0] : '';
   }
   function showLine(text) {
     const live = document.getElementById('live');
@@ -60,7 +65,7 @@
   }
   /* One <audio>. A job owns the player until it ends, errors, times out or is stopped.
      dropQueue() stops the clip now, so a new screen never waits behind an old line. */
-  let cur = null, runId = 0;
+  let cur = null, runId = 0, lastVoice = 0;
   player.preload = 'auto';
   player.addEventListener('ended', () => { if (cur) cur.finish(); });
   player.addEventListener('error', () => { if (cur && (player.src || '').indexOf('data:') !== 0) cur.finish(); });
@@ -84,7 +89,7 @@
           if (over) return;
           over = true;
           clearTimeout(timer);
-          if (cur === job) cur = null;
+          if (cur === job) { cur = null; document.documentElement.dataset.speaking = '0'; }
           resolve();
         },
         arm() {
@@ -95,6 +100,7 @@
         }
       };
       cur = job;
+      document.documentElement.dataset.speaking = '1';
       timer = setTimeout(job.finish, 9000);
       player.src = 'audio/' + key + '.mp3';
       let p;
@@ -109,10 +115,21 @@
     if (c) c.finish();
     try { if (!player.paused) player.pause(); } catch (e) { /* ignore */ }
   }
+  function caption(job) {
+    if (!job.text) return;
+    if (!job.keepBubble) showLine(job.text);
+    else {
+      const live = document.getElementById('live');
+      if (live) live.textContent = job.text;
+    }
+  }
   function run(job) {
     playing = true;
     const me = ++runId;
+    /* The caption appears when its line starts, never ahead of a line still speaking. */
+    if (job.g === gen) caption(job);
     playKey(job.key, job.g).then(() => {
+      lastVoice = performance.now();
       if (me !== runId) return;
       playing = false;
       pump();
@@ -124,16 +141,12 @@
     if (!job) return;
     run(job);
   }
-  /* opts.now: cut whatever is speaking and say this at once (tap feedback, new prompt). */
-  function say(key, caption, opts) {
-    const text = caption || lineOf(key);
-    if (!opts || !opts.keepBubble) showLine(text);
-    else {
-      const live = document.getElementById('live');
-      if (live && text) live.textContent = text;
-    }
-    if (opts && opts.now) dropQueue();
-    const job = { key, g: gen };
+  /* opts.now: cut whatever is speaking and say this at once (tap feedback, new prompt).
+     opts.keepBubble: caption goes to the live region only (bubble already shows it). */
+  function say(key, text, opts) {
+    opts = opts || {};
+    if (opts.now) dropQueue();
+    const job = { key, g: gen, text: text || lineOf(key), keepBubble: !!opts.keepBubble };
     if (!playing && !q.length) run(job);
     else q.push(job);
   }
@@ -145,6 +158,91 @@
     stopNow();
   }
   function busy() { return playing || q.length > 0; }
+  /* Say several lines in order. Each row: [key, caption?]. First row may cut (opts.now). */
+  function sayAll(rows, opts) {
+    rows.filter(Boolean).forEach((r, i) => say(r[0], r[1] || '', Object.assign({}, opts || {}, { now: i === 0 && opts && opts.now, keepBubble: r[2] === 'keep' || (opts && opts.keepBubble) })));
+  }
+
+  /* ---------- idle guide ----------
+     When a child does nothing for ~6 s after the voice stops, say the instruction again and
+     show a hand doing the action. After three repeats it says "천천히 해도 돼" once and rests. */
+  let idleSpec = null, idleAt = 0, idleN = 0, idleTimer = 0, lastTouch = 0;
+  function setIdle(spec) {
+    idleSpec = spec || null;
+    idleN = 0;
+    idleAt = performance.now();
+    hideHand();
+  }
+  function touched() {
+    lastTouch = performance.now();
+    hideHand();
+  }
+  function idleTick() {
+    if (!idleSpec || document.hidden) return;
+    const gate = document.getElementById('gate'), parent = document.getElementById('parent');
+    if ((gate && !gate.hidden) || (parent && !parent.hidden)) return;
+    if (busy()) return;
+    const now = performance.now();
+    const quiet = now - Math.max(lastVoice, lastTouch, idleAt);
+    const wait = (idleSpec.delay || 6000) + idleN * 2500;
+    if (quiet < wait) return;
+    if (idleN >= 3) {
+      if (idleN === 3 && canPlay(C().UI.slow)) say(C().UI.slow, '', { keepBubble: true });
+      idleN += 1;
+      if (idleN > 3) { idleAt = now + 60000; idleN = 0; }
+      return;
+    }
+    idleN += 1;
+    idleAt = now;
+    try { idleSpec.run(idleN); } catch (e) { /* ignore */ }
+  }
+  function startIdle() {
+    if (idleTimer) return;
+    idleTimer = setInterval(idleTick, 400);
+  }
+  /* hand pointer */
+  function handEl() {
+    let h = document.getElementById('hand');
+    if (!h) {
+      h = document.createElement('div');
+      h.id = 'hand';
+      h.setAttribute('aria-hidden', 'true');
+      h.innerHTML = '<img alt="" src="assets/icons/hand.svg"><i></i>';
+      document.body.appendChild(h);
+    }
+    return h;
+  }
+  function hideHand() {
+    const h = document.getElementById('hand');
+    if (h) { h.className = ''; h.style.display = 'none'; if (h._anim) { h._anim.cancel(); h._anim = null; } }
+  }
+  function showHand(el, mode) {
+    if (!el || !el.getBoundingClientRect) return;
+    const r = el.getBoundingClientRect();
+    if (!r.width) return;
+    const h = handEl();
+    h.style.display = 'block';
+    h.style.left = (r.left + r.width / 2) + 'px';
+    h.style.top = (r.top + r.height * 0.55) + 'px';
+    h.className = 'is-' + (mode || 'tap');
+    clearTimeout(h._t);
+    h._t = setTimeout(hideHand, 3600);
+  }
+  /* drag demo along client-space points */
+  function dragHand(pts, ms) {
+    if (!pts || pts.length < 2) return;
+    const h = handEl();
+    h.style.display = 'block';
+    h.style.left = '0px';
+    h.style.top = '0px';
+    h.className = 'is-drag';
+    if (h._anim) h._anim.cancel();
+    const frames = pts.map(p => ({ transform: 'translate(' + p[0] + 'px,' + p[1] + 'px)' }));
+    try {
+      h._anim = h.animate(frames, { duration: ms || 1800, iterations: 2, easing: 'ease-in-out' });
+      h._anim.onfinish = hideHand;
+    } catch (e) { hideHand(); }
+  }
   function unlock() {
     try {
       if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
@@ -235,6 +333,7 @@
       if (modalOn && e.target.closest && e.target.closest('#app')) return;
       unlock();
       armTap();
+      touched();
       const el = e.target.closest && e.target.closest('[data-tap]');
       if (!el || el.closest('[hidden]')) return;
       if (press) return;
@@ -434,25 +533,50 @@
     if (!sk) return false;
     return (sk.help || 0) > (sk.solo || 0) && (sk.solo || 0) < 3;
   }
-  function confetti(n) {
+  let fxN = 0;
+  function confetti(n, kind) {
     const fx = document.getElementById('fx');
     if (!fx) return;
     const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    fx.innerHTML = '';
+    fx.querySelectorAll('i').forEach(i => i.remove());
     if (reduce) return;
-    const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FF8FB8', '#FFF9EB'];
-    const count = n || 22;
+    const colors = ['#F4B59A', '#8FCBB0', '#8EB7E0', '#F2C14E', '#E7A0B4', '#FF8FB8', '#B9A4E8'];
+    const shapes = kind === 'hearts' ? ['heart'] : kind === 'stars' ? ['star'] : ['star', 'heart', 'dot', 'ribbon'];
+    const count = n || 26;
+    fxN += 1;
     for (let i = 0; i < count; i++) {
       const s = document.createElement('i');
-      if (i % 3 === 0) s.className = 'star';
-      const lane = i % 2 === 0 ? 2 + Math.random() * 8 : 90 + Math.random() * 8;
+      s.className = shapes[(i + fxN) % shapes.length];
+      const lane = fxN % 3 === 0 ? 4 + Math.random() * 92 : (i % 2 === 0 ? 2 + Math.random() * 22 : 76 + Math.random() * 22);
       s.style.left = lane + '%';
-      s.style.background = colors[i % colors.length];
-      s.style.animationDelay = (Math.random() * 80) + 'ms';
-      s.style.animationDuration = '0.82s';
+      s.style.setProperty('--c', colors[(i + fxN) % colors.length]);
+      s.style.setProperty('--dx', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
+      s.style.setProperty('--rot', ((Math.random() - 0.5) * 720).toFixed(0) + 'deg');
+      s.style.animationDelay = (Math.random() * 160) + 'ms';
+      s.style.animationDuration = (0.9 + Math.random() * 0.5).toFixed(2) + 's';
       fx.appendChild(s);
     }
-    setTimeout(() => { if (fx) fx.innerHTML = ''; }, 980);
+    setTimeout(() => { if (fx) fx.querySelectorAll('i').forEach(i => i.remove()); }, 1700);
+  }
+  /* A friend pops up from the bottom and cheers. Varies side, friend and pose so it never feels the same. */
+  const POSES = ['assets/char/monggeul_cheer.webp', 'assets/char/monggeul_jump.webp', 'assets/char/monggeul_clap.webp',
+    'assets/char/monggeul_laugh.webp', 'assets/char/monggeul_clap2.webp', 'assets/char/monggeul_surprise.webp'];
+  let cheerN = 0;
+  function cheer(text, big) {
+    const fx = document.getElementById('fx');
+    if (!fx) return;
+    const old = fx.querySelector('.cheer');
+    if (old) old.remove();
+    cheerN += 1;
+    const pals = (C().PALS || []).map(p => p[0]);
+    const pool = cheerN % 2 ? POSES : pals.concat(POSES);
+    const src = pool[Math.floor(Math.random() * pool.length)];
+    const box = document.createElement('div');
+    box.className = 'cheer ' + (cheerN % 2 ? 'from-right' : 'from-left') + (big ? ' is-big' : '');
+    box.innerHTML = '<img alt="" src="' + src + '"><b></b>';
+    box.querySelector('b').textContent = text || '';
+    fx.appendChild(box);
+    setTimeout(() => box.remove(), big ? 2300 : 1700);
   }
   let lastPraise = '';
   const bags = {};
@@ -524,8 +648,8 @@
     const pal = pals.length ? pals[palN % pals.length] : ['assets/char/monggeul_cheer.webp', '몽글이'];
     palN += 1;
     fillPraise(document.getElementById('bubble'), focus, p[0], pal);
-    if (!beat) confetti();
-    say(p[1], p[0], { keepBubble: true });
+    if (!beat) { confetti(); cheer(p[0], !!opts.big); }
+    say(p[1], p[0], { keepBubble: true, now: !!opts.now });
   }
   function takeAny(id, lines) {
     const pool = lines && lines.length ? lines.slice() : [];
@@ -540,7 +664,8 @@
     const pal = pals.length ? pals[palN % pals.length] : ['assets/char/monggeul_cheer.webp', '몽글이'];
     palN += 1;
     fillPraise(document.getElementById('bubble'), focus || '', p[0], pal);
-    confetti(5);
+    confetti(8, 'hearts');
+    if (kind === 'hint') cheer(p[0]);
     if (p[1] && (!hasAudio() || HAVE_AUDIO.has(p[1]))) say(p[1], p[0], { keepBubble: true });
     else {
       const live = document.getElementById('live');
@@ -557,8 +682,8 @@
   }
 
   window.V5X = {
-    get S() { return S; }, save, load, reset, stamp, say, dropQueue, busy, canPlay, unlock, syncSound, installPointer,
+    get S() { return S; }, save, load, reset, stamp, say, sayAll, dropQueue, busy, canPlay, unlock, setIdle, startIdle, showHand, hideHand, dragHand, touched, syncSound, installPointer,
     setDress, dressData, charBy, itemBy, itemFile, ensureStarters, isUnlocked, unlockNext, markSoloCloth, layerHTML,
-    bump, admitThin, hintSoon, chime, praise, encourage, confetti, shuffle, lineOf
+    bump, admitThin, hintSoon, chime, cheer, praise, encourage, confetti, shuffle, lineOf
   };
 })();

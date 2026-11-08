@@ -1,6 +1,8 @@
 'use strict';
-/* Plays. Scaffold is retry, then a hint, then the answer.
-   A star-worthy step is a real choice answered with no miss and no hint. */
+/* Plays. Every screen speaks its instruction, then the target sound; the caption is always the line being heard.
+   Scaffold is retry, then a sparkle hint, then "같이 해 보자" with the answer.
+   A star-worthy step is a real choice answered with no miss and no hint.
+   Idle ~6 s: the instruction is said again and a hand shows the action. */
 (function () {
   const X = () => window.V5X;
   const C = () => window.V5C;
@@ -12,6 +14,22 @@
     'assets/icons/sprout.svg', 'assets/stickers/space_07_별.webp'
   ];
   const STAR = 'assets/stickers/space_07_별.webp';
+
+  /* ---------- voice helpers ---------- */
+  function known(key) { return !!(key && X().canPlay(key) && X().lineOf(key)); }
+  function row(key, text) { return known(key) ? [key, text || ''] : null; }
+  function wordRow(id) { return row(C().wordKey(id)); }
+  function stemRows() { return (ctx && ctx.stem || []).filter(Boolean); }
+  function targetRows() { return (ctx && ctx.target || []).filter(Boolean); }
+  function speak(rows, now) {
+    const seen = {};
+    const list = rows.filter(r => r && !seen[r[0]] && (seen[r[0]] = 1));
+    X().sayAll(list, { now: now !== false });
+  }
+  function replayStem() {
+    if (!ctx) return;
+    speak(stemRows().concat(targetRows()));
+  }
 
   function assetSrc(file) {
     return String(file || '').split('/').map(encodeURIComponent).join('/');
@@ -61,7 +79,7 @@
     h.appendChild(p);
   }
   function payAnswer(g) {
-    if (g !== 'solo' && g !== 'retry') return;
+    if (g !== 'solo' && g !== 'retry' && g !== 'thin') return;
     const got = grantStickers();
     if (!got.length) return;
     ctx.earned = (ctx.earned || []).concat(got);
@@ -92,17 +110,38 @@
     b.classList.remove('praise-line');
     b.textContent = t;
   }
+  function mascot(face) {
+    const m = document.getElementById('mascot');
+    if (m) m.src = 'assets/char/monggeul_' + face + '.webp';
+  }
   function tone(s) { return TONES[(s && s.charCodeAt ? s.charCodeAt(0) : 0) % TONES.length]; }
   function nextBtn(label, tapName) {
     const h = host();
     const name = tapName || 'play-next';
     if (!h || h.querySelector('[data-tap="play-next"]') || h.querySelector('[data-tap="trial-next"]')) return;
     const b = document.createElement('button');
-    b.className = 'tap xl play-go';
+    b.className = 'tap xl play-go next-go';
     b.dataset.tap = name;
     b.type = 'button';
-    b.textContent = label || '다음';
+    b.innerHTML = '<span>' + (label || '다음') + '</span><img alt="" src="assets/icons/arrow.svg">';
     h.appendChild(b);
+    X().setIdle({
+      delay: 5000,
+      run: () => { X().say(C().UI.tapnext, '', { now: true }); X().showHand(b); }
+    });
+  }
+  /* Idle guide for the current task. */
+  function idleFor(targetFn, mode) {
+    X().setIdle({
+      run: () => {
+        replayStem();
+        const el = targetFn && targetFn();
+        if (el) X().showHand(el, mode || 'tap');
+      }
+    });
+  }
+  function choiceTarget() {
+    return host().querySelector('.is-sparkle') || host().querySelector('.choices');
   }
   function gradeNow() {
     if (!ctx.choice) return 'guide';
@@ -111,24 +150,22 @@
     if (ctx.misses > 0) return 'retry';
     return 'solo';
   }
-  function replayStem() {
-    if (!ctx || !ctx.voice) return;
-    X().say(ctx.voice.key, ctx.voice.text);
-  }
-  function endTrial() {
+  function endTrial(confirm) {
     if (!ctx || ctx.trialOver) return;
     ctx.trialOver = true;
+    X().hideHand();
     let g = gradeNow();
     if (g === 'solo' && (ctx.wide || 0) < 3) {
       g = (ctx.skill && X().admitThin(ctx.skill, ctx.occasion)) ? 'solo' : 'thin';
     }
     ctx.grades.push(g);
     if (ctx.skill) X().bump(ctx.skill, g, { occasion: ctx.occasion });
+    /* Name the answer first (the word, the syllable), then cheer. */
+    if (confirm && g !== 'shown') speak([confirm], true);
     if (g === 'hint') X().encourage('hint', ctx.focus || '');
-    else if (g === 'shown') X().encourage('shown', ctx.focus || '');
-    else if (g === 'solo') X().praise({ type: ctx.type, helped: false, focus: ctx.focus || '' });
-    else if (g === 'thin') bubble('한 번 맞았어. 다음에 또 보자');
-    else if (g === 'retry') X().praise({ type: ctx.type, helped: true, focus: ctx.focus || '' });
+    else if (g === 'shown') { /* "같이 해 보자" + answer already spoken */ }
+    else X().praise({ type: ctx.type, helped: g === 'retry', focus: ctx.focus || '', now: !confirm });
+    mascot(g === 'shown' ? 'think' : 'jump');
     payAnswer(g);
     if (ctx.ti + 1 < ctx.trials.length) {
       nextBtn('또 하나', 'trial-next');
@@ -141,35 +178,36 @@
     if (ctx.soloStep) payCloth();
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
-  function assist(el, correct) {
+  /* Wrong answer: say what was tapped (when we can), then help in steps. */
+  function assist(el, correct, saidRows) {
     if (!ctx || ctx.trialOver) return;
     if (el) {
       el.classList.remove('wiggle');
       void el.offsetWidth;
       el.classList.add('wiggle');
     }
+    mascot('think');
     ctx.misses += 1;
     const nodes = (Array.isArray(correct) ? correct : [correct]).filter(Boolean);
     const soon = ctx.skill && X().hintSoon(ctx.skill);
     const canHint = !!X().S.colorHints;
     const wantHint = canHint && !ctx.hinted && nodes.length && (ctx.misses >= 2 || (soon && ctx.misses >= 1));
+    const said = (saidRows || []).filter(Boolean);
     if (wantHint && ctx.misses < 3) {
       ctx.hinted = true;
       nodes.forEach(n => n.classList.add('is-sparkle'));
-      bubble('반짝이는 데를 봐!');
-      X().say(C().UI.hint, '반짝이는 데를 봐!');
+      const hintKey = ctx.misses % 2 ? C().UI.hint2 : C().UI.hint;
+      speak(said.concat([row(hintKey) || row(C().UI.hint)], targetRows()));
+      if (nodes[0]) X().showHand(nodes[0]);
       return;
     }
     if (ctx.misses < 2 && !ctx.hinted) {
-      bubble('다시 해 볼까?');
-      X().say(C().UI.retry, '다시 해 볼까?');
-      replayStem();
+      speak(said.length ? said.concat(targetRows()) : [row(C().UI.retry)].concat(targetRows()));
       return;
     }
     ctx.revealed = true;
     nodes.forEach(n => n.classList.add('show-ans'));
-    bubble('같이 해 보자!');
-    X().say(C().UI.together, '같이 해 보자!');
+    speak([row(C().UI.tryit) || row(C().UI.together)].concat(targetRows().length ? targetRows() : (ctx.afterMiss || [])));
     endTrial();
   }
   const GLYPHS = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'];
@@ -180,14 +218,20 @@
     return X().shuffle(out);
   }
   function fillTo(list, correct, n, fillers) {
-    const out = list.slice();
+    const out = list.slice(0, n);
+    if (out.indexOf(correct) < 0) out[out.length - 1] = correct;
     (fillers || []).forEach(x => {
       if (out.length >= n) return;
       if (x !== correct && out.indexOf(x) < 0) out.push(x);
     });
     return X().shuffle(out);
   }
-  function askN() { return C().choiceN(X().S.difficulty); }
+  /* Adaptive: options grow after clean streaks and shrink after struggle (within 2..4). */
+  function askN() {
+    const base = C().choiceN(X().S.difficulty);
+    const a = X().S.adapt || 0;
+    return Math.max(2, Math.min(4, base + (a >= 3 ? 1 : a <= -3 ? -1 : 0)));
+  }
   function markWide(n) { ctx.wide = n; ctx.choice = n >= 2; }
   function pickDistinct(pool, n) {
     const out = [];
@@ -202,20 +246,20 @@
     return out.length >= 2 ? out : C().hearOf(lesson);
   }
   function artFor(g) {
-    return C().jamoPic(g) || C().sylPic(g) || STAR;
+    return C().letterPic(g) || C().jamoPic(g) || C().sylPic(g) || STAR;
   }
-  function cardsHTML(items, render) {
-    return '<div class="choices">' + items.map(render).join('') + '</div>';
+  function cardsHTML(items, render, cls) {
+    return '<div class="choices' + (cls ? ' ' + cls : '') + '" data-n="' + items.length + '">' + items.map(render).join('') + '</div>';
   }
   function picCard(id, ok) {
-    return '<button type="button" class="tap choice pic-choice ' + tone(id) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="그림"><img alt="" width="512" height="512" src="' + C().pic(id) + '"></button>';
+    return '<button type="button" class="tap choice pic-choice ' + tone(id) + '" data-tap="pick" data-id="' + id + '" data-ok="' + (ok ? '1' : '0') + '" aria-label="그림"><img alt="" width="512" height="512" src="' + C().pic(id) + '"></button>';
   }
   function glyphCard(g, ok) {
-    return '<button type="button" class="tap choice glyph ' + tone(g) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + g + '"><img alt="" src="' + artFor(g) + '"><b>' + g + '</b></button>';
+    return '<button type="button" class="tap choice glyph ' + tone(g) + '" data-tap="pick" data-id="' + g + '" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + g + '"><b>' + g + '</b></button>';
   }
   function wordCard(id, ok) {
     const deco = DECO[id.length % DECO.length];
-    return '<button type="button" class="tap choice word ' + tone(C().ko(id)) + '" data-tap="pick" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + C().ko(id) + '"><img class="deco" alt="" src="' + deco + '"><b>' + C().ko(id) + '</b></button>';
+    return '<button type="button" class="tap choice word ' + tone(C().ko(id)) + '" data-tap="pick" data-id="' + id + '" data-ok="' + (ok ? '1' : '0') + '" aria-label="' + C().ko(id) + '"><img class="deco" alt="" src="' + deco + '"><b>' + C().ko(id) + '</b></button>';
   }
   function meter(n) {
     let html = '<div class="meter" id="meter">';
@@ -229,11 +273,11 @@
   function blockAlts(g, lesson, n) {
     const out = [];
     const alt = C().confuse(lesson, g);
-    if (alt && alt !== g) out.push(alt);
+    if (alt && alt !== g && C().jamoThrough(lesson.id).concat(['ㅌ']).indexOf(alt) >= 0) out.push(alt);
     const vowels = ['ㅏ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅣ'];
     const cons = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ'];
     const pool = vowels.indexOf(g) >= 0 ? vowels : cons;
-    (lesson.jamo || []).concat(pool).forEach(j => {
+    (lesson.jamo || []).filter(j => pool.indexOf(j) >= 0).concat(pool).forEach(j => {
       if (out.length < n && j !== g && out.indexOf(j) < 0) out.push(j);
     });
     return out;
@@ -296,82 +340,101 @@
   }
   function memoryPairs(lesson) {
     const reads = (lesson.read || []).filter(id => C().wordDecodable(id, lesson.id));
-    if (reads.length >= 2) {
-      const pick = X().shuffle(reads).slice(0, 2);
+    const sight = lesson.sight || [];
+    const ids = reads.concat(sight.filter(id => reads.indexOf(id) < 0));
+    if (ids.length >= 2) {
+      const pick = X().shuffle(ids).slice(0, 2);
       return {
         skill: weakerRead(pick),
-        pairs: pick.map(id => ({ id: id, face: C().ko(id), pic: C().pic(id) }))
-      };    }
+        pairs: pick.map(id => ({ id: id, face: C().ko(id), pic: C().pic(id), key: C().wordKey(id) }))
+      };
+    }
     let syls = [];
     (lesson.chant || []).forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
     ['아', '이', '오', '우'].forEach(s => { if (syls.indexOf(s) < 0) syls.push(s); });
-    syls = X().shuffle(syls).slice(0, 2);
+    syls = X().shuffle(syls.filter(s => C().sylPic(s))).slice(0, 2);
     return {
       skill: 's:' + syls[0],
-      pairs: syls.map(s => ({ id: s, face: s, pic: C().sylPic(s) || STAR }))
+      pairs: syls.map(s => ({ id: s, face: s, pic: C().sylPic(s) || STAR, key: C().sylKey(s) }))
     };
   }
-  function weakestKey() {
+  /* Spaced review: the most-needed skill with this prefix, optionally limited to some ids. */
+  function weakestKey(prefixRe, allow) {
     const skills = X().S.skill || {};
     let best = '';
     let bestNeed = 0;
     Object.keys(skills).forEach(k => {
-      if (!/^(j|r|sight|p|s):/.test(k)) return;
+      if (!(prefixRe || /^(j|r|sight|p|s):/).test(k)) return;
+      if (allow && allow.indexOf(k.slice(k.indexOf(':') + 1)) < 0) return;
       const it = skills[k];
       if (!it || !it.seen) return;
       const due = it.due && it.due <= Date.now();
-      const need = (it.help || 0) * 2 + (due ? 2 : 0) + ((it.solo || 0) === 0 ? 1 : 0) - (it.solo || 0);
+      const need = (it.help || 0) * 2 + (due ? 2 : 0) + ((it.solo || 0) === 0 ? 1 : 0) - (it.solo || 0) - (it.box || 0);
       if (need > bestNeed) { bestNeed = need; best = k; }
     });
     return best;
   }
 
+  /* ---------- renders ---------- */
+  function playKicker(text) {
+    const k = document.querySelector('.play-head .kicker');
+    if (k && text) k.textContent = text;
+  }
   function renderListen(item, lesson) {
     const target = item.id;
     const n = askN();
-    const opts = take(Math.min(n, Math.max(1, hearPool(lesson).length)), hearPool(lesson), target);
-    const title = ctx.type === 'treasure' ? '보물 상자 소리' : '어떤 그림일까?';
+    const pool = hearPool(lesson);
+    const opts = take(Math.min(n, Math.max(1, pool.length)), pool, target);
+    const treasure = ctx.type === 'treasure';
     markWide(opts.length);
     ctx.skill = item.skill;
     ctx.focus = C().ko(target);
     ctx.rewardKeys = ['w:' + target];
-    ctx.voice = { key: C().wordKey(target), text: '잘 들어 봐' };
-    const chest = ctx.type === 'treasure' ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
-    host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + chest + cardsHTML(opts, id => picCard(id, id === target));
-    bubble('잘 들어 봐');
-    X().say(ctx.voice.key, '잘 들어 봐', { keepBubble: true });
+    ctx.answerKey = C().wordKey(target);
+    ctx.stem = [treasure ? row(C().UI.treasure) : row(C().UI.which)];
+    ctx.target = [wordRow(target)];
+    const chest = treasure ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
+    host().innerHTML = (item.review ? '<p class="review-tag">다시 만나요</p>' : '') + chest + cardsHTML(opts, id => picCard(id, id === target), 'pics');
+    replayStem();
+    idleFor(choiceTarget, 'sweep');
   }
   function renderSparkle(item, lesson) {
     const target = item.g;
     const pool = [target];
     const alt = C().confuse(lesson, target);
-    if (alt && alt !== target) pool.push(alt);
+    if (alt && alt !== target && GLYPHS.indexOf(alt) >= 0) pool.push(alt);
     (lesson.focus || []).concat(lesson.jamo || []).forEach(g => { if (pool.indexOf(g) < 0) pool.push(g); });
     const opts = fillTo(pool, target, askN(), GLYPHS);
-    const title = ctx.type === 'treasure' ? '보물 글자' : '같은 글자를 눌러';
+    const treasure = ctx.type === 'treasure';
     markWide(opts.length);
     ctx.skill = item.skill;
     ctx.focus = target;
     ctx.rewardKeys = ['j:' + target];
-    ctx.voice = { key: C().jamoKey(target), text: title };
-    host().innerHTML = '<h1 class="prompt">' + title + '</h1>' + cardsHTML(opts, g => glyphCard(g, g === target));
-    X().say(ctx.voice.key, ctx.voice.text);
+    ctx.stem = [treasure ? row(C().UI.treasure) : row(C().UI.letter)];
+    ctx.target = [row(C().jamoKey(target))];
+    const chest = treasure ? '<img class="chest" id="chest" alt="" width="384" height="384" src="assets/pic/chest_closed.webp">' : '';
+    host().innerHTML = (item.review ? '<p class="review-tag">다시 만나요</p>' : '') + chest + cardsHTML(opts, g => glyphCard(g, g === target), 'glyphs');
+    replayStem();
+    idleFor(choiceTarget, 'sweep');
   }
   function renderBlocks(lesson) {
     const b = lesson.blocks;
-    const nDist = X().S.difficulty === 'hard' ? 3 : 2;
+    const nDist = X().S.difficulty === 'easy' ? 1 : X().S.difficulty === 'hard' ? 3 : 2;
     const cons = [b.c].concat(blockAlts(b.c, lesson, nDist));
     const vows = [b.v].concat(blockAlts(b.v, lesson, nDist));
     markWide(Math.min(cons.length, vows.length));
     ctx.skill = 's:' + b.say;
     ctx.focus = b.say;
     ctx.rewardKeys = ['j:' + b.c, 'j:' + b.v];
-    ctx.voice = { key: C().sylKey(b.say), text: '소리를 붙여 보자' };
-    const pieces = X().shuffle(cons.map(g => ({ g: g, kind: 'cho', ok: g === b.c }))).concat(
-      X().shuffle(vows.map(g => ({ g: g, kind: 'jung', ok: g === b.v })))
-    );
-    host().innerHTML = '<h1 class="prompt">소리를 붙여 보자</h1><div class="goal-pic"><img alt="" width="512" height="512" src="' + C().pic(b.word) + '"></div><div class="slots"><i data-slot="cho">+</i><i data-slot="jung">+</i><b class="sum" hidden></b></div><div class="choices pieces">' + pieces.map(p => '<button type="button" class="tap choice glyph ' + tone(p.g) + '" data-tap="piece" data-kind="' + p.kind + '" data-ok="' + (p.ok ? '1' : '0') + '" aria-label="' + p.g + '"><img alt="" src="' + artFor(p.g) + '"><b>' + p.g + '</b></button>').join('') + '</div>';
-    X().say(ctx.voice.key, ctx.voice.text);
+    ctx.stem = [row(C().UI.block)];
+    ctx.target = [row(C().sylKey(b.say))];
+    const btn = p => '<button type="button" class="tap choice glyph piece ' + tone(p.g) + '" data-tap="piece" data-kind="' + p.kind + '" data-id="' + p.g + '" data-ok="' + (p.ok ? '1' : '0') + '" aria-label="' + p.g + '"><b>' + p.g + '</b></button>';
+    const cs = X().shuffle(cons.map(g => ({ g: g, kind: 'cho', ok: g === b.c })));
+    const vs = X().shuffle(vows.map(g => ({ g: g, kind: 'jung', ok: g === b.v })));
+    host().innerHTML = '<div class="block-top"><div class="goal-pic"><img alt="" width="512" height="512" src="' + C().pic(b.word) + '"></div><div class="slots"><i data-slot="cho" class="is-next">?</i><span class="plus">+</span><i data-slot="jung">?</i><span class="eq">=</span><b class="sum" hidden></b></div></div>' +
+      '<div class="piece-rows"><div class="choices pieces" data-kind="cho">' + cs.map(btn).join('') + '</div><div class="choices pieces" data-kind="jung">' + vs.map(btn).join('') + '</div></div>';
+    replayStem();
+    idleFor(() => host().querySelector('.is-sparkle') || host().querySelector('.pieces[data-kind="' + (host().querySelector('[data-slot="cho"]').textContent === '?' ? 'cho' : 'jung') + '"]'), 'sweep');
   }
   function renderWordMatch(item, lesson) {
     const target = item.id;
@@ -380,9 +443,16 @@
     ctx.skill = item.skill;
     ctx.focus = C().ko(target);
     ctx.rewardKeys = ['w:' + target];
-    ctx.voice = { key: C().wordKey(target), text: '같은 낱말을 골라' };
-    host().innerHTML = '<h1 class="prompt">같은 낱말을 골라</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div><div class="choices">' + opts.map(id => wordCard(id, id === target)).join('') + '</div>';
-    X().say(ctx.voice.key, ctx.voice.text);
+    ctx.answerKey = C().wordKey(target);
+    const find = row('hw_' + target) || null;
+    const alone = item.kind === 'read' && X().S.difficulty === 'hard' && !item.review;
+    /* Hard: read alone first; the word is voiced only after a miss. */
+    ctx.stem = alone ? [row(C().UI.alone)] : (find ? [find] : [row(C().UI.find)]);
+    ctx.target = alone ? [] : (find ? [] : [wordRow(target)]);
+    ctx.afterMiss = find ? [find] : [wordRow(target)];
+    host().innerHTML = '<div class="hero-pic"><img alt="" width="512" height="512" src="' + C().pic(target) + '"></div>' + cardsHTML(opts, id => wordCard(id, id === target), 'words');
+    replayStem();
+    idleFor(choiceTarget, 'sweep');
   }
   function renderOnset(item, lesson) {
     const answer = item.syl;
@@ -391,11 +461,32 @@
     ctx.skill = item.skill;
     ctx.focus = answer;
     ctx.rewardKeys = keysForToken(answer);
-    const prompt = '처음 소리를 골라';
-    ctx.voice = { key: item.word ? C().wordKey(item.word) : C().sylKey(answer), text: prompt };
+    ctx.answerKey = C().sylKey(answer);
+    ctx.stem = item.word ? [wordRow(item.word)] : [];
+    ctx.target = [row('fy_' + C().hex(answer)) || row(C().sylKey(answer))];
     const pic = item.word ? C().pic(item.word) : (C().sylPic(answer) || STAR);
-    host().innerHTML = '<h1 class="prompt">' + prompt + '</h1><div class="hero-pic"><img alt="" width="512" height="512" src="' + pic + '"></div>' + cardsHTML(opts, g => glyphCard(g, g === answer));
-    X().say(ctx.voice.key, ctx.voice.text);
+    host().innerHTML = '<div class="hero-pic"><img alt="" width="512" height="512" src="' + pic + '"></div>' + cardsHTML(opts, g => glyphCard(g, g === answer), 'glyphs');
+    replayStem();
+    idleFor(choiceTarget, 'sweep');
+  }
+  function renderPhrase(item) {
+    const ph = C().PHRASES[item.key];
+    const others = Object.keys(C().PHRASES).filter(k => k !== item.key).map(k => C().PHRASES[k].pic).concat(C().PHRASE_DECOY);
+    const n = Math.min(askN(), 3);
+    const pics = X().shuffle([ph.pic].concat(X().shuffle(others).slice(0, n - 1)));
+    markWide(pics.length);
+    ctx.skill = 'ph:' + item.key;
+    ctx.focus = ph.text;
+    ctx.rewardKeys = ph.words.map(w => 'w:' + w);
+    ctx.answerKey = item.key;
+    const alone = X().S.difficulty === 'hard';
+    ctx.stem = alone ? [row(C().UI.alone)] : [row(C().UI.which)];
+    ctx.target = alone ? [] : [row(item.key)];
+    ctx.afterMiss = [row(item.key)];
+    host().innerHTML = '<button type="button" class="tap phrase-card" data-tap="phrase-say" aria-label="' + ph.text + ' 듣기">' + ph.text.split(' ').map(w => '<b>' + w + '</b>').join('') + '</button>' +
+      cardsHTML(pics, src => '<button type="button" class="tap choice pic-choice phrase-pic" data-tap="pick" data-ok="' + (src === ph.pic ? '1' : '0') + '" aria-label="그림"><img alt="" width="512" height="512" src="' + src + '"></button>', 'pics');
+    replayStem();
+    idleFor(choiceTarget, 'sweep');
   }
   function renderMemory(item) {
     markWide(4);
@@ -405,21 +496,24 @@
     (item.pairs || []).forEach(p => {
       keysForToken(p.id).forEach(k => { if (ctx.rewardKeys.indexOf(k) < 0) ctx.rewardKeys.push(k); });
     });
-    ctx.mem = { open: [] };
-    ctx.voice = { key: C().UI.match, text: '같은 짝을 찾아' };
+    ctx.mem = { open: [], keys: {} };
+    item.pairs.forEach(p => { ctx.mem.keys[p.id] = p.key; });
+    ctx.stem = [row(C().UI.memory)];
+    ctx.target = [];
     const cards = [];
     item.pairs.forEach(p => {
       cards.push({ pair: p.id, face: 'pic', pic: p.pic, word: p.face });
       cards.push({ pair: p.id, face: 'word', pic: p.pic, word: p.face });
     });
     const deck = X().shuffle(cards);
-    host().innerHTML = '<h1 class="prompt">같은 짝을 찾아</h1><div class="mem">' + deck.map((card, i) => {
+    host().innerHTML = '<div class="mem">' + deck.map((card, i) => {
       const inner = card.face === 'pic'
         ? '<img alt="" width="512" height="512" src="' + card.pic + '">'
-        : '<img class="deco" alt="" src="' + DECO[i % DECO.length] + '"><b>' + card.word + '</b>';
+        : '<b>' + card.word + '</b>';
       return '<button type="button" class="tap mem-card ' + tone(card.pair) + '" data-tap="card" data-pair="' + card.pair + '" data-i="' + i + '" aria-label="카드"><span class="back"><img alt="" src="' + STAR + '"></span><span class="front">' + inner + '</span></button>';
     }).join('') + '</div>';
-    X().say(ctx.voice.key, ctx.voice.text);
+    replayStem();
+    idleFor(() => host().querySelector('.mem-card.is-sparkle:not(.is-up)') || host().querySelector('.mem-card:not(.is-matched):not(.is-up)'));
   }
   function renderChant(lesson) {
     ctx.skill = null;
@@ -428,16 +522,18 @@
     ctx.rewardKeys = [];
     ctx.chant = 0;
     const first = lesson.chant[0];
-    ctx.voice = { key: C().sylKey(first), text: '소리를 따라 눌러' };
+    ctx.stem = [row(C().UI.chant)];
+    ctx.target = [row(C().sylKey(first))];
     const firstPic = C().sylPic(first) || STAR;
     host().innerHTML = '<div class="chant-board"><div class="chant-pic"><img id="chantPic" alt="" width="512" height="512" src="' + firstPic + '"><span id="chantWord">' + C().sylWord(first) + '</span></div>' + meter(lesson.chant.length) + '<div class="chant">' + lesson.chant.map((s, i) => {
       const key = C().sylKey(s);
       return '<button type="button" class="tap ctile ' + tone(s) + (i === 0 ? ' is-lit' : '') + '" data-tap="tile" data-i="' + i + '" data-audio="' + key + '" aria-label="' + s + '"><img class="tile-pic" alt="" src="' + (C().sylPic(s) || STAR) + '"><b>' + s + '</b></button>';
     }).join('') + '</div></div>';
-    X().say(ctx.voice.key, ctx.voice.text);
+    replayStem();
+    idleFor(() => host().querySelector('.ctile.is-lit'));
   }
-  /* Trace: drag a finger along the pink dotted guide, stroke by stroke. */
-  const TRACE_LINE = '분홍 점을 따라 손가락으로 써 볼까?';
+
+  /* ---------- trace: drag a finger along the pink dotted guide, stroke by stroke ---------- */
   function densify(st) {
     const raw = [];
     if (st.c) {
@@ -472,25 +568,40 @@
     for (let i = 1; i <= end; i++) d += 'L' + pts[i][0].toFixed(1) + ' ' + pts[i][1].toFixed(1);
     return d;
   }
-  function renderTrace(lesson) {
-    const g = lesson.trace;
+  function renderTrace(item) {
+    const g = item.g || ctx.lesson.trace;
     ctx.skill = 'm:' + g;
     ctx.choice = false;
     ctx.focus = g;
     ctx.rewardKeys = [];
     const diff = X().S.difficulty;
     ctx.trace = {
-      glyph: g, strokes: strokesOf(g), si: 0, k: 0, pid: null, ink: [], lifts: 0, moved: false,
+      glyph: g, strokes: strokesOf(g), si: 0, k: 0, pid: null, lifts: 0, moved: false,
       tol: diff === 'easy' ? 17 : diff === 'hard' ? 11 : 14
     };
-    const pic = C().jamoPic(g) || C().sylPic(g);
-    ctx.voice = { key: C().UI.trace, text: TRACE_LINE };
-    host().innerHTML = '<h1 class="prompt">' + TRACE_LINE + '</h1>' +
-      (pic ? '<div class="goal-pic slim"><img alt="" width="512" height="512" src="' + pic + '"></div>' : '') +
-      '<div class="trace-board" data-letter="' + g + '"><svg viewBox="0 0 100 100" aria-label="' + g + ' 따라 쓰기" role="img"></svg><p class="trace-count" aria-hidden="true"></p></div>';
+    const pic = C().letterPic(g) || C().jamoPic(g);
+    ctx.stem = [row(C().UI.trace)];
+    ctx.target = [row(C().jamoKey(g))];
+    host().innerHTML = '<div class="trace-wrap">' + '<div class="trace-card">' + (pic ? '<img alt="" width="512" height="512" src="' + pic + '">' : '') + '<b>' + g + '</b></div>' +
+      '<div class="trace-board" data-letter="' + g + '"><svg viewBox="0 0 100 100" aria-label="' + g + ' 따라 쓰기" role="img"></svg><p class="trace-count" aria-hidden="true"></p></div></div>';
     drawTrace();
     bindTrace();
-    X().say(ctx.voice.key, TRACE_LINE);
+    replayStem();
+    X().setIdle({ run: () => { replayStem(); demoStroke(); } });
+  }
+  function svgToClient(p) {
+    const svg = host() && host().querySelector('.trace-board svg');
+    if (!svg) return [0, 0];
+    const r = svg.getBoundingClientRect();
+    return [r.left + p[0] / 100 * r.width, r.top + p[1] / 100 * r.height];
+  }
+  function demoStroke() {
+    const t = ctx && ctx.trace;
+    if (!t || ctx.trialOver) return;
+    const cur = t.strokes[t.si];
+    if (!cur) return;
+    const pts = cur.filter((p, i) => i >= t.k && (i % 4 === 0 || i === cur.length - 1)).map(svgToClient);
+    X().dragHand(pts, Math.max(900, pts.length * 60));
   }
   function drawTrace() {
     const t = ctx.trace;
@@ -514,8 +625,8 @@
       if (t.k > 0) html += '<path class="st-ink" d="' + pathD(cur, t.k) + '"/>';
       const head = cur[t.k];
       const end = cur[cur.length - 1];
-      /* direction arrow a little ahead of the head */
-      const ahead = cur.find(p => p[2] >= head[2] + 9) || end;
+      html += '<circle class="st-end" cx="' + end[0].toFixed(1) + '" cy="' + end[1].toFixed(1) + '" r="3.4"/>';
+      const ahead = cur.find(p => p[2] >= head[2] + 12) || end;
       const ang = Math.atan2(ahead[1] - head[1], ahead[0] - head[0]) * 180 / Math.PI;
       if (ahead !== head) html += '<g class="st-arrow" transform="translate(' + ahead[0].toFixed(1) + ' ' + ahead[1].toFixed(1) + ') rotate(' + ang.toFixed(0) + ')"><path d="M-3 -3.4L2.6 0L-3 3.4"/></g>';
       html += '<circle class="st-head' + (ctx.hinted ? ' is-sparkle' : '') + '" cx="' + head[0].toFixed(1) + '" cy="' + head[1].toFixed(1) + '" r="5.6"/>';
@@ -523,7 +634,7 @@
     }
     svg.innerHTML = html;
     const cnt = host().querySelector('.trace-count');
-    if (cnt) cnt.textContent = t.strokes.length > 1 ? (Math.min(t.si + 1, t.strokes.length) + ' / ' + t.strokes.length + ' 획') : '';
+    if (cnt) cnt.textContent = t.strokes.length > 1 ? (Math.min(t.si + 1, t.strokes.length) + ' / ' + t.strokes.length) : '';
   }
   function tracePoint(e, svg) {
     const r = svg.getBoundingClientRect();
@@ -553,6 +664,7 @@
     const down = e => {
       if (ctx !== mine || ctx.trialOver || t.pid !== null) return;
       e.preventDefault();
+      X().touched();
       const p = tracePoint(e, svg);
       const head = t.strokes[t.si][t.k];
       t.moved = false;
@@ -566,6 +678,7 @@
     const move = e => {
       if (ctx !== mine || e.pointerId !== t.pid || ctx.trialOver) return;
       e.preventDefault();
+      X().touched();
       const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
       let moved = false;
       (evs.length ? evs : [e]).forEach(ev => { if (traceAdvance(tracePoint(ev, svg))) moved = true; });
@@ -599,38 +712,56 @@
     if (ctx.misses >= 7) {
       /* Write it together: draw the rest for them, then finish. */
       ctx.revealed = true;
-      bubble('같이 해 보자!');
-      X().say(C().UI.together, '같이 해 보자!', { now: true });
       t.si = t.strokes.length;
       drawTrace();
+      speak([row(C().UI.tryit) || row(C().UI.together)].concat(targetRows()));
       endTrace();
       return;
     }
     if (ctx.misses >= 3 && X().S.colorHints && !ctx.hinted) {
       ctx.hinted = true;
       drawTrace();
-      bubble(X().lineOf(C().UI.hint) || '반짝이는 데를 봐!');
-      X().say(C().UI.hint, '', { keepBubble: true, now: true });
+      speak([row(C().UI.hint2) || row(C().UI.hint)]);
+      demoStroke();
       return;
     }
-    bubble('번호 ' + (t.si + 1) + ' 동그라미에서 시작해');
-    X().say(C().UI.trace, TRACE_LINE, { keepBubble: true, now: true });
+    speak(stemRows());
+    demoStroke();
   }
   function strokeDone() {
     const t = ctx.trace;
     t.si += 1;
     t.k = 0;
     t.pid = null;
-    host().querySelector('.trace-board').classList.remove('is-drawing');
-    if (X().chime) X().chime(t.si);
+    const board = host().querySelector('.trace-board');
+    board.classList.remove('is-drawing');
+    X().chime(t.si);
+    X().confetti(6, 'stars');
     if (t.si >= t.strokes.length) {
       drawTrace();
-      host().querySelector('.trace-board').classList.add('is-complete');
+      board.classList.add('is-complete');
       endTrace();
       return;
     }
-    bubble('잘했어! 이제 ' + (t.si + 1) + '번');
     drawTrace();
+  }
+  function endTrace() {
+    if (ctx.trialOver) return;
+    const grade = ctx.revealed ? 'shown' : (ctx.hinted ? 'hint' : 'guide');
+    if (ctx.skill) X().bump(ctx.skill, grade);
+    ctx.trialOver = true;
+    ctx.grades.push(grade);
+    const g = ctx.trace && ctx.trace.glyph;
+    if (grade !== 'shown') {
+      if (g) speak([row(C().jamoKey(g))], true);
+      X().praise({ type: 'trace', helped: grade === 'hint', focus: g || '' });
+      mascot('jump');
+    }
+    if (ctx.ti + 1 < ctx.trials.length) { nextBtn('또 쓰기', 'trial-next'); return; }
+    ctx.playDone = true;
+    ctx.soloStep = false;
+    if (grade !== 'shown') payCloth();
+    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
 
   function showSyl(s) {
@@ -650,9 +781,8 @@
   function fillBlocks() {
     const b = ctx.lesson.blocks;
     ['cho', 'jung'].forEach(kind => {
-      const el = host().querySelector('[data-kind="' + kind + '"][data-ok="1"]');
       const slot = host().querySelector('[data-slot="' + kind + '"]');
-      if (el && slot && el.querySelector('b')) slot.textContent = el.querySelector('b').textContent.trim();
+      if (slot) { slot.textContent = kind === 'cho' ? b.c : b.v; slot.classList.add('is-filled'); slot.classList.remove('is-next'); }
     });
     const sum = host().querySelector('.sum');
     if (sum) { sum.hidden = false; sum.textContent = b.say; }
@@ -667,9 +797,10 @@
       return;
     }
     const slot = host().querySelector('[data-slot="' + kind + '"]');
-    if (slot && el.querySelector('b')) slot.textContent = el.querySelector('b').textContent.trim();
-    el.setAttribute('aria-disabled', 'true');
-    el.classList.add('is-off');
+    if (slot) { slot.textContent = el.dataset.id; slot.classList.add('is-filled'); slot.classList.remove('is-next'); }
+    host().querySelectorAll('[data-kind="' + kind + '"].piece').forEach(p => { p.setAttribute('aria-disabled', 'true'); p.classList.add('is-off'); p.classList.remove('is-sparkle'); });
+    el.classList.add('is-ok');
+    X().chime(kind === 'cho' ? 1 : 2);
     const cho = host().querySelector('[data-slot="cho"]').textContent.trim();
     const jung = host().querySelector('[data-slot="jung"]').textContent.trim();
     const b = ctx.lesson.blocks;
@@ -677,9 +808,14 @@
       const sum = host().querySelector('.sum');
       sum.hidden = false;
       sum.textContent = b.say;
-      X().say(C().sylKey(b.say), b.say);
-      endTrial();
-    } else bubble(kind === 'cho' ? '이제 모음!' : '이제 자음!');
+      sum.classList.add('is-burst');
+      endTrial(row(C().sylKey(b.say)));
+    } else {
+      const other = host().querySelector('[data-slot="' + (kind === 'cho' ? 'jung' : 'cho') + '"]');
+      if (other) other.classList.add('is-next');
+      /* say the letter just placed so every tap is heard */
+      speak([row(C().jamoKey(el.dataset.id))]);
+    }
   }
   function sparklePair() {
     const cards = Array.prototype.slice.call(host().querySelectorAll('.mem-card:not(.is-matched)'));
@@ -693,47 +829,50 @@
       open.forEach(el => el.classList.remove('is-up'));
       ctx.mem.open = [];
       ctx.hold = false;
-    }, 700);
+    }, 900);
   }
   function onCard(el) {
     if (ctx.trialOver || ctx.hold || el.classList.contains('is-matched') || el.classList.contains('is-up')) return;
     el.classList.add('is-up');
     ctx.mem.open.push(el);
-    if (ctx.mem.open.length < 2) return;
+    const key = ctx.mem.keys[el.dataset.pair];
+    if (ctx.mem.open.length < 2) { speak([row(key)]); return; }
     const a = ctx.mem.open[0];
     const b = ctx.mem.open[1];
     if (a.dataset.pair === b.dataset.pair) {
       a.classList.add('is-matched');
       b.classList.add('is-matched');
+      a.classList.remove('is-sparkle');
+      b.classList.remove('is-sparkle');
       ctx.mem.open = [];
+      X().chime(2);
       const done = host().querySelectorAll('.mem-card.is-matched').length === host().querySelectorAll('.mem-card').length;
-      if (done) endTrial();
+      if (done) endTrial(row(key));
+      else speak([row(key), row(C().UI.found)]);
       return;
     }
     const open = ctx.mem.open.slice();
     ctx.mem.open = [];
     ctx.misses += 1;
+    mascot('think');
     const soon = ctx.skill && X().hintSoon(ctx.skill);
     const canHint = !!X().S.colorHints;
     if (!ctx.hinted && canHint && (ctx.misses >= 2 || (soon && ctx.misses >= 1)) && ctx.misses < 3) {
       ctx.hinted = true;
       sparklePair();
-      bubble('반짝이는 데를 봐!');
-      X().say(C().UI.hint, '반짝이는 데를 봐!');
+      speak([row(key), row(C().UI.hint)]);
       closeCards(open);
       return;
     }
     if (ctx.misses >= 3 || (!canHint && ctx.misses >= 2)) {
       ctx.revealed = true;
       host().querySelectorAll('.mem-card').forEach(c => c.classList.add('is-up', 'is-matched', 'show-ans'));
-      bubble('같이 해 보자!');
-      X().say(C().UI.together, '같이 해 보자!');
+      speak([row(C().UI.tryit) || row(C().UI.together)]);
       ctx.hold = false;
       endTrial();
       return;
     }
-    bubble('다시 해 볼까?');
-    X().say(C().UI.retry, '다시 해 볼까?');
+    speak([row(key), row(C().UI.retry)]);
     closeCards(open);
   }
   function finishGuided() {
@@ -742,7 +881,8 @@
     ctx.playDone = true;
     ctx.soloStep = false;
     ctx.grades = ['guide'];
-    if (ctx.type === 'chant') X().praise({ type: 'chant', focus: ctx.focus || '' });
+    X().praise({ type: 'chant', focus: ctx.focus || '' });
+    mascot('jump');
     nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
   }
   function onTile(el) {
@@ -758,9 +898,10 @@
         ctx.hinted = true;
       }
       if (lit) {
+        /* Say the lit tile's syllable, never the tapped one: the kid hears what to press. */
         const ls = ctx.lesson.chant[+lit.dataset.i];
-        bubble('빛나는 ' + ls + ' 칸을 눌러 봐');
-        X().say(lit.dataset.audio || C().sylKey(ls), ls, { keepBubble: true, now: true });
+        speak([row(lit.dataset.audio || C().sylKey(ls))]);
+        X().showHand(lit);
       }
       return;
     }
@@ -769,43 +910,39 @@
     const s = ctx.lesson.chant[+el.dataset.i];
     showSyl(s);
     markMeter(ctx.chant);
-    bubble(s);
-    X().say(el.dataset.audio || C().sylKey(s), s, { keepBubble: true, now: true });
+    speak([row(el.dataset.audio || C().sylKey(s))]);
     const next = host().querySelector('.ctile[data-i="' + (ctx.chant + 1) + '"]');
     ctx.chant += 1;
     ctx.misses = 0;
     if (next) {
       next.classList.add('is-lit');
       const ns = ctx.lesson.chant[ctx.chant];
-      ctx.voice = { key: C().sylKey(ns), text: ns };
+      ctx.target = [row(C().sylKey(ns))];
     } else {
-      ctx.voice = { key: C().sylKey(s), text: s };
+      ctx.target = [row(C().sylKey(s))];
       finishGuided();
     }
   }
-  function endTrace() {
-    if (ctx.trialOver) return;
-    const grade = ctx.revealed ? 'shown' : (ctx.hinted ? 'hint' : 'guide');
-    if (ctx.skill) X().bump(ctx.skill, grade);
-    ctx.trialOver = true;
-    ctx.playDone = true;
-    ctx.soloStep = false;
-    ctx.grades = [grade];
-    const g = ctx.trace && ctx.trace.glyph;
-    if (grade !== 'shown') {
-      if (g) X().say(C().isSyl(g) ? C().sylKey(g) : C().jamoKey(g), g, { keepBubble: true, now: true });
-      X().praise({ type: 'trace', helped: grade === 'hint', focus: g || '' });
-      payCloth();
-    }
-    nextBtn(ctx.mode === 'practice' ? '마을로' : '다음', 'play-next');
-  }
 
+  /* ---------- trials ---------- */
+  function earlierIds(lesson, field) {
+    const out = [];
+    C().LESSONS.forEach(l => { if (l.id < lesson.id) (l[field] || []).forEach(x => { if (out.indexOf(x) < 0) out.push(x); }); });
+    return out;
+  }
   function listenItems(lesson, n) {
-    return pickDistinct(C().hearOf(lesson), n).map(id => ({ kind: 'listen', id: id, skill: 'p:' + id }));
+    const out = pickDistinct(C().hearOf(lesson), n).map(id => ({ kind: 'listen', id: id, skill: 'p:' + id }));
+    /* cumulative review: swap the last item for a due word from an earlier lesson */
+    const due = weakestKey(/^p:/, earlierIds(lesson, 'hear'));
+    if (n > 1 && due) out[out.length - 1] = { kind: 'listen', id: due.slice(2), skill: due, review: true };
+    return out;
   }
   function sparkleItems(lesson, n) {
     const focus = (lesson.focus && lesson.focus.length) ? lesson.focus : (lesson.jamo || []);
-    return pickDistinct(focus, n).map(g => ({ kind: 'sparkle', g: g, skill: 'j:' + g }));
+    const out = pickDistinct(focus, n).map(g => ({ kind: 'sparkle', g: g, skill: 'j:' + g }));
+    const due = weakestKey(/^j:/, earlierIds(lesson, 'focus'));
+    if (n > 1 && due) out[out.length - 1] = { kind: 'sparkle', g: due.slice(2), skill: due, review: true };
+    return out;
   }
   function matchItems(lesson, n) {
     const tasks = matchTasks(lesson);
@@ -820,18 +957,29 @@
     return out;
   }
   function treasureItem(lesson) {
+    const allowJ = C().jamoThrough(lesson.id);
     const key = weakestKey();
-    if (key.indexOf('j:') === 0) return { kind: 'sparkle', g: key.slice(2), skill: key };
+    if (key.indexOf('j:') === 0 && allowJ.indexOf(key.slice(2)) >= 0 && GLYPHS.indexOf(key.slice(2)) >= 0) return { kind: 'sparkle', g: key.slice(2), skill: key };
     if (key.indexOf('sight:') === 0) return { kind: 'sight', id: key.slice(6), skill: key };
-    if (key.indexOf('r:') === 0) return { kind: 'read', id: key.slice(2), skill: key };
-    if (key.indexOf('p:') === 0) return { kind: 'listen', id: key.slice(2), skill: key };
+    if (key.indexOf('r:') === 0) return { kind: 'read', id: key.slice(2), skill: key, review: true };
+    if (key.indexOf('p:') === 0 && C().WORDS[key.slice(2)]) return { kind: 'listen', id: key.slice(2), skill: key };
     if (key.indexOf('s:') === 0 && C().isSyl(key.slice(2))) {
       const p = C().split(key.slice(2));
-      return { kind: 'sparkle', g: p.jung, skill: 'j:' + p.jung };
+      if (GLYPHS.indexOf(p.jung) >= 0) return { kind: 'sparkle', g: p.jung, skill: 'j:' + p.jung };
     }
     const pool = hearPool(lesson);
     const id = pool[Math.floor(Math.random() * pool.length)] || C().hearOf(lesson)[0];
     return { kind: 'listen', id: id, skill: 'p:' + id };
+  }
+  function phraseItems(lesson, n) {
+    const keys = (lesson.phrases || []).filter(k => C().PHRASES[k]);
+    return keys.slice(0, n).map(k => ({ kind: 'phrase', key: k }));
+  }
+  function traceItems(lesson, spec) {
+    const all = (lesson.write && lesson.write.length) ? lesson.write : [lesson.trace];
+    const d = X().S.difficulty;
+    const n = spec.mode !== 'lesson' ? 1 : d === 'easy' ? 1 : d === 'hard' ? all.length : 2;
+    return all.slice(0, n).map(g => ({ kind: 'trace', g: g }));
   }
   function buildTrials(spec) {
     const lesson = spec.lesson;
@@ -844,7 +992,13 @@
     if (spec.type === 'blocks') return [{ kind: 'blocks' }];
     if (spec.type === 'memory') return [Object.assign({ kind: 'memory' }, memoryPairs(lesson))];
     if (spec.type === 'chant') return [{ kind: 'chant' }];
-    if (spec.type === 'trace') return [{ kind: 'trace' }];
+    if (spec.type === 'trace') return traceItems(lesson, spec);
+    if (spec.type === 'phrase') {
+      const items = phraseItems(lesson, spec.mode === 'lesson' ? 2 : 1);
+      if (items.length) return items;
+      /* practice before phrases exist: read a word instead */
+      return matchItems(lesson, 1);
+    }
     return listenItems(lesson, 1);
   }
   function startTrial() {
@@ -854,8 +1008,14 @@
     ctx.trialOver = false;
     ctx.hold = false;
     ctx.choice = true;
+    ctx.afterMiss = null;
+    ctx.answerKey = '';
+    X().hideHand();
+    mascot('think');
     const item = ctx.trials[ctx.ti] || { kind: 'listen', id: C().hearOf(ctx.lesson)[0], skill: '' };
     const kind = item.kind || ctx.type;
+    const step = host().closest('.play') && host().closest('.play').querySelector('.trial-dots');
+    if (step) step.innerHTML = ctx.trials.length > 1 ? ctx.trials.map((_, i) => '<i class="' + (i < ctx.ti ? 'is-on' : i === ctx.ti ? 'is-now' : '') + '"></i>').join('') : '';
     if (kind === 'listen') renderListen(item, ctx.lesson);
     else if (kind === 'sparkle') renderSparkle(item, ctx.lesson);
     else if (kind === 'blocks') renderBlocks(ctx.lesson);
@@ -863,7 +1023,8 @@
     else if (kind === 'onset' || kind === 'syl') renderOnset(item, ctx.lesson);
     else if (kind === 'memory') renderMemory(item);
     else if (kind === 'chant') renderChant(ctx.lesson);
-    else if (kind === 'trace') renderTrace(ctx.lesson);
+    else if (kind === 'trace') renderTrace(item);
+    else if (kind === 'phrase') renderPhrase(item);
     else renderListen(item, ctx.lesson);
   }
   function mount(stage, spec, done) {
@@ -884,7 +1045,8 @@
       cloth: null,
       rewardKeys: [],
       focus: '',
-      voice: null,
+      stem: [],
+      target: [],
       skill: null,
       misses: 0,
       hinted: false,
@@ -897,30 +1059,49 @@
     if (!ctx.trials.length) ctx.trials = [{ kind: 'listen', id: C().hearOf(spec.lesson)[0], skill: '' }];
     startTrial();
   }
+  function wrongRows(el) {
+    const id = el.dataset.id || '';
+    const kind = (ctx.trials[ctx.ti] || {}).kind;
+    if (kind === 'listen' && C().WORDS[id]) return [row('hy_' + id) || wordRow(id)];
+    const extra = targetRows().length ? [] : (ctx.afterMiss || []);
+    if ((kind === 'read' || kind === 'sight') && C().WORDS[id]) return [wordRow(id)].concat(extra);
+    if ((kind === 'onset' || kind === 'syl') && C().isSyl(id)) return [row('dy_' + C().hex(id)) || row(C().sylKey(id))];
+    if (kind === 'phrase') return [row(C().UI.retry)].concat(extra);
+    return null;
+  }
   function tap(el) {
     const t = el.dataset.tap;
     if (t === 'trial-next') {
+      X().dropQueue();
       ctx.ti += 1;
       startTrial();
       return true;
     }
     if (t === 'play-next') {
+      X().setIdle(null);
+      X().hideHand();
       if (onDone) onDone({
         solo: !!ctx.soloStep,
         scored: !!(ctx.scored && ctx.counted),
+        grades: (ctx && ctx.grades) || [],
         earned: (ctx && ctx.earned) || [],
         cloth: (ctx && ctx.cloth) || null
       });
       return true;
     }
+    if (t === 'phrase-say') { speak([row(ctx.answerKey)]); return true; }
     if (!ctx || ctx.trialOver) return false;
     if (t === 'pick') {
       if (el.dataset.ok === '1') {
         el.classList.add('is-ok');
+        X().chime(3);
         const chest = document.getElementById('chest');
-        if (chest) chest.src = 'assets/pic/chest_open.webp';
-        endTrial();
-      } else assist(el, host().querySelector('[data-ok="1"]'));
+        if (chest) { chest.src = 'assets/pic/chest_open.webp'; chest.classList.add('is-burst'); }
+        endTrial(ctx.answerKey ? row(ctx.answerKey) : null);
+      } else {
+        const said = wrongRows(el);
+        assist(el, host().querySelector('[data-ok="1"]'), said && said.filter(Boolean).length ? said : null);
+      }
       return true;
     }
     if (t === 'piece') { onPiece(el); return true; }
@@ -929,11 +1110,12 @@
     return false;
   }
   function replay() {
-    if (ctx && (ctx.type === 'listen' || ctx.type === 'treasure') && ctx.voice) {
-      bubble('잘 들어 봐');
-      X().say(ctx.voice.key, '잘 들어 봐', { keepBubble: true });
-    } else replayStem();    const b = document.getElementById('replayBtn');
-    if (b) b.dataset.n = String((+b.dataset.n || 0) + 1);
+    replayStem();
+    const b = document.getElementById('replayBtn');
+    if (b) {
+      b.dataset.n = String((+b.dataset.n || 0) + 1);
+      b.classList.remove('is-burst'); void b.offsetWidth; b.classList.add('is-burst');
+    }
   }
-  window.V5Play = { mount, tap, replay };
+  window.V5Play = { mount, tap, replay, _ctx: () => ctx };
 })();
