@@ -1710,3 +1710,8 @@ main[data-screen="stickers"] .pager { flex: none; display: flex; align-items: ce
 @media (max-width: 700px) and (min-height: 640px) {
   main[data-screen="home"] .scene { background: linear-gradient(180deg, #d7eef8 0%, #e6f5fb 50%, #e3f2d2 62%, #cfe7b8 100%); }
 }
+.path-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.path-list li { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 6px 10px; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+.path-list li small { grid-column: 1 / -1; color: var(--soft); font-size: .9rem; }
+.path-list li.is-done { border-color: var(--mint); background: #F1FBF5; }
+.path-list li.is-now { border-color: var(--sun-deep); background: #FFF8DD; }
