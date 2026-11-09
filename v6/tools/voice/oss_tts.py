@@ -211,7 +211,7 @@ def cmd_samples(a):
     eng = ENGINES[a.engine]()
     os.makedirs(os.path.join(OUT, 'samples'), exist_ok=True)
     keys = test_keys(); res = {}
-    for v in eng.voices():
+    for v in [x for x in eng.voices() if not a.voices or x in a.voices.split(',')]:
         vid = ('mg_' if a.engine == 'magpie' else 'ov_') + v.lower()
         files, rows, test = [], [], {}
         for i, t in enumerate(SAMPLE_LINES):
@@ -225,8 +225,8 @@ def cmd_samples(a):
         res[vid] = {'engine': a.engine, 'voice': v, 'files': files, 'samples': rows, 'test': test,
                     'score': summary(list(test.values())), 'score_letters': summary([test[k] for k in test if k.startswith('sy_')])}
         print(vid, res[vid]['score'], 'letters', res[vid]['score_letters'], flush=True)
-        json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
-    json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+        json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}_{a.voices or "all"}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+    json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}_{a.voices or "all"}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 
 def cmd_baseline(a):
     test = {}
@@ -266,6 +266,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('mode', choices=['samples', 'baseline', 'full'])
     ap.add_argument('--engine', default='magpie'); ap.add_argument('--voice', default='Sofia')
+    ap.add_argument('--voices', default='')
     ap.add_argument('--shard', default='0/1'); ap.add_argument('--tries', type=int, default=4)
     a = ap.parse_args()
     {'samples': cmd_samples, 'baseline': cmd_baseline, 'full': cmd_full}[a.mode](a)

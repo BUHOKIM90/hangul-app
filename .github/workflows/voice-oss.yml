@@ -3,7 +3,7 @@ name: voice-oss
 on:
   workflow_dispatch:
     inputs:
-      parts: { default: '["baseline","magpie","omnivoice"]' }
+      parts: { default: '["magpie:Sofia","magpie:John","magpie:Aria","omnivoice:f_young","omnivoice:f_high"]' }
   push:
     branches: ['v6.*']
     paths: ['v6/tools/voice/oss_tts.py', 'v6/tools/voice/oss_merge.py', '.github/workflows/voice-oss.yml']
@@ -15,9 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        part: ${{ fromJSON(inputs.parts || '["baseline","magpie","omnivoice"]') }}
+        part: ${{ fromJSON(inputs.parts || '["magpie:Sofia","magpie:John","magpie:Aria","omnivoice:f_young","omnivoice:f_high"]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,17 +25,19 @@ jobs:
       - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg libsndfile1 sox
       - run: pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
       - run: pip install -q faster-whisper soundfile numpy transformers librosa
-      - if: matrix.part == 'magpie'
+      - if: startsWith(matrix.part, 'magpie')
         run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign peft
-      - if: matrix.part == 'omnivoice'
+      - if: startsWith(matrix.part, 'omnivoice')
         run: pip install -q omnivoice
       - if: matrix.part == 'baseline'
         run: python v6/tools/voice/oss_tts.py baseline
       - if: matrix.part != 'baseline'
-        run: python v6/tools/voice/oss_tts.py samples --engine ${{ matrix.part }}
+        run: |
+          P='${{ matrix.part }}'
+          python v6/tools/voice/oss_tts.py samples --engine "${P%%:*}" --voices "${P#*:}"
       - if: always()
         uses: actions/upload-artifact@v4
-        with: { name: 'oss-${{ matrix.part }}', path: out, if-no-files-found: ignore }
+        with: { name: "oss-${{ strategy.job-index }}", path: out, if-no-files-found: ignore }
   merge:
     needs: gen
     if: always()
