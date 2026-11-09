@@ -1,5 +1,5 @@
 import subprocess, numpy as np, json, os, sys
-d=sys.argv[1]; out={}; KEEP={'sy_C774','sy_C6B0','sy_C73C'}; dropped=[]
+d=sys.argv[1]; out={}; KEEP=set()  # v6.3.2: all clips are clean neural recordings; trim every one; dropped=[]
 for f in sorted(os.listdir(d)):
     if not f.endswith('.mp3'): continue
     k=f[:-4]

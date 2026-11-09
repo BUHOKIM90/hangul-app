@@ -1333,7 +1333,7 @@
       }
       case 'cvow': {
         const cv = stage.v;
-        const CONS = { 'ㅘ': ['ㄱ', 'ㅎ'], 'ㅝ': ['ㅇ'], 'ㅢ': ['ㅇ'], 'ㅟ': ['ㄱ', 'ㅇ'] };
+        const CONS = { 'ㅘ': ['ㄱ', 'ㅎ'], 'ㅝ': ['ㅇ', 'ㅁ'], 'ㅢ': ['ㅇ'], 'ㅟ': ['ㄱ', 'ㅇ'] };
         out.push({ t: 'meet', cfg: { j: cv, title: cv + ' 친구를 만나요' } });
         out.push({ t: 'vmerge', cfg: { v: cv, cons: CONS[cv] || ['ㅇ'] } });
         const has = w => w.syl.some(x => { const j = D.split(x).jung; return j === cv || (cv === 'ㅟ' && j === 'ㅚ'); });
@@ -1347,7 +1347,7 @@
       }
       case 'cvrev': {
         const cvs = Array.from(L.v).filter(v => D.COMPLEX[v]);
-        const pool = ['과', '화', '워', '의', '귀', '위', '사', '가', '오', '이'].filter(x => D.has.sy(x));
+        const pool = ['과', '화', '와', '워', '뭐', '의', '귀', '위', '외', '사', '가', '오', '이'].filter(x => D.has.sy(x));
         out.push({ t: 'fish', cfg: { targets: shuffle(pool.filter(x => D.COMPLEX[D.split(x).jung])).slice(0, 4), pool, n: 4, k: 3, title: '미끄럼 낚시' } });
         const rd = wordsFor(L, w => w.syl.some(x => D.COMPLEX[D.split(x).jung]));
         if (rd.length >= 2) out.push({ t: 'shop', cfg: { words: shuffle(rd), pool: wordsFor(L), n: Math.min(3, rd.length) } });
