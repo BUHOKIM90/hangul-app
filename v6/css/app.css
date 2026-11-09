@@ -1055,3 +1055,4 @@ html[data-world="8"] #scene .tw { background: #fff; }
 /* the play buddy: bigger, friendlier presence */
 .buddy { width: 19vmin; }
 @media (orientation: portrait) { .buddy { width: 22vmin; } }
+.vpick.on { background: #E8F8F0; border-radius: 10px; }

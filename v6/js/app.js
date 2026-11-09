@@ -681,6 +681,10 @@
           <label class="pm-row"><input id="pmMic" type="checkbox" ${S.mic !== false ? 'checked' : ''}> '내가 읽어 볼게'에서 마이크로 녹음하기 (녹음은 기기 밖으로 나가지 않고 바로 버려집니다)</label>
           <button type="button" class="pm-btn" id="pmMicTest">마이크 미리 허용하기</button> <span id="pmMicMsg" class="pm-small"></span>
         </section>
+        <section><h3>목소리 고르기 (들어 보고 비교)</h3>
+          <p>같은 문장을 여러 목소리로 들어 볼 수 있습니다. 마음에 드는 목소리를 고르고 알려 주시면 앱의 모든 음성을 그 목소리로 다시 만듭니다.</p>
+          <div id="pmVoicePick"><p class="pm-small">불러오는 중…</p></div>
+        </section>
         <section><h3>가족 목소리</h3>
           <p>엄마·아빠 목소리로 녹음하면 앱이 그 목소리로 말합니다(녹음이 없으면 원래 녹음된 목소리, 이야기는 글자만). 녹음은 이 기기에만 저장됩니다.</p>
           <div id="pmVoices"></div>
@@ -724,6 +728,7 @@
       try { await G.Rec.open(); G.Rec.close(); t.textContent = '허용됐습니다.'; } catch (e) { t.textContent = '허용되지 않았습니다. 설정 > Safari > 마이크에서 바꿀 수 있습니다.'; }
     });
     voiceUi();
+    voicePick();
     $('#pmCheck').addEventListener('click', runCheck);
     $('#pmResetR').addEventListener('click', () => {
       if (!confirm('스티커와 옷을 모두 지울까요? 학습 진도는 남습니다.')) return;
@@ -803,6 +808,22 @@
     ['가족 낱말', ['ryeowon', 'eomma', 'appa', 'halmeoni', 'harabeoji', 'nuna', 'agi'].map(k => ['w_' + k, D.WORDS[k].w])],
     ['모험 이야기 (녹음하면 가족 목소리로 들려줍니다)', D.WORLD_ORDER.flatMap(w => [['p_w' + w, D.STORY[w][0]], ['p_wd' + w, D.STORY[w][1]]])]
   ];
+  /* compare candidate voices (v6/voice-samples, made by .github/workflows/voice-samples.yml) */
+  async function voicePick() {
+    const box = $('#pmVoicePick');
+    if (!box) return;
+    let L;
+    try { L = await (await fetch('v6/voice-samples/list.json', { cache: 'no-cache' })).json(); } catch (e) { box.innerHTML = '<p class="pm-small">샘플이 아직 없습니다.</p>'; return; }
+    const S = St.s.settings;
+    let cur = null;
+    const play = f => { if (cur) cur.pause(); cur = new Audio('v6/voice-samples/' + f); cur.play().catch(() => {}); };
+    box.innerHTML = L.voices.map(v => `<div class="vrow vpick${S.voicePick === v.id ? ' on' : ''}" data-id="${esc(v.id)}"><span class="vlabel"><b>${esc(v.label)}</b></span>
+      ${v.files.map((f, i) => `<button type="button" class="pm-btn sm" data-f="${esc(f)}">▶ ${esc(L.lines[i].slice(0, 9))}${L.lines[i].length > 9 ? '…' : ''}</button>`).join('')}
+      <button type="button" class="pm-btn sm pickv">${S.voicePick === v.id ? '✓ 고름' : '이 목소리'}</button></div>`).join('')
+      + `<p class="pm-small" id="pmVoiceChosen">${S.voicePick ? '고른 목소리: ' + esc((L.voices.find(v => v.id === S.voicePick) || {}).label || S.voicePick) : ''}</p>`;
+    box.querySelectorAll('[data-f]').forEach(b => { b.onclick = () => play(b.dataset.f); });
+    box.querySelectorAll('.pickv').forEach(b => { b.onclick = () => { S.voicePick = b.closest('.vpick').dataset.id; St.save(); voicePick(); }; });
+  }
   let recNow = null;
   function voiceUi() {
     const box = $('#pmVoices'), sbox = $('#pmSentences');
