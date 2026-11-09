@@ -17,6 +17,7 @@ jobs:
       matrix:
         part: ${{ fromJSON(inputs.parts || '["magpie:Sofia","magpie:John","magpie:Aria","omnivoice:f_young","omnivoice:f_high"]') }}
     runs-on: ubuntu-latest
+    env: { GITHUB_TOKEN: '${{ github.token }}' }
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4

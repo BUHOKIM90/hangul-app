@@ -77,7 +77,7 @@ def asr(path):
 def mos(wav, sr):
     global _mos
     if _mos is None:
-        _mos = torch.hub.load('tarepan/SpeechMOS:v1.2.0', 'utmos22_strong', trust_repo=True).eval()
+        _mos = torch.hub.load('tarepan/SpeechMOS:v1.2.0', 'utmos22_strong', trust_repo=True, skip_validation=True).eval()
     x = torch.from_numpy(np.asarray(wav, dtype=np.float32)).unsqueeze(0)
     with torch.no_grad(): return float(_mos(x, sr).item())
 

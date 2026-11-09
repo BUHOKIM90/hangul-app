@@ -1,0 +1,7 @@
+앱 음성 (audio/*.mp3)
+- v6.6부터: NVIDIA Magpie TTS Multilingual 357M (Sofia 목소리)로 만든 음성.
+  Model: https://huggingface.co/nvidia/magpie_tts_multilingual_357m
+  Licensed by NVIDIA Corporation under the NVIDIA Open Model License.
+- 자동 검사에서 더 분명하지 않았던 일부 글자는 이전 음성(Microsoft ko-KR-SunHiNeural)을 그대로 둠
+  (목록: v6/tools/voice/report_oss.json 의 kept_old).
+- 가족이 녹음한 목소리는 이 파일들이 아니라 그 기기(IndexedDB)에만 저장됨.

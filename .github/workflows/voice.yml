@@ -25,7 +25,10 @@ jobs:
       - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
       - run: pip install -q edge-tts numpy
       - name: make voices
-        run: python v6/tools/voice/make_voice.py
+        run: |
+          # since v6.6 the app speaks with the open-source voice (oss_full.json); do not overwrite it with this one
+          if [ -f v6/tools/voice/oss_full.json ]; then echo "open-source voice in use: change v6/tools/voice/oss_full.json to remake voices"; exit 1; fi
+          python v6/tools/voice/make_voice.py
       - name: measure speech and rebuild offline cache list
         run: rm -f v6/tools/trim.json && node v6/tools/build.mjs .
       - name: commit
