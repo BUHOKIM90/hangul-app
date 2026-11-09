@@ -46,8 +46,7 @@ class Magpie:
         return a[:n], self.sr
 
 class Omni:
-    DESIGNS = {'f_young': 'female, young adult', 'f_mid': 'female, middle-aged', 'f_high': 'female, young adult, high pitch',
-               'm_young': 'male, young adult'}
+    DESIGNS = {'f_young': 'female, young adult', 'f_high': 'female, young adult, high pitch'}
     def __init__(self):
         from omnivoice import OmniVoice
         self.m = OmniVoice.from_pretrained('k2-fsa/OmniVoice', device_map='cpu', dtype=torch.float32)
@@ -56,8 +55,9 @@ class Omni:
     def say(self, text, voice, seed):
         torch.manual_seed(seed)
         kw = dict(text=text, instruct=self.DESIGNS[voice])
-        try: audio = self.m.generate(language='ko', **kw)
-        except TypeError: audio = self.m.generate(**kw)
+        for extra in ({'language': 'ko', 'num_step': 16}, {'num_step': 16}, {}):
+            try: audio = self.m.generate(**extra, **kw); break
+            except TypeError: continue
         a = audio[0]
         a = a.detach().float().cpu().numpy() if torch.is_tensor(a) else np.asarray(a, dtype=np.float32)
         return a.reshape(-1), self.sr
