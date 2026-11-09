@@ -27,184 +27,39 @@
    }
   },
   {
-   "id": "sunhi_slow",
-   "voice": "ko-KR-SunHiNeural",
-   "rate": "-14%",
-   "pitch": "+0Hz",
-   "label": "선희, 더 차분하게",
+   "id": "qw_sohee",
+   "voice": "qwen:sohee",
+   "label": "Qwen3 · 소희 (한국어 원어민 여성) (자연스러움 3.2점)",
    "files": [
-    "sunhi_slow_0.mp3",
-    "sunhi_slow_1.mp3",
-    "sunhi_slow_2.mp3",
-    "sunhi_slow_3.mp3"
-   ]
-  },
-  {
-   "id": "hyunsu",
-   "voice": "ko-KR-HyunsuMultilingualNeural",
-   "rate": "-6%",
-   "pitch": "+0Hz",
-   "label": "현수 (최신 음성, 남성)",
-   "files": [
-    "hyunsu_0.mp3",
-    "hyunsu_1.mp3",
-    "hyunsu_2.mp3",
-    "hyunsu_3.mp3"
-   ]
-  },
-  {
-   "id": "injoon",
-   "voice": "ko-KR-InJoonNeural",
-   "rate": "-6%",
-   "pitch": "+0Hz",
-   "label": "인준 (남성)",
-   "files": [
-    "injoon_0.mp3",
-    "injoon_1.mp3",
-    "injoon_2.mp3",
-    "injoon_3.mp3"
-   ]
-  },
-  {
-   "id": "ava",
-   "voice": "en-US-AvaMultilingualNeural",
-   "rate": "-8%",
-   "pitch": "+0Hz",
-   "label": "Ava (다국어 최신 음성, 여성)",
-   "files": [
-    "ava_0.mp3",
-    "ava_1.mp3",
-    "ava_2.mp3",
-    "ava_3.mp3"
-   ]
-  },
-  {
-   "id": "emma",
-   "voice": "en-US-EmmaMultilingualNeural",
-   "rate": "-8%",
-   "pitch": "+0Hz",
-   "label": "Emma (다국어 최신 음성, 여성)",
-   "files": [
-    "emma_0.mp3",
-    "emma_1.mp3",
-    "emma_2.mp3",
-    "emma_3.mp3"
-   ]
-  },
-  {
-   "id": "seraphina",
-   "voice": "de-DE-SeraphinaMultilingualNeural",
-   "rate": "-8%",
-   "pitch": "+0Hz",
-   "label": "Seraphina (다국어 최신 음성, 여성)",
-   "files": [
-    "seraphina_0.mp3",
-    "seraphina_1.mp3",
-    "seraphina_2.mp3",
-    "seraphina_3.mp3"
-   ]
-  },
-  {
-   "id": "vivienne",
-   "voice": "fr-FR-VivienneMultilingualNeural",
-   "rate": "-8%",
-   "pitch": "+0Hz",
-   "label": "Vivienne (다국어 최신 음성, 여성)",
-   "files": [
-    "vivienne_0.mp3",
-    "vivienne_1.mp3",
-    "vivienne_2.mp3",
-    "vivienne_3.mp3"
-   ]
-  },
-  {
-   "id": "mg_sofia",
-   "voice": "magpie:Sofia",
-   "label": "엔비디아 Magpie · Sofia (자연스러움 3.9점)",
-   "files": [
-    "mg_sofia_0.mp3",
-    "mg_sofia_1.mp3",
-    "mg_sofia_2.mp3",
-    "mg_sofia_3.mp3"
+    "qw_sohee_0.mp3",
+    "qw_sohee_1.mp3",
+    "qw_sohee_2.mp3",
+    "qw_sohee_3.mp3"
    ],
    "score": {
     "n": 30,
-    "ok": 22,
-    "right": 22,
-    "cer": 0.225,
-    "mos": 3.894
+    "ok": 12,
+    "right": 15,
+    "cer": 2.349,
+    "mos": 3.165
    }
   },
   {
-   "id": "mg_john",
-   "voice": "magpie:John",
-   "label": "엔비디아 Magpie · John (자연스러움 3.8점)",
+   "id": "qw_kss",
+   "voice": "qwen:kss",
+   "label": "Qwen3 · 성우 목소리 (실제 한국인 성우 녹음 기반) (자연스러움 3.4점)",
    "files": [
-    "mg_john_0.mp3",
-    "mg_john_1.mp3",
-    "mg_john_2.mp3",
-    "mg_john_3.mp3"
-   ],
-   "score": {
-    "n": 30,
-    "ok": 21,
-    "right": 22,
-    "cer": 0.633,
-    "mos": 3.802
-   }
-  },
-  {
-   "id": "mg_aria",
-   "voice": "magpie:Aria",
-   "label": "엔비디아 Magpie · Aria (자연스러움 3.6점)",
-   "files": [
-    "mg_aria_0.mp3",
-    "mg_aria_1.mp3",
-    "mg_aria_2.mp3",
-    "mg_aria_3.mp3"
+    "qw_kss_0.mp3",
+    "qw_kss_1.mp3",
+    "qw_kss_2.mp3",
+    "qw_kss_3.mp3"
    ],
    "score": {
     "n": 30,
     "ok": 19,
     "right": 19,
-    "cer": 0.624,
-    "mos": 3.624
-   }
-  },
-  {
-   "id": "ov_f_young",
-   "voice": "omnivoice:f_young",
-   "label": "OmniVoice · 젊은 여성 (자연스러움 3.3점)",
-   "files": [
-    "ov_f_young_0.mp3",
-    "ov_f_young_1.mp3",
-    "ov_f_young_2.mp3",
-    "ov_f_young_3.mp3"
-   ],
-   "score": {
-    "n": 30,
-    "ok": 21,
-    "right": 21,
-    "cer": 0.226,
-    "mos": 3.339
-   }
-  },
-  {
-   "id": "ov_f_high",
-   "voice": "omnivoice:f_high",
-   "label": "OmniVoice · 밝은 여성 (자연스러움 2.7점)",
-   "files": [
-    "ov_f_high_0.mp3",
-    "ov_f_high_1.mp3",
-    "ov_f_high_2.mp3",
-    "ov_f_high_3.mp3"
-   ],
-   "score": {
-    "n": 30,
-    "ok": 16,
-    "right": 16,
-    "cer": 1.144,
-    "mos": 2.719
+    "cer": 1.902,
+    "mos": 3.361
    }
   }
  ]
