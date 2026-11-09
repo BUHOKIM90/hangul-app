@@ -1,0 +1,3487 @@
+{
+ "voice": "ko-KR-SunHiNeural",
+ "clips": {
+  "c_eomma": {
+   "text": "엄, 마. 두 번!",
+   "span": 2.2,
+   "runs": 2,
+   "ok": true
+  },
+  "c_goguma": {
+   "text": "고, 구, 마. 세 번!",
+   "span": 2.75,
+   "runs": 3,
+   "ok": true
+  },
+  "c_halmeoni": {
+   "text": "할, 머, 니. 세 번!",
+   "span": 3.15,
+   "runs": 3,
+   "ok": true
+  },
+  "c_appa": {
+   "text": "아, 빠. 두 번!",
+   "span": 2.11,
+   "runs": 2,
+   "ok": true
+  },
+  "c_hama": {
+   "text": "하, 마. 두 번!",
+   "span": 2.19,
+   "runs": 2,
+   "ok": true
+  },
+  "c_banana": {
+   "text": "바, 나, 나. 세 번!",
+   "span": 2.84,
+   "runs": 3,
+   "ok": true
+  },
+  "c_so": {
+   "text": "소. 한 번!",
+   "span": 1.46,
+   "runs": 1,
+   "ok": true
+  },
+  "c_ori": {
+   "text": "오, 리. 두 번!",
+   "span": 2.18,
+   "runs": 2,
+   "ok": true
+  },
+  "c_ryeowon": {
+   "text": "려, 원. 두 번!",
+   "span": 2.07,
+   "runs": 1,
+   "ok": true
+  },
+  "c_kokkiri": {
+   "text": "코, 끼, 리. 세 번!",
+   "span": 2.77,
+   "runs": 3,
+   "ok": true
+  },
+  "c_nabi": {
+   "text": "나, 비. 두 번!",
+   "span": 2.12,
+   "runs": 1,
+   "ok": true
+  },
+  "c_harabeoji": {
+   "text": "할, 아, 버, 지. 네 번!",
+   "span": 3.55,
+   "runs": 4,
+   "ok": true
+  },
+  "dy_AC00": {
+   "text": "그건 가야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_AC70": {
+   "text": "그건 거야.",
+   "span": 0.95,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_AD6C": {
+   "text": "그건 구야.",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_ADF8": {
+   "text": "그건 그야.",
+   "span": 1.06,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_ACE0": {
+   "text": "그건 고야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B098": {
+   "text": "그건 나야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_AE30": {
+   "text": "그건 기야.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B178": {
+   "text": "그건 노야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B108": {
+   "text": "그건 너야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B204": {
+   "text": "그건 누야.",
+   "span": 1.09,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B2C8": {
+   "text": "그건 니야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B290": {
+   "text": "그건 느야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B3C4": {
+   "text": "그건 도야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B354": {
+   "text": "그건 더야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B2E4": {
+   "text": "그건 다야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B450": {
+   "text": "그건 두야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B77C": {
+   "text": "그건 라야.",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B4DC": {
+   "text": "그건 드야.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B514": {
+   "text": "그건 디야.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B85C": {
+   "text": "그건 로야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B7EC": {
+   "text": "그건 러야.",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B8E8": {
+   "text": "그건 루야.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B974": {
+   "text": "그건 르야.",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B9AC": {
+   "text": "그건 리야.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_B9C8": {
+   "text": "그건 마야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BAA8": {
+   "text": "그건 모야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BA38": {
+   "text": "그건 머야.",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BC14": {
+   "text": "그건 바야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BBC0": {
+   "text": "그건 므야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BC15": {
+   "text": "그건 박이야.",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BB34": {
+   "text": "그건 무야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BBF8": {
+   "text": "그건 미야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BC29": {
+   "text": "그건 방이야.",
+   "span": 1.06,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BE0C": {
+   "text": "그건 브야.",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BC84": {
+   "text": "그건 버야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BCF4": {
+   "text": "그건 보야.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BD09": {
+   "text": "그건 봉이야.",
+   "span": 1.08,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BD80": {
+   "text": "그건 부야.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_BE44": {
+   "text": "그건 비야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C18C": {
+   "text": "그건 소야.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C218": {
+   "text": "그건 수야.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C0AC": {
+   "text": "그건 사야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C11C": {
+   "text": "그건 서야.",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C2A4": {
+   "text": "그건 스야.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C2DC": {
+   "text": "그건 시야.",
+   "span": 1.05,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C544": {
+   "text": "그건 아야.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C5B4": {
+   "text": "그건 어야.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C6B0": {
+   "text": "그건 우야.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C624": {
+   "text": "그건 오야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C774": {
+   "text": "그건 이야.",
+   "span": 0.91,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C73C": {
+   "text": "그건 으야.",
+   "span": 0.91,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C790": {
+   "text": "그건 자야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C870": {
+   "text": "그건 조야.",
+   "span": 0.95,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C800": {
+   "text": "그건 저야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C9C0": {
+   "text": "그건 지야.",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C988": {
+   "text": "그건 즈야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_C8FC": {
+   "text": "그건 주야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D558": {
+   "text": "그건 하야.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_CD08": {
+   "text": "그건 초야.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D638": {
+   "text": "그건 호야.",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D5C8": {
+   "text": "그건 허야.",
+   "span": 0.93,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D6C4": {
+   "text": "그건 후야.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D750": {
+   "text": "그건 흐야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_AC70": {
+   "text": "거를 찾아볼까?",
+   "span": 1.27,
+   "runs": 1,
+   "ok": true
+  },
+  "dy_D788": {
+   "text": "그건 히야.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_ACE0": {
+   "text": "고를 찾아볼까?",
+   "span": 1.21,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_AD6C": {
+   "text": "구를 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_AE30": {
+   "text": "기를 찾아볼까?",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B07C": {
+   "text": "끼를 찾아볼까?",
+   "span": 1.19,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B098": {
+   "text": "나를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B204": {
+   "text": "누를 찾아볼까?",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B2C8": {
+   "text": "니를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B2E4": {
+   "text": "다를 찾아볼까?",
+   "span": 1.26,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B3C4": {
+   "text": "도를 찾아볼까?",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B450": {
+   "text": "두를 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B77C": {
+   "text": "라를 찾아볼까?",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B824": {
+   "text": "려를 찾아볼까?",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B514": {
+   "text": "디를 찾아볼까?",
+   "span": 1.26,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B9C8": {
+   "text": "마를 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_B9AC": {
+   "text": "리를 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BAA8": {
+   "text": "모를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BA38": {
+   "text": "머를 찾아볼까?",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BBF8": {
+   "text": "미를 찾아볼까?",
+   "span": 1.27,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BC14": {
+   "text": "바를 찾아볼까?",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BB34": {
+   "text": "무를 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BC29": {
+   "text": "방을 찾아볼까?",
+   "span": 1.34,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BD80": {
+   "text": "부를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BE60": {
+   "text": "빠를 찾아볼까?",
+   "span": 1.21,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_BE44": {
+   "text": "비를 찾아볼까?",
+   "span": 1.27,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C18C": {
+   "text": "소를 찾아볼까?",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C2A4": {
+   "text": "스를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C0AC": {
+   "text": "사를 찾아볼까?",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C544": {
+   "text": "아를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C5B4": {
+   "text": "어를 찾아볼까?",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C624": {
+   "text": "오를 찾아볼까?",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C5C4": {
+   "text": "엄을 찾아볼까?",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C5EC": {
+   "text": "여를 찾아볼까?",
+   "span": 1.26,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C6B0": {
+   "text": "우를 찾아볼까?",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C6D0": {
+   "text": "원을 찾아볼까?",
+   "span": 1.31,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C774": {
+   "text": "이를 찾아볼까?",
+   "span": 1.21,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C790": {
+   "text": "자를 찾아볼까?",
+   "span": 1.27,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_CF54": {
+   "text": "코를 찾아볼까?",
+   "span": 1.27,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C720": {
+   "text": "유를 찾아볼까?",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_C8FC": {
+   "text": "주를 찾아볼까?",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_CC28": {
+   "text": "차를 찾아볼까?",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_D3EC": {
+   "text": "포를 찾아볼까?",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_D558": {
+   "text": "하를 찾아볼까?",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_agi": {
+   "text": "그건 아기야!",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_D5C8": {
+   "text": "허를 찾아볼까?",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ai": {
+   "text": "그건 아이야!",
+   "span": 0.99,
+   "runs": 1,
+   "ok": true
+  },
+  "fy_D560": {
+   "text": "할을 찾아볼까?",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_appa": {
+   "text": "그건 아빠야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_bada": {
+   "text": "그건 바다야!",
+   "span": 1.08,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_beoseu": {
+   "text": "그건 버스야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_cha": {
+   "text": "그건 차야!",
+   "span": 1.01,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_chijeu": {
+   "text": "그건 치즈야!",
+   "span": 1.13,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_banana": {
+   "text": "그건 바나나야!",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_chima": {
+   "text": "그건 치마야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_dari": {
+   "text": "그건 다리야!",
+   "span": 1.09,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_dubu": {
+   "text": "그건 두부야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_eobu": {
+   "text": "그건 어부야!",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_eomma": {
+   "text": "그건 엄마야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_eureureong": {
+   "text": "그건 으르렁이야!",
+   "span": 1.21,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_geobuk": {
+   "text": "그건 거북이야!",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gicha": {
+   "text": "그건 기차야!",
+   "span": 1.23,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_geomi": {
+   "text": "그건 거미야!",
+   "span": 1.07,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gita": {
+   "text": "그건 기타야!",
+   "span": 1.14,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gochu": {
+   "text": "그건 고추야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gogi": {
+   "text": "그건 고기야!",
+   "span": 1.2,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_goguma": {
+   "text": "그건 고구마야!",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gudu": {
+   "text": "그건 구두야!",
+   "span": 1.16,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_gorae": {
+   "text": "그건 고래야!",
+   "span": 1.11,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_haema": {
+   "text": "그건 해마야!",
+   "span": 1.05,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_halmeoni": {
+   "text": "그건 할머니야!",
+   "span": 1.19,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_hama": {
+   "text": "그건 하마야!",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_harabeoji": {
+   "text": "그건 할아버지야!",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_heori": {
+   "text": "그건 허리야!",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_hodu": {
+   "text": "그건 호두야!",
+   "span": 1.11,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_i_tooth": {
+   "text": "그건 이야!",
+   "span": 0.87,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_jadu": {
+   "text": "그건 자두야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ima": {
+   "text": "그건 이마야!",
+   "span": 1.06,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_jido": {
+   "text": "그건 지도야!",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_juseu": {
+   "text": "그건 주스야!",
+   "span": 1.17,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_keikeu": {
+   "text": "그건 케이크야!",
+   "span": 1.36,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ki": {
+   "text": "그건 키야!",
+   "span": 1.11,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ko": {
+   "text": "그건 코야!",
+   "span": 1.09,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_kkot": {
+   "text": "그건 꽃이야!",
+   "span": 1.14,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_lion": {
+   "text": "그건 사자야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_kokkiri": {
+   "text": "그건 코끼리야!",
+   "span": 1.33,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_mogi": {
+   "text": "그건 모기야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_meori": {
+   "text": "그건 머리야!",
+   "span": 1.09,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_moja": {
+   "text": "그건 모자야!",
+   "span": 1.13,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_nabi": {
+   "text": "그건 나비야!",
+   "span": 1.07,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_nuna": {
+   "text": "그건 누나야!",
+   "span": 1.13,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_namu": {
+   "text": "그건 나무야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_oi": {
+   "text": "그건 오이야!",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_nunsaram": {
+   "text": "그건 눈사람이야!",
+   "span": 1.35,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ojingeo": {
+   "text": "그건 오징어야!",
+   "span": 1.38,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ori": {
+   "text": "그건 오리야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_pija": {
+   "text": "그건 피자야!",
+   "span": 1.2,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_pado": {
+   "text": "그건 파도야!",
+   "span": 1.15,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_podo": {
+   "text": "그건 포도야!",
+   "span": 1.19,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_pungseon": {
+   "text": "그건 풍선이야!",
+   "span": 1.25,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_radio": {
+   "text": "그건 라디오야!",
+   "span": 1.3,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ryeowon": {
+   "text": "그건 려원이야!",
+   "span": 1.26,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_sangeo": {
+   "text": "그건 상어야!",
+   "span": 1.15,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_siso": {
+   "text": "그건 시소야!",
+   "span": 1.17,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_so": {
+   "text": "그건 소야!",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_saeu": {
+   "text": "그건 새우야!",
+   "span": 1.12,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_sobangcha": {
+   "text": "그건 소방차야!",
+   "span": 1.38,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_sora": {
+   "text": "그건 소라야!",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_tajo": {
+   "text": "그건 타조야!",
+   "span": 1.13,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_tomato": {
+   "text": "그건 토마토야!",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_tteokguk": {
+   "text": "그건 떡국이야!",
+   "span": 1.32,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_ubi": {
+   "text": "그건 우비야!",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_uyu": {
+   "text": "그건 우유야!",
+   "span": 1.22,
+   "runs": 1,
+   "ok": true
+  },
+  "hy_yeou": {
+   "text": "그건 여우야!",
+   "span": 1.08,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3131": {
+   "text": "기역, 기차 할 때 기역.",
+   "span": 2.34,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3132": {
+   "text": "쌍기역, 까치 할 때 쌍기역.",
+   "span": 2.59,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3137": {
+   "text": "디귿, 다리 할 때 디귿.",
+   "span": 2.23,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3134": {
+   "text": "니은, 나비 할 때 니은.",
+   "span": 2.5,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3138": {
+   "text": "쌍디귿, 딸기 할 때 쌍디귿.",
+   "span": 2.94,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3139": {
+   "text": "리을, 라디오 할 때 리을.",
+   "span": 2.66,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3141": {
+   "text": "미음, 모자 할 때 미음.",
+   "span": 2.66,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3142": {
+   "text": "비읍, 바나나 할 때 비읍.",
+   "span": 2.38,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3143": {
+   "text": "쌍비읍, 빵 할 때 쌍비읍.",
+   "span": 2.75,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3145": {
+   "text": "시옷, 사자 할 때 시옷.",
+   "span": 2.29,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3146": {
+   "text": "쌍시옷, 씨앗 할 때 쌍시옷.",
+   "span": 2.79,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3149": {
+   "text": "쌍지읒.",
+   "span": 0.93,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3147": {
+   "text": "이응, 오이 할 때 이응.",
+   "span": 2.68,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314A": {
+   "text": "치읓, 치마 할 때 치읓.",
+   "span": 2.19,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314B": {
+   "text": "키읔, 코끼리 할 때 키읔.",
+   "span": 2.31,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3148": {
+   "text": "지읒, 지도 할 때 지읒.",
+   "span": 2.11,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314D": {
+   "text": "피읖, 포도 할 때 피읖.",
+   "span": 2.16,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314C": {
+   "text": "티읕, 토마토 할 때 티읕.",
+   "span": 2.28,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314E": {
+   "text": "히읗, 하마 할 때 히읗.",
+   "span": 2.24,
+   "runs": 2,
+   "ok": true
+  },
+  "j_314F": {
+   "text": "아, 아기 할 때 아.",
+   "span": 2.08,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3150": {
+   "text": "애, 개 할 때 애.",
+   "span": 2.03,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3153": {
+   "text": "어, 어부 할 때 어.",
+   "span": 2.05,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3151": {
+   "text": "야, 야구 할 때 야.",
+   "span": 2.09,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3154": {
+   "text": "에, 게 할 때 에.",
+   "span": 1.96,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3158": {
+   "text": "와, 과자 할 때 와.",
+   "span": 1.97,
+   "runs": 1,
+   "ok": true
+  },
+  "j_315A": {
+   "text": "외.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3155": {
+   "text": "여, 여우 할 때 여.",
+   "span": 2.06,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3157": {
+   "text": "오, 오리 할 때 오.",
+   "span": 2.06,
+   "runs": 2,
+   "ok": true
+  },
+  "j_315B": {
+   "text": "요, 요요 할 때 요.",
+   "span": 2.0,
+   "runs": 2,
+   "ok": true
+  },
+  "j_315C": {
+   "text": "우, 우유 할 때 우.",
+   "span": 2.25,
+   "runs": 2,
+   "ok": true
+  },
+  "j_315F": {
+   "text": "위, 귀 할 때 위.",
+   "span": 1.99,
+   "runs": 2,
+   "ok": true
+  },
+  "j_315D": {
+   "text": "워, 원숭이 할 때 워.",
+   "span": 2.31,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3160": {
+   "text": "유, 우유 할 때 유.",
+   "span": 2.15,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3161": {
+   "text": "으, 으르렁 할 때 으.",
+   "span": 2.2,
+   "runs": 2,
+   "ok": true
+  },
+  "j_3162": {
+   "text": "의, 의자 할 때 의.",
+   "span": 2.1,
+   "runs": 1,
+   "ok": true
+  },
+  "j_3163": {
+   "text": "이, 이 할 때 이.",
+   "span": 2.08,
+   "runs": 2,
+   "ok": true
+  },
+  "s_2": {
+   "text": "바나나 나무.",
+   "span": 1.14,
+   "runs": 1,
+   "ok": true
+  },
+  "s_4": {
+   "text": "나비 모자.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  },
+  "s_1": {
+   "text": "나비도 나무도.",
+   "span": 1.24,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC00": {
+   "text": "가.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "s_6": {
+   "text": "아기 모자.",
+   "span": 1.03,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC10": {
+   "text": "감.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC15": {
+   "text": "강.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC38": {
+   "text": "갸.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC1C": {
+   "text": "개.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC70": {
+   "text": "거.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AC8C": {
+   "text": "게.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ACE0": {
+   "text": "고.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ACA8": {
+   "text": "겨.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ACF0": {
+   "text": "곰.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ACF5": {
+   "text": "공.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ACFC": {
+   "text": "과.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AD6C": {
+   "text": "구.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AD50": {
+   "text": "교.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AD6D": {
+   "text": "국.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ADC0": {
+   "text": "귀.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ADF8": {
+   "text": "그.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_ADDC": {
+   "text": "규.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AE30": {
+   "text": "기.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AE40": {
+   "text": "김.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AE00": {
+   "text": "글.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AF2C": {
+   "text": "꼬.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AE4C": {
+   "text": "까.",
+   "span": 0.55,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_AF43": {
+   "text": "꽃.",
+   "span": 0.48,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B07C": {
+   "text": "끼.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B098": {
+   "text": "나.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B0B4": {
+   "text": "내.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B108": {
+   "text": "너.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B124": {
+   "text": "네.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B0D0": {
+   "text": "냐.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B178": {
+   "text": "노.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B140": {
+   "text": "녀.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B1E8": {
+   "text": "뇨.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B204": {
+   "text": "누.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B208": {
+   "text": "눈.",
+   "span": 0.73,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B180": {
+   "text": "놀.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B290": {
+   "text": "느.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B274": {
+   "text": "뉴.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B298": {
+   "text": "늘.",
+   "span": 0.67,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B2E4": {
+   "text": "다.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B2C8": {
+   "text": "니.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B2EC": {
+   "text": "달.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B3C4": {
+   "text": "도.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B354": {
+   "text": "더.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B450": {
+   "text": "두.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B514": {
+   "text": "디.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B4DC": {
+   "text": "드.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B3FC": {
+   "text": "돼.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B538": {
+   "text": "딸.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B5A1": {
+   "text": "떡.",
+   "span": 0.41,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B77C": {
+   "text": "라.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B798": {
+   "text": "래.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B791": {
+   "text": "랑.",
+   "span": 0.7,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B7EC": {
+   "text": "러.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B801": {
+   "text": "렁.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B78C": {
+   "text": "람.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9AC": {
+   "text": "리.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B8E8": {
+   "text": "루.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B974": {
+   "text": "르.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B824": {
+   "text": "려.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B85C": {
+   "text": "로.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9B0": {
+   "text": "린.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9C8": {
+   "text": "마.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9E4": {
+   "text": "매.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9D0": {
+   "text": "말.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9B4": {
+   "text": "릴.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_B9BC": {
+   "text": "림.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BA00": {
+   "text": "먀.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BA38": {
+   "text": "머.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BA54": {
+   "text": "메.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BA70": {
+   "text": "며.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BA74": {
+   "text": "면.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BAA8": {
+   "text": "모.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BABD": {
+   "text": "몽.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BB18": {
+   "text": "묘.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BB34": {
+   "text": "무.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BB38": {
+   "text": "문.",
+   "span": 0.73,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BB3C": {
+   "text": "물.",
+   "span": 0.73,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BBA4": {
+   "text": "뮤.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BBC0": {
+   "text": "므.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BBF8": {
+   "text": "미.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC15": {
+   "text": "박.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC14": {
+   "text": "바.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC1C": {
+   "text": "발.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC24": {
+   "text": "밤.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC29": {
+   "text": "방.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC25": {
+   "text": "밥.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC30": {
+   "text": "배.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BC84": {
+   "text": "버.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BCC4": {
+   "text": "별.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BCF4": {
+   "text": "보.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BD07": {
+   "text": "봇.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BD80": {
+   "text": "부.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BD81": {
+   "text": "북.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BD84": {
+   "text": "분.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BE44": {
+   "text": "비.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BE0C": {
+   "text": "브.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BE57": {
+   "text": "빗.",
+   "span": 0.51,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BE60": {
+   "text": "빠.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BF40": {
+   "text": "뽀.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_BE75": {
+   "text": "빵.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C0AC": {
+   "text": "사.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C0B0": {
+   "text": "산.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C0C1": {
+   "text": "상.",
+   "span": 0.69,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C0C8": {
+   "text": "새.",
+   "span": 0.69,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C11C": {
+   "text": "서.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C120": {
+   "text": "선.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C18C": {
+   "text": "소.",
+   "span": 0.7,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C12F": {
+   "text": "섯.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C190": {
+   "text": "손.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C218": {
+   "text": "수.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C22D": {
+   "text": "숭.",
+   "span": 0.72,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C2DC": {
+   "text": "시.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C2A4": {
+   "text": "스.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C544": {
+   "text": "아.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C528": {
+   "text": "씨.",
+   "span": 0.7,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C545": {
+   "text": "악.",
+   "span": 0.47,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C557": {
+   "text": "앗.",
+   "span": 0.48,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C560": {
+   "text": "애.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C57C": {
+   "text": "야.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C591": {
+   "text": "양.",
+   "span": 0.69,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C5B4": {
+   "text": "어.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C5D0": {
+   "text": "에.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C5EC": {
+   "text": "여.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C5C4": {
+   "text": "엄.",
+   "span": 0.67,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C624": {
+   "text": "오.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C637": {
+   "text": "옷.",
+   "span": 0.46,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C694": {
+   "text": "요.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C6B0": {
+   "text": "우.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C720": {
+   "text": "유.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C704": {
+   "text": "위.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C6D0": {
+   "text": "원.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C6CC": {
+   "text": "워.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C73C": {
+   "text": "으.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C758": {
+   "text": "의.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C774": {
+   "text": "이.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C785": {
+   "text": "입.",
+   "span": 0.41,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C794": {
+   "text": "잔.",
+   "span": 0.85,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C7A5": {
+   "text": "장.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C790": {
+   "text": "자.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C800": {
+   "text": "저.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C870": {
+   "text": "조.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C9C0": {
+   "text": "지.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C988": {
+   "text": "즈.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C8FC": {
+   "text": "주.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C9D1": {
+   "text": "집.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_C9D5": {
+   "text": "징.",
+   "span": 0.7,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CC28": {
+   "text": "차.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CC98": {
+   "text": "처.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CD08": {
+   "text": "초.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CC45": {
+   "text": "책.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CD94": {
+   "text": "추.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CC0C": {
+   "text": "찌.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CE58": {
+   "text": "치.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CE74": {
+   "text": "카.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CEE4": {
+   "text": "커.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CE20": {
+   "text": "츠.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CF00": {
+   "text": "케.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CEF5": {
+   "text": "컵.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CFE0": {
+   "text": "쿠.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CF69": {
+   "text": "콩.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_CF54": {
+   "text": "코.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D06C": {
+   "text": "크.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D0A4": {
+   "text": "키.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D0C0": {
+   "text": "타.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D0D5": {
+   "text": "탕.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D1A0": {
+   "text": "토.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D22C": {
+   "text": "투.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D130": {
+   "text": "터.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D2F0": {
+   "text": "티.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D2B8": {
+   "text": "트.",
+   "span": 0.59,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D478": {
+   "text": "푸.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D3EC": {
+   "text": "포.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D37C": {
+   "text": "퍼.",
+   "span": 0.67,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D30C": {
+   "text": "파.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D504": {
+   "text": "프.",
+   "span": 0.58,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D48D": {
+   "text": "풍.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D558": {
+   "text": "하.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D560": {
+   "text": "할.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D574": {
+   "text": "해.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D53C": {
+   "text": "피.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D5C8": {
+   "text": "허.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D590": {
+   "text": "햐.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D638": {
+   "text": "호.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D5E4": {
+   "text": "헤.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D600": {
+   "text": "혀.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D654": {
+   "text": "화.",
+   "span": 0.6,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D6C4": {
+   "text": "후.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D6A8": {
+   "text": "효.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D734": {
+   "text": "휴.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D788": {
+   "text": "히.",
+   "span": 0.64,
+   "runs": 1,
+   "ok": true
+  },
+  "sy_D750": {
+   "text": "흐.",
+   "span": 0.62,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_balloon": {
+   "text": "들은 글자를 눌러 봐!",
+   "span": 1.75,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_bye": {
+   "text": "오늘은 여기까지. 내일 또 하자!",
+   "span": 3.7,
+   "runs": 2,
+   "ok": true
+  },
+  "ui4_block": {
+   "text": "블록으로 글자 만들자!",
+   "span": 1.82,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_hint": {
+   "text": "여기 반짝이는 데를 봐!",
+   "span": 1.77,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_chant": {
+   "text": "반짝이는 칸을 눌러 봐!",
+   "span": 1.88,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_echo2": {
+   "text": "이번엔 려원이가 혼자 읽어 볼까?",
+   "span": 2.35,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_memory": {
+   "text": "카드를 뒤집어서 짝꿍을 찾아볼까?",
+   "span": 2.42,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_free": {
+   "text": "더 놀고 싶으면, 놀이터에서 배운 놀이를 해 볼까?",
+   "span": 3.81,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc1": {
+   "text": "끝까지 들었네",
+   "span": 1.32,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc11": {
+   "text": "천천히 끝까지 해냈네",
+   "span": 1.79,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc12": {
+   "text": "글자를 하나하나 찾아냈네",
+   "span": 2.05,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc15": {
+   "text": "들은 글자를 쏙 잡았네",
+   "span": 1.99,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc2": {
+   "text": "순서대로 썼네",
+   "span": 1.41,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc16": {
+   "text": "어려웠는데 다시 해봤네",
+   "span": 2.07,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc17": {
+   "text": "그림을 보고 잘 생각했네.",
+   "span": 2.15,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc5": {
+   "text": "끝까지 들었네!",
+   "span": 1.28,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc18": {
+   "text": "한 글자씩 또박또박 읽었네",
+   "span": 2.4,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc3": {
+   "text": "혼자 읽었네!",
+   "span": 1.16,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc6": {
+   "text": "두 개를 붙여서 글자를 만들었네",
+   "span": 2.53,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc9": {
+   "text": "같은 소리끼리 잘 모았네!",
+   "span": 1.9,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_proc7": {
+   "text": "다시 찾아냈어. 포기하지 않았네.",
+   "span": 3.67,
+   "runs": 2,
+   "ok": true
+  },
+  "ui4_treasure": {
+   "text": "보물 상자를 열어 볼까?",
+   "span": 1.81,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_tapnext": {
+   "text": "여기 눌러 볼까?",
+   "span": 1.31,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_today": {
+   "text": "오늘 뭐 할까?",
+   "span": 1.18,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_treasure2": {
+   "text": "반짝! 보물을 찾았어!",
+   "span": 2.89,
+   "runs": 2,
+   "ok": true
+  },
+  "ui_clapq": {
+   "text": "몇 번 박수 쳤을까?",
+   "span": 1.59,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_find": {
+   "text": "어디 있을까?",
+   "span": 1.11,
+   "runs": 1,
+   "ok": true
+  },
+  "ui4_try": {
+   "text": "괜찮아. 같이 해 보자.",
+   "span": 3.0,
+   "runs": 2,
+   "ok": true
+  },
+  "ui_found": {
+   "text": "찾았다!",
+   "span": 0.91,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_good1": {
+   "text": "잘했어!",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_good2": {
+   "text": "멋져!",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_clapyou": {
+   "text": "이제 려원이도 짝짝 쳐 볼까?",
+   "span": 2.18,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_good3": {
+   "text": "최고야!",
+   "span": 0.86,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_listen": {
+   "text": "잘 듣고 골라 봐.",
+   "span": 1.6,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_hiname": {
+   "text": "려원아, 안녕!",
+   "span": 1.61,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_merge": {
+   "text": "블록을 합쳐서 만들어 볼까?",
+   "span": 2.05,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_levelup": {
+   "text": "우와, 한 단계 올라갔어!",
+   "span": 2.24,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_match": {
+   "text": "낱말 카드를 그림에 데려다 줄래?",
+   "span": 2.29,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_same": {
+   "text": "같은 소리로 시작하는 그림은 뭘까?",
+   "span": 2.35,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_sticker": {
+   "text": "스티커 받았어!",
+   "span": 1.29,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_together": {
+   "text": "같이 해 보자!",
+   "span": 1.16,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_which": {
+   "text": "어떤 그림일까?",
+   "span": 1.33,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_trace": {
+   "text": "분홍 점을 따라 손가락으로 써 볼까?",
+   "span": 2.54,
+   "runs": 1,
+   "ok": true
+  },
+  "w_agi": {
+   "text": "아기.",
+   "span": 0.79,
+   "runs": 1,
+   "ok": true
+  },
+  "ui_train": {
+   "text": "기차 칸을 눌러 봐. 무슨 소리가 날까?",
+   "span": 2.66,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ageo": {
+   "text": "악어.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ai": {
+   "text": "아이.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_appa": {
+   "text": "아빠.",
+   "span": 0.92,
+   "runs": 1,
+   "ok": true
+  },
+  "w_bada": {
+   "text": "바다.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "w_bae": {
+   "text": "배.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "w_bal": {
+   "text": "발.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "w_banana": {
+   "text": "바나나.",
+   "span": 0.95,
+   "runs": 1,
+   "ok": true
+  },
+  "w_bap": {
+   "text": "밥.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "w_beoseot": {
+   "text": "버섯.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "w_beoseu": {
+   "text": "버스.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "w_byeol": {
+   "text": "별.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "w_chaek": {
+   "text": "책.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "w_cha": {
+   "text": "차.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "w_chijeu": {
+   "text": "치즈.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "w_chima": {
+   "text": "치마.",
+   "span": 0.79,
+   "runs": 1,
+   "ok": true
+  },
+  "w_dal": {
+   "text": "달.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_dari": {
+   "text": "다리.",
+   "span": 0.79,
+   "runs": 1,
+   "ok": true
+  },
+  "w_dubu": {
+   "text": "두부.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_dwaeji": {
+   "text": "돼지.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_eomma": {
+   "text": "엄마.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "w_eobu": {
+   "text": "어부.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_eureureong": {
+   "text": "으르렁.",
+   "span": 0.92,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gae": {
+   "text": "개.",
+   "span": 0.57,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gabang": {
+   "text": "가방.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gangaji": {
+   "text": "강아지.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gawi": {
+   "text": "가위.",
+   "span": 0.85,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ge": {
+   "text": "게.",
+   "span": 0.56,
+   "runs": 1,
+   "ok": true
+  },
+  "w_geomi": {
+   "text": "거미.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_geurim": {
+   "text": "그림.",
+   "span": 0.92,
+   "runs": 1,
+   "ok": true
+  },
+  "w_geobuk": {
+   "text": "거북.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gimbap": {
+   "text": "김밥.",
+   "span": 0.85,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gicha": {
+   "text": "기차.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "w_girin": {
+   "text": "기린.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gita": {
+   "text": "기타.",
+   "span": 0.93,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gochu": {
+   "text": "고추.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gom": {
+   "text": "곰.",
+   "span": 0.76,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gogi": {
+   "text": "고기.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_goguma": {
+   "text": "고구마.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gong": {
+   "text": "공.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gorae": {
+   "text": "고래.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gorilla": {
+   "text": "고릴라.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "w_guk": {
+   "text": "국.",
+   "span": 0.5,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gudu": {
+   "text": "구두.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gwaja": {
+   "text": "과자.",
+   "span": 0.86,
+   "runs": 1,
+   "ok": true
+  },
+  "w_goyangi": {
+   "text": "고양이.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "w_gwi": {
+   "text": "귀.",
+   "span": 0.65,
+   "runs": 1,
+   "ok": true
+  },
+  "w_halmeoni": {
+   "text": "할머니.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "w_harabeoji": {
+   "text": "할아버지.",
+   "span": 1.02,
+   "runs": 1,
+   "ok": true
+  },
+  "w_hodu": {
+   "text": "호두.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_hobak": {
+   "text": "호박.",
+   "span": 0.68,
+   "runs": 1,
+   "ok": true
+  },
+  "w_hwabun": {
+   "text": "화분.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_hama": {
+   "text": "하마.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ima": {
+   "text": "이마.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_i_tooth": {
+   "text": "이.",
+   "span": 0.63,
+   "runs": 1,
+   "ok": true
+  },
+  "w_hyuji": {
+   "text": "휴지.",
+   "span": 0.89,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ip": {
+   "text": "입.",
+   "span": 0.41,
+   "runs": 1,
+   "ok": true
+  },
+  "w_jido": {
+   "text": "지도.",
+   "span": 0.74,
+   "runs": 1,
+   "ok": true
+  },
+  "w_jadu": {
+   "text": "자두.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_jip": {
+   "text": "집.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "w_kkachi": {
+   "text": "까치.",
+   "span": 0.93,
+   "runs": 1,
+   "ok": true
+  },
+  "w_juseu": {
+   "text": "주스.",
+   "span": 0.91,
+   "runs": 1,
+   "ok": true
+  },
+  "w_kkot": {
+   "text": "꽃.",
+   "span": 0.48,
+   "runs": 1,
+   "ok": true
+  },
+  "w_keop": {
+   "text": "컵.",
+   "span": 0.52,
+   "runs": 1,
+   "ok": true
+  },
+  "w_keikeu": {
+   "text": "케이크.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ko": {
+   "text": "코.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "w_kokkiri": {
+   "text": "코끼리.",
+   "span": 0.96,
+   "runs": 1,
+   "ok": true
+  },
+  "w_kong": {
+   "text": "콩.",
+   "span": 0.66,
+   "runs": 1,
+   "ok": true
+  },
+  "w_mal": {
+   "text": "말.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "w_lion": {
+   "text": "사자.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "w_mogi": {
+   "text": "모기.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_moja": {
+   "text": "모자.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_mul": {
+   "text": "물.",
+   "span": 0.73,
+   "runs": 1,
+   "ok": true
+  },
+  "w_mun": {
+   "text": "문.",
+   "span": 0.73,
+   "runs": 1,
+   "ok": true
+  },
+  "w_nemo": {
+   "text": "네모.",
+   "span": 0.79,
+   "runs": 1,
+   "ok": true
+  },
+  "w_namu": {
+   "text": "나무.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "w_nabi": {
+   "text": "나비.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_nuna": {
+   "text": "누나.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_nunsaram": {
+   "text": "눈사람.",
+   "span": 1.04,
+   "runs": 1,
+   "ok": true
+  },
+  "w_oi": {
+   "text": "오이.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ori": {
+   "text": "오리.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ot": {
+   "text": "옷.",
+   "span": 0.46,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ojingeo": {
+   "text": "오징어.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "w_pado": {
+   "text": "파도.",
+   "span": 0.77,
+   "runs": 1,
+   "ok": true
+  },
+  "w_pija": {
+   "text": "피자.",
+   "span": 0.79,
+   "runs": 1,
+   "ok": true
+  },
+  "w_podo": {
+   "text": "포도.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_pungseon": {
+   "text": "풍선.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ppang": {
+   "text": "빵.",
+   "span": 0.61,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ramyeon": {
+   "text": "라면.",
+   "span": 0.94,
+   "runs": 1,
+   "ok": true
+  },
+  "w_radio": {
+   "text": "라디오.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_robot": {
+   "text": "로봇.",
+   "span": 0.71,
+   "runs": 1,
+   "ok": true
+  },
+  "w_sagwa": {
+   "text": "사과.",
+   "span": 0.86,
+   "runs": 1,
+   "ok": true
+  },
+  "w_saeu": {
+   "text": "새우.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_san": {
+   "text": "산.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ryeowon": {
+   "text": "려원.",
+   "span": 0.97,
+   "runs": 1,
+   "ok": true
+  },
+  "w_satang": {
+   "text": "사탕.",
+   "span": 0.98,
+   "runs": 1,
+   "ok": true
+  },
+  "w_sangeo": {
+   "text": "상어.",
+   "span": 0.8,
+   "runs": 1,
+   "ok": true
+  },
+  "w_son": {
+   "text": "손.",
+   "span": 0.75,
+   "runs": 1,
+   "ok": true
+  },
+  "w_sobangcha": {
+   "text": "소방차.",
+   "span": 1.1,
+   "runs": 1,
+   "ok": true
+  },
+  "w_so": {
+   "text": "소.",
+   "span": 0.7,
+   "runs": 1,
+   "ok": true
+  },
+  "w_sora": {
+   "text": "소라.",
+   "span": 0.83,
+   "runs": 1,
+   "ok": true
+  },
+  "w_seonmul": {
+   "text": "선물.",
+   "span": 0.93,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ssiat": {
+   "text": "씨앗.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_subak": {
+   "text": "수박.",
+   "span": 0.72,
+   "runs": 1,
+   "ok": true
+  },
+  "w_tomato": {
+   "text": "토마토.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  },
+  "w_tokki": {
+   "text": "토끼.",
+   "span": 0.82,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ttalgi": {
+   "text": "딸기.",
+   "span": 0.86,
+   "runs": 1,
+   "ok": true
+  },
+  "w_tteok": {
+   "text": "떡.",
+   "span": 0.41,
+   "runs": 1,
+   "ok": true
+  },
+  "w_ubi": {
+   "text": "우비.",
+   "span": 0.78,
+   "runs": 1,
+   "ok": true
+  },
+  "w_uija": {
+   "text": "의자.",
+   "span": 0.81,
+   "runs": 1,
+   "ok": true
+  },
+  "w_yagu": {
+   "text": "야구.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "w_yeou": {
+   "text": "여우.",
+   "span": 0.9,
+   "runs": 1,
+   "ok": true
+  },
+  "w_uyu": {
+   "text": "우유.",
+   "span": 0.84,
+   "runs": 1,
+   "ok": true
+  },
+  "w_yoyo": {
+   "text": "요요.",
+   "span": 0.83,
+   "runs": 1,
+   "ok": true
+  },
+  "w_wonsungi": {
+   "text": "원숭이.",
+   "span": 1.0,
+   "runs": 1,
+   "ok": true
+  }
+ },
+ "suspect": [],
+ "errors": {}
+}
