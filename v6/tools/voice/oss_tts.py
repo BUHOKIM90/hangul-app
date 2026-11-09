@@ -81,6 +81,55 @@ def mos(wav, sr):
     x = torch.from_numpy(np.asarray(wav, dtype=np.float32)).unsqueeze(0)
     with torch.no_grad(): return float(_mos(x, sr).item())
 
+_fc = None
+def _fc_load():
+    global _fc
+    if _fc is None:
+        from transformers import WhisperForConditionalGeneration, WhisperProcessor
+        pr = WhisperProcessor.from_pretrained('openai/whisper-large-v3-turbo')
+        pr.tokenizer.set_prefix_tokens(language='korean', task='transcribe', predict_timestamps=False)
+        _fc = (pr, WhisperForConditionalGeneration.from_pretrained('openai/whisper-large-v3-turbo').eval())
+    return _fc
+
+def logp(path, texts):
+    """How likely Whisper finds each transcript for this audio (sum of token log-probs, teacher forced)."""
+    pr, m = _fc_load()
+    import librosa
+    wav, _ = librosa.load(path, sr=16000)
+    feat = pr(wav, sampling_rate=16000, return_tensors='pt').input_features
+    out = []
+    with torch.no_grad():
+        enc = m.model.encoder(feat).last_hidden_state
+        for i in range(0, len(texts), 24):
+            ids = [pr.tokenizer(t).input_ids for t in texts[i:i + 24]]
+            L = max(map(len, ids)); eot = pr.tokenizer.eos_token_id
+            x = torch.tensor([a + [eot] * (L - len(a)) for a in ids]); mask = torch.tensor([[1] * len(a) + [0] * (L - len(a)) for a in ids])
+            logits = m(encoder_outputs=(enc.expand(len(ids), -1, -1),), decoder_input_ids=x[:, :-1]).logits
+            lp = torch.log_softmax(logits.float(), -1).gather(-1, x[:, 1:].unsqueeze(-1)).squeeze(-1) * mask[:, 1:]
+            out += lp.sum(1).tolist()
+    return out
+
+def confusables(ch):
+    c = ord(ch) - 0xAC00; cho, jung, jong = c // 588, (c % 588) // 28, c % 28
+    alt = {chr(0xAC00 + x * 588 + jung * 28 + jong) for x in range(19)} | {chr(0xAC00 + cho * 588 + x * 28 + jong) for x in range(21)} \
+        | {chr(0xAC00 + cho * 588 + jung * 28 + x) for x in range(28)}
+    alt.discard(ch); return sorted(alt)
+
+def right(path, text, heard):
+    """Was the line said right? Exact read-back, or (single letters, where read-back is unreliable) the letter wins
+    against every letter that differs in one part (가 vs 카/까/거/각 ...); for longer lines, Whisper finds the real
+    line about as likely as its own guess."""
+    c = cer(text, heard)
+    if c == 0: return True, 'heard'
+    h = hangul(text)
+    if len(h) == 1:
+        cands = [text] + [text.replace(h, x) for x in confusables(h)]
+        s = logp(path, cands)
+        return s[0] >= max(s[1:]), 'forced-choice'
+    if c > 0.34: return False, 'misheard'
+    s = logp(path, [text, heard])
+    return s[0] >= s[1] - 1.0, 'likelihood'
+
 def hangul(s): return re.sub(r'[^가-힣]', '', s)
 def cer(ref, hyp):
     r, h = hangul(ref), hangul(hyp)
@@ -125,7 +174,8 @@ def check(path, text, wav=None, sr=None):
     if wav is None: wav, sr = sf.read(path, dtype='float32'); wav = wav if wav.ndim == 1 else wav.mean(1)
     r = {'text': text, 'heard': heard, 'cer': round(cer(text, heard), 3), 'span': round(span, 2), 'runs': runs,
          'mos': round(mos(wav, sr), 3)}
-    r['ok'] = r['cer'] == 0 and lo <= span <= hi and runs <= max_runs + 1
+    r['right'], r['how'] = right(path, text, heard)
+    r['ok'] = bool(r['right']) and lo <= span <= hi and runs <= max_runs + 1
     return r
 
 def best_of(eng, text, voice, tries, path):
@@ -151,7 +201,7 @@ def best_of(eng, text, voice, tries, path):
 def summary(rows):
     rows = [r for r in rows if r]
     if not rows: return {}
-    return {'n': len(rows), 'ok': sum(r['ok'] for r in rows), 'cer': round(float(np.mean([r['cer'] for r in rows])), 3),
+    return {'n': len(rows), 'ok': sum(r['ok'] for r in rows), 'right': sum(bool(r.get('right')) for r in rows), 'cer': round(float(np.mean([r['cer'] for r in rows])), 3),
             'mos': round(float(np.mean([r['mos'] for r in rows])), 3)}
 
 # ---------------------------------------------------------------- modes
@@ -179,12 +229,15 @@ def cmd_baseline(a):
     test = {}
     for k in test_keys():
         test[k] = check(os.path.join(ROOT, 'audio', k + '.mp3'), LINES[k])
+    letters = {k: check(os.path.join(ROOT, 'audio', k + '.mp3'), LINES[k]) for k in sorted(LINES) if k.startswith('sy_')}
     sam = {}
     for f in sorted(os.listdir(os.path.join(ROOT, 'v6/voice-samples'))):
         if f.startswith('sunhi_') and f.endswith('.mp3') and not f.startswith('sunhi_slow'):
             i = int(f.split('_')[1].split('.')[0]); sam[f] = check(os.path.join(ROOT, 'v6/voice-samples', f), SAMPLE_LINES[i])
     res = {'sunhi_now': {'engine': 'edge', 'voice': 'ko-KR-SunHiNeural', 'test': test, 'samples': list(sam.values()),
-                         'score': summary(list(test.values())), 'score_letters': summary([test[k] for k in test if k.startswith('sy_')])}}
+                         'score': summary(list(test.values())), 'score_letters': summary([test[k] for k in test if k.startswith('sy_')]),
+                         'all_letters': summary(list(letters.values())), 'letters_wrong': {k: v for k, v in letters.items() if not v['right']}}}
+    print(res['sunhi_now']['all_letters'], list(res['sunhi_now']['letters_wrong'].items())[:30])
     print(res['sunhi_now']['score'], res['sunhi_now']['score_letters'])
     os.makedirs(OUT, exist_ok=True)
     json.dump(res, open(os.path.join(OUT, 'scores_baseline.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)

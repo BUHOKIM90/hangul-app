@@ -3,7 +3,8 @@
 import json, os, shutil, glob
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 OUT = os.path.join(ROOT, 'out'); SAM = os.path.join(ROOT, 'v6/voice-samples')
-scores = {}
+SC = os.path.join(ROOT, 'v6/tools/voice/oss_scores.json')
+scores = json.load(open(SC, encoding='utf8')) if os.path.exists(SC) else {}
 for f in sorted(glob.glob(os.path.join(OUT, '**', 'scores_*.json'), recursive=True)):
     scores.update(json.load(open(f, encoding='utf8')))
 for f in glob.glob(os.path.join(OUT, '**', 'samples', '*.mp3'), recursive=True):

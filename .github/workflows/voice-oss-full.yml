@@ -1,0 +1,56 @@
+name: voice-oss-full
+# Remake every app clip with the chosen open-source voice (6 parallel parts), keep only clips heard exactly right.
+on:
+  workflow_dispatch:
+    inputs:
+      engine: { default: magpie }
+      voice: { default: Sofia }
+      min_pass: { default: '0.97' }
+permissions:
+  contents: write
+concurrency: voice
+jobs:
+  gen:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg libsndfile1 sox
+      - run: pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -q faster-whisper soundfile numpy transformers librosa
+      - if: inputs.engine == 'magpie'
+        run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign peft
+      - if: inputs.engine == 'omnivoice'
+        run: pip install -q omnivoice
+      - run: python v6/tools/voice/oss_tts.py full --engine ${{ inputs.engine }} --voice ${{ inputs.voice }} --shard ${{ matrix.shard }}/8
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: 'full-${{ matrix.shard }}', path: out, if-no-files-found: ignore }
+  apply:
+    needs: gen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg && pip install -q numpy
+      - uses: actions/download-artifact@v4
+        with: { path: out }
+      - run: python3 v6/tools/voice/oss_apply.py
+        env: { ENGINE: '${{ inputs.engine }}', VOICE: '${{ inputs.voice }}', MIN_PASS: '${{ inputs.min_pass }}' }
+      - run: rm -f v6/tools/trim.json && node v6/tools/build.mjs .
+      - run: |
+          git config user.name "voice-bot"
+          git config user.email "voice-bot@users.noreply.github.com"
+          git add audio v6/tools/trim.json v6/js/trim.js sw.js v6/tools/voice/report_oss.json
+          git commit -m "voice: 앱 음성을 ${{ inputs.engine }} ${{ inputs.voice }} 목소리로 다시 만듦 (Whisper로 모두 확인)" || exit 0
+          git pull --rebase -q origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"

@@ -2,6 +2,8 @@ name: voice-oss
 # Open-source Korean voices (NVIDIA Magpie, OmniVoice): samples for 목소리 고르기 + automatic scores vs the current voice.
 on:
   workflow_dispatch:
+    inputs:
+      parts: { default: '["baseline","magpie","omnivoice"]' }
   push:
     branches: ['v6.*']
     paths: ['v6/tools/voice/oss_tts.py', 'v6/tools/voice/oss_merge.py', '.github/workflows/voice-oss.yml']
@@ -13,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        part: [baseline, magpie, omnivoice]
+        part: ${{ fromJSON(inputs.parts || '["baseline","magpie","omnivoice"]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
@@ -22,9 +24,9 @@ jobs:
         with: { python-version: '3.11' }
       - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg libsndfile1 sox
       - run: pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-      - run: pip install -q faster-whisper soundfile numpy
+      - run: pip install -q faster-whisper soundfile numpy transformers librosa
       - if: matrix.part == 'magpie'
-        run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign
+        run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign peft
       - if: matrix.part == 'omnivoice'
         run: pip install -q omnivoice
       - if: matrix.part == 'baseline'
