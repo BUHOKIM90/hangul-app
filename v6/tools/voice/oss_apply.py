@@ -10,7 +10,11 @@ rep = {}
 for f in glob.glob(os.path.join(ROOT, 'out', '**', 'full_*.json'), recursive=True):
     rep.update(json.load(open(f, encoding='utf8')))
 src = {os.path.basename(p)[:-4]: p for p in glob.glob(os.path.join(ROOT, 'out', '**', 'audio', '*.mp3'), recursive=True)}
-good = [k for k in LINES if k in rep and rep[k].get('right') and k in src]
+def better(r):
+    # single letters: at least as clearly that letter (vs every look-alike letter) as the clip used now
+    if r.get('old_margin') is not None: return r.get('margin') is not None and r['margin'] >= min(r['old_margin'], 0.0)
+    return bool(r.get('right'))
+good = [k for k in LINES if k in rep and k in src and better(rep[k])]
 kept = sorted(set(LINES) - set(good))
 print(f'right {len(good)}/{len(LINES)}; kept old voice: {kept[:80]}')
 out = {'engine': os.environ.get('ENGINE'), 'voice': os.environ.get('VOICE'), 'right': len(good), 'total': len(LINES), 'kept_old': kept, 'clips': rep}

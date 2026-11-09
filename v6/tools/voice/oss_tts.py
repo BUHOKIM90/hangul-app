@@ -125,7 +125,7 @@ def right(path, text, heard):
     if len(h) == 1:
         cands = [text] + [text.replace(h, x) for x in confusables(h)]
         s = logp(path, cands)
-        return s[0] >= max(s[1:]), 'forced-choice'
+        return s[0] >= max(s[1:]), 'forced-choice:%.2f' % (s[0] - max(s[1:]))
     if c > 0.34: return False, 'misheard'
     s = logp(path, [text, heard])
     return s[0] >= s[1] - 1.0, 'likelihood'
@@ -175,6 +175,7 @@ def check(path, text, wav=None, sr=None):
     r = {'text': text, 'heard': heard, 'cer': round(cer(text, heard), 3), 'span': round(span, 2), 'runs': runs,
          'mos': round(mos(wav, sr), 3)}
     r['right'], r['how'] = right(path, text, heard)
+    r['margin'] = float(r['how'].split(':')[1]) if r['how'].startswith('forced') else (5.0 if r['right'] and len(hangul(text)) == 1 else None)
     r['ok'] = bool(r['right']) and lo <= span <= hi and runs <= max_runs + 1
     return r
 
@@ -189,7 +190,8 @@ def best_of(eng, text, voice, tries, path):
         tmp = path + f'.try{t}.mp3'
         to_mp3(wav, sr, tmp)
         r = check(tmp, text, wav, sr); r['take'] = t
-        if best is None or (r['ok'], -r['cer'], r['mos']) > (best[0]['ok'], -best[0]['cer'], best[0]['mos']):
+        key = lambda q: (q['ok'], q['margin'] or 0, -q['cer'], q['mos'])
+        if best is None or key(r) > key(best[0]):
             if best: os.remove(best[1])
             best = (r, tmp)
         else: os.remove(tmp)
@@ -214,15 +216,16 @@ def cmd_samples(a):
         files, rows, test = [], [], {}
         for i, t in enumerate(SAMPLE_LINES):
             f = f'{vid}_{i}.mp3'
-            r = best_of(eng, t, v, 3, os.path.join(OUT, 'samples', f))
+            r = best_of(eng, t, v, 2, os.path.join(OUT, 'samples', f))
             if r: files.append(f); rows.append(r)
         for k in keys:
             p = os.path.join(OUT, 'samples', f'_t_{vid}_{k}.mp3')
-            r = best_of(eng, LINES[k], v, 2, p)
+            r = best_of(eng, LINES[k], v, 1, p)
             if r: test[k] = r; os.remove(p)
         res[vid] = {'engine': a.engine, 'voice': v, 'files': files, 'samples': rows, 'test': test,
                     'score': summary(list(test.values())), 'score_letters': summary([test[k] for k in test if k.startswith('sy_')])}
         print(vid, res[vid]['score'], 'letters', res[vid]['score_letters'], flush=True)
+        json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
     json.dump(res, open(os.path.join(OUT, f'scores_{a.engine}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 
 def cmd_baseline(a):
@@ -251,7 +254,12 @@ def cmd_full(a):
     for k in keys:
         r = best_of(eng, LINES[k], a.voice, a.tries, os.path.join(OUT, 'audio', k + '.mp3'))
         rep[k] = r or {'text': LINES[k], 'ok': False, 'failed': True}
+        if r and len(hangul(LINES[k])) == 1:   # how clearly the clip the app uses now says this letter
+            old = os.path.join(ROOT, 'audio', k + '.mp3')
+            rr, how = right(old, LINES[k], asr(old))
+            rep[k]['old_margin'] = float(how.split(':')[1]) if how.startswith('forced') else 5.0
         print(k, (r or {}).get('ok'), (r or {}).get('heard'), (r or {}).get('mos'), flush=True)
+        json.dump(rep, open(os.path.join(OUT, f'full_{i}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
     json.dump(rep, open(os.path.join(OUT, f'full_{i}.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 
 if __name__ == '__main__':
