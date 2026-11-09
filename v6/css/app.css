@@ -1037,3 +1037,21 @@ html[data-world="8"] #scene .tw { background: #fff; }
 .pic img.em.own { width: 1.3em; height: 1.3em; margin: -.15em; }
 /* shop name tags: keep the word clear of the tag hole */
 .tag { padding-left: 7vmin; padding-right: 3.6vmin; white-space: nowrap; }
+
+/* praise word: never wider than the screen */
+#praise { white-space: normal; width: max-content; max-width: 92vw; text-align: center; line-height: 1.15; word-break: keep-all; }
+
+/* picture + word under it */
+.picw { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: .4em; line-height: 1; }
+.picw .cap { font-weight: 400; font-family: var(--font); color: var(--ink); font-size: max(18px, 5.4vmin); white-space: nowrap; letter-spacing: .02em; }
+.card .picw .pic { font-size: 14vmin; }
+.card.pair .picw .pic { font-size: 9vmin; }
+.card.pair .picw .cap { font-size: max(15px, 4.2vmin); }
+.picw.pic-l .pic { font-size: 15vmin; }
+.picw.pic-l .cap { font-size: max(18px, 5vmin); }
+.cust-bubble .picw .pic { font-size: 11vmin; }
+.cust-bubble .picw .cap { font-size: max(16px, 4.4vmin); }
+.pick.read .card .picw .pic { font-size: 11vmin; }
+/* the play buddy: bigger, friendlier presence */
+.buddy { width: 19vmin; }
+@media (orientation: portrait) { .buddy { width: 22vmin; } }

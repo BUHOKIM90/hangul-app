@@ -129,6 +129,8 @@
     A.sfx(UI.pick(['yay1', 'yay2', 'yay3', 'yay4']));
     const box = UI.$('#praise');
     box.textContent = p.text;
+    /* always fits the screen width (phones): size by length, wrap if still needed */
+    box.style.fontSize = `min(11.5vmin, ${Math.max(6, Math.floor(84 / Math.max(4, p.text.length + 1)))}vw)`;
     box.hidden = false;
     box.classList.remove('show'); void box.offsetWidth; box.classList.add('show');
     UI.burst(at);
@@ -241,6 +243,11 @@
   UI.pic = function (w, cls) {
     const W = D.WORDS[w];
     return `<span class="pic ${cls || ''}" aria-label="${W ? W.w : ''}">${UI.picFace(W && W.pic)}</span>`;
+  };
+  /* Picture with its word written underneath (so the child always sees the letters with the picture). */
+  UI.picW = function (w, cls) {
+    const W = D.WORDS[w];
+    return `<span class="picw ${cls || ''}">${UI.pic(w)}<b class="cap">${W ? UI.esc(W.w) : ''}</b></span>`;
   };
   UI.live = function (t) { const l = UI.$('#live'); if (l) l.textContent = t; };
 

@@ -234,32 +234,40 @@
       } else A.sfx('tap');
     }
     light(-1);
-    /* phase 3: find the sound */
+    /* phase 3: find the sound. Any cell with the same letter counts (나비 나무 has two 나). */
     UI.$('.play-sub', host).textContent = '어떤 칸일까?';
     cells.forEach(c => c.classList.remove('done'));
+    let qNow = -1;
+    /* during the quiz the button repeats only the letter to find; before it, the whole song */
+    songBtn.innerHTML = UI.E('🔊 다시 듣기');
     songBtn.hidden = false;
-    UI.tap(songBtn, () => A.song(keys, light, cfg.beat || 0.66).then(() => light(-1)));
-    const qs = shuffle(syl.map((s, i) => i)).slice(0, Math.min(cfg.quiz || 2, syl.length));
+    UI.tap(songBtn, () => { if (qNow >= 0) A.play(keys[qNow]); else A.song(keys, light, cfg.beat || 0.66).then(() => light(-1)); });
+    const uniq = syl.map((s, i) => i).filter(i => syl.indexOf(syl[i]) === i);
+    const qs = shuffle(uniq).slice(0, Math.min(cfg.quiz || 2, uniq.length));
     for (const qi of qs) {
       if (!ctx.alive()) return;
+      qNow = qi;
+      const want = syl[qi];
+      const same = cells.filter((c, k) => syl[k] === want);
       await sleep(300);
       A.play(keys[qi]);
       let tries = 0;
-      const stop = hintAfter(ctx, cells[qi], 6000);
+      const stop = hintAfter(ctx, same[0], 6000);
       ans('i' + qi);
       await choose(cells, async (c, e) => {
         const k = +c.dataset.i;
-        if (k === qi) {
-          stop(); c.classList.remove('hint');
-          light(k); await right(ctx, 'chant', e, c, 'sy:' + syl[qi]); light(-1);
+        if (syl[k] === want) {
+          stop(); same.forEach(x => x.classList.remove('hint'));
+          light(k); await right(ctx, 'chant', e, c, 'sy:' + want); light(-1);
           return true;
         }
         tries++;
-        wrong(ctx, c, 'sy:' + syl[qi], thatClip(syl[k]));
-        if (tries >= 2) cells[qi].classList.add('hint');
+        wrong(ctx, c, 'sy:' + want, thatClip(syl[k]));
+        if (tries >= 2) same.forEach(x => x.classList.add('hint'));
         return false;
       });
     }
+    qNow = -1;
   };
 
   /* ---------- 2. pop: balloons ---------- */
@@ -316,7 +324,7 @@
       if (read) b.appendChild(el('div', 'word-big', esc(D.WORDS[k].w)));
       const grid = el('div', 'cards');
       const opts = shuffle([k].concat(apart(shuffle((cfg.pool || cfg.words).filter(x => x !== k && UI.emKey(D.WORDS[x].pic || '') !== UI.emKey(D.WORDS[k].pic || ''))), 2, [k])));
-      const nodes = opts.map(o => { const n = el('button', 'tap card', UI.pic(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
+      const nodes = opts.map(o => { const n = el('button', 'tap card', UI.picW(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
       b.appendChild(grid);
       await sleep(200);
       if (!read) { if (qs.indexOf(k) === 0) await say(ctx, 'ui_which'); A.play('w_' + k); }
@@ -348,7 +356,7 @@
       cur = k;
       const W0 = D.WORDS[k];
       b.innerHTML = '';
-      const top = el('div', 'clap-top', UI.pic(k, 'pic-l'));
+      const top = el('div', 'clap-top', UI.picW(k, 'pic-l'));
       const dots = el('div', 'dots');
       const ds = W0.syl.map(s => { const d = el('span', 'dot', `<b>${esc(s)}</b>`); dots.appendChild(d); return d; });
       top.appendChild(dots);
@@ -387,7 +395,7 @@
       cur = k;
       const n = D.WORDS[k].syl.length;
       b.innerHTML = '';
-      b.appendChild(el('div', 'clap-top', UI.pic(k, 'pic-l') + '<p class="ask">몇 번 쳤을까?</p>'));
+      b.appendChild(el('div', 'clap-top', UI.picW(k, 'pic-l') + '<p class="ask">몇 번 쳤을까?</p>'));
       const row = el('div', 'counts');
       const opts = [1, 2, 3, 4].filter(x => Math.abs(x - n) <= 2).slice(0, 3);
       if (!opts.includes(n)) opts[2] = n;
@@ -419,10 +427,10 @@
       if (!ctx.alive()) return;
       cur = a;
       b.innerHTML = '';
-      const top = el('div', 'first-top', UI.pic(a, 'pic-l') + `<span class="first-syl">${esc(D.WORDS[a].syl[0])}…</span>`);
+      const top = el('div', 'first-top', UI.picW(a, 'pic-l') + `<span class="first-syl">${esc(D.WORDS[a].syl[0])}…</span>`);
       b.appendChild(top);
       const grid = el('div', 'cards');
-      const nodes = shuffle([m].concat(decoys)).map(o => { const n = el('button', 'tap card', UI.pic(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
+      const nodes = shuffle([m].concat(decoys)).map(o => { const n = el('button', 'tap card', UI.picW(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
       b.appendChild(grid);
       await A.play('w_' + a);
       if (!ctx.alive()) return;
@@ -599,7 +607,7 @@
       cur = k;
       const W0 = D.WORDS[k];
       b.innerHTML = '';
-      b.appendChild(el('div', 'train-pic', UI.pic(k, 'pic-l')));
+      b.appendChild(el('div', 'train-pic', UI.picW(k, 'pic-l')));
       const track = el('div', 'track');
       track.appendChild(el('span', 'loco', '🚂'));
       const slots = W0.syl.map(() => { const s = el('span', 'car empty', ''); track.appendChild(s); return s; });
@@ -756,7 +764,7 @@
       const decoyPool = cfg.decoys.filter(d => d.join() !== pics.join() && !d.some(x => pics.some(y => x !== y && D.clash(x, y))));
       const opts = shuffle([pics].concat(shuffle(decoyPool).slice(0, 2)));
       const grid = el('div', 'cards wide');
-      const nodes = opts.map(o => { const n = el('button', 'tap card pair', o.map(k => UI.pic(k)).join('')); n.type = 'button'; n.dataset.v = o.join(); grid.appendChild(n); return n; });
+      const nodes = opts.map(o => { const n = el('button', 'tap card pair', o.map(k => UI.picW(k)).join('')); n.type = 'button'; n.dataset.v = o.join(); grid.appendChild(n); return n; });
       b.appendChild(grid);
       await A.preload(clips);
       await sleep(250);
@@ -843,7 +851,7 @@
       cur = k;
       b.innerHTML = '';
       const pal = pick(pals).id;
-      const cust = el('div', 'customer', `<div class="cust-pal">${UI.mascot('happy', {}, pal)}</div><div class="cust-bubble">${UI.pic(k)}<b>주세요!</b></div>`);
+      const cust = el('div', 'customer', `<div class="cust-pal">${UI.mascot('happy', {}, pal)}</div><div class="cust-bubble">${UI.picW(k)}<b>주세요!</b></div>`);
       const shelf = el('div', 'shelf');
       const pool = (cfg.pool || cfg.words).filter(x => x !== k && D.WORDS[x].w !== D.WORDS[k].w && !D.clash(x, k));
       const opts = shuffle([k].concat(shuffle(pool).slice(0, 2)));

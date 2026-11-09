@@ -5,17 +5,17 @@
   const LINE = '#4B3642';
   const C = {};
   const SPEC = {
-    lumi:  { name: '별사탕 공주 루미', gem: 'ㅎ', body: '#FFE9DE', dress: '#D7C6FF', hair: '#FF9CC8', gemC: '#FF5C9E' },
-    tori:  { name: '구름토끼 토리', gem: 'ㄱ', body: '#FFFFFF', inner: '#FFC2D6', gemC: '#7CC8FF' },
-    kong:  { name: '아기용 콩이', gem: 'ㄴ', body: '#A9EBCF', belly: '#FFF3CF', gemC: '#FFB443' },
-    mong:  { name: '솜사탕양 몽글이', gem: 'ㅏ', body: '#FFE9F2', face: '#FFF4E6', gemC: '#B48CFF' },
-    pomi:  { name: '리본고양이 뽀미', gem: 'ㅁ', body: '#E4DAFF', inner: '#FFC2D6', gemC: '#FF5C93' },
-    piyak: { name: '병아리 삐약이', gem: 'ㅇ', body: '#FFE873', gemC: '#5FC2FF' },
-    bori:  { name: '꿀곰 보리', gem: 'ㅂ', body: '#E8B98A', inner: '#FFE7C9', gemC: '#7FD18B' },
-    dori:  { name: '바둑강아지 도리', gem: 'ㄷ', body: '#FFF6EA', inner: '#C99B7A', gemC: '#FF9548' },
-    sori:  { name: '꼬리여우 소리', gem: 'ㅅ', body: '#FFB27A', inner: '#FFF6EA', gemC: '#4FB8FF' },
-    pang:  { name: '대나무판다 팡팡', gem: 'ㅈ', body: '#FFFFFF', inner: '#5B4A57', gemC: '#5CC98A' },
-    yuni:  { name: '무지개유니콘 유니', gem: 'ㅊ', body: '#FFFFFF', inner: '#FFC2D6', gemC: '#A77BFF' }
+    lumi:  { name: '별사탕 공주 루미', gem: 'ㅎ', body: '#FFE9DE', dress: '#D7C6FF', hair: '#FF9CC8', gemC: '#FF5C9E', iris: '#D46FA8' },
+    tori:  { name: '구름토끼 토리', gem: 'ㄱ', body: '#FFFFFF', inner: '#FFC2D6', gemC: '#7CC8FF', iris: '#7FA8E0' },
+    kong:  { name: '아기용 콩이', gem: 'ㄴ', body: '#A9EBCF', belly: '#FFF3CF', gemC: '#FFB443', iris: '#5FAE8C' },
+    mong:  { name: '솜사탕양 몽글이', gem: 'ㅏ', body: '#FFE9F2', face: '#FFF4E6', gemC: '#B48CFF', iris: '#B48CFF' },
+    pomi:  { name: '리본고양이 뽀미', gem: 'ㅁ', body: '#E4DAFF', inner: '#FFC2D6', gemC: '#FF5C93', iris: '#C46FB0' },
+    piyak: { name: '병아리 삐약이', gem: 'ㅇ', body: '#FFE873', gemC: '#5FC2FF', iris: '#8C6A3E' },
+    bori:  { name: '꿀곰 보리', gem: 'ㅂ', body: '#E8B98A', inner: '#FFE7C9', gemC: '#7FD18B', iris: '#9A6B42' },
+    dori:  { name: '바둑강아지 도리', gem: 'ㄷ', body: '#FFF6EA', inner: '#C99B7A', gemC: '#FF9548', iris: '#9A6B42' },
+    sori:  { name: '꼬리여우 소리', gem: 'ㅅ', body: '#FFB27A', inner: '#FFF6EA', gemC: '#4FB8FF', iris: '#C9773A' },
+    pang:  { name: '대나무판다 팡팡', gem: 'ㅈ', body: '#FFFFFF', inner: '#5B4A57', gemC: '#5CC98A', iris: '#7A6A76' },
+    yuni:  { name: '무지개유니콘 유니', gem: 'ㅊ', body: '#FFFFFF', inner: '#FFC2D6', gemC: '#A77BFF', iris: '#A77BFF' }
   };
   C.SPEC = SPEC;
   C.ALIAS = { mong: 'mong', rabbit: 'tori', bear: 'bori', cat: 'pomi', chick: 'piyak', puppy: 'dori', fox: 'sori', panda: 'pang' };
@@ -24,20 +24,21 @@
     const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.5 : r; p.push((x + Math.cos(a) * rr).toFixed(1) + ' ' + (y + Math.sin(a) * rr).toFixed(1)); }
     return `<path d="M${p.join(' L')}Z" fill="${fill}" ${sw(3)}/>`;
   }
-  function eyes(mood, y) {
+  /* Big kawaii eyes: dark rim, colored iris (gradient), pupil, three shines. id = this drawing's gradient id. */
+  function eyes(mood, y, id, irisC) {
     const one = (x, dir) => {
-      if (mood === 'joy' || mood === 'cheer') return `<path d="M${x - 8} ${y + 2} Q${x} ${y - 8} ${x + 8} ${y + 2}" fill="none" ${sw(4.4)}/>`;
-      if (mood === 'wink' && dir < 0) return `<path d="M${x - 8} ${y} Q${x} ${y - 7} ${x + 8} ${y}" fill="none" ${sw(4.4)}/>`;
-      if (mood === 'think') return `<ellipse cx="${x}" cy="${y + 2}" rx="5.4" ry="5.4" fill="${LINE}"/><circle cx="${x - 1.6}" cy="${y}" r="1.8" fill="#fff"/>`;
-      const s = mood === 'wow' ? 1.18 : 1;
-      /* big glossy eyes: dark plum, a warm glow at the bottom, one big and one small shine */
-      return `<g class="eye"><ellipse cx="${x}" cy="${y}" rx="${8.4 * s}" ry="${10.6 * s}" fill="${LINE}"/>`
-        + `<ellipse cx="${x}" cy="${y + 4.4 * s}" rx="${5.8 * s}" ry="${4.6 * s}" fill="#9B6C8E" opacity=".75"/>`
-        + `<circle cx="${x - 2.8}" cy="${y - 4.2 * s}" r="${3.9 * s}" fill="#fff"/>`
-        + `<circle cx="${x + 3.2}" cy="${y + 3.8 * s}" r="${1.8 * s}" fill="#fff"/>`
-        + `<circle cx="${x + 3.6}" cy="${y - 6 * s}" r="${1 * s}" fill="#fff" opacity=".9"/></g>`;
+      if (mood === 'joy' || mood === 'cheer') return `<path d="M${x - 10} ${y + 3} Q${x} ${y - 9} ${x + 10} ${y + 3}" fill="none" ${sw(4.6)}/>`;
+      if (mood === 'wink' && dir < 0) return `<path d="M${x - 10} ${y + 1} Q${x} ${y - 8} ${x + 10} ${y + 1}" fill="none" ${sw(4.6)}/>`;
+      if (mood === 'think') return `<path d="M${x - 9} ${y + 2} Q${x} ${y + 7} ${x + 9} ${y + 2}" fill="none" ${sw(4.2)}/>`;
+      const s = mood === 'wow' ? 1.12 : 1, rx = 10.6 * s, ry = 13 * s;
+      return `<g class="eye"><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${LINE}"/>`
+        + `<ellipse cx="${x}" cy="${y + 1.6 * s}" rx="${rx - 2.2}" ry="${ry - 2.6}" fill="url(#ir${id})"/>`
+        + `<ellipse cx="${x}" cy="${y + 0.6 * s}" rx="${4.6 * s}" ry="${6 * s}" fill="${LINE}"/>`
+        + `<ellipse cx="${x - 3.8 * s}" cy="${y - 5.4 * s}" rx="${4.4 * s}" ry="${4.8 * s}" fill="#fff"/>`
+        + `<circle cx="${x + 4 * s}" cy="${y + 5.6 * s}" r="${2.2 * s}" fill="#fff"/>`
+        + `<circle cx="${x + 4.4 * s}" cy="${y - 6.6 * s}" r="${1.2 * s}" fill="#fff" opacity=".9"/></g>`;
     };
-    return `<g class="eyes blinker">${one(74, -1)}${one(126, 1)}</g>`;
+    return `<g class="eyes blinker">${one(76, -1)}${one(124, 1)}</g>`;
   }
   function mouth(mood, y) {
     if (mood === 'joy' || mood === 'cheer') return `<path d="M91 ${y - 1} Q100 ${y + 13} 109 ${y - 1}Z" fill="#E8466A" ${sw(3)}/><path d="M95 ${y + 6} Q100 ${y + 2} 105 ${y + 6} Q100 ${y + 10} 95 ${y + 6}Z" fill="#FF9FB4"/>`;
@@ -82,6 +83,7 @@
                 <circle cx="34" cy="122" r="10" fill="#FFE066" ${sw(3)}/><circle cx="166" cy="122" r="10" fill="#FFE066" ${sw(3)}/>`;
         head = `<path d="M100 104 C146 104 166 132 166 162 C166 194 140 210 100 210 C60 210 34 194 34 162 C34 132 54 104 100 104Z" fill="${f}" ${sw()}/>`;
         over = `<path d="M38 150 C40 118 62 98 100 98 C138 98 160 118 162 150 C150 138 140 132 130 132 C126 140 118 144 110 140 C104 132 98 128 92 134 C86 144 74 142 70 132 C58 134 46 140 38 150Z" fill="${H}" ${sw()}/>
+                <path d="M58 122 Q100 98 142 122" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/>
                 <path d="M76 98 L82 70 L92 86 L100 62 L108 86 L118 70 L124 98Z" fill="#FFD95A" ${sw(3.6)}/><circle cx="100" cy="84" r="5" fill="#FF5C9E" ${sw(2.6)}/>
                 <g transform="translate(150 132) rotate(-14)">${star(0, 0, 11, '#FFE066')}</g>`;
         face = ''; mouthY = 182; eyeY = 164;
@@ -163,7 +165,8 @@
     }
     const lowerMouth = k === 'bori' ? `<path d="M100 175 v4" ${sw(3)}/>` : '';
     const id = ++uid;
-    const defs = `<radialGradient id="ck${id}"><stop offset="0" stop-color="#FF8FB0" stop-opacity=".95"/><stop offset=".6" stop-color="#FFA3BE" stop-opacity=".55"/><stop offset="1" stop-color="#FFB8CB" stop-opacity="0"/></radialGradient>`;
+    const irisC = sp.iris || '#B9729A';
+    const defs = `<linearGradient id="ir${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4B3642"/><stop offset=".45" stop-color="${irisC}" stop-opacity=".85"/><stop offset="1" stop-color="${irisC}"/></linearGradient><radialGradient id="ck${id}"><stop offset="0" stop-color="#FF8FB0" stop-opacity=".95"/><stop offset=".6" stop-color="#FFA3BE" stop-opacity=".55"/><stop offset="1" stop-color="#FFB8CB" stop-opacity="0"/></radialGradient>`;
     /* soft shine on the top of the head and the tummy */
     const shine = `<ellipse cx="68" cy="${k === 'lumi' ? 999 : 122}" rx="15" ry="7" transform="rotate(-24 68 122)" fill="#fff" opacity=".55"/><circle cx="88" cy="${k === 'lumi' ? 999 : 116}" r="3" fill="#fff" opacity=".6"/>`;
     const sparkle = mood === 'cheer' || mood === 'joy' ? `<g fill="#FFE066" stroke="${LINE}" stroke-width="2" stroke-linejoin="round"><path d="M22 120 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/><path d="M178 104 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z"/></g>` : '';
@@ -173,7 +176,7 @@
       ${back}${out.back || ''}
       <g class="m-body">${k === 'lumi' ? bodyRig(sp.dress, mood, gem(sp, 100, 234), '#FF8FBF', `<path d="M72 198 C66 220 46 252 44 264 C70 274 130 274 156 264 C154 252 134 220 128 198Z" fill="${sp.dress}" ${sw()}/><path d="M48 258 q13 10 26 2 q13 10 26 2 q13 10 26 2 q13 10 26 2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`) : bodyRig(tint, mood, bodyExtra + gem(sp, 100, 238), f)}${out.neck || ''}</g>
       <g class="m-head"${mood === 'think' ? ' transform="rotate(-6 100 200)"' : ''}>${ears}${head}${shine}${over}
-        ${cheeks(eyeY + 16, id)}${eyes(mood, eyeY)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? mouth(mood, mouthY) : ''}${lowerMouth}
+        ${cheeks(eyeY + 16, id)}${eyes(mood, eyeY, id, sp.iris)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? mouth(mood, mouthY) : ''}${lowerMouth}
         ${out.eyes || ''}${out.hat || ''}</g>${sparkle}</g></svg>`;
   };
   G.CHF = C;
