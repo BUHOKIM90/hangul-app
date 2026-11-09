@@ -1,0 +1,114 @@
+{
+ "lines": [
+  "려원아, 안녕! 오늘도 같이 놀자!",
+  "그건 가 글자야.",
+  "나비.",
+  "잘했어! 혼자 읽었네!"
+ ],
+ "voices": [
+  {
+   "id": "sunhi",
+   "voice": "ko-KR-SunHiNeural",
+   "rate": "-6%",
+   "pitch": "+6Hz",
+   "label": "선희 (지금 목소리, 여성)",
+   "files": [
+    "sunhi_0.mp3",
+    "sunhi_1.mp3",
+    "sunhi_2.mp3",
+    "sunhi_3.mp3"
+   ]
+  },
+  {
+   "id": "sunhi_slow",
+   "voice": "ko-KR-SunHiNeural",
+   "rate": "-14%",
+   "pitch": "+0Hz",
+   "label": "선희, 더 차분하게",
+   "files": [
+    "sunhi_slow_0.mp3",
+    "sunhi_slow_1.mp3",
+    "sunhi_slow_2.mp3",
+    "sunhi_slow_3.mp3"
+   ]
+  },
+  {
+   "id": "hyunsu",
+   "voice": "ko-KR-HyunsuMultilingualNeural",
+   "rate": "-6%",
+   "pitch": "+0Hz",
+   "label": "현수 (최신 음성, 남성)",
+   "files": [
+    "hyunsu_0.mp3",
+    "hyunsu_1.mp3",
+    "hyunsu_2.mp3",
+    "hyunsu_3.mp3"
+   ]
+  },
+  {
+   "id": "injoon",
+   "voice": "ko-KR-InJoonNeural",
+   "rate": "-6%",
+   "pitch": "+0Hz",
+   "label": "인준 (남성)",
+   "files": [
+    "injoon_0.mp3",
+    "injoon_1.mp3",
+    "injoon_2.mp3",
+    "injoon_3.mp3"
+   ]
+  },
+  {
+   "id": "ava",
+   "voice": "en-US-AvaMultilingualNeural",
+   "rate": "-8%",
+   "pitch": "+0Hz",
+   "label": "Ava (다국어 최신 음성, 여성)",
+   "files": [
+    "ava_0.mp3",
+    "ava_1.mp3",
+    "ava_2.mp3",
+    "ava_3.mp3"
+   ]
+  },
+  {
+   "id": "emma",
+   "voice": "en-US-EmmaMultilingualNeural",
+   "rate": "-8%",
+   "pitch": "+0Hz",
+   "label": "Emma (다국어 최신 음성, 여성)",
+   "files": [
+    "emma_0.mp3",
+    "emma_1.mp3",
+    "emma_2.mp3",
+    "emma_3.mp3"
+   ]
+  },
+  {
+   "id": "seraphina",
+   "voice": "de-DE-SeraphinaMultilingualNeural",
+   "rate": "-8%",
+   "pitch": "+0Hz",
+   "label": "Seraphina (다국어 최신 음성, 여성)",
+   "files": [
+    "seraphina_0.mp3",
+    "seraphina_1.mp3",
+    "seraphina_2.mp3",
+    "seraphina_3.mp3"
+   ]
+  },
+  {
+   "id": "vivienne",
+   "voice": "fr-FR-VivienneMultilingualNeural",
+   "rate": "-8%",
+   "pitch": "+0Hz",
+   "label": "Vivienne (다국어 최신 음성, 여성)",
+   "files": [
+    "vivienne_0.mp3",
+    "vivienne_1.mp3",
+    "vivienne_2.mp3",
+    "vivienne_3.mp3"
+   ]
+  }
+ ]
+}
