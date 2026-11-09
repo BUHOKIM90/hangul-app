@@ -85,6 +85,9 @@ def kss_reference(out_dir):
     print('KSS reference', round(d, 1), 's:', txt, flush=True)
     return p, txt
 
+INSTRUCT = ('Speak standard Seoul Korean clearly and warmly, like a kind kindergarten teacher, at a calm, slightly slow pace. '
+            'Pronounce every syllable precisely. Read only the given text: no sighs, no breaths, no laughs, no filler sounds.')
+
 class Qwen:
     """Qwen3-TTS (Apache 2.0). 'sohee' = its built-in native Korean female voice; 'kss' = clone of a real Korean
     voice actress (KSS dataset)."""
@@ -98,7 +101,9 @@ class Qwen:
     def say(self, text, voice, seed):
         torch.manual_seed(seed)
         if voice == 'sohee':
-            wavs, sr = self._model('CustomVoice').generate_custom_voice(text=text, language='Korean', speaker='Sohee')
+            m = self._model('CustomVoice')
+            try: wavs, sr = m.generate_custom_voice(text=text, language='Korean', speaker='Sohee', instruct=INSTRUCT)
+            except TypeError: wavs, sr = m.generate_custom_voice(text=text, language='Korean', speaker='Sohee')
         else:
             m = self._model('Base')
             if self.prompt is None:
@@ -167,9 +172,11 @@ def right(path, text, heard):
     """Was the line said right? Exact read-back, or (single letters, where read-back is unreliable) the letter wins
     against every letter that differs in one part (가 vs 카/까/거/각 ...); for longer lines, Whisper finds the real
     line about as likely as its own guess."""
-    c = cer(text, heard)
+    nt, nh = norm(text), norm(heard)
+    c = cer(nt, nh)
     if c == 0: return True, 'heard'
     h = hangul(text)
+    if len(h) > 1 and len(nh) > len(nt): return False, 'extra-sound'
     if len(h) == 1:
         cands = [text] + [text.replace(h, x) for x in confusables(h)]
         s = logp(path, cands)
@@ -179,6 +186,12 @@ def right(path, text, heard):
     return s[0] >= s[1] - 1.0, 'likelihood'
 
 def hangul(s): return re.sub(r'[^가-힣]', '', s)
+NAMES = dict(zip('ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', ['기역', '쌍기역', '니은', '디귿', '쌍디귿', '리을', '미음', '비읍', '쌍비읍', '시옷', '쌍시옷',
+             '이응', '지읒', '쌍지읒', '치읓', '키읔', '티읕', '피읖', '히읗']))
+def norm(t):
+    """How Whisper writes things that were said right: letter names as the letter, 려원 as 여원, 기역 as 기억 (same sound)."""
+    t = ''.join(NAMES.get(c, c) for c in t).replace('려원', '여원').replace('기억', '기역')
+    return hangul(t)
 def cer(ref, hyp):
     r, h = hangul(ref), hangul(hyp)
     if not r: return 0.0
@@ -249,6 +262,14 @@ def last_word(wav, sr):
     a, b = merged[-1]
     return wav[max(0, (a - 6) * hop):min(len(wav), (b + 12) * hop)]
 
+def trim_edges(wav, sr):
+    hop = int(sr * 0.01); n = len(wav) // hop
+    if n < 5: return wav
+    rms = np.sqrt(np.mean(wav[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
+    loud = np.where(20 * np.log10(rms / (rms.max() + 1e-12)) > -28)[0]
+    if not len(loud): return wav
+    return wav[max(0, (loud[0] - 4) * hop):min(len(wav), (loud[-1] + 10) * hop)]
+
 def short(text): return len(hangul(text)) <= 2 and ',' not in text
 
 def best_of(eng, text, voice, tries, path):
@@ -265,6 +286,7 @@ def best_of(eng, text, voice, tries, path):
                 wav, sr = eng.say(text, voice, seed=1234 + t * 7919)
         except Exception as e:
             print('  fail', voice, text, repr(e)[:160]); continue
+        if isinstance(eng, Qwen): wav = trim_edges(wav, sr)
         if len(wav) < sr * 0.1: continue
         tmp = path + f'.try{t}.mp3'
         to_mp3(wav, sr, tmp)

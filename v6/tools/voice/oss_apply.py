@@ -15,13 +15,14 @@ NAMES = dict(zip('ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', ['
              '이응', '지읒', '쌍지읒', '치읓', '키읔', '티읕', '피읖', '히읗']))
 def norm(t):
     # how Whisper writes things that were said right: letter names as the letter itself, 려원 as 여원 (same sound)
-    t = ''.join(NAMES.get(c, c) for c in t).replace('려원', '여원')
+    t = ''.join(NAMES.get(c, c) for c in t).replace('려원', '여원').replace('기억', '기역')
     return re.sub(r'[^가-힣]', '', t)
 def heard_right(r):
     return bool(r.get('heard') is not None and norm(r['text']) == norm(r['heard']))
 def better(r):
     # single letters: at least as clearly that letter (vs every look-alike letter) as the clip used now
     if r.get('old_margin') is not None: return r.get('margin') is not None and r['margin'] >= min(r['old_margin'], 0.0)
+    if r.get('how') in ('extra-sound', 'misheard'): return False
     return bool(r.get('right')) or heard_right(r)
 good = [k for k in LINES if k in rep and k in src and better(rep[k])]
 kept = sorted(set(LINES) - set(good))

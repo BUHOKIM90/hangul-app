@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     runs-on: ubuntu-latest
     env: { GITHUB_TOKEN: '${{ github.token }}' }
     timeout-minutes: 340
@@ -32,7 +32,7 @@ jobs:
         run: pip install -q qwen-tts pyarrow huggingface_hub
       - if: steps.cfg.outputs.engine == 'omnivoice'
         run: pip install -q omnivoice
-      - run: python v6/tools/voice/oss_tts.py full --engine ${{ steps.cfg.outputs.engine }} --voice ${{ steps.cfg.outputs.voice }} --shard ${{ matrix.shard }}/12
+      - run: python v6/tools/voice/oss_tts.py full --engine ${{ steps.cfg.outputs.engine }} --voice ${{ steps.cfg.outputs.voice }} --shard ${{ matrix.shard }}/16 --tries 6
       - if: always()
         uses: actions/upload-artifact@v4
         with: { name: 'full-${{ matrix.shard }}', path: out, if-no-files-found: ignore }
