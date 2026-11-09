@@ -1,0 +1,37 @@
+name: voice
+# Recreates all voice clips (audio/*.mp3) with one natural Korean voice and checks every file.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v6/tools/voice/lines.json'
+      - 'v6/tools/voice/make_voice.py'
+      - '.github/workflows/voice.yml'
+permissions:
+  contents: write
+concurrency: voice
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - run: pip install -q edge-tts numpy
+      - name: make voices
+        run: python v6/tools/voice/make_voice.py
+      - name: measure speech and rebuild offline cache list
+        run: rm -f v6/tools/trim.json && node v6/tools/build.mjs .
+      - name: commit
+        run: |
+          git config user.name "voice-bot"
+          git config user.email "voice-bot@users.noreply.github.com"
+          git add audio v6/tools/trim.json v6/js/trim.js sw.js v6/tools/voice/report.json
+          git commit -m "voice: 모든 음성을 ko-KR-SunHiNeural 한 목소리로 다시 만듦 (자동 검사 포함)" || exit 0
+          git pull --rebase -q origin main
+          git push

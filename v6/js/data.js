@@ -152,6 +152,12 @@ ima|이마||body`;
   /* hy_ = "그건 X야!", hw_ = "X 글씨를 찾아볼까?" — only keys whose recordings exist. */
   const HY = new Set('agi ai appa bada banana beoseu cha chijeu chima dari dubu eobu eomma eureureong geobuk geomi gicha gita gochu gogi goguma gorae gudu haema halmeoni hama harabeoji heori hodu i_tooth ima jadu jido juseu keikeu ki kkot ko kokkiri lion meori mogi moja nabi namu nuna nunsaram oi ojingeo ori pado pija podo pungseon radio ryeowon saeu sangeo siso so sobangcha sora tajo tomato tteokguk ubi uyu yeou'.split(' '));
   const HW = HY;
+  /* Words whose pictures a 4-year-old could mix up: never offered as choices side by side. */
+  const CONFUSE = [['gae', 'gangaji'], ['ai', 'nuna', 'ryeowon', 'agi'], ['eomma', 'nuna'], ['bada', 'pado', 'mul'], ['keop', 'uyu', 'juseu'],
+    ['gorae', 'sangeo'], ['sagwa', 'tomato'], ['gwaja', 'keikeu'], ['ot', 'chima'], ['halmeoni', 'harabeoji', 'eobu']];
+  const GROUP = {};
+  CONFUSE.forEach((g, i) => g.forEach(k => { (GROUP[k] = GROUP[k] || []).push(i); }));
+  const clash = (a, b) => a === b || (GROUP[a] || []).some(i => (GROUP[b] || []).includes(i));
   const CLAP = new Set('appa banana eomma goguma halmeoni hama harabeoji kokkiri nabi ori ryeowon so'.split(' '));
   /* Words whose syllables are all simple CV (no batchim). */
   function noBatchim(w) { return Array.from(w).every(ch => { const s = split(ch); return s && !s.jong; }); }
@@ -462,7 +468,7 @@ ima|이마||body`;
   G.D = {
     CHO, JUNG, split, join, hex, syKey, fyKey, dyKey, jKey, has, SY, WORDS, HY, HW, CLAP, noBatchim,
     BASIC_V, VROW, JNAME, JPIC, STROKES, strokesFor, WORLDS: W, STAGES: ST, PHRASES, SENTENCES,
-    WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
+    clash, WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
     PRAISE_VOICE, CHEERS, PRAISE_FIT, STICKER_SETS, STICKERS, OUTFITS, FRIENDS
   };
 })(window);
