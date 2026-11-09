@@ -1056,3 +1056,15 @@ html[data-world="8"] #scene .tw { background: #fff; }
 .buddy { width: 19vmin; }
 @media (orientation: portrait) { .buddy { width: 22vmin; } }
 .vpick.on { background: #E8F8F0; border-radius: 10px; }
+/* narrow phones: the sun would sit on top of the sound button */
+@media (max-width: 560px) { #scene .sun { display: none; } }
+/* narrow phones: compact top bar so everything fits on one line */
+@media (max-width: 560px) {
+  .hud { gap: 1.2vmin; padding: 1vmin 1.6vmin; }
+  .hud-lv .bar { display: none; }
+  .hud-lv, .hud-star, .hud-fire { padding: .4vmin 1.6vmin .4vmin 1.2vmin; font-size: 4.6vmin; gap: .6vmin; }
+  .hud-home { width: 13vmin; height: 13vmin; min-width: 48px; min-height: 48px; }
+  .dots-prog { gap: .9vmin; flex-shrink: 1; min-width: 0; }
+  .dots-prog i { width: 2.8vmin; height: 2.8vmin; }
+  .hud-lock { width: 46px; height: 46px; min-width: 46px; min-height: 46px; margin-left: auto; }
+}
