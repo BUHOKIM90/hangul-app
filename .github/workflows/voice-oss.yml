@@ -3,7 +3,7 @@ name: voice-oss
 on:
   workflow_dispatch:
     inputs:
-      parts: { default: '["magpie:Sofia","magpie:John","magpie:Aria","omnivoice:f_young","omnivoice:f_high"]' }
+      parts: { default: '["qwen:sohee","qwen:kss"]' }
   push:
     branches: ['v6.*']
     paths: ['v6/tools/voice/oss_tts.py', 'v6/tools/voice/oss_merge.py', '.github/workflows/voice-oss.yml']
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        part: ${{ fromJSON(inputs.parts || '["magpie:Sofia","magpie:John","magpie:Aria","omnivoice:f_young","omnivoice:f_high"]') }}
+        part: ${{ fromJSON(inputs.parts || '["qwen:sohee","qwen:kss"]') }}
     runs-on: ubuntu-latest
     env: { GITHUB_TOKEN: '${{ github.token }}' }
     timeout-minutes: 240
@@ -28,6 +28,8 @@ jobs:
       - run: pip install -q faster-whisper soundfile numpy transformers librosa
       - if: startsWith(matrix.part, 'magpie')
         run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign peft
+      - if: startsWith(matrix.part, 'qwen')
+        run: pip install -q qwen-tts pyarrow huggingface_hub
       - if: startsWith(matrix.part, 'omnivoice')
         run: pip install -q omnivoice
       - if: matrix.part == 'baseline'

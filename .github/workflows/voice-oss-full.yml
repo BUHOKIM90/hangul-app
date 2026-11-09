@@ -28,6 +28,8 @@ jobs:
         run: python3 -c "import json;c=json.load(open('v6/tools/voice/oss_full.json'));print('\n'.join(f'{k}={v}' for k,v in c.items()))" >> "$GITHUB_OUTPUT"
       - if: steps.cfg.outputs.engine == 'magpie'
         run: pip install -q "nemo_toolkit[tts] @ git+https://github.com/NVIDIA/NeMo.git@main" kaldialign peft
+      - if: steps.cfg.outputs.engine == 'qwen'
+        run: pip install -q qwen-tts pyarrow huggingface_hub
       - if: steps.cfg.outputs.engine == 'omnivoice'
         run: pip install -q omnivoice
       - run: python v6/tools/voice/oss_tts.py full --engine ${{ steps.cfg.outputs.engine }} --voice ${{ steps.cfg.outputs.voice }} --shard ${{ matrix.shard }}/12

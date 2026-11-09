@@ -62,7 +62,55 @@ class Omni:
         a = a.detach().float().cpu().numpy() if torch.is_tensor(a) else np.asarray(a, dtype=np.float32)
         return a.reshape(-1), self.sr
 
-ENGINES = {'magpie': Magpie, 'omnivoice': Omni}
+def kss_reference(out_dir):
+    """A clear 5-9 s line read by the professional Korean voice actress of the KSS dataset (real human speech,
+    CC BY-NC-SA 4.0, non-commercial use) to clone the voice from."""
+    import io, pyarrow.parquet as pq
+    from huggingface_hub import HfApi, hf_hub_download
+    files = sorted(f for f in HfApi().list_repo_files('Bingsu/KSS_Dataset', repo_type='dataset') if f.endswith('.parquet'))
+    t = pq.read_table(hf_hub_download('Bingsu/KSS_Dataset', files[0], repo_type='dataset'))
+    cols = t.column_names; print('KSS columns', cols, flush=True)
+    rows = t.slice(0, 600).to_pylist()
+    tcol = next(c for c in ('expanded_script', 'original_script', 'text') if c in cols)
+    best = None
+    for r in rows:
+        txt = r[tcol]; a = r['audio']
+        if not re.fullmatch(r'[가-힣 ,.?!]+', txt or ''): continue
+        wav, sr = sf.read(io.BytesIO(a['bytes']), dtype='float32')
+        d = len(wav) / sr
+        if 5.0 <= d <= 9.0 and (best is None or abs(d - 7) < abs(best[2] - 7)):
+            best = (wav, sr, d, txt)
+    wav, sr, d, txt = best
+    p = os.path.join(out_dir, 'kss_ref.wav'); sf.write(p, wav, sr)
+    print('KSS reference', round(d, 1), 's:', txt, flush=True)
+    return p, txt
+
+class Qwen:
+    """Qwen3-TTS (Apache 2.0). 'sohee' = its built-in native Korean female voice; 'kss' = clone of a real Korean
+    voice actress (KSS dataset)."""
+    def __init__(self): self.m = {}; self.prompt = None
+    def voices(self): return ['sohee', 'kss']
+    def _model(self, kind):
+        if kind not in self.m:
+            from qwen_tts import Qwen3TTSModel
+            self.m[kind] = Qwen3TTSModel.from_pretrained(f'Qwen/Qwen3-TTS-12Hz-1.7B-{kind}', device_map='cpu', dtype=torch.float32)
+        return self.m[kind]
+    def say(self, text, voice, seed):
+        torch.manual_seed(seed)
+        if voice == 'sohee':
+            wavs, sr = self._model('CustomVoice').generate_custom_voice(text=text, language='Korean', speaker='Sohee')
+        else:
+            m = self._model('Base')
+            if self.prompt is None:
+                os.makedirs(OUT, exist_ok=True)
+                ref, rt = kss_reference(OUT)
+                self.prompt = m.create_voice_clone_prompt(ref_audio=ref, ref_text=rt, x_vector_only_mode=False)
+            wavs, sr = m.generate_voice_clone(text=text, language='Korean', voice_clone_prompt=self.prompt)
+        a = wavs[0]
+        a = a.detach().float().cpu().numpy() if torch.is_tensor(a) else np.asarray(a, dtype=np.float32)
+        return a.reshape(-1), int(sr)
+
+ENGINES = {'magpie': Magpie, 'omnivoice': Omni, 'qwen': Qwen}
 
 # ---------------------------------------------------------------- checks
 _asr = _mos = None
@@ -212,7 +260,7 @@ def cmd_samples(a):
     os.makedirs(os.path.join(OUT, 'samples'), exist_ok=True)
     keys = test_keys(); res = {}
     for v in [x for x in eng.voices() if not a.voices or x in a.voices.split(',')]:
-        vid = ('mg_' if a.engine == 'magpie' else 'ov_') + v.lower()
+        vid = {'magpie': 'mg_', 'omnivoice': 'ov_', 'qwen': 'qw_'}[a.engine] + v.lower()
         files, rows, test = [], [], {}
         for i, t in enumerate(SAMPLE_LINES):
             f = f'{vid}_{i}.mp3'

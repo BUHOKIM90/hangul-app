@@ -10,12 +10,12 @@ for f in sorted(glob.glob(os.path.join(OUT, '**', 'scores_*.json'), recursive=Tr
 for f in glob.glob(os.path.join(OUT, '**', 'samples', '*.mp3'), recursive=True):
     if not os.path.basename(f).startswith('_t_'): shutil.copy(f, SAM)
 L = json.load(open(os.path.join(SAM, 'list.json'), encoding='utf8'))
-L['voices'] = [v for v in L['voices'] if not v['id'].startswith(('mg_', 'ov_'))]
-NAME = {'magpie': '엔비디아 Magpie', 'omnivoice': 'OmniVoice'}
-KO = {'f_young': '젊은 여성', 'f_mid': '중년 여성', 'f_high': '밝은 여성', 'm_young': '젊은 남성'}
+L['voices'] = [v for v in L['voices'] if v['id'] == 'sunhi']   # machine-sounding candidates removed; current voice kept for comparison
+NAME = {'magpie': '엔비디아 Magpie', 'omnivoice': 'OmniVoice', 'qwen': 'Qwen3'}
+KO = {'sohee': '소희 (한국어 원어민 여성)', 'kss': '성우 목소리 (실제 한국인 성우 녹음 기반)', 'f_young': '젊은 여성', 'f_mid': '중년 여성', 'f_high': '밝은 여성', 'm_young': '젊은 남성'}
 base = scores.get('sunhi_now', {}).get('score', {})
 for vid, s in scores.items():
-    if s.get('engine') not in NAME or not s.get('files'): continue
+    if s.get('engine') != 'qwen' or not s.get('files'): continue
     sc = s.get('score', {})
     L['voices'].append({'id': vid, 'voice': f"{s['engine']}:{s['voice']}", 'label': f"{NAME[s['engine']]} · {KO.get(s['voice'], s['voice'])}"
                         + (f" (자연스러움 {sc['mos']:.1f}점)" if sc else ''), 'files': s['files'], 'score': sc})
