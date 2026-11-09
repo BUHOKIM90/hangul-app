@@ -91,67 +91,117 @@
     A.bgm(St.s.settings.bgm);
     const m = main();
     m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
     m.dataset.screen = 'home';
     m.appendChild(hud());
     const stage = St.stage();
     const world = D.WORLDS[stage.w];
+    App.setWorld(stage.w);
     const wrap = el('div', 'home');
-    const left = el('div', 'home-left');
-    const buddy = el('button', 'tap home-buddy', UI.mascot('happy'));
-    buddy.type = 'button';
-    UI.tap(buddy, () => { buddy.innerHTML = UI.mascot(UI.pick(['joy', 'wow', 'cheer'])); buddy.classList.remove('jump'); void buddy.offsetWidth; buddy.classList.add('jump'); A.play('ui_hiname'); });
-    left.appendChild(buddy);
+    wrap.appendChild(el('div', 'world-tag', `<span class="wt-ico">${world.icon}</span><b>${esc(world.name)}</b><small>${stage.id} / ${D.STAGES.length}</small>`));
+    const road = el('div', 'road');
+    UI.tap(road, e => {
+      const me = e.target.closest('.road-me');
+      if (!me) return;
+      me.classList.remove('hop'); void me.getBoundingClientRect(); me.classList.add('hop');
+      A.play('ui_hiname');
+    });
+    wrap.appendChild(road);
+    const dock = el('div', 'dock');
     const cast = el('div', 'cast');
-    D.FRIENDS.filter(f => f.id !== (St.s.reward.friend || 'mong')).forEach((f, i) => {
+    const nextLock = D.FRIENDS.find(f => f.lv > St.s.reward.level);
+    const pals = D.FRIENDS.filter(f => f.id !== UI.friendId(St.s.reward.friend) && f.lv <= St.s.reward.level).slice(-3);
+    if (nextLock) pals.push(nextLock);
+    pals.forEach((f, i) => {
       const own = f.lv <= St.s.reward.level;
-      const c = btn('cast-pal' + (own ? '' : ' locked'), UI.mascot(own ? 'happy' : 'think', {}, f.id) + (own ? '' : `<i>레벨 ${f.lv}</i>`), () => {
+      const c = btn('cast-pal' + (own ? '' : ' locked'), UI.mascot(own ? 'happy' : 'think', {}, f.id) + (own ? '' : `<i>Lv${f.lv}</i>`), () => {
         if (!own) { UI.oops(c); return; }
-        c.classList.remove('jump'); void c.offsetWidth; c.classList.add('jump'); A.sfx(UI.pick(['yay1', 'yay2', 'pop']));
+        c.classList.remove('jump'); void c.offsetWidth; c.classList.add('jump'); A.sfx('pop');
+        UI.sayGem(f.id);
       }, f.name);
-      c.style.animationDelay = (i * 0.3) + 's';
+      c.style.animationDelay = (i * 0.35) + 's';
       cast.appendChild(c);
     });
-    left.appendChild(cast);
-    wrap.appendChild(left);
-    const right = el('div', 'home-right');
-    right.appendChild(mapStrip(stage));
+    dock.appendChild(cast);
     const done = St.todayCount() >= St.s.settings.perDay;
     const play = btn('play-go' + (done ? ' rest' : ''), done
       ? '<span class="pg-ico">🎠</span><span class="pg-txt">놀이터</span><small>오늘 모험 끝! 더 놀자</small>'
-      : `<span class="pg-ico">▶</span><span class="pg-txt">놀자!</span><small>${esc(world.icon + ' ' + stage.title)}</small>`,
+      : `<span class="pg-ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 7 L34 20 L12 33Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg></span><span class="pg-txt">놀자!</span><small>${esc(stage.title)}</small>`,
     () => (done ? App.playground() : App.runStage(stage)), '놀자');
-    right.appendChild(play);
+    dock.appendChild(play);
     const row = el('div', 'home-row');
     const newN = St.s.reward.newStickers.length;
-    row.appendChild(btn('home-tile', `<span>📒</span><b>스티커</b><small>${St.stickerCount()}/120</small>${newN ? `<i class="badge">${newN}</i>` : ''}`, () => App.stickers(), '스티커북'));
-    row.appendChild(btn('home-tile', '<span>👗</span><b>옷장</b>', () => App.closet(), '옷장'));
-    row.appendChild(btn('home-tile', '<span>🎠</span><b>놀이터</b>', () => App.playground(), '놀이터'));
-    right.appendChild(row);
-    wrap.appendChild(right);
+    row.appendChild(btn('home-tile t-book', `<span>📒</span><b>스티커</b>${newN ? `<i class="badge">${newN}</i>` : ''}`, () => App.stickers(), '스티커북'));
+    row.appendChild(btn('home-tile t-closet', '<span>👗</span><b>옷장</b>', () => App.closet(), '옷장'));
+    row.appendChild(btn('home-tile t-park', '<span>🎠</span><b>놀이터</b>', () => App.playground(), '놀이터'));
+    dock.appendChild(row);
+    wrap.appendChild(dock);
     m.appendChild(wrap);
+    const drawRoad = () => { const r = road.getBoundingClientRect(); road.innerHTML = roadSvg(stage, r.width, r.height); };
+    drawRoad();
+    App._drawRoad = drawRoad;
     if (first) {
       const d = St.checkDaily();
       if (d) { await dailyGift(d); if (App.screen === 'home') { await App.home(); } }
-      A.play('ui_hiname');
+      A.sequence(['ui_hiname', St.todayCount() >= St.s.settings.perDay ? 'ui4_free' : 'ui4_today'], null, 0.3);
     }
   };
-  function mapStrip(stage) {
-    const box = el('div', 'map');
-    const world = D.WORLDS[stage.w];
-    box.style.setProperty('--wc', world.color);
-    box.appendChild(el('div', 'map-title', `${world.icon} ${esc(world.name)} <small>${stage.id} / ${D.STAGES.length}</small>`));
-    const path = el('div', 'map-path');
-    const from = Math.max(1, Math.min(stage.id - 3, D.STAGES.length - 6));
-    for (let i = from; i < from + 7 && i <= D.STAGES.length; i++) {
-      const s = D.STAGES[i - 1];
-      const st = St.s.learn.done[i] ? 'done' : (i === stage.id ? 'now' : 'soon');
-      const n = el('span', 'stone ' + st, st === 'done' ? '⭐' : (st === 'now' ? UI.mascot('happy') : String(i)));
-      n.title = s.title;
-      path.appendChild(n);
-    }
-    box.appendChild(path);
-    return box;
+  /* The adventure road: 7 stepping stones on a winding path; the buddy stands on today's stone. */
+  /* The road is drawn to fit its box: wide boxes get a left-to-right road with as many stones as fit,
+     tall boxes get a road climbing upwards. */
+  function roadSvg(stage, bw, bh) {
+    const a = bw && bh ? bw / bh : 2.6;
+    const tall = a < 0.9;
+    const n = tall ? 6 : Math.max(3, Math.min(7, Math.round((360 * a - 100) / 150)));
+    const W = tall ? 600 : Math.max(560, 360 * a), H = tall ? 900 : 360;
+    const step = tall ? 140 : (W - 160) / (n - 1);
+    const from = Math.max(1, Math.min(stage.id - Math.floor((n - 1) / 3), D.STAGES.length - n + 1));
+    const pts = [];
+    for (let k = 0; k < n; k++) pts.push(tall ? [300 + Math.sin(k * 1.25 + 0.4) * 170, 830 - k * 140] : [80 + k * step, 240 + Math.sin(k * 1.15 + 0.6) * 55]);
+    const start = tall ? [pts[0][0] - 40, H + 60] : [pts[0][0] - 90, pts[0][1] + 30];
+    let d = `M${start[0]} ${start[1]}`;
+    pts.forEach((p, k) => {
+      const q = k ? pts[k - 1] : start;
+      if (tall) { const my = (q[1] + p[1]) / 2; d += ` C${q[0]} ${my} ${p[0]} ${my} ${p[0]} ${p[1]}`; }
+      else { const mx = (q[0] + p[0]) / 2; d += ` C${mx} ${q[1]} ${mx} ${p[1]} ${p[0]} ${p[1]}`; }
+    });
+    const last = pts[n - 1];
+    d += tall ? ` C${last[0]} ${last[1] - 60} ${last[0] + 40} ${last[1] - 90} ${last[0] + 60} -40` : ` C${last[0] + 50} ${last[1]} ${last[0] + 60} ${last[1] - 20} ${W + 20} ${last[1] - 30}`;
+    let stones = '', me = '';
+    const rx = tall ? 62 : 50, ry = tall ? 28 : 24;
+    pts.forEach(([x, y], k) => {
+      const id = from + k;
+      if (id > D.STAGES.length) return;
+      const st = St.s.learn.done[id] ? 'done' : (id === stage.id ? 'now' : 'soon');
+      stones += `<g class="stone ${st}"><ellipse cx="${x}" cy="${y + 10}" rx="${rx + 2}" ry="${ry}" class="st-shadow"/><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" class="st-top"/>` +
+        (st === 'done' ? `<text x="${x}" y="${y + 10}" class="st-star">★</text>` : st === 'soon' ? `<text x="${x}" y="${y + 10}" class="st-num">${id}</text>` : '') + '</g>';
+      if (st === 'now') {
+        const mw = tall ? 190 : 144, mh = mw * 312 / 200;
+        me = `<g class="road-me"><ellipse cx="${x}" cy="${y + 2}" rx="${rx + 8}" ry="${ry - 6}" class="me-glow"/><svg x="${x - mw / 2}" y="${y - mh * 0.86}" width="${mw}" height="${mh}" viewBox="0 0 200 312" overflow="visible">${UI.mascot('happy').replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg></g>`;
+      }
+    });
+    const fx = tall ? last[0] + 70 : W - 35, fy = tall ? last[1] - 150 : last[1] - 125;
+    const flag = `<g class="road-flag" transform="translate(${fx} ${fy})"><path d="M0 0 V100" stroke="#2B2D5C" stroke-width="6" stroke-linecap="round"/><path d="M3 4 L58 20 L3 38Z" fill="#FF6B6B" stroke="#2B2D5C" stroke-width="5" stroke-linejoin="round"/></g>`;
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-label="모험 지도"><path d="${d}" class="road-edge"/><path d="${d}" class="road-path"/><path d="${d}" class="road-dash"/>${stones}${flag}${me}</svg>`;
   }
+  /* Re-draw the road when the iPad turns. */
+  let rt = null;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (App.screen === 'home' && App._drawRoad && $('.road')) App._drawRoad(); }, 120); });
+
+  /* World colours drive the background scene (sky + hills) behind every screen. */
+  /* muted pastel scene per world (same family as the 6-colour UI palette) */
+  const SCENES = {
+    1: ['#BFE3F6', '#F3F8F6', '#C5E6B4', '#A6D69C'], 2: ['#B9DDF5', '#F1F7FB', '#B3DCF0', '#93C8E6'],
+    3: ['#FBDDBF', '#FFF6EC', '#F6CFA2', '#EDB988'], 4: ['#F9D3DC', '#FFF4F6', '#F5BFCC', '#EBA5B6'],
+    5: ['#DDD3F7', '#F8F5FD', '#CFC2F3', '#B9A9EA'], 6: ['#CFCBF3', '#F3F2FC', '#BDB6EC', '#A59DE0'],
+    7: ['#C3EBDD', '#F2FBF7', '#AEE0CC', '#91D2B9'], 8: ['#C9DAF5', '#F3F6FC', '#FFFFFF', '#E3EAF7']
+  };
+  App.setWorld = function (w) {
+    const c = SCENES[w] || SCENES[1], r = document.documentElement.style;
+    r.setProperty('--sky1', c[0]); r.setProperty('--sky2', c[1]); r.setProperty('--hill1', c[2]); r.setProperty('--hill2', c[3]);
+    document.documentElement.dataset.world = w;
+  };
 
   /* ---------- daily gift + streak ---------- */
   async function dailyGift(d) {
@@ -165,7 +215,7 @@
     if (d.day === 7) { const o = St.giveOutfit(); if (o) extra = `<p class="outfit-got">새 옷: ${esc(o.name)}!</p>`; }
     await revealStickers(got, extra);
   }
-  function stickerHtml(s, cls) { return `<span class="stk r${s.r} ${cls || ''}"><span>${s.e}</span></span>`; }
+  function stickerHtml(s, cls) { return `<span class="stk r${s.r} ${cls || ''}"><span>${UI.em(s.e)}</span></span>`; }
   async function revealStickers(list, extra) {
     A.sfx('sparkle');
     UI.burst(null, 30);
@@ -182,9 +232,12 @@
     A.stop();
     App.screen = 'stage';
     A.bgm(false);
+    App.setWorld(stage.w || 1);
     App._levelUp = false;
     const m = main();
     m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
     m.dataset.screen = 'stage';
     const plays = Plan.make(stage);
     const dots = el('div', 'dots-prog', plays.map(() => '<i></i>').join(''));
@@ -237,10 +290,19 @@
     if (!ctx.alive()) return;
     if (App._levelUp) await levelUp();
     if (!ctx.alive()) return;
-    App.home();
+    await App.home();
+    const nx = St.stage();
+    if (stage.k !== 'review' && nx.w !== stage.w && nx.id > stage.id) await worldArrive(nx.w);
+    if (stage.k !== 'review' && St.todayCount() === St.s.settings.perDay) A.play('ui4_bye');
   };
   const PLAY_ICON = { meet: '🔤', chant: '🎵', pop: '🎈', pick: '🖼️', clap: '🥁', first: '👂', block: '🧱', trace: '✏️', train: '🚂', memory: '🃏', batchim: '💎', story: '📖' };
 
+  /* A new world on the map: a short celebration with the world's picture. */
+  async function worldArrive(w) {
+    const W = D.WORLDS[w];
+    A.sfx('fanfare'); UI.burst(null, 36);
+    await UI.modal(`<div class="arrive"><div class="arrive-ico">${UI.em(W.icon)}</div><h3>새 마을 도착!</h3><p class="arrive-name">${esc(W.name)}</p></div>`, [['출발!', 1, 'go']], 'arrive-m');
+  }
   async function maybeGift(ctx) {
     if (ctx.giftUsed || ctx.right < 3 || Math.random() > (App.giftRate !== undefined ? App.giftRate : 0.15)) return;
     ctx.giftUsed = true;
@@ -300,6 +362,8 @@
     App.screen = 'stickers';
     const m = main();
     m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
     m.dataset.screen = 'book';
     m.appendChild(hud({ home: true }));
     const owned = St.s.reward.stickers;
@@ -328,13 +392,15 @@
   };
 
   /* ---------- closet ---------- */
-  const SLOTS = [['friend', '친구', '🐰'], ['hat', '모자', '🎩'], ['eyes', '안경', '👓'], ['neck', '목', '🎀'], ['back', '망토', '🦸'], ['body', '색', '🎨']];
+  const SLOTS = [['friend', '친구', '🐰'], ['hat', '모자', '🎩'], ['eyes', '안경', '👓'], ['neck', '목', '🎀'], ['back', '망토', '✨'], ['body', '색', '🎨']];
   App.closet = function (slot) {
     leave(); App.sess++; A.stop();
     App.screen = 'closet';
     slot = slot || 'friend';
     const m = main();
     m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
     m.dataset.screen = 'closet';
     m.appendChild(hud({ home: true }));
     const R = St.s.reward;
@@ -344,12 +410,12 @@
     const tabs = el('div', 'closet-tabs');
     SLOTS.forEach(([k, name, ico]) => tabs.appendChild(btn('ctab' + (k === slot ? ' on' : ''), `<span>${ico}</span><small>${name}</small>`, () => { A.sfx('tap'); App.closet(k); }, name)));
     side.appendChild(tabs);
-    const grid = el('div', 'closet-grid');
+    const grid = el('div', 'closet-grid scroll');
     if (slot === 'friend') D.FRIENDS.forEach(f => {
-      const own = f.lv <= R.level, on = (R.friend || 'mong') === f.id;
-      const it = btn('citem' + (own ? ' own' : ' locked') + (on ? ' on' : ''), `<span class="cprev">${UI.mascot('happy', {}, f.id)}</span><b>${esc(f.name)}</b><small>${on ? '내 짝꿍' : own ? '고르기' : '🔒 레벨 ' + f.lv}</small>`, () => {
+      const own = f.lv <= R.level, on = UI.friendId(R.friend) === f.id;
+      const it = btn('citem' + (own ? ' own' : ' locked') + (on ? ' on' : ''), `<span class="cprev">${UI.mascot('happy', {}, f.id)}</span><b>${esc(f.short)}</b><small>${on ? '내 짝꿍' : own ? '고르기' : '🔒 레벨 ' + f.lv}</small>`, () => {
         if (!own) { UI.oops(it); return; }
-        R.friend = f.id; St.save(); A.sfx('fanfare'); UI.burst(null, 20); App.closet('friend');
+        R.friend = f.id; St.save(); A.sfx('fanfare'); UI.burst(null, 20); UI.sayGem(f.id); App.closet('friend');
       }, f.name);
       grid.appendChild(it);
     });
@@ -378,6 +444,8 @@
     App.screen = 'playground';
     const m = main();
     m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
     m.dataset.screen = 'playground';
     m.appendChild(hud({ home: true }));
     const wrap = el('div', 'pg scroll');
@@ -542,6 +610,49 @@
       info.textContent = `버전 v6 · 오프라인 저장 ${n}/${want}개 파일${n >= want ? ' · 인터넷 없이 쓸 수 있습니다' : ''}`;
     } catch (e) { info.textContent = '버전 v6'; }
   }
+
+  /* ---------- helper hand: if nothing is touched for a while, show what to press ---------- */
+  App.idleHelp = true;
+  let hintShown = 0;
+  function targetNow() {
+    const q = s => document.querySelector(s);
+    if (q('.modal .mbtn')) return q('.modal .mbtn');
+    if (q('.gift-box')) return q('.gift-box');
+    if (App.screen === 'home') return q('.play-go');
+    if (App.screen !== 'stage') return null;
+    const a = G.__answer;
+    if (a != null) {
+      const n = a.startsWith('i') && q('.cell') ? q('.cell[data-i="' + a.slice(1) + '"]') : Array.from(document.querySelectorAll('.play [data-v]')).find(x => x.dataset.v === a && x.style.visibility !== 'hidden');
+      if (n && n.isConnected) return n;
+    }
+    return q('.intro .next-btn') || q('.meet .next-btn:not([hidden])') || q('.chest:not(.open)') || q('.drum.next') || q('.vblock.next') || q('.cell.next') || q('.mcard:not(.matched):not(.open)') || q('.write-board:not(.done)');
+  }
+  function showHand(t) {
+    const r = t.getBoundingClientRect();
+    if (!r.width) return;
+    const h = el('img', 'help-hand');
+    h.src = 'v6/img/e/1f446.svg'; h.alt = '';
+    let x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (t.classList.contains('write-board') && G.__board) {
+      const smp = G.__board._test.samples()[0], sc = G.__board._test.size() / 100;
+      x = r.left + smp.x * sc; y = r.top + smp.y * sc;
+    }
+    h.style.left = x + 'px'; h.style.top = y + 'px';
+    UI.$('#fx').appendChild(h);
+    t.classList.add('hint');
+    setTimeout(() => { h.remove(); if (t.isConnected && !t.classList.contains('next')) t.classList.remove('hint'); }, 3200);
+  }
+  setInterval(() => {
+    if (!App.idleHelp || App.adult || document.hidden || !A.ready) return;
+    const idle = performance.now() - Math.max(UI.lastInput || 0, App._screenAt || 0, A.lastVoiceEnd ? A.lastVoiceEnd() : 0);
+    const wait = App.screen === 'home' ? 12000 : 7000;
+    if (idle < wait || performance.now() - hintShown < 9000 || A.busy()) return;
+    const t = targetNow();
+    if (!t) return;
+    hintShown = performance.now();
+    showHand(t);
+    A.play(t.classList.contains('write-board') ? 'ui4_hint' : 'ui4_tapnext');
+  }, 1000);
 
   /* ---------- service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

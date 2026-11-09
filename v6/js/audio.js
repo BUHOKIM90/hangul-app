@@ -118,7 +118,7 @@
     if (A.log.length > 200) A.log.splice(0, 100);
     return new Promise(res => {
       node.res = res;
-      src.onended = () => { voices.delete(node); res(myGen === gen); };
+      src.onended = () => { voices.delete(node); lastEnd = performance.now(); res(myGen === gen); };
     });
   };
   A.say = (key, opt) => A.play(key, opt);
@@ -128,6 +128,9 @@
     voices.clear();
   };
   A.gen = () => gen;
+  let lastEnd = 0;
+  A.busy = () => voices.size > 0;
+  A.lastVoiceEnd = () => lastEnd;
   A.now = () => (ctx ? ctx.currentTime : 0);
 
   /* Play clips one after another; onEach(i) fires when clip i is heard. gap in seconds. */
@@ -207,7 +210,8 @@
       case 'yay4': for (let i = 0; i < 6; i++) tone(1200 + i * 260, t + i * 0.035, 0.09, 'sine', 0.15); break;
       case 'wrong': tone(330, t, 0.18, 'sine', 0.2, 220); break;
       case 'pop': tone(600, t, 0.08, 'sine', 0.3, 1400); noise(t, 0.05, 0.12, 2000); break;
-      case 'tap': tone(700, t, 0.05, 'sine', 0.15); break;
+      case 'tap': tone(520, t, 0.07, 'sine', 0.22, 980); tone(1400, t + 0.025, 0.05, 'sine', 0.06); break;
+      case 'open': tone(392, t, 0.12, 'sine', 0.16, 784); tone(1175, t + 0.08, 0.16, 'triangle', 0.1); break;
       case 'whoosh': noise(t, 0.25, 0.08, 600); break;
       case 'snap': tone(900, t, 0.05, 'square', 0.08); tone(1350, t + 0.04, 0.08, 'triangle', 0.2); break;
       case 'star': tone(N.E6, t, 0.08, 'sine', 0.18); tone(N.G6, t + 0.06, 0.14, 'sine', 0.18); break;

@@ -217,10 +217,20 @@ ima|이마||body`;
       : st.map(p => [x + p[0] * w / 100, y + p[1] * h / 100]));
   }
   /* Strokes for one jamo or one syllable; null if not writable. */
+  /* Complex vowels = a horizontal part under the first consonant + a vertical part on the right. */
+  const COMPLEX = { 'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'], 'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'], 'ㅢ': ['ㅡ', 'ㅣ'] };
   function strokesFor(ch) {
     if (STROKES[ch]) return STROKES[ch];
     const s = split(ch);
-    if (!s || !STROKES[s.jung] || !STROKES[s.cho] || (s.jong && !STROKES[s.jong])) return null;
+    if (!s || !STROKES[s.cho] || (s.jong && !STROKES[s.jong])) return null;
+    if (COMPLEX[s.jung]) {
+      const [h, v] = COMPLEX[s.jung];
+      const bx = s.jong ? [[12, 4, 38, 34], [4, 24, 56, 30], [52, 2, 44, 60], [18, 64, 60, 32]] : [[6, 4, 48, 44], [2, 26, 62, 44], [50, 0, 48, 92]];
+      let out = place(STROKES[s.cho], bx[0]).concat(place(STROKES[h], bx[1]), place(STROKES[v], bx[2]));
+      if (s.jong) out = out.concat(place(STROKES[s.jong], bx[3]));
+      return out;
+    }
+    if (!STROKES[s.jung]) return null;
     const b = boxes(s);
     let out = place(STROKES[s.cho], b[0]).concat(place(STROKES[s.jung], b[1]));
     if (s.jong) out = out.concat(place(STROKES[s.jong], b[2]));
@@ -241,15 +251,18 @@ ima|이마||body`;
   const ST = [];
   const add = (w, k, o, title) => ST.push(Object.assign({ id: ST.length + 1, w, k, title }, o));
   for (let n = 1; n <= 6; n++) add(1, 'sound', { n }, '소리 놀이 ' + n);
+  add(1, 'name', { n: 1 }, '내 이름 려원');
   [['ㅏ'], ['ㅣ'], ['rev'], ['ㅗ'], ['ㅜ'], ['rev'], ['ㅓ'], ['ㅡ'], ['rev']].forEach(([v]) => {
     if (v === 'rev') add(2, 'vrev', {}, '모음 복습'); else add(2, 'vowel', { v }, v + ' 만나기');
   });
+  add(2, 'name', { n: 2 }, '내 이름 쓰기');
   const C1 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㄹ'];
   C1.forEach((c, i) => {
     add(3, 'cons1', { c }, c + ' 노래');
     add(3, 'cons2', { c }, c + ' 낱말');
     if (i % 3 === 2 || i === C1.length - 1) add(3, 'crev', {}, '자음 복습');
   });
+  add(3, 'name', { n: 3 }, '려원이 글자 ㄹ');
   ['ㅊ', 'ㅋ', 'ㅌ', 'ㅍ'].forEach((c, i) => {
     add(4, 'cons1', { c }, c + ' 노래');
     add(4, 'cons2', { c }, c + ' 낱말');
@@ -264,6 +277,7 @@ ima|이마||body`;
     add(6, 'bat2', { b }, b + ' 받침 낱말');
     if (i === 3 || i === BAT.length - 1) add(6, 'brev', {}, '받침 복습');
   });
+  add(7, 'name', { n: 4 }, '내 이름 혼자 쓰기');
   [['fam', '가족'], ['ani', '동물'], ['food', '먹거리'], ['ride', '탈것과 물건'], ['body', '몸'], ['nature', '자연'],
     ['ani', '동물 2'], ['food', '먹거리 2'], ['thing', '물건'], ['mix', '낱말 모음'], ['mix', '낱말 모음 2'], ['mix', '낱말 대장'], ['mix', '낱말 왕']]
     .forEach(([g, t]) => add(7, 'word', { g }, t));
@@ -309,7 +323,7 @@ ima|이마||body`;
     ['동물', '🐶🐱🐰🐻🐼🦊🐯🦁🐮🐷🐸🐵🐔🐧🐤🦄🐨🦒🐘🦔'],
     ['간식', '🍎🍓🍌🍇🍉🍑🍒🥝🍞🧁🍩🍪🍦🍭🍫🍕🍔🍟🍙🥕'],
     ['탈것', '🚗🚕🚌🚑🚒🚓🚜🚲🛴🚂🚀✈️🚁⛵🚤🛸🏎️🚛🚚🛻'],
-    ['바다', '🐳🐬🦈🐠🐡🐙🦑🦀🦞🐢🦭🐚🐋🦐🐟🌊⚓🏝️🐧🧜'],
+    ['바다', '🐳🐬🦈🐠🐡🐙🦑🦀🦞🐢🦭🐚🐋🦐🐟🌊⚓🏝️🐧🐊'],
     ['하늘', '🌙⭐🌟☀️🪐🌍☄️🌈⚡❄️☁️🌠🌌🌞🌛🌝🔭🛰️👽🎆'],
     ['장난감', '🎈🎁🎀🧸🪀🎨🎪🎠🎡🎢🪁⚽🏀🎸🥁🎺🎹🧩🪄👑']
   ];
@@ -342,23 +356,27 @@ ima|이마||body`;
     { id: 'back_cape', slot: 'back', name: '빨간 망토', cost: 20 },
     { id: 'back_star', slot: 'back', name: '별 망토', cost: 30, lv: 4 },
     { id: 'back_wing', slot: 'back', name: '요정 날개', cost: 35, lv: 6 },
-    { id: 'body_pink', slot: 'body', name: '분홍 몽글이', cost: 15, color: '#FFC1D9' },
-    { id: 'body_mint', slot: 'body', name: '민트 몽글이', cost: 15, color: '#B5F0DA' },
-    { id: 'body_lemon', slot: 'body', name: '레몬 몽글이', cost: 15, color: '#FFF1A6' },
-    { id: 'body_lilac', slot: 'body', name: '보라 몽글이', cost: 20, color: '#D9C8FF' },
-    { id: 'body_peach', slot: 'body', name: '복숭아 몽글이', cost: 20, color: '#FFD3B5' },
-    { id: 'body_rainbow', slot: 'body', name: '무지개 몽글이', cost: 50, lv: 8, color: 'rainbow' }
+    { id: 'body_pink', slot: 'body', name: '분홍 옷', cost: 15, color: '#FFC1D9' },
+    { id: 'body_mint', slot: 'body', name: '민트 옷', cost: 15, color: '#B5F0DA' },
+    { id: 'body_lemon', slot: 'body', name: '레몬 옷', cost: 15, color: '#FFF1A6' },
+    { id: 'body_lilac', slot: 'body', name: '보라 옷', cost: 20, color: '#D9C8FF' },
+    { id: 'body_peach', slot: 'body', name: '복숭아 옷', cost: 20, color: '#FFD3B5' },
+    { id: 'body_rainbow', slot: 'body', name: '무지개 옷', cost: 50, lv: 8, color: 'rainbow' }
   ];
 
   /* Friends (all drawn in ui.js). lv = level that unlocks the friend. */
   const FRIENDS = [
-    { id: 'mong', name: '몽글이', color: '#BFE3FF', line: '#5B7FB8', lv: 1 },
-    { id: 'rabbit', name: '토끼 토리', color: '#FFFFFF', line: '#D99AB5', lv: 1 },
-    { id: 'bear', name: '곰 보리', color: '#E0B486', line: '#9A6B3F', lv: 2 },
-    { id: 'cat', name: '고양이 모모', color: '#FFCF8A', line: '#C98A3A', lv: 3 },
-    { id: 'chick', name: '병아리 삐삐', color: '#FFE66B', line: '#D9A400', lv: 4 },
-    { id: 'panda', name: '판다 콩콩', color: '#FFFFFF', line: '#4A4A5A', lv: 5 },
-    { id: 'puppy', name: '강아지 뭉치', color: '#F3E1C7', line: '#A9835A', lv: 7 }
+    { id: 'lumi', name: '별사탕 공주 루미', short: '루미', lv: 1 },
+    { id: 'tori', name: '구름토끼 토리', short: '토리', lv: 1 },
+    { id: 'mong', name: '솜사탕양 몽글이', short: '몽글이', lv: 2 },
+    { id: 'pomi', name: '리본고양이 뽀미', short: '뽀미', lv: 3 },
+    { id: 'kong', name: '아기용 콩이', short: '콩이', lv: 4 },
+    { id: 'piyak', name: '병아리 삐약이', short: '삐약이', lv: 5 },
+    { id: 'bori', name: '꿀곰 보리', short: '보리', lv: 6 },
+    { id: 'dori', name: '바둑강아지 도리', short: '도리', lv: 7 },
+    { id: 'sori', name: '꼬리여우 소리', short: '소리', lv: 8 },
+    { id: 'pang', name: '대나무판다 팡팡', short: '팡팡', lv: 9 },
+    { id: 'yuni', name: '무지개유니콘 유니', short: '유니', lv: 11 }
   ];
   G.D = {
     CHO, JUNG, split, join, hex, syKey, fyKey, dyKey, jKey, has, SY, WORDS, HY, HW, CLAP, noBatchim,

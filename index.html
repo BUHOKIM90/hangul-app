@@ -18,6 +18,12 @@
 <link rel="stylesheet" href="v6/css/app.css">
 </head>
 <body>
+<div id="scene" aria-hidden="true">
+  <i class="sun"></i>
+  <svg class="cloud c1" viewBox="0 0 120 60"><path d="M20 50 C0 50 0 26 22 26 C24 8 50 4 60 20 C70 6 98 10 96 30 C116 30 118 50 100 50Z"/></svg>
+  <svg class="cloud c2" viewBox="0 0 120 60"><path d="M20 50 C0 50 0 26 22 26 C24 8 50 4 60 20 C70 6 98 10 96 30 C116 30 118 50 100 50Z"/></svg>
+  <svg class="hills" viewBox="0 0 1000 300" preserveAspectRatio="none"><path class="h1" d="M0 120 C160 40 320 60 460 110 C620 170 780 60 1000 90 V300 H0Z"/><path class="h2" d="M0 200 C200 140 380 190 540 170 C720 150 860 210 1000 180 V300 H0Z"/></svg>
+</div>
 <div id="app"><main id="main" data-screen="splash"></main></div>
 <div id="splash"></div>
 <div id="praise" hidden aria-live="polite"></div>
@@ -28,6 +34,7 @@
 <script defer src="v6/js/data.js"></script>
 <script defer src="v6/js/audio.js"></script>
 <script defer src="v6/js/store.js"></script>
+<script defer src="v6/js/chars.js"></script>
 <script defer src="v6/js/ui.js"></script>
 <script defer src="v6/js/write.js"></script>
 <script defer src="v6/js/games.js"></script>

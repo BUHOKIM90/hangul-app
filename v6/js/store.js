@@ -13,7 +13,7 @@
   }
   function freshReward() {
     return {
-      stars: 0, xp: 0, level: 1, friend: 'mong', stickers: {}, newStickers: [], outfits: [], wear: {},
+      stars: 0, xp: 0, level: 1, friend: 'lumi', stickers: {}, newStickers: [], outfits: [], wear: {},
       daily: { last: '', idx: 0 }, streak: { last: '', count: 0, best: 0, marks: [] }
     };
   }
@@ -23,6 +23,9 @@
   const base = fresh();
   ['learn', 'reward', 'settings'].forEach(k => { S[k] = Object.assign({}, base[k], S[k] || {}); });
 
+  /* friends were redrawn in v6.2: carry an old pick over to its new look-alike */
+  { const old = { rabbit: 'tori', bear: 'bori', cat: 'pomi', chick: 'piyak', puppy: 'dori', fox: 'sori', panda: 'pang', pig: 'lumi', koala: 'lumi', tiger: 'lumi', monkey: 'lumi' };
+    if (old[S.reward.friend]) S.reward.friend = old[S.reward.friend]; }
   const St = { s: S };
   St.save = function () { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage full or private mode */ } };
   St.day = function (d) {
@@ -124,7 +127,7 @@
   /* Parent: clear stickers and outfits only. Learning progress, stars and streak stay. */
   St.resetRewards = function () {
     const R = S.reward;
-    R.stickers = {}; R.newStickers = []; R.outfits = []; R.wear = {}; R.friend = 'mong';
+    R.stickers = {}; R.newStickers = []; R.outfits = []; R.wear = {}; R.friend = 'lumi';
     St.save();
   };
   St.resetAll = function () { S = fresh(); St.s = S; St.save(); };

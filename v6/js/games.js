@@ -22,12 +22,25 @@
     return { h, say };
   }
   /* Spoken instruction at the start of a play (4-year-olds cannot read the subtitle). */
-  async function say(ctx, key) { if (ctx.alive() && key) await A.play(key); }
+  async function say(ctx, key) {
+    if (!ctx.alive() || !key) return;
+    /* While the instruction plays, the friend explains it on the (still empty) board. */
+    const b = UI.$('.play .play-body');
+    let ex = null;
+    if (b && !b.children.length) {
+      const sub = UI.$('.play .play-sub');
+      ex = el('div', 'explain', `<div class="ex-pal">${UI.mascot('wow')}</div><p class="ex-bubble">${esc(sub ? sub.textContent : '')}</p>`);
+      b.appendChild(ex);
+    }
+    await A.play(key);
+    if (ex) ex.remove();
+  }
   function body(host, cls) { const b = el('div', 'play-body ' + (cls || '')); host.appendChild(b); return b; }
   /* Correct answer: praise text + jingle now (same tap handler), then lead sound, then praise voice. */
   async function right(ctx, type, e, node, item, lead) {
     St.mark(item, true);
     ctx.right++;
+    ctx.streakWrong = 0;
     const at = UI.pointOf(e, node);
     const p = UI.praise(type, at, { lead });
     UI.flyStar(at).then(() => ctx.star());
@@ -37,8 +50,11 @@
   function wrong(ctx, node, item, clip) {
     St.mark(item, false);
     ctx.wrong++;
+    ctx.streakWrong = (ctx.streakWrong || 0) + 1;
     UI.oops(node);
-    if (clip) setTimeout(() => { if (ctx.alive()) A.play(clip); }, 250);
+    /* after two misses in a row: name what was pressed, then "괜찮아. 같이 해 보자." */
+    const seq = [clip].concat(ctx.streakWrong === 2 ? ['ui4_try'] : []).filter(Boolean);
+    if (seq.length) setTimeout(() => { if (ctx.alive()) A.sequence(seq, null, 0.2); }, 250);
   }
   const syClip = ch => (D.has.sy(ch) ? D.syKey(ch) : null);
   const findClip = ch => (D.has.fy(ch) ? D.fyKey(ch) : syClip(ch));
@@ -67,11 +83,11 @@
 
   /* ---------- 0. meet: big letter card ---------- */
   P.meet = async function (host, cfg, ctx) {
-    const j = cfg.j, w = D.WORDS[D.JPIC[j]];
+    const j = cfg.j, w = D.WORDS[cfg.word || D.JPIC[j]];
     const clip = cfg.clip || (D.has.j(j) ? D.jKey(j) : jamoClip(j));
     head(host, cfg.title || '새 글자 친구', clip);
     const b = body(host, 'meet');
-    const card = el('button', 'tap meet-card', `<span class="meet-letter">${esc(j)}</span>${w && w.pic ? `<span class="meet-pic">${w.pic}</span><span class="meet-word">${esc(w.w)}</span>` : ''}`);
+    const card = el('button', 'tap meet-card' + (j.length > 1 ? ' word' : ''), `<span class="meet-letter">${esc(j)}</span>${w && w.pic ? `<span class="meet-pic">${w.pic}</span>${j.length > 1 ? '' : `<span class="meet-word">${esc(w.w)}</span>`}` : ''}`);
     card.type = 'button';
     b.appendChild(card);
     const go = btn('next-btn', '다음 ▶', null, '다음');
@@ -217,7 +233,7 @@
       b.innerHTML = '';
       if (read) b.appendChild(el('div', 'word-big', esc(D.WORDS[k].w)));
       const grid = el('div', 'cards');
-      const opts = shuffle([k].concat(shuffle((cfg.pool || cfg.words).filter(x => x !== k && D.WORDS[x].pic !== D.WORDS[k].pic)).slice(0, 2)));
+      const opts = shuffle([k].concat(shuffle((cfg.pool || cfg.words).filter(x => x !== k && UI.emKey(D.WORDS[x].pic || '') !== UI.emKey(D.WORDS[k].pic || ''))).slice(0, 2)));
       const nodes = opts.map(o => { const n = el('button', 'tap card', UI.pic(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
       b.appendChild(grid);
       await sleep(200);
@@ -702,6 +718,16 @@
         const wr = St.weak(k => k.startsWith('write:'), 2).map(k => k.slice(6));
         const tr = wr.concat(shuffle(pool.length ? pool : vs)).filter(ch => D.strokesFor(ch)).slice(0, 2);
         out.push({ t: 'trace', cfg: { chars: tr.length ? tr : ['ㅏ'], faint: true } });
+        break;
+      }
+      case 'name': {
+        /* Own name first (NELP 2008; Bloodgood 1999): read it as a whole word, build it, write it. */
+        const fam = ['eomma', 'appa', 'agi', 'nuna', 'halmeoni', 'harabeoji'];
+        out.push({ t: 'meet', cfg: { j: '려원', word: 'ryeowon', clip: 'w_ryeowon', title: '내 이름' } });
+        out.push({ t: 'pick', cfg: { mode: 'read', words: ['ryeowon', shuffle(fam)[0], 'ryeowon'], pool: fam, n: 3, title: '내 이름 찾기' } });
+        out.push({ t: 'train', cfg: { words: ['ryeowon', 'ryeowon'], n: stage.n >= 2 ? 2 : 1, title: '이름 기차' } });
+        if (stage.n === 3) out.push({ t: 'pop', cfg: { targets: ['려', '라', '려', '로'], pool: ['려', '라', '로', '루', '리'], k: 3, title: '려원이 글자 찾기' } });
+        out.push({ t: 'trace', cfg: { chars: stage.n === 3 ? ['ㄹ', '려', '원'] : ['려', '원'], faint: stage.n >= 4, title: '내 이름 쓰기' } });
         break;
       }
       case 'sound': {
