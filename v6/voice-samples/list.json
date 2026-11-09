@@ -11,13 +11,19 @@
    "voice": "ko-KR-SunHiNeural",
    "rate": "-6%",
    "pitch": "+6Hz",
-   "label": "선희 (지금 목소리, 여성)",
+   "label": "선희 (지금 목소리, 여성) (자연스러움 3.6점)",
    "files": [
     "sunhi_0.mp3",
     "sunhi_1.mp3",
     "sunhi_2.mp3",
     "sunhi_3.mp3"
-   ]
+   ],
+   "score": {
+    "n": 30,
+    "ok": 23,
+    "cer": 0.171,
+    "mos": 3.608
+   }
   },
   {
    "id": "sunhi_slow",

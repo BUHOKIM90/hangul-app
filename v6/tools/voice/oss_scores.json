@@ -1,0 +1,328 @@
+{
+ "sunhi_now": {
+  "engine": "edge",
+  "voice": "ko-KR-SunHiNeural",
+  "test": {
+   "sy_AC00": {
+    "text": "가.",
+    "heard": "가",
+    "cer": 0.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.175,
+    "ok": true
+   },
+   "sy_B098": {
+    "text": "나.",
+    "heard": "나",
+    "cer": 0.0,
+    "span": 0.57,
+    "runs": 1,
+    "mos": 3.625,
+    "ok": true
+   },
+   "sy_B5A1": {
+    "text": "떡.",
+    "heard": "떡",
+    "cer": 0.0,
+    "span": 0.4,
+    "runs": 1,
+    "mos": 2.51,
+    "ok": true
+   },
+   "sy_BAA8": {
+    "text": "모.",
+    "heard": "뭐",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 2.166,
+    "ok": false
+   },
+   "sy_BE57": {
+    "text": "빗.",
+    "heard": "빛",
+    "cer": 1.0,
+    "span": 0.5,
+    "runs": 1,
+    "mos": 3.546,
+    "ok": false
+   },
+   "sy_C545": {
+    "text": "악.",
+    "heard": "아",
+    "cer": 1.0,
+    "span": 0.45,
+    "runs": 1,
+    "mos": 2.024,
+    "ok": false
+   },
+   "sy_C800": {
+    "text": "저.",
+    "heard": "저",
+    "cer": 0.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.349,
+    "ok": true
+   },
+   "sy_D0A4": {
+    "text": "키.",
+    "heard": "키",
+    "cer": 0.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 4.024,
+    "ok": true
+   },
+   "w_ageo": {
+    "text": "악어.",
+    "heard": "악어",
+    "cer": 0.0,
+    "span": 0.79,
+    "runs": 1,
+    "mos": 3.772,
+    "ok": true
+   },
+   "w_geobuk": {
+    "text": "거북.",
+    "heard": "거북",
+    "cer": 0.0,
+    "span": 0.66,
+    "runs": 1,
+    "mos": 3.576,
+    "ok": true
+   },
+   "w_ip": {
+    "text": "입.",
+    "heard": "1.",
+    "cer": 1.0,
+    "span": 0.4,
+    "runs": 1,
+    "mos": 2.052,
+    "ok": false
+   },
+   "w_pija": {
+    "text": "피자.",
+    "heard": "피자",
+    "cer": 0.0,
+    "span": 0.75,
+    "runs": 1,
+    "mos": 4.318,
+    "ok": true
+   },
+   "j_3131": {
+    "text": "기역, 기차 할 때 기역.",
+    "heard": "기역, 기차할 때 기역",
+    "cer": 0.0,
+    "span": 2.29,
+    "runs": 2,
+    "mos": 3.706,
+    "ok": true
+   },
+   "j_3148": {
+    "text": "지읒, 지도 할 때 지읒.",
+    "heard": "ㅈ, 지도할 때 ㅈ",
+    "cer": 0.5,
+    "span": 2.06,
+    "runs": 2,
+    "mos": 4.093,
+    "ok": false
+   },
+   "j_3155": {
+    "text": "여, 여우 할 때 여.",
+    "heard": "이요 여우할 때요",
+    "cer": 0.5,
+    "span": 2.02,
+    "runs": 1,
+    "mos": 3.65,
+    "ok": false
+   },
+   "dy_AC00": {
+    "text": "그건 가 글자야.",
+    "heard": "그건 가 글자야.",
+    "cer": 0.0,
+    "span": 1.46,
+    "runs": 1,
+    "mos": 4.028,
+    "ok": true
+   },
+   "dy_B8E8": {
+    "text": "그건 루 글자야.",
+    "heard": "그건 루 글자야.",
+    "cer": 0.0,
+    "span": 1.49,
+    "runs": 1,
+    "mos": 3.998,
+    "ok": true
+   },
+   "dy_C218": {
+    "text": "그건 수 글자야.",
+    "heard": "그건 수 글자야.",
+    "cer": 0.0,
+    "span": 1.43,
+    "runs": 1,
+    "mos": 3.898,
+    "ok": true
+   },
+   "fy_AC70": {
+    "text": "거 글자를 찾아볼까?",
+    "heard": "거 글자를 찾아볼까?",
+    "cer": 0.0,
+    "span": 1.72,
+    "runs": 1,
+    "mos": 3.993,
+    "ok": true
+   },
+   "fy_BD80": {
+    "text": "부 글자를 찾아볼까?",
+    "heard": "구 글자를 찾아볼까?",
+    "cer": 0.125,
+    "span": 1.63,
+    "runs": 1,
+    "mos": 3.929,
+    "ok": false
+   },
+   "hy_agi": {
+    "text": "그건 아기야!",
+    "heard": "그건 아기야.",
+    "cer": 0.0,
+    "span": 1.11,
+    "runs": 1,
+    "mos": 4.1,
+    "ok": true
+   },
+   "hy_keikeu": {
+    "text": "그건 케이크야!",
+    "heard": "그건 케이크야.",
+    "cer": 0.0,
+    "span": 1.37,
+    "runs": 1,
+    "mos": 4.139,
+    "ok": true
+   },
+   "ui_clapq": {
+    "text": "몇 번 박수 쳤을까?",
+    "heard": "몇 번 박수 쳤을까?",
+    "cer": 0.0,
+    "span": 1.6,
+    "runs": 1,
+    "mos": 4.026,
+    "ok": true
+   },
+   "ui_levelup": {
+    "text": "우와, 한 단계 올라갔어!",
+    "heard": "우와, 한 단계 올라갔어.",
+    "cer": 0.0,
+    "span": 2.27,
+    "runs": 1,
+    "mos": 3.409,
+    "ok": true
+   },
+   "ui4_balloon": {
+    "text": "들은 글자를 눌러 봐!",
+    "heard": "들은 글자를 눌러봐.",
+    "cer": 0.0,
+    "span": 1.77,
+    "runs": 1,
+    "mos": 3.802,
+    "ok": true
+   },
+   "ui4_proc17": {
+    "text": "그림을 보고 잘 생각했네!",
+    "heard": "그림을 보고 잘 생각했네.",
+    "cer": 0.0,
+    "span": 2.04,
+    "runs": 1,
+    "mos": 3.846,
+    "ok": true
+   },
+   "v_alone": {
+    "text": "이제 혼자 써 볼까?",
+    "heard": "이제 혼자 써볼까?",
+    "cer": 0.0,
+    "span": 1.64,
+    "runs": 1,
+    "mos": 3.978,
+    "ok": true
+   },
+   "v_w3": {
+    "text": "자음 마을에 아기용 콩이가 살아. 자음 친구들을 다 만나면 콩이가 나올 거야!",
+    "heard": "자음 마을에 아기용 콩이가 살아. 자음 친구들을 다 만나면 콩이가 나올 거야.",
+    "cer": 0.0,
+    "span": 6.4,
+    "runs": 2,
+    "mos": 3.457,
+    "ok": true
+   },
+   "c_appa": {
+    "text": "아, 빠! 두 번 쳤어!",
+    "heard": "아, 빠 두 번 쳤어",
+    "cer": 0.0,
+    "span": 3.35,
+    "runs": 3,
+    "mos": 4.007,
+    "ok": true
+   },
+   "s_1": {
+    "text": "나비도 나무도.",
+    "heard": "나비도 나무도",
+    "cer": 0.0,
+    "span": 1.26,
+    "runs": 1,
+    "mos": 4.04,
+    "ok": true
+   }
+  },
+  "samples": [
+   {
+    "text": "려원아, 안녕! 오늘도 같이 놀자!",
+    "heard": "려원아 안녕. 오늘도 같이 놀자.",
+    "cer": 0.0,
+    "span": 4.04,
+    "runs": 2,
+    "mos": 3.94,
+    "ok": true
+   },
+   {
+    "text": "그건 가 글자야.",
+    "heard": "그건 가 글자야.",
+    "cer": 0.0,
+    "span": 1.46,
+    "runs": 1,
+    "mos": 3.942,
+    "ok": true
+   },
+   {
+    "text": "나비.",
+    "heard": "나비",
+    "cer": 0.0,
+    "span": 0.74,
+    "runs": 1,
+    "mos": 4.039,
+    "ok": true
+   },
+   {
+    "text": "잘했어! 혼자 읽었네!",
+    "heard": "잘했어. 혼자 읽었네.",
+    "cer": 0.0,
+    "span": 2.93,
+    "runs": 2,
+    "mos": 4.277,
+    "ok": true
+   }
+  ],
+  "score": {
+   "n": 30,
+   "ok": 23,
+   "cer": 0.171,
+   "mos": 3.608
+  },
+  "score_letters": {
+   "n": 8,
+   "ok": 5,
+   "cer": 0.375,
+   "mos": 3.052
+  }
+ }
+}
