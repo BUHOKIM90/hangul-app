@@ -976,3 +976,11 @@ html:has(#main[data-screen="decorate"]) #scene .sun { display: none; }
 .modal.compact .modal-card { padding-top: 1.4vh; padding-bottom: 1.4vh; }
 .modal.compact .modal-btns { margin-top: 1.2vh; }
 .modal.tiny .lv-mascot, .modal.tiny .arrive-pal, .modal.tiny .arrive-ico, .modal.tiny .arrive-story { display: none; }
+/* 첫소리 친구 on portrait: three choices in one row so nothing falls off a tall-but-narrow screen */
+@media (orientation: portrait) {
+  .play-body.first { justify-content: space-evenly; }
+  .play-body.first .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(96%, 92vmin); }
+  .play-body.first .cards > :nth-child(3):last-child { grid-column: auto; width: auto; }
+  .play-body.first .card .pic { font-size: 20vmin; }
+  .first-top .pic-l { font-size: 18vmin; }
+}
