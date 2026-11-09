@@ -773,3 +773,10 @@ img.em, .pic img.em { filter: none; }
 .help-hand { filter: drop-shadow(0 1vmin 0 rgba(75, 54, 66, .25)); }
 .road { overflow: hidden; }
 @media (orientation: portrait) { .play-go { grid-template-columns: auto auto; justify-content: center; } }
+/* sticker book: the slot itself is the sticker card; the sticker art fits inside it */
+.book-page .slot { display: grid; place-items: center; overflow: hidden; min-height: 0; border-radius: 3vmin; border: 0; }
+.book-page .slot.has { background: #fff; border: var(--line); box-shadow: var(--step-s); }
+.book-page .slot .stk { width: auto; height: 100%; max-width: 100%; border: 0 !important; box-shadow: none !important; background: transparent; }
+.book-page .slot .stk.r1 { background: transparent; }
+.book-page .slot.has:has(.stk.r1) { background: linear-gradient(135deg, #FFE3EC, #FFF3CC 50%, #DDF4EA); }
+.book-page .slot.has:has(.stk.r2) { background: var(--bu1); }
