@@ -1,6 +1,8 @@
 'use strict';
 /* v6 write: free finger tracing over a pink guide. No snapping: the child's own line is kept.
-   Done when most of the guide is covered and most ink is near the guide. */
+   Done when most of the guide is covered and most ink is near the guide.
+   Stroke check (settings.strokes = 'soft'): a stroke that clearly starts a later stroke first, or runs backwards,
+   is gently wiped and the right start dot pulses. opt.hidden: the guide is invisible (writing from memory). */
 (function (G) {
   const D = G.D, UI = G.UI, A = G.A;
   const RAINBOW = ['#FF5A7A', '#FF9F43', '#F7C600', '#2DBE7E', '#3A9BFF', '#8B6CFF'];
@@ -43,6 +45,10 @@
     const syll = ch.length === 1 && !!D.split(ch);
     const dpr = Math.min(3, G.devicePixelRatio || 1);
     let size = 0, sc = 1, samples = [], cov = [], inkPts = [], nearCount = 0, active = null, strokeNo = 0, finished = false;
+    const hidden = !!opt.hidden;
+    const checkOn = !hidden && (opt.strokes || 'soft') !== 'off';
+    let inkStrokes = [], cur = null, doneStroke = [], pulse = -1, pulseT = 0;
+    const errors = { order: 0, dir: 0 };
     let resolveDone;
     const done = new Promise(r => { resolveDone = r; });
     const gx = guide.getContext('2d'), ix = ink.getContext('2d');
@@ -56,7 +62,7 @@
       sc = size / 100;
       samples = samplesOf(strokes, 2.2);
       cov = samples.map(() => false);
-      inkPts = []; nearCount = 0;
+      inkPts = []; nearCount = 0; inkStrokes = []; doneStroke = strokes.map(() => false);
       ix.setTransform(dpr, 0, 0, dpr, 0, 0); ix.clearRect(0, 0, size, size);
       drawGuide();
     }
@@ -68,7 +74,8 @@
       gx.beginPath(); gx.moveTo(size / 2, 6); gx.lineTo(size / 2, size - 6); gx.moveTo(6, size / 2); gx.lineTo(size - 6, size / 2); gx.stroke();
       gx.setLineDash([]);
       gx.lineCap = 'round'; gx.lineJoin = 'round';
-      const alpha = opt.faint ? 0.38 : 1;
+      if (hidden && !finished) return;
+      const alpha = hidden ? 0.35 : opt.faint ? 0.38 : 1;
       strokes.forEach(st => {
         pathOf(gx, st, sc);
         gx.strokeStyle = `rgba(255,143,184,${alpha})`; gx.lineWidth = widthU * sc; gx.stroke();
@@ -87,8 +94,9 @@
         const [dx, dy] = dirOf(st);
         for (let k = 0; k < 3 && placed.some(([px, py]) => Math.hypot(px - x, py - y) < widthU * 1.1); k++) { x += dx * widthU * 1.15; y += dy * widthU * 1.15; }
         placed.push([x, y]);
-        const dr = strokes.length > 6 ? 0.46 : 0.62;
-        gx.fillStyle = '#3CC48A'; gx.beginPath(); gx.arc(x * sc, y * sc, widthU * sc * dr, 0, Math.PI * 2); gx.fill();
+        const dr = (strokes.length > 6 ? 0.46 : 0.62) * (i === pulse ? 1.45 : 1);
+        if (hidden) return;
+        gx.fillStyle = i === pulse ? '#FFB800' : (doneStroke[i] ? '#9BD9BE' : '#3CC48A'); gx.beginPath(); gx.arc(x * sc, y * sc, widthU * sc * dr, 0, Math.PI * 2); gx.fill();
         gx.fillStyle = '#fff'; gx.font = `bold ${Math.round(widthU * sc * dr * 1.3)}px Jua, sans-serif`; gx.textAlign = 'center'; gx.textBaseline = 'middle';
         gx.fillText(String(i + 1), x * sc, y * sc + 1);
         const ax = (x + dx * widthU * 1.1) * sc, ay = (y + dy * widthU * 1.1) * sc;
@@ -112,16 +120,18 @@
       requestAnimationFrame(step);
     }
     function local(e) { const r = ink.getBoundingClientRect(); return [(e.clientX - r.left) / sc, (e.clientY - r.top) / sc]; }
-    const tolCov = syll ? 6.5 : 8.5, tolNear = syll ? 11 : 14;
+    const loose = hidden ? 1.7 : 1;
+    const tolCov = (syll ? 6.5 : 8.5) * loose, tolNear = (syll ? 11 : 14) * loose;
     function addPoint(p) {
       inkPts.push(p);
+      if (cur) cur.pts.push(p);
       let near = false, changed = false;
       for (let i = 0; i < samples.length; i++) {
         const d = Math.hypot(samples[i].x - p[0], samples[i].y - p[1]);
         if (d < tolNear) near = true;
-        if (!cov[i] && d < tolCov) { cov[i] = true; changed = true; }
+        if (!cov[i] && d < tolCov) { cov[i] = true; changed = true; if (cur) cur.newly.push(i); }
       }
-      if (near) nearCount++;
+      if (near) { nearCount++; if (cur) cur.near++; }
       return changed;
     }
     function stats() {
@@ -130,10 +140,66 @@
       const prec = inkPts.length ? nearCount / inkPts.length : 0;
       return { c, minStroke: Math.min.apply(null, per), prec };
     }
+    function strokeCov(si) {
+      let n = 0, c = 0;
+      samples.forEach((sm, i) => { if (sm.s === si) { n++; if (cov[i]) c++; } });
+      return n ? c / n : 1;
+    }
+    /* Judge one finished finger stroke. Returns true if it was kept. Lenient: only clear mistakes are wiped. */
+    function judge(st) {
+      const mark = () => strokes.forEach((_, si) => { if (!doneStroke[si] && strokeCov(si) >= 0.6) doneStroke[si] = true; });
+      if (!checkOn || !st || st.newly.length < 6) { mark(); return true; }
+      /* strokes already mostly covered before this finger stroke count as written */
+      const fresh = new Set(st.newly);
+      strokes.forEach((_, si) => {
+        if (doneStroke[si]) return;
+        let n = 0, c = 0;
+        samples.forEach((sm, i) => { if (sm.s === si) { n++; if (cov[i] && !fresh.has(i)) c++; } });
+        if (n && c / n >= 0.6) doneStroke[si] = true;
+      });
+      const by = {};
+      st.newly.forEach(i => { const k = samples[i].s; by[k] = (by[k] || 0) + 1; });
+      const main = +Object.keys(by).sort((a, b) => by[b] - by[a])[0];
+      const share = by[main] / st.newly.length;
+      const expect = doneStroke.indexOf(false);
+      let bad = null;
+      if (expect >= 0 && main !== expect && share > 0.7 && (by[expect] || 0) / st.newly.length < 0.15 && main > expect) bad = 'order';
+      else if (share > 0.7 && !strokes[main].c) {
+        /* direction: where along the guide stroke did the finger start and end? */
+        const idx = samples.map((sm, i) => [sm, i]).filter(([sm]) => sm.s === main);
+        const near = p => idx.reduce((b, [sm, i]) => { const d = Math.hypot(sm.x - p[0], sm.y - p[1]); return d < b[0] ? [d, i] : b; }, [1e9, -1])[1];
+        const a = near(st.pts[0]), z = near(st.pts[st.pts.length - 1]);
+        if (a >= 0 && z >= 0 && a - z > idx.length * 0.45) bad = 'dir';
+      }
+      if (!bad) { mark(); return true; }
+      errors[bad]++;
+      st.newly.forEach(i => { cov[i] = false; });
+      inkStrokes.pop();
+      inkPts = inkPts.slice(0, inkPts.length - st.pts.length);
+      nearCount = Math.max(0, nearCount - st.near);
+      redrawInk();
+      pulse = bad === 'order' ? expect : main;
+      clearTimeout(pulseT);
+      pulseT = setTimeout(() => { pulse = -1; drawGuide(); }, 1800);
+      drawGuide();
+      UI.oops(wrap);
+      if (opt.onStrokeError) opt.onStrokeError(bad, { main, expect, share: +share.toFixed(2), done: doneStroke.slice() });
+      return false;
+    }
+    function redrawInk() {
+      ix.clearRect(0, 0, size, size);
+      inkStrokes.forEach(st => {
+        ix.strokeStyle = st.color; ix.lineWidth = Math.max(10, widthU * sc * 0.55); ix.lineCap = 'round'; ix.lineJoin = 'round';
+        ix.beginPath(); st.pts.forEach((p, i) => (i ? ix.lineTo(p[0] * sc, p[1] * sc) : ix.moveTo(p[0] * sc, p[1] * sc))); 
+        if (st.pts.length === 1) ix.lineTo(st.pts[0][0] * sc + 0.1, st.pts[0][1] * sc);
+        ix.stroke();
+      });
+    }
     function check(final) {
       const s = stats();
-      if (s.c >= 0.8 && s.minStroke >= 0.6 && s.prec >= 0.5) { win(); return; }
-      if (final && s.c >= 0.8 && s.prec < 0.5) {
+      const need = hidden ? [0.65, 0.4, 0.45] : [0.8, 0.6, 0.5];
+      if (s.c >= need[0] && s.minStroke >= need[1] && s.prec >= need[2]) { win(); return; }
+      if (final && s.c >= need[0] && s.prec < need[2]) {
         UI.oops(wrap);
         setTimeout(clear, 450);
       }
@@ -143,11 +209,11 @@
       finished = true;
       wrap.classList.add('done');
       cov = cov.map(() => true); drawGuide();
-      resolveDone({ ok: true, stats: stats() });
+      resolveDone({ ok: true, stats: Object.assign(stats(), { errors }) });
     }
     function clear() {
       if (finished) return;
-      inkPts = []; nearCount = 0; cov = cov.map(() => false);
+      inkPts = []; nearCount = 0; cov = cov.map(() => false); inkStrokes = []; doneStroke = strokes.map(() => false);
       ix.clearRect(0, 0, size, size); drawGuide();
     }
     ink.addEventListener('pointerdown', e => {
@@ -156,6 +222,8 @@
       active = e.pointerId;
       try { ink.setPointerCapture(e.pointerId); } catch (err) { /* old browsers */ }
       const p = local(e);
+      cur = { pts: [], newly: [], near: 0, color: RAINBOW[strokeNo % RAINBOW.length] };
+      inkStrokes.push(cur);
       ix.strokeStyle = RAINBOW[strokeNo++ % RAINBOW.length];
       ix.lineWidth = Math.max(10, widthU * sc * 0.55); ix.lineCap = 'round'; ix.lineJoin = 'round';
       ix.beginPath(); ix.moveTo(p[0] * sc, p[1] * sc); ix.lineTo(p[0] * sc + 0.1, p[1] * sc); ix.stroke();
@@ -165,7 +233,8 @@
     ink.addEventListener('pointermove', e => {
       if (e.pointerId !== active || finished) return;
       e.preventDefault();
-      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      let evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+      if (!evs.length) evs = [e];
       let changed = false;
       evs.forEach(ev => {
         const p = local(ev), q = ink._last;
@@ -175,9 +244,16 @@
         ink._last = p;
       });
       if (changed) { drawGuide(); if (Math.random() < 0.25) A.sfx('ink'); }
-      check(false);
+      /* with stroke checks on, a letter is judged when the finger lifts */
+      if (!checkOn) check(false);
     });
-    const up = e => { if (e.pointerId !== active) return; active = null; check(true); };
+    const up = e => {
+      if (e.pointerId !== active) return;
+      active = null;
+      const st = cur; cur = null;
+      if (finished) return;
+      if (judge(st)) check(true);
+    };
     ink.addEventListener('pointerup', up);
     ink.addEventListener('pointercancel', up);
     let lastW = 0, lastH = 0;
@@ -190,7 +266,7 @@
     layout();
     ro.observe(host);
     demo();
-    return { done, clear, wrap, destroy() { ro.disconnect(); wrap.remove(); }, _test: { samples: () => samples, size: () => size, stats } };
+    return { done, clear, wrap, errors, destroy() { ro.disconnect(); wrap.remove(); }, _test: { samples: () => samples, size: () => size, stats } };
   }
   G.W = { board, samplesOf };
 })(window);

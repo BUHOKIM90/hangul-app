@@ -70,6 +70,7 @@
     const go = btn('splash-go', '▶<span>시작</span>', async () => {
       A.init();
       A.setVolume(St.s.settings.voice, St.s.settings.sfx);
+      if (G.Rec) G.Rec.loadAll();
       A.sfx('yay1');
       s.classList.add('out');
       setTimeout(() => s.remove(), 450);
@@ -81,7 +82,7 @@
   }
 
   /* ---------- home ---------- */
-  function leave() { if (App._abort) { App._abort(); App._abort = null; } }
+  function leave() { if (App._abort) { App._abort(); App._abort = null; } if (G.Rec) G.Rec.close(); }
   App.home = async function (first) {
     leave();
     App.sess++;
@@ -110,11 +111,11 @@
     wrap.appendChild(road);
     const dock = el('div', 'dock');
     const cast = el('div', 'cast');
-    const nextLock = D.FRIENDS.find(f => f.lv > St.s.reward.level);
-    const pals = D.FRIENDS.filter(f => f.id !== UI.friendId(St.s.reward.friend) && f.lv <= St.s.reward.level).slice(-3);
+    const nextLock = D.FRIENDS.find(f => !St.hasFriend(f));
+    const pals = D.FRIENDS.filter(f => f.id !== UI.friendId(St.s.reward.friend) && St.hasFriend(f)).slice(-3);
     if (nextLock) pals.push(nextLock);
     pals.forEach((f, i) => {
-      const own = f.lv <= St.s.reward.level;
+      const own = St.hasFriend(f);
       const c = btn('cast-pal' + (own ? '' : ' locked'), UI.mascot(own ? 'happy' : 'think', {}, f.id) + (own ? '' : `<i>Lv${f.lv}</i>`), () => {
         if (!own) { UI.oops(c); return; }
         c.classList.remove('jump'); void c.offsetWidth; c.classList.add('jump'); A.sfx('pop');
@@ -144,6 +145,7 @@
     if (first) {
       const d = St.checkDaily();
       if (d) { await dailyGift(d); if (App.screen === 'home') { await App.home(); } }
+      if (!(St.s.reward.told || []).includes(stage.w) && App.screen === 'home') { await worldArrive(stage.w, true); }
       A.sequence(['ui_hiname', St.todayCount() >= St.s.settings.perDay ? 'ui4_free' : 'ui4_today'], null, 0.3);
     }
   };
@@ -168,12 +170,25 @@
     });
     const last = pts[n - 1];
     d += tall ? ` C${last[0]} ${last[1] - 60} ${last[0] + 40} ${last[1] - 90} ${last[0] + 60} -40` : ` C${last[0] + 50} ${last[1]} ${last[0] + 60} ${last[1] - 20} ${W + 20} ${last[1] - 30}`;
-    let stones = '', me = '';
+    let stones = '', me = '', deco = '';
     const rx = tall ? 62 : 50, ry = tall ? 28 : 24;
+    /* landmarks of each stone's world between the stones, alternating sides of the road */
+    const emImg = (e, x, y, w) => `<image href="v6/img/e/${UI.emKey(e)}.svg" x="${x - w / 2}" y="${y - w / 2}" width="${w}" height="${w}" class="lm"/>`;
+    const DECO = { 1: ['🌳', '🍄', '🌸'], 2: ['🌊', '🐚', '🐠'], 3: ['🏡', '🌳', '🐶'], 4: ['🎪', '🎈', '🎠'], 5: ['🌈', '⭐', '🦄'], 9: ['🌱', '🐼', '🌳'],
+      6: ['💎', '🐻', '⭐'], 10: ['🎢', '🎡', '🎈'], 7: ['🎡', '🌳', '🎈'], 8: ['☁️', '🌙', '⭐'] };
+    pts.forEach(([x, y], k) => {
+      if (k === n - 1) return;
+      const id = Math.min(D.STAGES.length, from + k), wd = D.STAGES[id - 1].w;
+      const set = DECO[wd] || DECO[1], [x2, y2] = pts[k + 1];
+      const side = k % 2 ? -1 : 1, mx = (x + x2) / 2, my = (y + y2) / 2;
+      deco += tall ? emImg(set[k % set.length], mx + side * 150, my, 70) : emImg(set[k % set.length], mx + side * 18, my - (k % 2 ? 96 : 78), 58);
+    });
     pts.forEach(([x, y], k) => {
       const id = from + k;
       if (id > D.STAGES.length) return;
       const st = St.s.learn.done[id] ? 'done' : (id === stage.id ? 'now' : 'soon');
+      const ws = D.STAGES[id - 1].w, edge = id > 1 && D.STAGES[id - 2].w !== ws;
+      if (edge) stones += `<g class="gate-sign" transform="translate(${x} ${y - (tall ? 60 : 52)})"><rect x="-46" y="-26" width="92" height="40" rx="14" fill="${D.WORLDS[ws].color}"/><image href="v6/img/e/${UI.emKey(D.WORLDS[ws].icon)}.svg" x="-14" y="-22" width="28" height="28"/></g>`;
       stones += `<g class="stone ${st}"><ellipse cx="${x}" cy="${y + 10}" rx="${rx + 2}" ry="${ry}" class="st-shadow"/><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" class="st-top"/>` +
         (st === 'done' ? `<text x="${x}" y="${y + 10}" class="st-star">★</text>` : st === 'soon' ? `<text x="${x}" y="${y + 10}" class="st-num">${id}</text>` : '') + '</g>';
       if (st === 'now') {
@@ -183,7 +198,15 @@
     });
     const fx = tall ? last[0] + 70 : W - 35, fy = tall ? last[1] - 150 : last[1] - 125;
     const flag = `<g class="road-flag" transform="translate(${fx} ${fy})"><path d="M0 0 V100" stroke="#2B2D5C" stroke-width="6" stroke-linecap="round"/><path d="M3 4 L58 20 L3 38Z" fill="#FF6B6B" stroke="#2B2D5C" stroke-width="5" stroke-linejoin="round"/></g>`;
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-label="모험 지도"><path d="${d}" class="road-edge"/><path d="${d}" class="road-path"/><path d="${d}" class="road-dash"/>${stones}${flag}${me}</svg>`;
+    /* the friend waiting at the end of this world */
+    const gf = D.FRIENDS.find(f => f.id === D.WORLDS[stage.w].guide);
+    let guide = '';
+    if (gf) {
+      const met = St.hasFriend(gf) && (St.s.reward.met || []).includes('w' + stage.w);
+      const gw = tall ? 120 : 92, gh = gw * 312 / 200, gx = tall ? fx - gw - 10 : fx - gw - 6, gy = fy + 100 - gh;
+      guide = `<g class="road-guide${met ? ' met' : ''}"><svg x="${gx}" y="${gy}" width="${gw}" height="${gh}" viewBox="0 0 200 312" overflow="visible">${UI.mascot(met ? 'wave' : 'think', {}, gf.id).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg>${met ? '' : `<g transform="translate(${gx + gw * 0.05} ${gy + 14})"><circle r="20" fill="#fff" stroke="#4B3642" stroke-width="4"/><text y="9" class="st-q">?</text></g>`}</g>`;
+    }
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-label="모험 지도"><path d="${d}" class="road-edge"/><path d="${d}" class="road-path"/><path d="${d}" class="road-dash"/>${deco}${stones}${flag}${guide}${me}</svg>`;
   }
   /* Re-draw the road when the iPad turns. */
   let rt = null;
@@ -271,6 +294,7 @@
     await Promise.race([pre, sleep(2500)]);
     await new Promise(r => UI.tap(go, r));
     A.sfx('whoosh');
+    const t0 = performance.now();
     for (let i = 0; i < plays.length; i++) {
       if (!ctx.alive()) return;
       dots.children[i].classList.add('now');
@@ -285,23 +309,55 @@
       await sleep(200);
     }
     if (!ctx.alive()) return;
-    if (stage.k === 'review') { St.s.learn.reviews = (St.s.learn.reviews || 0) + 1; St.save(); } else St.finishStage(stage.id, ctx.right, ctx.wrong);
+    const secs = (performance.now() - t0) / 1000;
+    let firstTime = false;
+    if (stage.k === 'review') { St.s.learn.reviews = (St.s.learn.reviews || 0) + 1; St.logDay(ctx.right, ctx.wrong, 0, secs); }
+    else { firstTime = St.finishStage(stage.id, ctx.right, ctx.wrong); St.logDay(0, 0, 0, secs); }
     await chest(ctx);
     if (!ctx.alive()) return;
     if (App._levelUp) await levelUp();
     if (!ctx.alive()) return;
+    /* last stage of a world: the friend waiting at the end of the road joins */
+    const lastOfWorld = stage.k !== 'review' && D.STAGES.filter(x => x.w === stage.w).every(x => St.s.learn.done[x.id]);
+    if (lastOfWorld && firstTime && !(St.s.reward.met || []).includes('w' + stage.w)) await worldDone(stage.w);
+    if (!ctx.alive()) return;
     await App.home();
     const nx = St.stage();
-    if (stage.k !== 'review' && nx.w !== stage.w && nx.id > stage.id) await worldArrive(nx.w);
+    if (stage.k !== 'review' && nx.w !== stage.w && !(St.s.reward.told || []).includes(nx.w)) await worldArrive(nx.w);
     if (stage.k !== 'review' && St.todayCount() === St.s.settings.perDay) A.play('ui4_bye');
   };
-  const PLAY_ICON = { meet: '🔤', chant: '🎵', pop: '🎈', pick: '🖼️', clap: '🥁', first: '👂', block: '🧱', trace: '✏️', train: '🚂', memory: '🃏', batchim: '💎', story: '📖' };
+  const MIC_ICO = '<svg viewBox="0 0 40 40" class="ico-svg" aria-hidden="true"><rect x="13" y="4" width="14" height="21" rx="7" fill="#FF9DB6" stroke="#4B3642" stroke-width="3"/><path d="M8 19 a12 12 0 0 0 24 0 M20 31 v5 M13 36 h14" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg>';
+  const PLAY_ICON = { meet: '🔤', chant: '🎵', pop: '🎈', pick: '🖼️', clap: '🥁', first: '👂', block: '🧱', trace: '✏️', train: '🚂', memory: '🃏', batchim: '💎', story: '📖',
+    fish: '🐟', shop: '🎁', hide: '🔭', speak: MIC_ICO, twin: '🌱', vmerge: '🎢' };
 
   /* A new world on the map: a short celebration with the world's picture. */
-  async function worldArrive(w) {
+  async function worldArrive(w, quiet) {
     const W = D.WORLDS[w];
-    A.sfx('fanfare'); UI.burst(null, 36);
-    await UI.modal(`<div class="arrive"><div class="arrive-ico">${UI.em(W.icon)}</div><h3>새 마을 도착!</h3><p class="arrive-name">${esc(W.name)}</p></div>`, [['출발!', 1, 'go']], 'arrive-m');
+    const told = St.s.reward.told = St.s.reward.told || [];
+    if (!told.includes(w)) { told.push(w); St.save(); }
+    if (!quiet) { A.sfx('fanfare'); UI.burst(null, 36); }
+    const g = D.FRIENDS.find(f => f.id === W.guide);
+    const own = g && St.hasFriend(g);
+    const p = UI.modal(`<div class="arrive"><div class="arrive-row"><div class="arrive-ico">${UI.em(W.icon)}</div>${g ? `<div class="arrive-pal${own ? '' : ' shadow'}">${UI.mascot(own ? 'wave' : 'think', {}, g.id)}</div>` : ''}</div>
+      <h3>${quiet ? '모험 시작!' : '새 마을 도착!'}</h3><p class="arrive-name">${esc(W.name)}</p><p class="arrive-story">${esc(D.STORY[w][0])}</p></div>`, [['출발!', 1, 'go']], 'arrive-m');
+    A.play('p_w' + w);
+    await p;
+    A.stop();
+  }
+  async function worldDone(w) {
+    const W = D.WORLDS[w];
+    const g = D.FRIENDS.find(f => f.id === W.guide);
+    St.s.reward.met = St.s.reward.met || [];
+    St.s.reward.met.push('w' + w);
+    if (g) St.meet(g.id);
+    St.save();
+    A.sfx('fanfare'); UI.burst(null, 50);
+    const stk = St.pickSticker(2);
+    const p = UI.modal(`<div class="arrive done"><div class="arrive-pal big">${UI.mascot('cheer', {}, g ? g.id : undefined)}</div>
+      <h3>${esc(W.name)} 끝!</h3><p class="arrive-story">${esc(D.STORY[w][1])}</p>${g ? `<p class="outfit-got">${esc(g.name)}가 친구가 됐어!</p>` : ''}<div class="reveal-row">${stickerHtml(stk, 'big')}</div></div>`, [['우와!', 1, 'go']], 'arrive-m');
+    A.play('p_wd' + w);
+    await p;
+    A.stop();
   }
   async function maybeGift(ctx) {
     if (ctx.giftUsed || ctx.right < 3 || Math.random() > (App.giftRate !== undefined ? App.giftRate : 0.15)) return;
@@ -385,10 +441,110 @@
       page.appendChild(c);
     });
     book.appendChild(page);
-    book.appendChild(el('p', 'book-count', `${esc(D.STICKER_SETS[tab][0])} · 모두 ${St.stickerCount()} / 120`));
+    const foot = el('div', 'book-foot');
+    foot.appendChild(el('p', 'book-count', `${esc(D.STICKER_SETS[tab][0])} · 모두 ${St.stickerCount()} / 120`));
+    const haveHere = D.STICKERS.filter(x => x.set === tab && owned[x.id]).length;
+    foot.appendChild(btn('deco-go' + (haveHere ? '' : ' off'), '🎨<span>꾸미기</span>', () => { if (!haveHere) { UI.oops(); return; } App.decorate(tab); }, '스티커로 꾸미기'));
+    book.appendChild(foot);
     m.appendChild(book);
     St.s.reward.newStickers = St.s.reward.newStickers.filter(id => D.STICKERS[id].set !== tab);
     St.save();
+  };
+
+  /* ---------- sticker scenes: drag owned stickers onto a picture, move them, drag back to the tray to remove ---------- */
+  const SCENE_BG = [
+    /* 동물: meadow */ '<rect width="400" height="250" fill="#CDEBFA"/><circle cx="340" cy="52" r="26" fill="#FFE38A" stroke="#4B3642" stroke-width="3"/><path d="M0 150 C80 110 160 130 220 150 C290 172 340 130 400 140 V250 H0Z" fill="#B8E3A6" stroke="#4B3642" stroke-width="3"/><path d="M0 200 C120 180 260 210 400 190 V250 H0Z" fill="#9ED48E" stroke="#4B3642" stroke-width="3"/><g stroke="#4B3642" stroke-width="3" fill="#F3D2A8">' + [20, 60, 100, 140].map(x => `<rect x="${x}" y="150" width="12" height="44" rx="4"/>`).join('') + '<rect x="14" y="160" width="146" height="8" rx="4"/><rect x="14" y="178" width="146" height="8" rx="4"/></g>',
+    /* 간식: picnic */ '<rect width="400" height="250" fill="#FFF1D9"/><path d="M0 120 H400 V250 H0Z" fill="#C9EBC0" stroke="#4B3642" stroke-width="3"/><g stroke="#4B3642" stroke-width="3"><path d="M60 150 L340 150 L380 236 L20 236Z" fill="#FFB3C7"/></g><g fill="#fff" opacity=".85">' + [0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${70 + i * 40} 150 L${90 + i * 40} 150 L${88 + i * 48 - 20} 236 L${62 + i * 48 - 20} 236Z"/>`).join('') + '</g>',
+    /* 탈것: road */ '<rect width="400" height="250" fill="#D7EEFB"/><g stroke="#4B3642" stroke-width="3"><rect x="20" y="60" width="60" height="100" fill="#FFD3B5"/><rect x="90" y="30" width="70" height="130" fill="#C9B9F5"/><rect x="250" y="50" width="60" height="110" fill="#A5D4F3"/><rect x="320" y="80" width="60" height="80" fill="#FFE7A6"/><path d="M0 160 H400 V250 H0Z" fill="#8E8A99"/></g><g fill="#fff">' + [0, 1, 2, 3, 4, 5].map(i => `<rect x="${10 + i * 70}" y="202" width="40" height="8" rx="4"/>`).join('') + '</g>',
+    /* 바다: sea */ '<rect width="400" height="250" fill="#CFEFFF"/><path d="M0 90 Q25 80 50 90 T100 90 T150 90 T200 90 T250 90 T300 90 T350 90 T400 90 V250 H0Z" fill="#7FC7EE" stroke="#4B3642" stroke-width="3"/><path d="M0 140 Q25 130 50 140 T100 140 T150 140 T200 140 T250 140 T300 140 T350 140 T400 140 V250 H0Z" fill="#5AB2E3"/><path d="M0 214 C100 196 300 230 400 206 V250 H0Z" fill="#FBE3B5" stroke="#4B3642" stroke-width="3"/>',
+    /* 하늘: night */ '<rect width="400" height="250" fill="#4A4E8C"/><circle cx="320" cy="60" r="34" fill="#FFF2B3" stroke="#4B3642" stroke-width="3"/><circle cx="334" cy="52" r="30" fill="#4A4E8C"/><g fill="#FFF7D6">' + [[40, 40], [90, 90], [150, 30], [210, 70], [260, 120], [60, 150], [180, 160], [360, 170]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join('') + '</g><path d="M0 220 C120 196 280 236 400 210 V250 H0Z" fill="#6E6AA8" stroke="#4B3642" stroke-width="3"/>',
+    /* 장난감: room */ '<rect width="400" height="250" fill="#FFF0F4"/><path d="M0 170 H400 V250 H0Z" fill="#E8C49A" stroke="#4B3642" stroke-width="3"/><g stroke="#4B3642" stroke-width="3"><rect x="40" y="40" width="110" height="70" rx="8" fill="#BFE3F6"/><path d="M95 40 V110 M40 75 H150" /><rect x="250" y="90" width="120" height="12" rx="6" fill="#F3BD82"/><rect x="250" y="140" width="120" height="12" rx="6" fill="#F3BD82"/></g>'
+  ];
+  App.decorate = function (tab) {
+    leave(); App.sess++; A.stop();
+    App.screen = 'decorate';
+    const m = main();
+    m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
+    m.dataset.screen = 'decorate';
+    m.appendChild(hud({ home: true }));
+    const R = St.s.reward;
+    R.scenes = R.scenes || {};
+    const placed = R.scenes[tab] = R.scenes[tab] || [];
+    const wrap = el('div', 'deco');
+    const scene = el('div', 'deco-scene', `<svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${SCENE_BG[tab] || SCENE_BG[0]}</svg>`);
+    const side = el('div', 'deco-side');
+    side.appendChild(btn('deco-back', '📒<span>스티커북</span>', () => App.stickers(tab), '스티커북으로'));
+    const tray = el('div', 'deco-tray scroll');
+    side.appendChild(tray);
+    wrap.append(scene, side);
+    m.appendChild(wrap);
+    const save = () => St.save();
+    const MAX = 40;
+    function put(item) {
+      const s0 = D.STICKERS[item.id];
+      const n = el('div', 'placed', UI.em(s0.e));
+      n.style.left = item.x + '%'; n.style.top = item.y + '%';
+      n.style.setProperty('--s', item.s || 1);
+      scene.appendChild(n);
+      drag(n, item.id, item);
+    }
+    function trayFill() {
+      tray.innerHTML = '';
+      D.STICKERS.filter(x => x.set === tab && R.stickers[x.id]).forEach(x => {
+        const used = placed.filter(p => p.id === x.id).length;
+        const left = R.stickers[x.id] * 3 - used;
+        const t = el('div', 'deco-stk' + (left > 0 ? '' : ' empty'), UI.em(x.e) + `<i>${Math.max(0, left)}</i>`);
+        tray.appendChild(t);
+        if (left > 0) drag(t, x.id, null);
+      });
+    }
+    /* each owned sticker can be used up to 3 times per scene (×3 per copy) */
+    function drag(node, id, item) {
+      node.style.touchAction = 'none';
+      node.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const pid = e.pointerId, sx = e.clientX, sy = e.clientY;
+        let g = null;
+        try { node.setPointerCapture(pid); } catch (err) { /* ignore */ }
+        const mv = ev => {
+          if (ev.pointerId !== pid) return;
+          if (!g && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) {
+            g = el('div', 'placed ghosting', UI.em(D.STICKERS[id].e));
+            g.style.setProperty('--s', item ? item.s || 1 : 1);
+            document.body.appendChild(g);
+            if (item) node.style.opacity = '.25';
+            A.sfx('tap');
+          }
+          if (g) { g.style.left = ev.clientX + 'px'; g.style.top = ev.clientY + 'px'; }
+        };
+        const upv = ev => {
+          if (ev.pointerId !== pid) return;
+          node.removeEventListener('pointermove', mv); node.removeEventListener('pointerup', upv); node.removeEventListener('pointercancel', upv);
+          if (!g) {
+            if (item) { item.s = item.s >= 1.6 ? 0.8 : (item.s || 1) + 0.4; node.style.setProperty('--s', item.s); A.sfx('pop'); save(); }
+            return;
+          }
+          g.remove();
+          const r = scene.getBoundingClientRect();
+          const inScene = ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom;
+          const x = Math.round((ev.clientX - r.left) / r.width * 1000) / 10, y = Math.round((ev.clientY - r.top) / r.height * 1000) / 10;
+          if (item) {
+            if (inScene) { item.x = x; item.y = y; node.style.left = x + '%'; node.style.top = y + '%'; node.style.opacity = ''; A.sfx('snap'); }
+            else { placed.splice(placed.indexOf(item), 1); node.remove(); A.sfx('whoosh'); trayFill(); }
+          } else if (inScene && placed.length < MAX) {
+            const it = { id, x, y, s: 1 };
+            placed.push(it); put(it); A.sfx('snap'); UI.burst({ x: ev.clientX, y: ev.clientY }, 8); trayFill();
+          }
+          save();
+        };
+        node.addEventListener('pointermove', mv); node.addEventListener('pointerup', upv); node.addEventListener('pointercancel', upv);
+      });
+    }
+    placed.forEach(put);
+    trayFill();
+    A.play('p_deco');
   };
 
   /* ---------- closet ---------- */
@@ -412,7 +568,7 @@
     side.appendChild(tabs);
     const grid = el('div', 'closet-grid scroll');
     if (slot === 'friend') D.FRIENDS.forEach(f => {
-      const own = f.lv <= R.level, on = UI.friendId(R.friend) === f.id;
+      const own = St.hasFriend(f), on = UI.friendId(R.friend) === f.id;
       const it = btn('citem' + (own ? ' own' : ' locked') + (on ? ' on' : ''), `<span class="cprev">${UI.mascot('happy', {}, f.id)}</span><b>${esc(f.short)}</b><small>${on ? '내 짝꿍' : own ? '고르기' : '🔒 레벨 ' + f.lv}</small>`, () => {
         if (!own) { UI.oops(it); return; }
         R.friend = f.id; St.save(); A.sfx('fanfare'); UI.burst(null, 20); UI.sayGem(f.id); App.closet('friend');
@@ -506,12 +662,32 @@
           <label class="pm-row">단계 바꾸기 <select id="pmStage">${opts}</select></label>
           <button type="button" class="pm-btn" id="pmGo">이 단계로 이동</button>
         </section>
+        <section><h3>이번 주</h3>${weekHtml()}</section>
+        <section><h3>글자 지도 (어떤 글자가 약한지)</h3>
+          <p class="pm-small">앱 안에서 고르기·만들기·쓰기·읽기 기록을 글자별로 모았습니다. <span class="hm-key g">잘함 85%↑</span> <span class="hm-key m">보통</span> <span class="hm-key l">연습 필요 65%↓</span> <span class="hm-key n">아직 안 배움</span></p>
+          ${heatHtml()}
+          ${novelHtml()}
+        </section>
+        <section><h3>오늘 같이 해 볼 것</h3><p class="pm-tip">${esc(tipText())}</p>
+        </section>
         <section><h3>설정</h3>
           <label class="pm-row">하루 모험 수
             <select id="pmPer">${[1, 2, 3, 4].map(n => `<option ${n === S.perDay ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
           <label class="pm-row">목소리 크기 <input id="pmVoice" type="range" min="0" max="1" step="0.1" value="${S.voice}"></label>
           <label class="pm-row">효과음 크기 <input id="pmSfx" type="range" min="0" max="1" step="0.1" value="${S.sfx}"></label>
           <label class="pm-row"><input id="pmBgm" type="checkbox" ${S.bgm ? 'checked' : ''}> 홈 화면 배경 음악 (놀이 중에는 꺼짐)</label>
+          <label class="pm-row">쓰기 획순·방향 확인
+            <select id="pmStrokes"><option value="soft" ${S.strokes !== 'off' ? 'selected' : ''}>켜기 (분명히 틀린 획만 다시)</option><option value="off" ${S.strokes === 'off' ? 'selected' : ''}>끄기</option></select></label>
+          <label class="pm-row"><input id="pmMic" type="checkbox" ${S.mic !== false ? 'checked' : ''}> '내가 읽어 볼게'에서 마이크로 녹음하기 (녹음은 기기 밖으로 나가지 않고 바로 버려집니다)</label>
+          <button type="button" class="pm-btn" id="pmMicTest">마이크 미리 허용하기</button> <span id="pmMicMsg" class="pm-small"></span>
+        </section>
+        <section><h3>가족 목소리</h3>
+          <p>엄마·아빠 목소리로 녹음하면 앱이 그 목소리로 말합니다. 녹음이 없는 말은 기기 목소리로 나옵니다. 녹음은 이 기기에만 저장됩니다.</p>
+          <div id="pmVoices"></div>
+          <h4>우리 가족 문장</h4>
+          <p class="pm-small">'이야기 하늘'과 '소리 내어 읽기'에서 아이가 이 문장을 읽게 됩니다. 짧게(두세 낱말) 쓰고 그대로 녹음해 주세요.</p>
+          <div class="pm-row"><input id="pmSentence" type="text" maxlength="24" placeholder="예: 려원이 사랑해"><button type="button" class="pm-btn" id="pmSentenceRec">● 쓰고 녹음</button></div>
+          <div id="pmSentences"></div>
         </section>
         <section><h3>글자 점검 (2~4주마다 한 번)</h3>
           <p>앱 밖에서 실제로 읽을 수 있는지 확인합니다. 글자를 크게 보여 주면 아이가 소리 내어 읽고, 어른이 ✓/✗를 누릅니다. 소리는 나오지 않습니다(약 3분).</p>
@@ -532,7 +708,7 @@
             <li>하루 1~2단계(8~15분)가 적당합니다.</li>
           </ul>
         </section>
-        <section><h3>정보</h3><p id="pmInfo">버전 v6 · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
+        <section><h3>정보</h3><p id="pmInfo">버전 v6.3 · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
       </div>`;
     $('#pmClose').addEventListener('click', closeParent);
     $('#pmGo').addEventListener('click', () => { St.setStage(+$('#pmStage').value); msg('단계를 바꿨습니다.'); });
@@ -540,6 +716,14 @@
     $('#pmVoice').addEventListener('input', e => { S.voice = +e.target.value; A.setVolume(S.voice, S.sfx); St.save(); });
     $('#pmSfx').addEventListener('input', e => { S.sfx = +e.target.value; A.setVolume(S.voice, S.sfx); St.save(); A.sfx('correct'); });
     $('#pmBgm').addEventListener('change', e => { S.bgm = e.target.checked; St.save(); });
+    $('#pmStrokes').addEventListener('change', e => { S.strokes = e.target.value; St.save(); });
+    $('#pmMic').addEventListener('change', e => { S.mic = e.target.checked; St.save(); });
+    $('#pmMicTest').addEventListener('click', async () => {
+      const t = $('#pmMicMsg');
+      if (!G.Rec || !G.Rec.micOk()) { t.textContent = '이 브라우저는 녹음을 지원하지 않습니다. 아이는 소리 내 읽은 뒤 스피커로 정답을 듣습니다.'; return; }
+      try { await G.Rec.open(); G.Rec.close(); t.textContent = '허용됐습니다.'; } catch (e) { t.textContent = '허용되지 않았습니다. 설정 > Safari > 마이크에서 바꿀 수 있습니다.'; }
+    });
+    voiceUi();
     $('#pmCheck').addEventListener('click', runCheck);
     $('#pmResetR').addEventListener('click', () => {
       if (!confirm('스티커와 옷을 모두 지울까요? 학습 진도는 남습니다.')) return;
@@ -552,6 +736,119 @@
     });
     offlineInfo();
   };
+  /* ---------- parent: weekly view, letter map, tips, family voices ---------- */
+  function weekHtml() {
+    const log = St.s.learn.log || {};
+    const days = [];
+    for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(St.day(d)); }
+    const prev = [];
+    for (let i = 13; i >= 7; i--) { const d = new Date(); d.setDate(d.getDate() - i); prev.push(St.day(d)); }
+    const sum = ds => ds.reduce((a, d) => { const v = log[d] || [0, 0, 0, 0]; return [a[0] + v[0], a[1] + v[1], a[2] + v[2], a[3] + v[3]]; }, [0, 0, 0, 0]);
+    const w = sum(days), p = sum(prev);
+    const max = Math.max(1, ...days.map(d => (log[d] || [0, 0, 0, 0])[3]));
+    const WD = ['일', '월', '화', '수', '목', '금', '토'];
+    const bars = days.map(d => {
+      const v = log[d] || [0, 0, 0, 0], h = Math.round(v[3] / max * 100), pct = v[0] + v[1] ? Math.round(v[0] / (v[0] + v[1]) * 100) : null;
+      return `<div class="wk-day"><div class="wk-bar"><i style="height:${h}%"></i></div><b>${Math.round(v[3] / 60)}분</b><small>${WD[new Date(d + 'T12:00').getDay()]}${pct !== null ? ' · ' + pct + '%' : ''}</small></div>`;
+    }).join('');
+    const pct = x => (x[0] + x[1] ? Math.round(x[0] / (x[0] + x[1]) * 100) + '%' : '-');
+    return `<div class="wk">${bars}</div><p>이번 주: 단계 <b>${w[2]}</b>개 · <b>${Math.round(w[3] / 60)}</b>분 · 정답률 <b>${pct(w)}</b> &nbsp;|&nbsp; 지난주: 단계 ${p[2]}개 · ${Math.round(p[3] / 60)}분 · 정답률 ${pct(p)}</p>`;
+  }
+  /* rights/wrongs per letter, from every item the plays record */
+  function letterStats() {
+    const it = St.s.learn.items, out = {};
+    const add = (j, v) => { if (!j) return; const o = out[j] = out[j] || [0, 0]; o[0] += v[0]; o[1] += v[1]; };
+    Object.entries(it).forEach(([k, v]) => {
+      const i = k.indexOf(':'), kind = k.slice(0, i), x = k.slice(i + 1);
+      if (kind === 'j') { add(x, v); return; }
+      if (['sy', 'say', 'write', 'stroke'].includes(kind) && x.length === 1) {
+        const sp = D.split(x);
+        if (!sp) { add(x, v); return; }
+        add(sp.cho === 'ㅇ' ? null : sp.cho, v); add(sp.jung, v); if (sp.jong) add('_' + sp.jong, v);
+      }
+    });
+    return out;
+  }
+  function heatHtml() {
+    const st = letterStats(), L = Plan.learnedAt(St.s.learn.stage);
+    const cell = (j, label, known) => {
+      const v = st[j];
+      let c = 'n', t = '';
+      if (v && v[0] + v[1] >= 2) { const p = v[0] / (v[0] + v[1]); c = p >= 0.85 ? 'g' : p >= 0.65 ? 'm' : 'l'; t = Math.round(p * 100) + '%'; }
+      else if (known) { c = 'k'; t = '기록 적음'; }
+      return `<span class="hm ${c}" title="${t}"><b>${esc(label || j)}</b><small>${t}</small></span>`;
+    };
+    const row = (name, list, f) => `<div class="hm-row"><span class="hm-name">${name}</span>${list.map(j => cell(f ? f(j) : j, j, f ? L.b.has(j) : (L.c.has(j) || L.v.has(j)))).join('')}</div>`;
+    return row('자음', 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ'.split('')) + row('쌍자음', 'ㄲㄸㅃㅆㅉ'.split('')) +
+      row('모음', 'ㅏㅓㅗㅜㅡㅣㅑㅕㅛㅠㅐㅔ'.split('')) + row('미끄럼 모음', 'ㅘㅝㅢㅟㅚ'.split('')) + row('받침', 'ㅇㄴㅁㄹㄱㅂㅅ'.split(''), j => '_' + j);
+  }
+  function novelHtml() {
+    const N = St.s.learn.novel || {}, vals = Object.values(N);
+    const said = St.s.learn.says || 0;
+    if (!vals.length && !said) return '<p class="pm-small">\'내가 읽어 볼게\' 기록이 아직 없습니다.</p>';
+    const ok = vals.reduce((a, v) => a + v[0], 0), n = vals.reduce((a, v) => a + v[1], 0);
+    const last = Object.entries(N).slice(-10).map(([k, v]) => `${esc(k.split(':')[1])}${v[0] ? '✓' : '·'}`).join(' ');
+    return `<p>소리 내어 읽기 <b>${said}</b>번 · 처음 보는 글자 스스로 읽기 <b>${n}</b>번 중 아이가 "똑같아"라고 한 것 <b>${ok}</b>번${n ? ` (${Math.round(ok / n * 100)}%)` : ''}</p>
+      ${last ? `<p class="pm-small">최근: ${last} — 아이 스스로 판단한 결과이므로, 녹음을 같이 들어 보시거나 '글자 점검'으로 확인해 주세요.</p>` : ''}`;
+  }
+  function tipText() {
+    const stage = St.stage(), st = letterStats(), L = Plan.learnedAt(stage.id);
+    const cand = Array.from(L.c).filter(c => c !== 'ㅇ');
+    const weak = cand.map(c => [c, st[c] ? st[c][0] / Math.max(1, st[c][0] + st[c][1]) : 1]).sort((a, b) => a[1] - b[1])[0];
+    const j = weak ? weak[0] : 'ㄱ';
+    const list = D.TIPS[stage.w] || D.TIPS[1];
+    return list[new Date().getDate() % list.length].replace('{j}', j);
+  }
+  const VOICE_GROUPS = [
+    ['가족 낱말', ['ryeowon', 'eomma', 'appa', 'halmeoni', 'harabeoji', 'nuna', 'agi'].map(k => ['w_' + k, D.WORDS[k].w])],
+    ['안내 말 (지금은 기기 목소리)', Object.keys(D.PROMPTS).filter(k => !/^p_w/.test(k)).map(k => [k, D.PROMPTS[k]])],
+    ['모험 이야기', D.WORLD_ORDER.flatMap(w => [['p_w' + w, D.STORY[w][0]], ['p_wd' + w, D.STORY[w][1]]])],
+    ['녹음 없는 글자', Array.from(new Set(['따', '또', '띠', '뚜', '싸', '쏘', '쑤', '짜', '쪼', '쭈', '뿌', '삐', '꾸', '와', '외', '궈', '뭐', '회'])).filter(c => !D.has.sy(c)).map(c => [D.syKey(c), c])]
+  ];
+  let recNow = null;
+  function voiceUi() {
+    const box = $('#pmVoices'), sbox = $('#pmSentences');
+    if (!box) return;
+    const ok = G.Rec && G.Rec.micOk();
+    const rowHtml = ([key, label], del) => {
+      const has = G.Rec && G.Rec.items.has(key);
+      return `<div class="vrow" data-k="${esc(key)}"><span class="vlabel">${esc(label)}</span>${has ? '<span class="vhas">가족 녹음</span>' : ''}
+        <button type="button" class="pm-btn sm vplay">▶ 듣기</button>${ok ? '<button type="button" class="pm-btn sm vrec">● 녹음</button>' : ''}${has ? `<button type="button" class="pm-btn sm warn vdel">${del ? '지우기' : '녹음 지우기'}</button>` : ''}</div>`;
+    };
+    box.innerHTML = (ok ? '' : '<p class="pm-warn">이 브라우저에서는 녹음할 수 없습니다.</p>') +
+      VOICE_GROUPS.map(([g, list]) => `<details><summary>${esc(g)} (${list.filter(([k]) => G.Rec && G.Rec.items.has(k)).length}/${list.length})</summary>${list.map(x => rowHtml(x)).join('')}</details>`).join('');
+    sbox.innerHTML = (G.Rec ? G.Rec.sentences() : []).map(r => rowHtml([r.key, r.label], true)).join('') || '<p class="pm-small">아직 없습니다.</p>';
+    const wire = root => root.querySelectorAll('.vrow').forEach(rw => {
+      const key = rw.dataset.k, label = rw.querySelector('.vlabel').textContent;
+      rw.querySelector('.vplay').onclick = () => { A.init(); A.play(key); };
+      const del = rw.querySelector('.vdel');
+      if (del) del.onclick = async () => { await G.Rec.del(key); voiceUi(); };
+      const rb = rw.querySelector('.vrec');
+      if (rb) rb.onclick = () => recordInto(rb, key, label, G.Rec.items.get(key) ? G.Rec.items.get(key).kind : 'clip');
+    });
+    wire(box); wire(sbox);
+    $('#pmSentenceRec').onclick = () => {
+      const tx = $('#pmSentence').value.trim();
+      if (!tx) { $('#pmSentence').focus(); return; }
+      recordInto($('#pmSentenceRec'), 'u_' + Date.now(), tx, 'sentence');
+    };
+  }
+  async function recordInto(b, key, label, kind) {
+    if (recNow) { const r = recNow; recNow = null; const blob = await r.stop(); G.Rec.close(); if (blob.size > 800) { await G.Rec.put(key, blob, { label, kind }); A.init(); A.play(key); } if (kind === 'sentence') $('#pmSentence').value = ''; voiceUi(); return; }
+    try {
+      A.init(); A.stop();
+      recNow = await G.Rec.record({ maxMs: 12000 });
+      b.textContent = '■ 멈추기'; b.classList.add('rec');
+      recNow.done.then(async blob => {
+        if (!recNow) return;
+        recNow = null; G.Rec.close();
+        if (blob.size > 800) { await G.Rec.put(key, blob, { label, kind }); }
+        voiceUi();
+      });
+      b.onclick = () => recordInto(b, key, label, kind);
+    } catch (e) { recNow = null; b.textContent = '마이크 허용 필요'; }
+  }
+
   /* ---------- parent-run reading check ---------- */
   const CHECK = [
     ['모음', 'ㅏㅓㅗㅜㅡㅣ'.split('')],
@@ -591,6 +888,8 @@
   }
   function msg(t) { const m = $('#pmMsg'); if (m) m.textContent = t; }
   function closeParent() {
+    if (recNow) { recNow.stop(); recNow = null; }
+    if (G.Rec) G.Rec.close();
     const box = $('#parent');
     box.hidden = true;
     box.innerHTML = '';
@@ -600,15 +899,15 @@
   async function offlineInfo() {
     const info = $('#pmInfo');
     try {
-      if (!('caches' in G)) { info.textContent = '버전 v6 · 이 브라우저는 오프라인 저장을 지원하지 않습니다.'; return; }
+      if (!('caches' in G)) { info.textContent = '버전 v6.3 · 이 브라우저는 오프라인 저장을 지원하지 않습니다.'; return; }
       const keys = await caches.keys();
       const k = keys.find(x => x.startsWith('hangul-v6'));
-      if (!k) { info.textContent = '버전 v6 · 오프라인 저장 준비 중(처음 한 번은 인터넷이 필요합니다).'; return; }
+      if (!k) { info.textContent = '버전 v6.3 · 오프라인 저장 준비 중(처음 한 번은 인터넷이 필요합니다).'; return; }
       const c = await caches.open(k);
       const n = (await c.keys()).length;
       const want = G.SW_FILES_COUNT || n;
-      info.textContent = `버전 v6 · 오프라인 저장 ${n}/${want}개 파일${n >= want ? ' · 인터넷 없이 쓸 수 있습니다' : ''}`;
-    } catch (e) { info.textContent = '버전 v6'; }
+      info.textContent = `버전 v6.3 · 오프라인 저장 ${n}/${want}개 파일${n >= want ? ' · 인터넷 없이 쓸 수 있습니다' : ''}`;
+    } catch (e) { info.textContent = '버전 v6.3'; }
   }
 
   /* ---------- helper hand: if nothing is touched for a while, show what to press ---------- */

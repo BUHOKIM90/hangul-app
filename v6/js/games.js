@@ -81,6 +81,82 @@
     return () => clearTimeout(t);
   }
 
+  /* Any syllable can be spoken: the studio clip when there is one, otherwise a family recording or the device voice. */
+  const sayKey = ch => syClip(ch) || D.syKey(ch);
+  /* ---------- drag-and-drop (tapping still works: the piece flies into its slot) ---------- */
+  function inside(z, x, y) {
+    const r = z.getBoundingClientRect(), pad = Math.max(28, Math.min(innerWidth, innerHeight) * 0.05);
+    return x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad;
+  }
+  function ghostOf(n) {
+    const r = n.getBoundingClientRect(), g = n.cloneNode(true);
+    g.classList.remove('hint', 'next', 'tap');
+    g.classList.add('ghost');
+    g.removeAttribute('data-v');
+    Object.assign(g.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', visibility: 'visible' });
+    document.body.appendChild(g);
+    return g;
+  }
+  function fly(n, z) {
+    const g = ghostOf(n), a = n.getBoundingClientRect(), b = z.getBoundingClientRect();
+    n.classList.add('lifted');
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    const an = g.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx}px, ${dy}px) scale(.9)` }], { duration: 260, easing: 'cubic-bezier(.3,.7,.4,1)' });
+    return new Promise(res => { an.onfinish = () => { g.remove(); n.classList.remove('lifted'); res(); }; });
+  }
+  /* Like choose(), but the child can drag a piece onto dropOf(node). handler(node, e) returns true to finish. */
+  function chooseDrag(nodes, dropOf, handler) {
+    return new Promise(res => {
+      let busy = false, over = false;
+      const run = async (n, e) => {
+        busy = true;
+        const r = await handler(n, e);
+        busy = false;
+        if (r) { over = true; res(n); }
+      };
+      nodes.forEach(n => {
+        n.style.touchAction = 'none';
+        n.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !busy && !over) { e.preventDefault(); run(n, e); } });
+        n.addEventListener('pointerdown', e => {
+          if (busy || over || e.button > 0 || n.style.visibility === 'hidden') return;
+          e.preventDefault();
+          const id = e.pointerId, sx = e.clientX, sy = e.clientY;
+          let g = null, zone = null;
+          try { n.setPointerCapture(id); } catch (err) { /* old browsers */ }
+          const move = ev => {
+            if (ev.pointerId !== id) return;
+            const dx = ev.clientX - sx, dy = ev.clientY - sy;
+            if (!g && Math.hypot(dx, dy) > 12) { g = ghostOf(n); n.classList.add('lifted'); A.sfx('tap'); }
+            if (!g) return;
+            g.style.transform = `translate(${dx}px, ${dy}px) scale(1.08) rotate(${Math.max(-8, Math.min(8, dx / 30))}deg)`;
+            const z = dropOf(n);
+            if (zone && zone !== z) zone.classList.remove('drop-over');
+            zone = z;
+            if (z) z.classList.toggle('drop-over', inside(z, ev.clientX, ev.clientY));
+          };
+          const up = async ev => {
+            if (ev.pointerId !== id) return;
+            n.removeEventListener('pointermove', move); n.removeEventListener('pointerup', up); n.removeEventListener('pointercancel', up);
+            if (zone) zone.classList.remove('drop-over');
+            if (busy || over) { if (g) { g.remove(); n.classList.remove('lifted'); } return; }
+            const z = dropOf(n);
+            if (!g) {
+              busy = true;
+              if (z) await fly(n, z);
+              run(n, ev);
+              return;
+            }
+            if (z && ev.type === 'pointerup' && inside(z, ev.clientX, ev.clientY)) { g.remove(); n.classList.remove('lifted'); run(n, ev); return; }
+            const back = g.animate([{ transform: g.style.transform }, { transform: 'translate(0,0)' }], { duration: 240, easing: 'ease-out' });
+            back.onfinish = () => { g.remove(); n.classList.remove('lifted'); };
+          };
+          n.addEventListener('pointermove', move); n.addEventListener('pointerup', up); n.addEventListener('pointercancel', up);
+        });
+      });
+    });
+  }
+  const MIC = '<svg class="mic-ico" viewBox="0 0 40 40" aria-hidden="true"><rect x="13" y="4" width="14" height="21" rx="7" fill="#fff" stroke="#4B3642" stroke-width="3"/><path d="M8 19 a12 12 0 0 0 24 0 M20 31 v5 M13 36 h14" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg>';
+
   /* ---------- 0. meet: big letter card ---------- */
   P.meet = async function (host, cfg, ctx) {
     const j = cfg.j, w = D.WORDS[cfg.word || D.JPIC[j]];
@@ -376,9 +452,9 @@
       const stage = el('div', 'merge');
       const left = el('div', 'slot-c', blockFace(c, 'cons'));
       const plus = el('div', 'merge-plus', '+');
-      const right_ = el('div', 'slot-v');
+      const right_ = el('div', 'slot-v empty', '<span class="q">?</span>');
       const eq = el('div', 'merge-eq', '=');
-      const res = el('div', 'slot-r');
+      const res = el('div', 'slot-r empty', '<span class="q">?</span>');
       stage.append(left, plus, right_, eq, res);
       b.appendChild(stage);
       const tray = el('div', 'tray');
@@ -388,17 +464,20 @@
       for (let vi = 0; vi < vs.length; vi++) {
         const v = vs[vi];
         if (!ctx.alive()) return;
-        tray.innerHTML = ''; right_.innerHTML = ''; res.innerHTML = '';
-        const vb = el('button', 'tap vblock', blockFace(v, 'vow')); vb.type = 'button';
+        tray.innerHTML = ''; right_.innerHTML = '<span class="q">?</span>'; right_.classList.add('empty'); res.innerHTML = '<span class="q">?</span>'; res.classList.add('empty');
+        const vb = el('button', 'tap vblock', blockFace(v, 'vow')); vb.type = 'button'; vb.dataset.v = v;
         tray.appendChild(vb);
         vb.classList.add('next');
-        const e = await new Promise(r => UI.tap(vb, r));
+        ans(v);
+        let e = null;
+        await chooseDrag([vb], () => right_, (n, ev) => { e = ev; return true; });
         A.sfx('snap');
         vb.remove();
+        right_.classList.remove('empty');
         right_.innerHTML = blockFace(v, 'vow in');
         const s = D.join(c, v, '');
         target = s;
-        const show = () => { res.innerHTML = blockFace(s, 'syl pop-in'); made.appendChild(el('span', 'chip', esc(s))); };
+        const show = () => { res.classList.remove('empty'); res.innerHTML = blockFace(s, 'syl pop-in'); made.appendChild(el('span', 'chip', esc(s))); };
         St.mark('sy:' + s, true);
         if (vi === vs.length - 1) { await right(ctx, 'block', e, res, 'block:' + c, () => A.play(D.syKey(s), { onStart: show })); return; }
         await A.play(D.syKey(s), { onStart: show });
@@ -427,7 +506,7 @@
       A.play(findClip(s));
       let tries = 0;
       ans(v);
-      await choose(nodes, async (n, e) => {
+      await chooseDrag(nodes, () => slot, async (n, e) => {
         if (n.dataset.v === v) {
           A.sfx('snap');
           slot.classList.remove('empty');
@@ -458,24 +537,45 @@
     side.append(prog, eraser);
     b.append(area, side);
     const list = cfg.chars.filter(ch => D.strokesFor(ch));
-    prog.innerHTML = list.map(() => '<i></i>').join('');
-    for (let i = 0; i < list.length; i++) {
+    /* look: each letter twice — first over the guide, then from memory with the guide hidden */
+    const rounds = list.flatMap(ch => (cfg.look ? [[ch, false], [ch, true]] : [[ch, false]]));
+    prog.innerHTML = rounds.map(() => '<i></i>').join('');
+    let lastErr = 0;
+    const onStrokeError = kind => {
+      if (performance.now() - lastErr < 2500) return;
+      lastErr = performance.now();
+      A.play(kind === 'order' ? 'p_order' : 'p_dir');
+    };
+    for (let i = 0; i < rounds.length; i++) {
       if (!ctx.alive()) return;
-      const ch = list[i];
+      const [ch, hid] = rounds[i];
       cur = ch;
-      h.h.querySelector('.play-title').textContent = ch + ' 써 볼까?';
+      h.h.querySelector('.play-title').textContent = hid ? ch + ' 혼자 써 볼까?' : ch + ' 써 볼까?';
       area.innerHTML = '';
-      const bd = W.board(area, ch, { faint: cfg.faint });
+      if (hid) {
+        /* show the letter once more, then hide it */
+        const peek = el('div', 'peek', esc(ch));
+        area.appendChild(peek);
+        await A.play('p_look');
+        await sleep(900);
+        if (!ctx.alive()) return;
+        peek.classList.add('gone');
+        await sleep(350);
+        area.innerHTML = '';
+      }
+      const bd = W.board(area, ch, { faint: cfg.faint, hidden: hid, strokes: St.s.settings.strokes || 'soft', onStrokeError });
       G.__board = bd;
       eraser.onpointerdown = e => { e.preventDefault(); A.sfx('whoosh'); bd.clear(); };
       const c = clipOf(ch);
       /* not awaited: a quick child may finish before the instruction ends */
-      A.sequence((i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
+      A.sequence((hid ? ['p_alone'] : i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
       const r = await Promise.race([bd.done, ctx.aborted]);
       if (!r || !ctx.alive()) { bd.destroy(); return; }
       prog.children[i].classList.add('on');
+      const er = r.stats && r.stats.errors ? r.stats.errors.order + r.stats.errors.dir : 0;
+      if (er) St.mark('stroke:' + ch, false);
       await right(ctx, 'trace', null, bd.wrap, 'write:' + ch, c ? () => A.play(c) : null);
-      await sleep(250);
+      await sleep(hid ? 700 : 250);
       bd.destroy();
     }
   };
@@ -507,7 +607,7 @@
       await A.play('w_' + k);
       let i = 0;
       ans(W0.syl[0]);
-      await choose(nodes, async (n, e) => {
+      await chooseDrag(nodes, () => slots[i] || slots[slots.length - 1], async (n, e) => {
         const need = W0.syl[i];
         if (n.dataset.v === need) {
           n.style.visibility = 'hidden';
@@ -596,7 +696,7 @@
       if (cfg.mode === 'make') A.play(D.syKey(s)); else { if (syClip(bd)) await A.play(syClip(bd)); nodes[0].classList.add('next'); }
       let tries = 0;
       ans(bb);
-      await choose(nodes, async (n, e) => {
+      await chooseDrag(nodes, () => slot, async (n, e) => {
         if (n.dataset.v === bb) {
           A.sfx('snap');
           n.style.visibility = 'hidden';
@@ -662,14 +762,334 @@
     }
   };
 
+  /* ---------- 12. fish: catch the fish carrying the letter you heard ---------- */
+  P.fish = async function (host, cfg, ctx) {
+    let target = null;
+    const promptOf = t => (cfg.jamo ? jamoClip(t) : (findClip(t) || sayKey(t)));
+    const thatOf = t => (cfg.jamo ? jamoClip(t) : (D.has.dy(t) ? D.dyKey(t) : sayKey(t)));
+    head(host, cfg.title || '글자 낚시', () => target && promptOf(target), '들은 글자 물고기를 잡아 봐!');
+    const b = body(host, 'fish');
+    const qs = cfg.targets.slice(0, cfg.n || 4);
+    await A.preload(qs.map(promptOf));
+    await say(ctx, 'p_fish');
+    const bucket = el('div', 'bucket');
+    for (const t of qs) {
+      if (!ctx.alive()) return;
+      target = t;
+      b.innerHTML = '';
+      const pond = el('div', 'pond');
+      const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t)).slice(0, (cfg.k || 3) - 1)));
+      const nodes = opts.map((o, i) => {
+        const lane = el('div', 'lane');
+        const f = el('button', 'tap fishy c' + ((i + qs.indexOf(t)) % 5),
+          `<svg viewBox="0 0 130 80" aria-hidden="true"><path d="M100 40 L128 14 L124 40 L128 66Z" class="tail"/><ellipse cx="58" cy="40" rx="54" ry="34" class="bd"/><circle cx="22" cy="32" r="6" fill="#4B3642"/><circle cx="20" cy="30" r="2" fill="#fff"/><path d="M12 48 q6 5 12 0" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg><span>${esc(o)}</span>`);
+        f.type = 'button'; f.dataset.v = o;
+        f.style.animationDuration = (7 + i * 1.7 + Math.random() * 2) + 's';
+        f.style.animationDelay = (-Math.random() * 6) + 's';
+        lane.appendChild(f); pond.appendChild(lane);
+        return f;
+      });
+      b.append(pond, bucket);
+      const fitSwim = () => nodes.forEach(f => { const lw = f.parentElement.getBoundingClientRect().width, fw = f.getBoundingClientRect().width; f.style.setProperty('--d', Math.max(0, lw - fw - 8) + 'px'); });
+      fitSwim();
+      await sleep(250);
+      A.play(promptOf(t));
+      let tries = 0;
+      const item = (cfg.jamo ? 'j:' : 'sy:') + t;
+      ans(t);
+      await choose(nodes, async (n, e) => {
+        if (n.dataset.v === t) {
+          n.classList.add('caught'); A.sfx('pop');
+          bucket.appendChild(el('span', 'chip', esc(t)));
+          await right(ctx, 'pop', e, n, item);
+          return true;
+        }
+        tries++;
+        wrong(ctx, n, item, thatOf(n.dataset.v));
+        if (tries >= 2) nodes.find(x => x.dataset.v === t).classList.add('hint');
+        return false;
+      });
+    }
+  };
+
+  /* ---------- 13. shop: a friend wants something — hand over its name tag (reading) ---------- */
+  P.shop = async function (host, cfg, ctx) {
+    let cur = null;
+    head(host, cfg.title || '글자 가게', () => cur && 'w_' + cur, '손님이 갖고 싶은 물건의 이름표를 건네 줘!');
+    const b = body(host, 'shop');
+    const qs = cfg.words.slice(0, cfg.n || 3);
+    await A.preload(qs.map(k => 'w_' + k));
+    await say(ctx, 'p_shop');
+    const pals = UI.friendsOwned();
+    for (const k of qs) {
+      if (!ctx.alive()) return;
+      cur = k;
+      b.innerHTML = '';
+      const pal = pick(pals).id;
+      const cust = el('div', 'customer', `<div class="cust-pal">${UI.mascot('happy', {}, pal)}</div><div class="cust-bubble">${UI.pic(k)}<b>주세요!</b></div>`);
+      const shelf = el('div', 'shelf');
+      const pool = (cfg.pool || cfg.words).filter(x => x !== k && D.WORDS[x].w !== D.WORDS[k].w);
+      const opts = shuffle([k].concat(shuffle(pool).slice(0, 2)));
+      const nodes = opts.map(o => { const n = el('button', 'tap tag', `<span>${esc(D.WORDS[o].w)}</span>`); n.type = 'button'; n.dataset.v = o; shelf.appendChild(n); return n; });
+      b.append(cust, shelf);
+      await sleep(200);
+      A.play('w_' + k);
+      let tries = 0;
+      ans(k);
+      await chooseDrag(nodes, () => cust, async (n, e) => {
+        if (n.dataset.v === k) {
+          n.style.visibility = 'hidden';
+          cust.classList.add('happy');
+          cust.querySelector('.cust-pal').innerHTML = UI.mascot('joy', {}, pal);
+          await right(ctx, 'read', e, cust, 'w:' + k, () => A.play('w_' + k));
+          return true;
+        }
+        tries++;
+        wrong(ctx, n, 'w:' + k, wordThat(n.dataset.v));
+        if (tries >= 2) nodes.find(x => x.dataset.v === k).classList.add('hint');
+        return false;
+      });
+    }
+  };
+
+  /* ---------- 14. hide: find every copy of a letter hidden in a busy picture ---------- */
+  const HIDE_DECOR = ['🌸', '🍄', '⭐', '🦋', '🌳', '🎈', '🐤', '🍓'];
+  P.hide = async function (host, cfg, ctx) {
+    const t = cfg.target, count = cfg.count || 3;
+    const clipOf = x => (cfg.jamo ? jamoClip(x) : sayKey(x));
+    head(host, cfg.title || '숨은 글자 찾기', clipOf(t), `'${t}' 를 모두 찾아 봐!`);
+    const b = body(host, 'hide');
+    await say(ctx, 'p_hide');
+    if (!ctx.alive()) return;
+    const bar = el('div', 'hide-bar', `<span class="hide-t">${esc(t)}</span><span class="hide-n">${'<i></i>'.repeat(count)}</span>`);
+    const field = el('div', 'hide-field');
+    b.append(bar, field);
+    await sleep(30);
+    const r = field.getBoundingClientRect();
+    const wide = r.width >= r.height;
+    const cols = wide ? 6 : 4, rows = wide ? 3 : 5, cells = shuffle(Array.from({ length: cols * rows }, (_, i) => i));
+    const decoys = cfg.decoys.filter(x => x !== t);
+    const nDecor = 3, nDecoy = cols * rows - count - nDecor;
+    const list = Array(count).fill(t).map(x => ({ x, t: true }))
+      .concat(Array.from({ length: nDecoy }, (_, i) => ({ x: decoys[i % decoys.length] })))
+      .concat(shuffle(HIDE_DECOR).slice(0, nDecor).map(x => ({ x, deco: true })));
+    const COL = ['#E8789A', '#5FBE9E', '#74B4E2', '#9F8BE0', '#F29E70', '#E9B648'];
+    const nodes = [];
+    list.forEach((it, i) => {
+      const c = cells[i], cx = (c % cols + 0.5) / cols, cy = (Math.floor(c / cols) + 0.5) / rows;
+      const n = el('button', 'tap hid' + (it.deco ? ' deco' : ''), it.deco ? UI.em(it.x) : esc(it.x));
+      n.type = 'button';
+      if (!it.deco) n.dataset.v = it.x;
+      n.style.left = (cx + (Math.random() - 0.5) * 0.35 / cols) * 100 + '%';
+      n.style.top = (cy + (Math.random() - 0.5) * 0.3 / rows) * 100 + '%';
+      n.style.setProperty('--rot', (Math.random() * 50 - 25).toFixed(0) + 'deg');
+      n.style.color = COL[i % COL.length];
+      n.style.fontSize = (wide ? 10 : 9) + Math.random() * 3 + 'vmin';
+      field.appendChild(n);
+      nodes.push(n);
+    });
+    A.play(clipOf(t));
+    let found = 0, miss = 0;
+    ans(t);
+    await choose(nodes, async (n, e) => {
+      if (n.classList.contains('deco')) { n.classList.remove('wiggle'); void n.offsetWidth; n.classList.add('wiggle'); A.sfx('pop'); return false; }
+      if (n.classList.contains('found')) return false;
+      if (n.dataset.v === t) {
+        n.classList.add('found'); delete n.dataset.v; n.dataset.f = t;
+        bar.querySelectorAll('.hide-n i')[found].classList.add('on');
+        found++; miss = 0;
+        if (found >= count) { await right(ctx, 'pop', e, n, (cfg.jamo ? 'j:' : 'sy:') + t, () => A.play(clipOf(t))); return true; }
+        A.sfx('correct');
+        St.mark((cfg.jamo ? 'j:' : 'sy:') + t, true);
+        return false;
+      }
+      miss++;
+      wrong(ctx, n, (cfg.jamo ? 'j:' : 'sy:') + t, clipOf(n.dataset.v));
+      if (miss >= 2) { const nx = nodes.find(x => x.dataset.v === t); if (nx) nx.classList.add('hint'); }
+      return false;
+    });
+  };
+
+  /* ---------- 15. speak: "내가 읽어 볼게" — read aloud, hear yourself, hear the answer, say if it matched ---------- */
+  P.speak = async function (host, cfg, ctx) {
+    const items = cfg.items.slice(0, cfg.n || 2);
+    let cur = null;
+    const playAnswer = (it, textEl) => {
+      if (it.keys) {
+        const ws = Array.from(textEl.querySelectorAll('.sw'));
+        return A.sequence(it.keys, i => ws.forEach((w, k) => w.classList.toggle('lit', k === i)), 0.18).then(() => ws.forEach(w => w.classList.remove('lit')));
+      }
+      return A.play(it.clip, { onStart: () => textEl.classList.add('lit') }).then(() => textEl.classList.remove('lit'));
+    };
+    const h = head(host, cfg.title || (cfg.novel ? '처음 보는 글자' : '내가 읽어 볼게'), () => { if (cur) playAnswer(cur, UI.$('.speak-text', host)); return null; },
+      cfg.novel ? '처음 보는 글자야. 읽을 수 있을까?' : '소리 내서 읽어 볼까?');
+    if (h.say) h.say.dataset.role = 'answer';
+    const b = body(host, 'speak');
+    let useMic = St.s.settings.mic !== false && !!G.Rec && G.Rec.micOk();
+    await say(ctx, cfg.novel ? 'p_new' : (useMic ? 'p_speak' : 'p_speak2'));
+    try {
+      for (const it of items) {
+        if (!ctx.alive()) return;
+        cur = it;
+        b.innerHTML = '';
+        const text = el('div', 'speak-text' + (it.text.length > 3 ? ' long' : ''),
+          it.keys ? it.text.split(' ').map(w => `<span class="sw">${esc(w)}</span>`).join(' ') : esc(it.text));
+        if (it.pic) text.insertAdjacentHTML('afterbegin', UI.pic(it.pic, 'speak-pic'));
+        b.appendChild(text);
+        const row = el('div', 'speak-row');
+        b.appendChild(row);
+        let tries = 0, ok = false;
+        while (!ok && ctx.alive()) {
+          row.innerHTML = '';
+          let mine = null;
+          if (useMic) {
+            const mic = el('button', 'tap mic-btn', MIC + '<span>말하기</span>');
+            mic.type = 'button'; mic.dataset.v = 'rec';
+            row.appendChild(mic);
+            ans('rec');
+            await new Promise(r => UI.tap(mic, r));
+            if (!ctx.alive()) return;
+            try {
+              mic.classList.add('rec');
+              mic.querySelector('span').textContent = '다 했으면 눌러!';
+              const meter = el('i', 'meter');
+              mic.appendChild(meter);
+              const rec = await G.Rec.record({ maxMs: it.text.length > 4 ? 6000 : 3500, onLevel: v => { meter.style.transform = `scale(${1 + v * 0.6})`; } });
+              UI.tap(mic, () => rec.stop());
+              const blob = await rec.done;
+              mine = await A.decode(await blob.arrayBuffer());
+            } catch (err) {
+              useMic = false;
+              continue;
+            }
+            mic.remove();
+            if (!ctx.alive()) return;
+            const me = el('div', 'speak-me on', MIC + '<span>려원이 목소리</span>');
+            row.appendChild(me);
+            await A.playBuffer(mine);
+            me.classList.remove('on');
+            await sleep(250);
+          } else {
+            const lis = el('button', 'tap mic-btn listen', '🔊<span>다 읽었어!</span>');
+            lis.type = 'button'; lis.dataset.v = 'rec';
+            row.appendChild(lis);
+            ans('rec');
+            await new Promise(r => UI.tap(lis, r));
+            lis.remove();
+          }
+          if (!ctx.alive()) return;
+          await playAnswer(it, text);
+          if (!ctx.alive()) return;
+          row.innerHTML = '';
+          const yes = el('button', 'tap same-btn yes', '💖<span>똑같아!</span>'); yes.type = 'button'; yes.dataset.v = 'same';
+          const again = el('button', 'tap same-btn again', '🔁<span>다시</span>'); again.type = 'button';
+          row.append(yes, again);
+          ans('same');
+          A.play('p_same');
+          const v = await new Promise(r => { UI.tap(yes, e => r(e)); UI.tap(again, () => r(null)); });
+          tries++;
+          St.s.learn.says = (St.s.learn.says || 0) + 1;
+          if (cfg.novel) St.novel(it.item, !!v);
+          if (v || tries >= 2) {
+            ok = true;
+            await right(ctx, 'read', v || null, text, it.item, null);
+          }
+        }
+      }
+    } finally {
+      if (G.Rec && useMic) G.Rec.close();
+    }
+  };
+
+  /* ---------- 16. twin: plain vs twin consonant (가 → 까) ---------- */
+  P.twin = async function (host, cfg, ctx) {
+    head(host, cfg.title || '쌍둥이 소리', null, '어떻게 다를까? 눌러서 들어 봐!');
+    const b = body(host, 'twin');
+    const pairs = cfg.pairs;
+    await A.preload(pairs.flat().map(sayKey));
+    await say(ctx, 'p_twin');
+    const glow = c => { c.classList.remove('glow'); void c.offsetWidth; c.classList.add('glow'); };
+    for (const [a, t] of pairs.slice(0, 2)) {
+      if (!ctx.alive()) return;
+      b.innerHTML = '';
+      const row = el('div', 'twin-row');
+      const ca = el('button', 'tap twin-card soft', esc(a)), ct = el('button', 'tap twin-card strong', esc(t));
+      ca.type = ct.type = 'button';
+      row.append(ca, el('span', 'twin-vs', '→'), ct);
+      b.appendChild(row);
+      await sleep(200);
+      await A.play(sayKey(a), { onStart: () => glow(ca) });
+      await sleep(250);
+      await A.play(sayKey(t), { onStart: () => glow(ct) });
+      if (!ctx.alive()) return;
+      UI.tap(ca, () => A.play(sayKey(a), { onStart: () => glow(ca) }));
+      ct.dataset.v = t; ct.classList.add('next'); ans(t);
+      const e = await new Promise(r => UI.tap(ct, r));
+      ct.classList.remove('next');
+      await right(ctx, 'pop', e, ct, 'sy:' + t, () => A.play(sayKey(t), { onStart: () => glow(ct) }));
+    }
+    const qs = shuffle(pairs.flatMap(p => [[p, 0], [p, 1]])).slice(0, cfg.n || 3);
+    for (const [p, i] of qs) {
+      if (!ctx.alive()) return;
+      b.innerHTML = '';
+      const row = el('div', 'twin-row');
+      const nodes = shuffle(p).map(x => { const n = el('button', 'tap twin-card', esc(x)); n.type = 'button'; n.dataset.v = x; row.appendChild(n); return n; });
+      b.appendChild(row);
+      const want = p[i];
+      ans(want);
+      await sleep(250);
+      A.play(sayKey(want));
+      await choose(nodes, async (n, e) => {
+        if (n.dataset.v === want) { n.classList.add('right'); await right(ctx, 'pop', e, n, 'sy:' + want, () => A.play(sayKey(want))); return true; }
+        wrong(ctx, n, 'sy:' + want, sayKey(n.dataset.v));
+        return false;
+      });
+    }
+  };
+
+  /* ---------- 17. vmerge: ㅗ + ㅏ = ㅘ, then ㄱ + ㅘ = 과 ---------- */
+  P.vmerge = async function (host, cfg, ctx) {
+    const cv = cfg.v, [h0, v0] = D.COMPLEX[cv];
+    let target = cv;
+    head(host, cfg.title || '모음 미끄럼', () => (target === cv ? jamoClip(cv) : sayKey(target)), '모음 둘을 붙여 봐!');
+    const b = body(host, 'block');
+    await say(ctx, 'p_cvow');
+    const steps = [[h0, v0, cv, 'vow', jamoClip(cv)]].concat((cfg.cons || []).map(c => [c, cv, D.join(c, cv, ''), 'cons', null]));
+    for (const [left0, piece, made, kind, clip0] of steps) {
+      if (!ctx.alive()) return;
+      target = made;
+      const clip = clip0 || sayKey(made);
+      b.innerHTML = '';
+      const stage = el('div', 'merge');
+      const left = el('div', 'slot-c', blockFace(left0, kind === 'vow' ? 'vow' : 'cons'));
+      const slot = el('div', 'slot-v empty', '<span class="q">?</span>');
+      const res = el('div', 'slot-r empty', '<span class="q">?</span>');
+      stage.append(left, el('div', 'merge-plus', '+'), slot, el('div', 'merge-eq', '='), res);
+      b.appendChild(stage);
+      const tray = el('div', 'tray');
+      const pb = el('button', 'tap vblock next', blockFace(piece, 'vow')); pb.type = 'button'; pb.dataset.v = piece;
+      tray.appendChild(pb);
+      b.appendChild(tray);
+      ans(piece);
+      let e = null;
+      await chooseDrag([pb], () => slot, (n, ev) => { e = ev; return true; });
+      A.sfx('snap');
+      pb.remove();
+      slot.classList.remove('empty'); slot.innerHTML = blockFace(piece, 'vow in');
+      await right(ctx, 'block', e, res, kind === 'vow' ? 'j:' + cv : 'sy:' + made, () => A.play(clip, { onStart: () => { res.classList.remove('empty'); res.innerHTML = blockFace(made, 'syl pop-in'); } }));
+      await sleep(200);
+    }
+  };
+
   /* ---------- planner ---------- */
   function learnedAt(id) {
     const L = { v: new Set(), c: new Set(['ㅇ']), b: new Set() };
     D.STAGES.forEach(s => {
       if (s.id > id) return;
       if (s.v) L.v.add(s.v);
-      if (s.k === 'cons1') L.c.add(s.c);
+      if (s.k === 'cons1' || s.k === 'twin') L.c.add(s.c);
       if (s.k === 'bat1') L.b.add(s.b);
+      if (s.k === 'cvow') { L.v.add(s.v); if (s.v === 'ㅟ') L.v.add('ㅚ'); }
     });
     if (id > 15) D.BASIC_V.forEach(v => L.v.add(v));
     return L;
@@ -695,6 +1115,18 @@
   const vRow = (c, vs) => vs.map(v => D.join(c, v, '')).filter(s => D.has.sy(s));
   function weakSy(f) { return St.weak(k => k.startsWith('sy:') && (!f || f(k.slice(3))), 3).map(k => k.slice(3)); }
 
+  /* Letters made from what the child knows but has never been asked about: reading by the code, not by memory. */
+  function novelSy(L, n, f) {
+    const items = St.s.learn.items;
+    const vs = Array.from(L.v).filter(v => !D.COMPLEX[v]);
+    const all = Array.from(L.c).flatMap(c => vs.map(v => D.join(c, v, ''))).filter(x => x && D.has.sy(x) && (!f || f(x)));
+    const fresh = all.filter(x => !items['sy:' + x] && !items['say:' + x]);
+    return shuffle(fresh.length >= n ? fresh : all).slice(0, n);
+  }
+  const sayItem = x => ({ text: x, clip: sayKey(x), item: 'say:' + x });
+  const sayWord = k => ({ text: D.WORDS[k].w, clip: 'w_' + k, item: 'sayw:' + k });
+  const sayPhrase = ws => ({ text: ws.map(k => D.WORDS[k].w).join(' '), keys: ws.map(k => 'w_' + k), item: 'sayp:' + ws.join('+') });
+  const learnedJamo = L => Array.from(L.c).concat(Array.from(L.v));
   const Plan = {};
   Plan.learnedAt = learnedAt;
   Plan.readable = readable;
@@ -718,6 +1150,9 @@
         const wr = St.weak(k => k.startsWith('write:'), 2).map(k => k.slice(6));
         const tr = wr.concat(shuffle(pool.length ? pool : vs)).filter(ch => D.strokesFor(ch)).slice(0, 2);
         out.push({ t: 'trace', cfg: { chars: tr.length ? tr : ['ㅏ'], faint: true } });
+        if (pool.length >= 3) out.splice(1, 0, { t: 'fish', cfg: { targets: shuffle(pool).slice(0, 3), pool, n: 3, k: 3 } });
+        const nv = novelSy(L2, 2);
+        if (nv.length) out.push({ t: 'speak', cfg: { items: nv.map(sayItem), novel: true, n: 2 } });
         break;
       }
       case 'name': {
@@ -727,7 +1162,8 @@
         out.push({ t: 'pick', cfg: { mode: 'read', words: ['ryeowon', shuffle(fam)[0], 'ryeowon'], pool: fam, n: 3, title: '내 이름 찾기' } });
         out.push({ t: 'train', cfg: { words: ['ryeowon', 'ryeowon'], n: stage.n >= 2 ? 2 : 1, title: '이름 기차' } });
         if (stage.n === 3) out.push({ t: 'pop', cfg: { targets: ['려', '라', '려', '로'], pool: ['려', '라', '로', '루', '리'], k: 3, title: '려원이 글자 찾기' } });
-        out.push({ t: 'trace', cfg: { chars: stage.n === 3 ? ['ㄹ', '려', '원'] : ['려', '원'], faint: stage.n >= 4, title: '내 이름 쓰기' } });
+        out.push({ t: 'trace', cfg: { chars: stage.n === 3 ? ['ㄹ', '려', '원'] : ['려', '원'], faint: stage.n === 2, look: stage.n >= 4, title: stage.n >= 4 ? '보고 쓰기, 가리고 쓰기' : '내 이름 쓰기' } });
+        if (stage.n >= 2) out.push({ t: 'speak', cfg: { items: [sayWord('ryeowon')], n: 1, title: '내 이름 읽기' } });
         break;
       }
       case 'sound': {
@@ -756,13 +1192,14 @@
         }
         const vw = pics().filter(w => w.syl.some(s => D.split(s).jung === v)).map(w => w.key);
         if (vw.length >= 2) out.push({ t: 'pick', cfg: { words: shuffle(vw), pool: listenWords(8).concat(vw), n: 3, title: v + ' 소리 낱말' } });
+        if (known.length >= 3 || stage.k === 'vowel2') out.push({ t: 'hide', cfg: { target: v, jamo: true, decoys: (stage.k === 'vowel' ? D.BASIC_V : vs).filter(x => x !== v), count: 3 } });
         out.push({ t: 'trace', cfg: { chars: [v] } });
         break;
       }
       case 'vrev': case 'vrev2': {
         const known = Array.from(L.v);
         out.push({ t: 'chant', cfg: { syl: (stage.k === 'vrev' ? known : known.slice(-6)).map(x => D.VROW[x]).filter(s => D.has.sy(s)), quiz: 3 } });
-        out.push({ t: 'pop', cfg: { jamo: true, targets: shuffle(known).slice(0, 5), pool: known, n: 5, k: 3 } });
+        out.push({ t: stage.id % 2 ? 'fish' : 'pop', cfg: { jamo: true, targets: shuffle(known).slice(0, 4), pool: known, n: 4, k: 3 } });
         out.push({ t: 'pick', cfg: { words: listenWords(4), n: 4 } });
         out.push({ t: 'trace', cfg: { chars: shuffle(known).slice(0, 2), faint: true } });
         break;
@@ -774,6 +1211,7 @@
         out.push({ t: 'chant', cfg: { syl: row, quiz: 2 } });
         const pool = row.concat(vRow('ㅇ', D.BASIC_V).slice(0, 2));
         out.push({ t: 'pop', cfg: { targets: shuffle(row).slice(0, 4), pool, k: 3 } });
+        out.push({ t: 'hide', cfg: { target: c, jamo: true, decoys: learnedJamo(L).filter(x => x !== c && x !== 'ㅇ').concat(['ㅇ']), count: 3 } });
         out.push({ t: 'trace', cfg: { chars: [c] } });
         break;
       }
@@ -786,17 +1224,21 @@
         if (wsAll.length >= 3) out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(ws.length >= 2 ? ws : wsAll), pool: wsAll.length >= 3 ? wsAll : pics().map(w => w.key), n: 3 } });
         else out.push({ t: 'pick', cfg: { words: listenWords(3), n: 3 } });
         out.push({ t: 'trace', cfg: { chars: [D.join(c, 'ㅏ', ''), D.join(c, 'ㅗ', '')] } });
+        const nv = novelSy(L, 2, x => D.split(x).cho === c);
+        if (nv.length) out.push({ t: 'speak', cfg: { items: nv.map(sayItem), novel: true, n: 2 } });
         break;
       }
       case 'crev': {
         const cs = Array.from(L.c).filter(c => c !== 'ㅇ').slice(-4);
         const pool = cs.flatMap(c => vRow(c, ['ㅏ', 'ㅗ', 'ㅣ', 'ㅜ']));
         const weak = weakSy(s => pool.includes(s));
-        out.push({ t: 'pop', cfg: { targets: weak.concat(shuffle(pool)).slice(0, 5), pool, n: 5, k: 4, title: '보물 풍선' } });
+        out.push({ t: stage.id % 2 ? 'fish' : 'pop', cfg: { targets: weak.concat(shuffle(pool)).slice(0, 4), pool, n: 4, k: 4, title: stage.id % 2 ? '글자 낚시' : '보물 풍선' } });
         const ws = wordsFor(L);
         if (ws.length >= 3) out.push({ t: 'memory', cfg: { words: shuffle(ws), pairs: 3 } });
         if (ws.length >= 3) out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(ws), pool: ws, n: 4 } });
         out.push({ t: 'trace', cfg: { chars: shuffle(cs).slice(0, 2).map(c => D.join(c, pick(['ㅏ', 'ㅣ', 'ㅗ']), '')), faint: true } });
+        const nv = novelSy(L, 2);
+        if (nv.length) out.push({ t: 'speak', cfg: { items: nv.map(sayItem), novel: true, n: 2 } });
         break;
       }
       case 'bat1': {
@@ -820,6 +1262,7 @@
         if (rd.length >= 2) out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(rd), pool: wordsFor(L), n: 3 } });
         const tr = shuffle(ws.flatMap(k => D.WORDS[k].syl).filter(s => D.split(s).jong === bb && D.strokesFor(s)));
         out.push({ t: 'trace', cfg: { chars: tr.slice(0, 2) } });
+        if (rd.length) out.push({ t: 'speak', cfg: { items: shuffle(rd).slice(0, 2).map(sayWord), n: 2 } });
         break;
       }
       case 'brev': {
@@ -831,6 +1274,8 @@
         out.push({ t: 'batchim', cfg: { items, mode: 'make', codas, n: 4 } });
         out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(ws), pool: ws, n: 4 } });
         out.push({ t: 'trace', cfg: { chars: shuffle(['강', '곰', '달', '눈', '밥', '옷', '책'].filter(s => D.strokesFor(s))).slice(0, 2), faint: true } });
+        const nb = shuffle(items.map(([x, cd]) => { const p0 = D.split(x); return D.join(p0.cho, p0.jung, cd); }).filter(x => D.has.sy(x) && !St.s.learn.items['sy:' + x])).slice(0, 2);
+        if (nb.length) out.push({ t: 'speak', cfg: { items: nb.map(sayItem), novel: true, n: 2 } });
         break;
       }
       case 'word': {
@@ -838,10 +1283,59 @@
         if (ws.length < 4) ws = wordsFor(L);
         const tw = ws.filter(k => allSy(D.WORDS[k]) && D.WORDS[k].syl.length >= 2);
         if (tw.length) out.push({ t: 'train', cfg: { words: shuffle(tw), n: 3 } });
-        out.push({ t: 'memory', cfg: { words: shuffle(ws), pairs: stage.id % 2 ? 3 : 4 } });
-        out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(ws), pool: ws, n: 4 } });
+        if (stage.id % 2) out.push({ t: 'shop', cfg: { words: shuffle(ws), pool: ws, n: 3 } });
+        else out.push({ t: 'memory', cfg: { words: shuffle(ws), pairs: 4 } });
+        out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(ws), pool: ws, n: 3 } });
+        out.push({ t: 'speak', cfg: { items: shuffle(ws).slice(0, 2).map(sayWord), n: 2 } });
         const w0 = shuffle(tw.length ? tw : ws)[0] || 'nabi';
         out.push({ t: 'trace', cfg: { chars: D.WORDS[w0].syl.filter(s => D.strokesFor(s)).slice(0, 2), faint: stage.id % 2 === 0 } });
+        break;
+      }
+      case 'twin': {
+        const t = stage.c, base = D.TWINS[t];
+        const pairs = ['ㅏ', 'ㅗ', 'ㅣ'].map(v => [D.join(base, v, ''), D.join(t, v, '')]);
+        out.push({ t: 'meet', cfg: { j: t, title: t + ' (' + D.JNAME[t] + ')' } });
+        out.push({ t: 'twin', cfg: { pairs, n: 3 } });
+        const tw = pics().filter(w => w.syl.some(x => D.split(x).cho === t)).map(w => w.key);
+        if (tw.length) out.push({ t: 'pick', cfg: { words: shuffle(tw), pool: tw.concat(listenWords(6)), n: Math.min(3, tw.length), title: t + ' 소리 낱말' } });
+        out.push({ t: 'hide', cfg: { target: t, jamo: true, decoys: [base, base, base].concat(Object.keys(D.TWINS).filter(x => x !== t), Object.values(D.TWINS).filter(x => x !== base)), count: 3 } });
+        out.push({ t: 'trace', cfg: { chars: [t, pairs[0][1]] } });
+        out.push({ t: 'speak', cfg: { items: pairs.slice(1, 3).map(p => sayItem(p[1])), novel: true, n: 2 } });
+        break;
+      }
+      case 'twrev': {
+        const ts = Array.from(L.c).filter(c => D.TWINS[c]);
+        const pool = ts.flatMap(t => ['ㅏ', 'ㅗ', 'ㅣ'].flatMap(v => [D.join(t, v, ''), D.join(D.TWINS[t], v, '')]));
+        out.push({ t: 'fish', cfg: { targets: shuffle(pool.filter(x => D.TWINS[D.split(x).cho])).slice(0, 4), pool, n: 4, k: 3, title: '쌍둥이 낚시' } });
+        const tw = pics().filter(w => w.syl.some(x => ts.includes(D.split(x).cho))).map(w => w.key);
+        if (tw.length >= 2) out.push({ t: 'memory', cfg: { words: shuffle(tw), pairs: Math.min(3, tw.length) } });
+        out.push({ t: 'trace', cfg: { chars: shuffle(ts).slice(0, 2).map(t => D.join(t, pick(['ㅏ', 'ㅗ']), '')), faint: true } });
+        out.push({ t: 'speak', cfg: { items: shuffle(pool).slice(0, 2).map(sayItem), novel: true, n: 2 } });
+        break;
+      }
+      case 'cvow': {
+        const cv = stage.v;
+        const CONS = { 'ㅘ': ['ㄱ', 'ㅎ'], 'ㅝ': ['ㅇ', 'ㄱ'], 'ㅢ': ['ㅇ'], 'ㅟ': ['ㄱ', 'ㅇ'] };
+        out.push({ t: 'meet', cfg: { j: cv, title: cv + ' 친구를 만나요' } });
+        out.push({ t: 'vmerge', cfg: { v: cv, cons: CONS[cv] || ['ㅇ'] } });
+        const has = w => w.syl.some(x => { const j = D.split(x).jung; return j === cv || (cv === 'ㅟ' && j === 'ㅚ'); });
+        const cw = pics().filter(has).map(w => w.key);
+        const rd = wordsFor(L, has);
+        if (rd.length) out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(rd), pool: wordsFor(L), n: Math.min(3, rd.length) } });
+        else if (cw.length) out.push({ t: 'pick', cfg: { words: shuffle(cw), pool: cw.concat(listenWords(6)), n: Math.min(3, cw.length) } });
+        out.push({ t: 'trace', cfg: { chars: [cv, D.join((CONS[cv] || ['ㅇ'])[0], cv, '')] } });
+        out.push({ t: 'speak', cfg: { items: (CONS[cv] || ['ㅇ']).map(c => sayItem(D.join(c, cv, ''))).concat(rd.slice(0, 1).map(sayWord)), n: 2 } });
+        break;
+      }
+      case 'cvrev': {
+        const cvs = Array.from(L.v).filter(v => D.COMPLEX[v]);
+        const pool = ['과', '화', '워', '의', '귀', '위', '사', '가', '오', '이'].filter(x => D.has.sy(x));
+        out.push({ t: 'fish', cfg: { targets: shuffle(pool.filter(x => D.COMPLEX[D.split(x).jung])).slice(0, 4), pool, n: 4, k: 3, title: '미끄럼 낚시' } });
+        const rd = wordsFor(L, w => w.syl.some(x => D.COMPLEX[D.split(x).jung]));
+        if (rd.length >= 2) out.push({ t: 'shop', cfg: { words: shuffle(rd), pool: wordsFor(L), n: Math.min(3, rd.length) } });
+        out.push({ t: 'hide', cfg: { target: pick(cvs), jamo: true, decoys: cvs.concat(['ㅗ', 'ㅏ', 'ㅜ', 'ㅓ', 'ㅡ', 'ㅣ']), count: 3 } });
+        out.push({ t: 'trace', cfg: { chars: shuffle(['과', '워', '의', '귀']).slice(0, 2), faint: true } });
+        out.push({ t: 'speak', cfg: { items: shuffle(rd).slice(0, 2).map(sayWord), n: 2 } });
         break;
       }
       case 'story': {
@@ -851,8 +1345,11 @@
         const items = n >= 4 ? ph.slice(0, 2).concat([pick(D.SENTENCES)]) : ph;
         out.push({ t: 'story', cfg: { items, decoys, alone: n >= 6, n: 3 } });
         const ws = wordsFor(L);
-        out.push({ t: 'memory', cfg: { words: shuffle(ws), pairs: 4 } });
+        if (n % 2) out.push({ t: 'shop', cfg: { words: shuffle(ws), pool: ws, n: 3 } });
+        else out.push({ t: 'memory', cfg: { words: shuffle(ws), pairs: 4 } });
         out.push({ t: 'story', cfg: { items: shuffle(D.PHRASES).slice(0, 2).map(p => ({ words: p })), decoys, alone: true, n: 2, title: '혼자 읽기' } });
+        const fam = (G.Rec ? G.Rec.sentences() : []).map(r => ({ text: r.label, clip: r.key, item: 'sayu:' + r.key }));
+        out.push({ t: 'speak', cfg: { items: shuffle(fam).slice(0, 1).concat([sayPhrase(pick(D.PHRASES))]), n: 2, title: '소리 내어 읽기' } });
         const w0 = pick(ws.filter(k => D.WORDS[k].syl.length === 2)) || 'nabi';
         out.push({ t: 'trace', cfg: { chars: D.WORDS[w0].syl.filter(s => D.strokesFor(s)), faint: true } });
         break;
@@ -868,6 +1365,10 @@
     if (p.t === 'chant') return c.syl && c.syl.filter(s => D.has.sy(s)).length >= 2;
     if (p.t === 'pop') return c.targets && c.targets.length && c.pool && c.pool.length >= 2;
     if (p.t === 'batchim') return c.items && c.items.length > 0;
+    if (p.t === 'fish') return c.targets && c.targets.length && c.pool && c.pool.length >= 2;
+    if (p.t === 'shop') return c.words && c.words.length >= 1 && (c.pool || c.words).length >= 3;
+    if (p.t === 'hide') return !!c.target && c.decoys && c.decoys.length >= 2;
+    if (p.t === 'speak') return c.items && c.items.length >= 1;
     return true;
   }
   /* Every clip a stage may play (for preloading). */
@@ -884,6 +1385,8 @@
       (cfg.syl || []).forEach(addSy);
       (cfg.targets || []).forEach(x => { addSy(x); if (D.VROW[x]) addSy(D.VROW[x]); });
       (cfg.chars || []).forEach(x => { addSy(x); if (D.VROW[x]) addSy(D.VROW[x]); });
+      if (t === 'speak') (cfg.items || []).forEach(it => { if (it.clip) out.add(it.clip); (it.keys || []).forEach(k => out.add(k)); });
+      if (cfg.target) addSy(cfg.target);
     });
     return Array.from(out);
   };

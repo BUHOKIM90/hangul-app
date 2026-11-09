@@ -145,7 +145,7 @@
     return Promise.all([voice, UI.sleep(900)]);
   };
   /* A random unlocked friend jumps up from the bottom edge to cheer. */
-  UI.friendsOwned = () => D.FRIENDS.filter(f => f.lv <= St.s.reward.level);
+  UI.friendsOwned = () => D.FRIENDS.filter(f => St.hasFriend(f));
   UI.cheerFriend = function () {
     const fx = UI.$('#fx');
     if (!fx) return;

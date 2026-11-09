@@ -160,13 +160,18 @@ ima|이마||body`;
   const VROW = { 'ㅏ': '아', 'ㅓ': '어', 'ㅗ': '오', 'ㅜ': '우', 'ㅡ': '으', 'ㅣ': '이', 'ㅑ': '야', 'ㅕ': '여', 'ㅛ': '요', 'ㅠ': '유', 'ㅐ': '애', 'ㅔ': '에' };
   const JNAME = {
     'ㄱ': '기역', 'ㄴ': '니은', 'ㄷ': '디귿', 'ㄹ': '리을', 'ㅁ': '미음', 'ㅂ': '비읍', 'ㅅ': '시옷', 'ㅇ': '이응', 'ㅈ': '지읒',
-    'ㅊ': '치읓', 'ㅋ': '키읔', 'ㅌ': '티읕', 'ㅍ': '피읖', 'ㅎ': '히읗'
+    'ㅊ': '치읓', 'ㅋ': '키읔', 'ㅌ': '티읕', 'ㅍ': '피읖', 'ㅎ': '히읗',
+    'ㄲ': '쌍기역', 'ㄸ': '쌍디귿', 'ㅃ': '쌍비읍', 'ㅆ': '쌍시옷', 'ㅉ': '쌍지읒'
   };
+  Object.assign(VROW, { 'ㅘ': '와', 'ㅝ': '워', 'ㅢ': '의', 'ㅟ': '위', 'ㅚ': '외' });
+  const TWINS = { 'ㄲ': 'ㄱ', 'ㄸ': 'ㄷ', 'ㅃ': 'ㅂ', 'ㅆ': 'ㅅ', 'ㅉ': 'ㅈ' };
   /* Picture friend for each letter (shown on the letter card). */
   const JPIC = {
     'ㅏ': 'agi', 'ㅓ': 'eobu', 'ㅗ': 'ori', 'ㅜ': 'uyu', 'ㅡ': 'eureureong', 'ㅣ': 'i_tooth',
     'ㄱ': 'gicha', 'ㄴ': 'nabi', 'ㄷ': 'dari', 'ㄹ': 'radio', 'ㅁ': 'moja', 'ㅂ': 'banana', 'ㅅ': 'lion', 'ㅇ': 'oi', 'ㅈ': 'jido', 'ㅎ': 'hama',
-    'ㅊ': 'chima', 'ㅋ': 'kokkiri', 'ㅌ': 'tomato', 'ㅍ': 'podo', 'ㅑ': 'yagu', 'ㅕ': 'yeou', 'ㅛ': 'yoyo', 'ㅠ': 'uyu', 'ㅐ': 'gae', 'ㅔ': 'ge'
+    'ㅊ': 'chima', 'ㅋ': 'kokkiri', 'ㅌ': 'tomato', 'ㅍ': 'podo', 'ㅑ': 'yagu', 'ㅕ': 'yeou', 'ㅛ': 'yoyo', 'ㅠ': 'uyu', 'ㅐ': 'gae', 'ㅔ': 'ge',
+    'ㄲ': 'kkachi', 'ㄸ': 'ttalgi', 'ㅃ': 'ppang', 'ㅆ': 'ssiat', 'ㅉ': 'tteok',
+    'ㅘ': 'gwaja', 'ㅝ': 'wonsungi', 'ㅢ': 'uija', 'ㅟ': 'gwi', 'ㅚ': 'gwi'
   };
 
   /* Strokes on a 100×100 box: polyline [[x,y],…] or circle {c:[cx,cy,r]}. */
@@ -219,6 +224,11 @@ ima|이마||body`;
   /* Strokes for one jamo or one syllable; null if not writable. */
   /* Complex vowels = a horizontal part under the first consonant + a vertical part on the right. */
   const COMPLEX = { 'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'], 'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'], 'ㅢ': ['ㅡ', 'ㅣ'] };
+  /* Complex vowels on their own: the horizontal part low-left, the vertical part on the right. */
+  Object.keys(COMPLEX).forEach(cv => {
+    const [h, v] = COMPLEX[cv];
+    STROKES[cv] = place(STROKES[h], [0, 26, 64, 62]).concat(place(STROKES[v], [44, 0, 56, 100]));
+  });
   function strokesFor(ch) {
     if (STROKES[ch]) return STROKES[ch];
     const s = split(ch);
@@ -237,58 +247,100 @@ ima|이마||body`;
     return out;
   }
 
-  /* Curriculum: 96 stages. */
+  /* Curriculum. Worlds are listed in play order (ids are stable keys, not the order). */
   const W = {
-    1: { name: '소리 숲', color: '#7BD389', icon: '🌳' },
-    2: { name: '모음 바다', color: '#6EC6FF', icon: '🌊' },
-    3: { name: '자음 마을', color: '#FFB86B', icon: '🏡' },
-    4: { name: '자음 마을 2', color: '#FF9AA2', icon: '🎪' },
-    5: { name: '무지개 모음', color: '#C3A6FF', icon: '🌈' },
-    6: { name: '받침 동굴', color: '#9C8CFF', icon: '💎' },
-    7: { name: '낱말 공원', color: '#5ED6B4', icon: '🎡' },
-    8: { name: '이야기 하늘', color: '#7FB2FF', icon: '☁️' }
+    1: { name: '소리 숲', color: '#7BD389', icon: '🌳', guide: 'mong' },
+    2: { name: '모음 바다', color: '#6EC6FF', icon: '🌊', guide: 'pomi' },
+    3: { name: '자음 마을', color: '#FFB86B', icon: '🏡', guide: 'kong' },
+    4: { name: '자음 마을 2', color: '#FF9AA2', icon: '🎪', guide: 'piyak' },
+    5: { name: '무지개 모음', color: '#C3A6FF', icon: '🌈', guide: 'yuni' },
+    9: { name: '쌍둥이 숲', color: '#8FD694', icon: '🌱', guide: 'pang' },
+    6: { name: '받침 동굴', color: '#9C8CFF', icon: '💎', guide: 'bori' },
+    10: { name: '미끄럼 모음', color: '#FFB3C7', icon: '🎢', guide: 'dori' },
+    7: { name: '낱말 공원', color: '#5ED6B4', icon: '🎡', guide: 'sori' },
+    8: { name: '이야기 하늘', color: '#7FB2FF', icon: '☁️', guide: 'lumi' }
   };
-  const ST = [];
-  const add = (w, k, o, title) => ST.push(Object.assign({ id: ST.length + 1, w, k, title }, o));
-  for (let n = 1; n <= 6; n++) add(1, 'sound', { n }, '소리 놀이 ' + n);
-  add(1, 'name', { n: 1 }, '내 이름 려원');
-  [['ㅏ'], ['ㅣ'], ['rev'], ['ㅗ'], ['ㅜ'], ['rev'], ['ㅓ'], ['ㅡ'], ['rev']].forEach(([v]) => {
-    if (v === 'rev') add(2, 'vrev', {}, '모음 복습'); else add(2, 'vowel', { v }, v + ' 만나기');
-  });
-  add(2, 'name', { n: 2 }, '내 이름 쓰기');
-  const C1 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㄹ'];
-  C1.forEach((c, i) => {
-    add(3, 'cons1', { c }, c + ' 노래');
-    add(3, 'cons2', { c }, c + ' 낱말');
-    if (i % 3 === 2 || i === C1.length - 1) add(3, 'crev', {}, '자음 복습');
-  });
-  add(3, 'name', { n: 3 }, '려원이 글자 ㄹ');
-  ['ㅊ', 'ㅋ', 'ㅌ', 'ㅍ'].forEach((c, i) => {
-    add(4, 'cons1', { c }, c + ' 노래');
-    add(4, 'cons2', { c }, c + ' 낱말');
-    if (i % 2 === 1) add(4, 'crev', {}, '자음 복습');
-  });
-  ['ㅑ', 'ㅕ', 'rev', 'ㅛ', 'ㅠ', 'rev', 'ㅐ', 'ㅔ'].forEach(v => {
-    if (v === 'rev') add(5, 'vrev2', {}, '무지개 복습'); else add(5, 'vowel2', { v }, v + ' 만나기');
-  });
-  const BAT = ['ㅇ', 'ㄴ', 'ㅁ', 'ㄹ', 'ㄱ', 'ㅂ', 'ㅅ'];
-  BAT.forEach((b, i) => {
-    add(6, 'bat1', { b }, b + ' 받침');
-    add(6, 'bat2', { b }, b + ' 받침 낱말');
-    if (i === 3 || i === BAT.length - 1) add(6, 'brev', {}, '받침 복습');
-  });
-  add(7, 'name', { n: 4 }, '내 이름 혼자 쓰기');
-  [['fam', '가족'], ['ani', '동물'], ['food', '먹거리'], ['ride', '탈것과 물건'], ['body', '몸'], ['nature', '자연'],
-    ['ani', '동물 2'], ['food', '먹거리 2'], ['thing', '물건'], ['mix', '낱말 모음'], ['mix', '낱말 모음 2'], ['mix', '낱말 대장'], ['mix', '낱말 왕']]
-    .forEach(([g, t]) => add(7, 'word', { g }, t));
-  for (let n = 1; n <= 10; n++) add(8, 'story', { n }, '이야기 ' + n);
+  const WORLD_ORDER = [1, 2, 3, 4, 5, 9, 6, 10, 7, 8];
+  /* Short story for each world: who is waiting at the end of the road (spoken by TTS or a family recording). */
+  const STORY = {
+    1: ['소리 숲에서 몽글이가 길을 잃었대! 소리 놀이를 하면서 몽글이를 찾아 주자.', '몽글이를 찾았어! 이제 같이 가자!'],
+    2: ['모음 바다 어딘가에 뽀미가 있대. 모음 친구들을 만나면서 찾아보자!', '뽀미를 찾았어! 바다를 다 건넜어!'],
+    3: ['자음 마을에 아기용 콩이가 살아. 자음 친구들을 다 만나면 콩이가 나올 거야!', '콩이를 만났어! 자음 마을 끝!'],
+    4: ['삐약이가 자음 마을 2에서 기다리고 있어!', '삐약이를 만났어!'],
+    5: ['무지개 끝에 유니콘 유니가 있대!', '유니를 만났어! 무지개를 다 건넜어!'],
+    9: ['쌍둥이 숲에는 똑같은 글자 둘이 꼭 붙어 있어. 판다 팡팡을 찾아보자!', '팡팡을 찾았어! 쌍둥이 글자 박사!'],
+    6: ['받침 동굴 깊은 곳에 꿀곰 보리가 꿀을 숨겨 놨대!', '보리의 꿀단지를 찾았어!'],
+    10: ['미끄럼 모음은 모음 둘이 미끄럼을 타고 합쳐진 거야. 도리를 찾아보자!', '도리를 만났어!'],
+    7: ['낱말 공원에서 여우 소리가 숨바꼭질을 하고 있어!', '소리를 찾았어! 낱말 공원 끝!'],
+    8: ['이야기 하늘에서 루미 공주가 별 이야기를 들려준대!', '모든 모험을 끝냈어! 려원이는 이제 한글 박사야!']
+  };
+  /* v1 = the original 100-stage list (kept only to move old progress onto the new list). */
+  function buildStages(v) {
+    const ST = [];
+    const seen = {};
+    const add = (w, k, o, title) => {
+      const key = k + ':' + (o.v || o.c || o.b || o.g || o.n || '');
+      seen[key] = (seen[key] || 0) + 1;
+      ST.push(Object.assign({ id: ST.length + 1, w, k, title, uid: key + '#' + seen[key] }, o));
+    };
+    for (let n = 1; n <= 6; n++) add(1, 'sound', { n }, '소리 놀이 ' + n);
+    add(1, 'name', { n: 1 }, '내 이름 려원');
+    [['ㅏ'], ['ㅣ'], ['rev'], ['ㅗ'], ['ㅜ'], ['rev'], ['ㅓ'], ['ㅡ'], ['rev']].forEach(([x]) => {
+      if (x === 'rev') add(2, 'vrev', {}, '모음 복습'); else add(2, 'vowel', { v: x }, x + ' 만나기');
+    });
+    add(2, 'name', { n: 2 }, '내 이름 쓰기');
+    const C1 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ', 'ㄹ'];
+    C1.forEach((c, i) => {
+      add(3, 'cons1', { c }, c + ' 노래');
+      add(3, 'cons2', { c }, c + ' 낱말');
+      if (i % 3 === 2 || i === C1.length - 1) add(3, 'crev', {}, '자음 복습');
+    });
+    add(3, 'name', { n: 3 }, '려원이 글자 ㄹ');
+    ['ㅊ', 'ㅋ', 'ㅌ', 'ㅍ'].forEach((c, i) => {
+      add(4, 'cons1', { c }, c + ' 노래');
+      add(4, 'cons2', { c }, c + ' 낱말');
+      if (i % 2 === 1) add(4, 'crev', {}, '자음 복습');
+    });
+    ['ㅑ', 'ㅕ', 'rev', 'ㅛ', 'ㅠ', 'rev', 'ㅐ', 'ㅔ'].forEach(x => {
+      if (x === 'rev') add(5, 'vrev2', {}, '무지개 복습'); else add(5, 'vowel2', { v: x }, x + ' 만나기');
+    });
+    if (v >= 2) ['ㄲ', 'ㄸ', 'ㅃ', 'rev', 'ㅆ', 'ㅉ', 'rev'].forEach(x => {
+      if (x === 'rev') add(9, 'twrev', {}, '쌍둥이 복습'); else add(9, 'twin', { c: x }, x + ' 쌍둥이');
+    });
+    const BAT = ['ㅇ', 'ㄴ', 'ㅁ', 'ㄹ', 'ㄱ', 'ㅂ', 'ㅅ'];
+    BAT.forEach((b, i) => {
+      add(6, 'bat1', { b }, b + ' 받침');
+      add(6, 'bat2', { b }, b + ' 받침 낱말');
+      if (i === 3 || i === BAT.length - 1) add(6, 'brev', {}, '받침 복습');
+    });
+    if (v >= 2) ['ㅘ', 'ㅝ', 'rev', 'ㅢ', 'ㅟ', 'rev'].forEach(x => {
+      if (x === 'rev') add(10, 'cvrev', {}, '미끄럼 복습'); else add(10, 'cvow', { v: x }, x + ' 만나기');
+    });
+    add(7, 'name', { n: 4 }, '내 이름 혼자 쓰기');
+    [['fam', '가족'], ['ani', '동물'], ['food', '먹거리'], ['ride', '탈것과 물건'], ['body', '몸'], ['nature', '자연'],
+      ['ani', '동물 2'], ['food', '먹거리 2'], ['thing', '물건'], ['mix', '낱말 모음'], ['mix', '낱말 모음 2'], ['mix', '낱말 대장'], ['mix', '낱말 왕']]
+      .forEach(([g, t]) => add(7, 'word', { g }, t));
+    for (let n = 1; n <= (v >= 2 ? 12 : 10); n++) add(8, 'story', { n }, '이야기 ' + n);
+    return ST;
+  }
+  const ST = buildStages(2);
+  /* old stage id -> new stage id (same lesson) */
+  const MIGRATE_V1 = {};
+  { const byUid = {}; ST.forEach(s => { byUid[s.uid] = s.id; }); buildStages(1).forEach(s => { MIGRATE_V1[s.id] = byUid[s.uid]; }); }
+  const CURRICULUM_VERSION = 2;
 
   /* Two-word phrases read word by word (each word clip lights its word). */
   const PHRASES = [
     ['agi', 'uyu'], ['eomma', 'moja'], ['appa', 'gudu'], ['nabi', 'namu'], ['hama', 'moja'], ['ori', 'bada'],
     ['banana', 'uyu'], ['halmeoni', 'gabang'], ['gangaji', 'gong'], ['tokki', 'ttalgi'], ['gom', 'ppang'], ['ryeowon', 'chima'],
-    ['goyangi', 'mul'], ['harabeoji', 'chaek'], ['kokkiri', 'pungseon'], ['robot', 'gicha'], ['agi', 'yoyo'], ['dal', 'byeol']
+    ['goyangi', 'mul'], ['harabeoji', 'chaek'], ['kokkiri', 'pungseon'], ['robot', 'gicha'], ['agi', 'yoyo'], ['dal', 'byeol'],
+    ['eomma', 'gimbap'], ['appa', 'gita'], ['ryeowon', 'gabang'], ['nuna', 'chaek'], ['agi', 'moja'], ['halmeoni', 'subak'],
+    ['harabeoji', 'namu'], ['gom', 'kkot'], ['tokki', 'gicha'], ['yeou', 'san'], ['gorae', 'pado'], ['sangeo', 'bada'],
+    ['ori', 'pungseon'], ['goyangi', 'uyu'], ['gangaji', 'ppang'], ['kokkiri', 'mul'], ['geobuk', 'bada'], ['girin', 'namu'],
+    ['robot', 'gong'], ['beoseu', 'gicha'], ['agi', 'gom', 'ppang'], ['eomma', 'appa', 'ryeowon'], ['tokki', 'ttalgi', 'uyu'],
+    ['dal', 'byeol', 'namu'], ['gangaji', 'goyangi', 'gong'], ['ryeowon', 'moja', 'gabang']
   ];
+
   /* Recorded short sentences (caption verified in v5 QA). */
   const SENTENCES = [
     { clip: 's_1', text: '나비도 나무도', pics: ['nabi', 'namu'] },
@@ -378,9 +430,45 @@ ima|이마||body`;
     { id: 'pang', name: '대나무판다 팡팡', short: '팡팡', lv: 9 },
     { id: 'yuni', name: '무지개유니콘 유니', short: '유니', lv: 11 }
   ];
+  /* Spoken lines that have no studio recording yet. They are spoken by a family recording (어른 메뉴 → 가족 목소리)
+     when there is one, otherwise by the device voice (speechSynthesis, ko-KR). */
+  const PROMPTS = {
+    p_fish: '들은 글자 물고기를 잡아 봐!',
+    p_shop: '손님이 갖고 싶은 물건의 이름표를 끌어서 건네 줘!',
+    p_hide: '숨어 있는 글자를 모두 찾아 봐!',
+    p_speak: '이번엔 려원이가 소리 내서 읽어 볼까? 빨간 버튼을 누르고 말해 봐!',
+    p_speak2: '혼자 읽어 봐. 다 읽으면 스피커를 눌러서 맞았는지 들어 보자.',
+    p_mine: '려원이 목소리 들어 보자.',
+    p_answer: '정답은',
+    p_same: '똑같이 읽었어?',
+    p_drag: '블록을 끌어서 빈칸에 쏙 넣어 봐!',
+    p_order: '번호 순서대로 써 볼까?',
+    p_dir: '화살표 쪽으로 써 볼까?',
+    p_look: '잘 보고 기억해!',
+    p_alone: '이제 혼자 써 볼까?',
+    p_deco: '스티커를 끌어서 그림을 꾸며 봐!',
+    p_twin: '똑같은 글자 둘이 붙으면 더 세게 소리 나!',
+    p_cvow: '모음 둘이 미끄럼을 타고 하나가 됐어!',
+    p_new: '처음 보는 글자야. 읽을 수 있을까?'
+  };
+  WORLD_ORDER.forEach(w => { PROMPTS['p_w' + w] = STORY[w][0]; PROMPTS['p_wd' + w] = STORY[w][1]; });
+  /* Things to do together away from the screen; {j} is filled with a letter the child finds hard. */
+  const TIPS = {
+    1: ['저녁 식탁에서 반찬 이름을 말하며 박수를 쳐 보세요. "김-치" 두 번!', '가족 이름을 부르면서 손뼉 치기 놀이를 해 보세요.'],
+    2: ['목욕할 때 "아~ 이~ 오~ 우~" 입 모양 거울 놀이를 해 보세요.', '그림책에서 ㅏ 모양을 손가락으로 찾아보세요.'],
+    3: ['마트 간판에서 \'{j}\' 찾기 놀이를 해 보세요.', '포스트잇에 \'{j}\'를 써서 집 안 물건에 붙여 보세요.'],
+    4: ['과자 봉지 글자에서 \'{j}\'를 찾아보세요.', '자동차 번호판에서 아는 글자를 찾아보세요.'],
+    5: ['"야구, 여우, 요요, 우유" 끝말 흉내 놀이를 해 보세요.', '냉장고 자석으로 ㅑ ㅕ ㅛ ㅠ를 만들어 보세요.'],
+    9: ['"가-까, 다-따" 세게 말하기 놀이를 해 보세요.', '빵집 간판에서 쌍둥이 글자(ㅃ)를 찾아보세요.'],
+    6: ['"가방에 ㅇ 붙이면?" 하고 받침 붙이기 말놀이를 해 보세요.', '간판 글자에서 받침이 있는 글자를 찾아보세요.'],
+    10: ['"오+아=와" 미끄럼 말놀이를 해 보세요.', '과자 봉지에서 \'과\' 자를 찾아보세요.'],
+    7: ['장 볼 목록을 아이와 함께 써 보세요(그림 + 낱말).', '아이 이름과 가족 이름을 종이에 함께 써 보세요.'],
+    8: ['그림책 한 쪽을 아이가 손가락으로 짚으며 읽게 해 보세요.', '오늘 있었던 일을 두 낱말로 써 보세요. 예: "려원 공원"']
+  };
   G.D = {
     CHO, JUNG, split, join, hex, syKey, fyKey, dyKey, jKey, has, SY, WORDS, HY, HW, CLAP, noBatchim,
     BASIC_V, VROW, JNAME, JPIC, STROKES, strokesFor, WORLDS: W, STAGES: ST, PHRASES, SENTENCES,
+    WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, TIPS, TWINS, COMPLEX,
     PRAISE_VOICE, CHEERS, PRAISE_FIT, STICKER_SETS, STICKERS, OUTFITS, FRIENDS
   };
 })(window);
