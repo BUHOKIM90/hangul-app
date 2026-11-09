@@ -39,7 +39,10 @@ const FIXED = {
   ui4_free: '더 놀고 싶으면, 놀이터에서 배운 놀이를 해 볼까?',
   s_1: '나비도 나무도.', s_2: '바나나 나무.', s_4: '나비 모자.', s_6: '아기 모자.'
 };
-Object.values(D.PRAISE_VOICE).forEach(([text, clip]) => { FIXED[clip] = text; });
+/* praise: end with ! so the voice sounds lively */
+Object.values(D.PRAISE_VOICE).forEach(([text, clip]) => { FIXED[clip] = /[.!?]$/.test(text) ? text.replace(/\.$/, '!') : text + '!'; });
+/* dedicated lines for the newer plays and the world stories (subtitle = text) */
+Object.values(D.PROMPT_CLIP).forEach(([clip, text]) => { keys.add(clip); FIXED[clip] = text; });
 const JWORD = { 'ㄲ': '까치', 'ㄸ': '딸기', 'ㅃ': '빵', 'ㅆ': '씨앗', 'ㅘ': '과자', 'ㅝ': '원숭이', 'ㅢ': '의자', 'ㅟ': '귀', 'ㅐ': '개', 'ㅔ': '게' };
 const COUNT = ['', '한', '두', '세', '네', '다섯'];
 function textOf(k) {
@@ -48,8 +51,9 @@ function textOf(k) {
   if (m) {
     const c = ch(m[2]);
     if (m[1] === 'sy') return c + '.';
-    if (m[1] === 'fy') return c + (hasB(c) ? '을' : '를') + ' 찾아볼까?';
-    if (m[1] === 'dy') return '그건 ' + c + (hasB(c) ? '이야.' : '야.');
+    /* "가 글자" keeps the syllable from being heard as a word (그건 가야 → '가야') */
+    if (m[1] === 'fy') return c + ' 글자를 찾아볼까?';
+    if (m[1] === 'dy') return '그건 ' + c + ' 글자야.';
     const name = D.JNAME[c] || D.VROW[c] || c;
     const wk = D.JPIC[c], word = JWORD[c] || (wk && D.WORDS[wk] ? D.WORDS[wk].w : '');
     return word ? `${name}, ${word} 할 때 ${name}.` : name + '.';
@@ -61,7 +65,7 @@ function textOf(k) {
     if (m[1] === 'w') return w + '.';
     if (m[1] === 'hy') return '그건 ' + w + (hasB(w) ? '이야!' : '야!');
     const syl = Array.from(w);
-    return syl.join(', ') + '. ' + COUNT[syl.length] + ' 번!';
+    return syl.join(', ') + '! ' + COUNT[syl.length] + ' 번 쳤어!';
   }
   return null;
 }

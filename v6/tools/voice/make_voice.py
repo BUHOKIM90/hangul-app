@@ -16,9 +16,14 @@ VOICE = 'ko-KR-SunHiNeural'
 
 def rate_for(key):
     kind = key.split('_')[0]
-    if kind in ('sy', 'w'): return '-15%'      # single syllables / words: clear and a little slow
-    if kind in ('j', 'c'): return '-12%'
-    return '-5%'                              # sentences: natural pace
+    if kind in ('sy', 'w'): return '-12%'     # single syllables / words: clear, a little slow
+    if kind in ('j', 'c'): return '-10%'
+    return '-6%'                              # sentences: calm, natural pace
+
+def pitch_for(key):
+    kind = key.split('_')[0]
+    if kind in ('sy', 'w', 'j'): return '+2Hz'  # letters stay neutral so the sound is clear
+    return '+6Hz'                               # talking to a child: a little brighter
 
 def speech_span(path):
     """(seconds of speech from first to last sound, number of separate sound runs, file length)"""
@@ -50,7 +55,7 @@ async def make(key, text, sem, report):
         for attempt in range(4):
             tmp = path + '.tmp.mp3'
             try:
-                await edge_tts.Communicate(text, VOICE, rate=rate_for(key)).save(tmp)
+                await edge_tts.Communicate(text, VOICE, rate=rate_for(key), pitch=pitch_for(key)).save(tmp)
             except Exception as e:
                 report['errors'][key] = str(e)[:120]
                 await asyncio.sleep(2 + attempt * 3)

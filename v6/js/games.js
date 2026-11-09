@@ -277,7 +277,7 @@
       b.innerHTML = '';
       const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t)).slice(0, (cfg.k || 3) - 1)));
       const nodes = opts.map((o, i) => {
-        const n = el('button', 'tap balloon c' + ((i + qs.indexOf(t)) % 5), `<span>${esc(o)}</span><i class="string"></i>`);
+        const n = el('button', 'tap balloon c' + ((i + qs.indexOf(t)) % 5), `<span>${esc(o)}</span><i class="knot"></i><i class="string"></i>`);
         n.type = 'button'; n.dataset.v = o; n.style.animationDelay = (-i * 0.7) + 's';
         b.appendChild(n); return n;
       });
@@ -562,7 +562,8 @@
         /* show the letter once more, then hide it */
         const peek = el('div', 'peek', esc(ch));
         area.appendChild(peek);
-        await sleep(1800);
+        await A.play('p_look');
+        await sleep(900);
         if (!ctx.alive()) return;
         peek.classList.add('gone');
         await sleep(350);
@@ -573,7 +574,7 @@
       eraser.onpointerdown = e => { e.preventDefault(); A.sfx('whoosh'); bd.clear(); };
       const c = clipOf(ch);
       /* not awaited: a quick child may finish before the instruction ends */
-      A.sequence((!hid && i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
+      A.sequence((hid ? ['p_alone'] : i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
       const r = await Promise.race([bd.done, ctx.aborted]);
       if (!r || !ctx.alive()) { bd.destroy(); return; }
       prog.children[i].classList.add('on');
@@ -783,7 +784,7 @@
     let target = null;
     const promptOf = t => (cfg.jamo ? jamoClip(t) : (findClip(t) || sayKey(t)));
     const thatOf = t => (cfg.jamo ? jamoClip(t) : (D.has.dy(t) ? D.dyKey(t) : sayKey(t)));
-    head(host, cfg.title || '글자 낚시', () => target && promptOf(target), '들은 글자를 눌러 봐!');
+    head(host, cfg.title || '글자 낚시', () => target && promptOf(target), D.sub('p_fish'));
     const b = body(host, 'fish');
     const qs = cfg.targets.slice(0, cfg.n || 4);
     await A.preload(qs.map(promptOf));
@@ -793,12 +794,12 @@
       if (!ctx.alive()) return;
       target = t;
       b.innerHTML = '';
-      const pond = el('div', 'pond');
+      const pond = el('div', 'pond', '<i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i><i class="bub b4"></i><i class="weed w1"></i><i class="weed w2"></i>');
       const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t)).slice(0, (cfg.k || 3) - 1)));
       const nodes = opts.map((o, i) => {
         const lane = el('div', 'lane');
         const f = el('button', 'tap fishy c' + ((i + qs.indexOf(t)) % 5),
-          `<svg viewBox="0 0 130 80" aria-hidden="true"><path d="M100 40 L128 14 L124 40 L128 66Z" class="tail"/><ellipse cx="58" cy="40" rx="54" ry="34" class="bd"/><circle cx="22" cy="32" r="6" fill="#4B3642"/><circle cx="20" cy="30" r="2" fill="#fff"/><path d="M12 48 q6 5 12 0" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg><span>${esc(o)}</span>`);
+          `<svg viewBox="0 0 130 80" aria-hidden="true"><path d="M100 40 L128 14 L124 40 L128 66Z" class="tail"/><path d="M50 8 Q66 -4 80 10" class="tail"/><ellipse cx="58" cy="40" rx="54" ry="34" class="bd"/><path d="M84 22 q8 18 0 36 M94 26 q6 14 0 28" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/><ellipse cx="34" cy="20" rx="12" ry="5" fill="#fff" opacity=".55" transform="rotate(-18 34 20)"/><circle cx="22" cy="34" r="7" fill="#4B3642"/><circle cx="20" cy="31.5" r="2.8" fill="#fff"/><circle cx="24.5" cy="37" r="1.2" fill="#fff"/><ellipse cx="30" cy="48" rx="5" ry="3" fill="#FF8FB0" opacity=".7"/><path d="M10 50 q6 5 12 0" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg><span>${esc(o)}</span>`);
         f.type = 'button'; f.dataset.v = o;
         f.style.animationDuration = (7 + i * 1.7 + Math.random() * 2) + 's';
         f.style.animationDelay = (-Math.random() * 6) + 's';
@@ -831,7 +832,7 @@
   /* ---------- 13. shop: a friend wants something — hand over its name tag (reading) ---------- */
   P.shop = async function (host, cfg, ctx) {
     let cur = null;
-    head(host, cfg.title || '글자 가게', () => cur && 'w_' + cur, '낱말 카드를 그림에 데려다 줄래?');
+    head(host, cfg.title || '글자 가게', () => cur && 'w_' + cur, D.sub('p_shop'));
     const b = body(host, 'shop');
     const qs = cfg.words.slice(0, cfg.n || 3);
     await A.preload(qs.map(k => 'w_' + k));
@@ -873,7 +874,7 @@
   P.hide = async function (host, cfg, ctx) {
     const t = cfg.target, count = cfg.count || 3;
     const clipOf = x => (cfg.jamo ? jamoClip(x) : sayKey(x));
-    head(host, cfg.title || '숨은 글자 찾기', clipOf(t), '어디 있을까?');
+    head(host, cfg.title || '숨은 글자 찾기', clipOf(t), D.sub('p_hide'));
     const b = body(host, 'hide');
     await say(ctx, 'p_hide');
     if (!ctx.alive()) return;
@@ -938,7 +939,7 @@
       return A.play(it.clip, { onStart: () => textEl.classList.add('lit') }).then(() => textEl.classList.remove('lit'));
     };
     const h = head(host, cfg.title || (cfg.novel ? '처음 보는 글자' : '내가 읽어 볼게'), () => { if (cur) playAnswer(cur, UI.$('.speak-text', host)); return null; },
-      '이번엔 려원이가 혼자 읽어 볼까?');
+      D.sub('p_speak'));
     if (h.say) h.say.dataset.role = 'answer';
     const b = body(host, 'speak');
     let useMic = St.s.settings.mic !== false && !!G.Rec && G.Rec.micOk();
@@ -983,6 +984,7 @@
             if (!ctx.alive()) return;
             const me = el('div', 'speak-me on', MIC + '<span>려원이 목소리</span>');
             row.appendChild(me);
+            await A.play('p_mine');
             await A.playBuffer(mine);
             me.classList.remove('on');
             await sleep(250);
@@ -1002,6 +1004,7 @@
           const again = el('button', 'tap same-btn again', '🔁<span>다시</span>'); again.type = 'button';
           row.append(yes, again);
           ans('same');
+          A.play('p_same');
           const v = await new Promise(r => { UI.tap(yes, e => r(e)); UI.tap(again, () => r(null)); });
           tries++;
           St.s.learn.says = (St.s.learn.says || 0) + 1;
@@ -1019,7 +1022,7 @@
 
   /* ---------- 16. twin: plain vs twin consonant (가 → 까) ---------- */
   P.twin = async function (host, cfg, ctx) {
-    head(host, cfg.title || '쌍둥이 소리', null, '잘 듣고 골라 봐.');
+    head(host, cfg.title || '쌍둥이 소리', null, D.sub('p_twin'));
     const b = body(host, 'twin');
     const pairs = cfg.pairs;
     await A.preload(pairs.flat().map(sayKey));
@@ -1067,7 +1070,7 @@
   P.vmerge = async function (host, cfg, ctx) {
     const cv = cfg.v, [h0, v0] = D.COMPLEX[cv];
     let target = cv;
-    head(host, cfg.title || '모음 미끄럼', () => (target === cv ? jamoClip(cv) : sayKey(target)), '블록을 합쳐서 만들어 볼까?');
+    head(host, cfg.title || '모음 미끄럼', () => (target === cv ? jamoClip(cv) : sayKey(target)), D.sub('p_cvow'));
     const b = body(host, 'block');
     await say(ctx, 'p_cvow');
     const steps = [[h0, v0, cv, 'vow', jamoClip(cv)]].concat((cfg.cons || []).map(c => [c, cv, D.join(c, cv, ''), 'cons', null]));

@@ -19,7 +19,7 @@
   };
   C.SPEC = SPEC;
   C.ALIAS = { mong: 'mong', rabbit: 'tori', bear: 'bori', cat: 'pomi', chick: 'piyak', puppy: 'dori', fox: 'sori', panda: 'pang' };
-  const sw = (w) => `stroke="${LINE}" stroke-width="${w || 4.2}" stroke-linejoin="round" stroke-linecap="round"`;
+  const sw = (w) => `stroke="${LINE}" stroke-width="${w || 3.8}" stroke-linejoin="round" stroke-linecap="round"`;
   function star(x, y, r, fill) {
     const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.5 : r; p.push((x + Math.cos(a) * rr).toFixed(1) + ' ' + (y + Math.sin(a) * rr).toFixed(1)); }
     return `<path d="M${p.join(' L')}Z" fill="${fill}" ${sw(3)}/>`;
@@ -29,18 +29,25 @@
       if (mood === 'joy' || mood === 'cheer') return `<path d="M${x - 8} ${y + 2} Q${x} ${y - 8} ${x + 8} ${y + 2}" fill="none" ${sw(4.4)}/>`;
       if (mood === 'wink' && dir < 0) return `<path d="M${x - 8} ${y} Q${x} ${y - 7} ${x + 8} ${y}" fill="none" ${sw(4.4)}/>`;
       if (mood === 'think') return `<ellipse cx="${x}" cy="${y + 2}" rx="5.4" ry="5.4" fill="${LINE}"/><circle cx="${x - 1.6}" cy="${y}" r="1.8" fill="#fff"/>`;
-      const s = mood === 'wow' ? 1.25 : 1;
-      return `<g class="eye"><ellipse cx="${x}" cy="${y}" rx="${6.6 * s}" ry="${9 * s}" fill="${LINE}"/><ellipse cx="${x - 1.8 * dir * -1 - 1.6}" cy="${y - 3.4 * s}" rx="${2.6 * s}" ry="${3.2 * s}" fill="#fff"/><circle cx="${x + 2}" cy="${y + 4 * s}" r="${1.2 * s}" fill="#fff"/></g>`;
+      const s = mood === 'wow' ? 1.18 : 1;
+      /* big glossy eyes: dark plum, a warm glow at the bottom, one big and one small shine */
+      return `<g class="eye"><ellipse cx="${x}" cy="${y}" rx="${8.4 * s}" ry="${10.6 * s}" fill="${LINE}"/>`
+        + `<ellipse cx="${x}" cy="${y + 4.4 * s}" rx="${5.8 * s}" ry="${4.6 * s}" fill="#9B6C8E" opacity=".75"/>`
+        + `<circle cx="${x - 2.8}" cy="${y - 4.2 * s}" r="${3.9 * s}" fill="#fff"/>`
+        + `<circle cx="${x + 3.2}" cy="${y + 3.8 * s}" r="${1.8 * s}" fill="#fff"/>`
+        + `<circle cx="${x + 3.6}" cy="${y - 6 * s}" r="${1 * s}" fill="#fff" opacity=".9"/></g>`;
     };
     return `<g class="eyes blinker">${one(74, -1)}${one(126, 1)}</g>`;
   }
   function mouth(mood, y) {
-    if (mood === 'joy' || mood === 'cheer') return `<path d="M92 ${y - 1} Q100 ${y + 12} 108 ${y - 1}Z" fill="#FF6F8E" ${sw(3.2)}/>`;
+    if (mood === 'joy' || mood === 'cheer') return `<path d="M91 ${y - 1} Q100 ${y + 13} 109 ${y - 1}Z" fill="#E8466A" ${sw(3)}/><path d="M95 ${y + 6} Q100 ${y + 2} 105 ${y + 6} Q100 ${y + 10} 95 ${y + 6}Z" fill="#FF9FB4"/>`;
     if (mood === 'wow') return `<ellipse cx="100" cy="${y + 3}" rx="4.6" ry="6" fill="#FF6F8E" ${sw(3.2)}/>`;
     if (mood === 'think') return `<path d="M95 ${y + 3} h10" fill="none" ${sw(3.4)}/>`;
     return `<path d="M93 ${y} q3.5 4.4 7 0 q3.5 4.4 7 0" fill="none" ${sw(3.2)}/>`;
   }
-  const cheeks = y => `<ellipse cx="56" cy="${y}" rx="10" ry="6.4" fill="#FF9FB8" opacity=".75"/><ellipse cx="144" cy="${y}" rx="10" ry="6.4" fill="#FF9FB8" opacity=".75"/>`;
+  let uid = 0;
+  const cheeks = (y, id) => `<ellipse cx="54" cy="${y}" rx="13" ry="8" fill="url(#ck${id})"/><ellipse cx="146" cy="${y}" rx="13" ry="8" fill="url(#ck${id})"/>`
+    + `<path d="M48 ${y - 1} l3 -3 M54 ${y - 1} l3 -3 M140 ${y - 1} l3 -3 M146 ${y - 1} l3 -3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".85"/>`;
   function gem(sp, x, y) {
     return `<g class="gem"><circle cx="${x}" cy="${y}" r="19" fill="#fff" ${sw(3.4)}/><circle cx="${x}" cy="${y}" r="14.4" fill="none" stroke="${sp.gemC}" stroke-width="3"/>
       <text x="${x}" y="${y + 7.4}" text-anchor="middle" font-size="21" font-weight="900" fill="${sp.gemC}" font-family="'Jua','Apple SD Gothic Neo','Noto Sans KR',sans-serif">${sp.gem}</text>
@@ -57,7 +64,7 @@
          <path d="M136 214 C148 206 154 194 154 184" fill="none" ${sw(17)}/><path d="M136 214 C148 206 154 194 154 184" fill="none" stroke="${fill}" stroke-width="9.6" stroke-linecap="round"/>`
       : `<ellipse cx="60" cy="230" rx="9" ry="12" transform="rotate(28 60 230)" fill="${fill}" ${sw()}/><ellipse cx="140" cy="230" rx="9" ry="12" transform="rotate(-28 140 230)" fill="${fill}" ${sw()}/>`;
     return `<ellipse cx="82" cy="268" rx="15" ry="9" fill="${feet || fill}" ${sw()}/><ellipse cx="118" cy="268" rx="15" ry="9" fill="${feet || fill}" ${sw()}/>
-      ${skirt || `<path d="M62 200 C56 226 62 266 100 266 C138 266 144 226 138 200Z" fill="${fill}" ${sw()}/>`}${extra || ''}${arms}`;
+      ${skirt || `<path d="M62 200 C56 226 62 266 100 266 C138 266 144 226 138 200Z" fill="${fill}" ${sw()}/>`}<ellipse cx="100" cy="208" rx="32" ry="7" fill="${LINE}" opacity=".12"/>${extra || ''}${arms}`;
   }
   const HEAD = 'M100 92 C150 92 176 122 176 158 C176 192 146 210 100 210 C54 210 24 192 24 158 C24 122 50 92 100 92Z';
   C.draw = function (k, mood, wear, out) {
@@ -155,14 +162,19 @@
         break;
     }
     const lowerMouth = k === 'bori' ? `<path d="M100 175 v4" ${sw(3)}/>` : '';
-    return `<svg class="mascot-svg" viewBox="0 0 200 312" aria-hidden="true">${out.defs ? `<defs>${out.defs}</defs>` : ''}
+    const id = ++uid;
+    const defs = `<radialGradient id="ck${id}"><stop offset="0" stop-color="#FF8FB0" stop-opacity=".95"/><stop offset=".6" stop-color="#FFA3BE" stop-opacity=".55"/><stop offset="1" stop-color="#FFB8CB" stop-opacity="0"/></radialGradient>`;
+    /* soft shine on the top of the head and the tummy */
+    const shine = `<ellipse cx="68" cy="${k === 'lumi' ? 999 : 122}" rx="15" ry="7" transform="rotate(-24 68 122)" fill="#fff" opacity=".55"/><circle cx="88" cy="${k === 'lumi' ? 999 : 116}" r="3" fill="#fff" opacity=".6"/>`;
+    const sparkle = mood === 'cheer' || mood === 'joy' ? `<g fill="#FFE066" stroke="${LINE}" stroke-width="2" stroke-linejoin="round"><path d="M22 120 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/><path d="M178 104 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z"/></g>` : '';
+    return `<svg class="mascot-svg" viewBox="0 0 200 312" aria-hidden="true"><defs>${defs}${out.defs || ''}</defs>
       <ellipse cx="100" cy="286" rx="54" ry="8" fill="rgba(75,54,66,.14)"/>
       <g transform="translate(0 6)">
       ${back}${out.back || ''}
       <g class="m-body">${k === 'lumi' ? bodyRig(sp.dress, mood, gem(sp, 100, 234), '#FF8FBF', `<path d="M72 198 C66 220 46 252 44 264 C70 274 130 274 156 264 C154 252 134 220 128 198Z" fill="${sp.dress}" ${sw()}/><path d="M48 258 q13 10 26 2 q13 10 26 2 q13 10 26 2 q13 10 26 2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`) : bodyRig(tint, mood, bodyExtra + gem(sp, 100, 238), f)}${out.neck || ''}</g>
-      <g class="m-head"${mood === 'think' ? ' transform="rotate(-6 100 200)"' : ''}>${ears}${head}${over}
-        ${cheeks(eyeY + 14)}${eyes(mood, eyeY)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? mouth(mood, mouthY) : ''}${lowerMouth}
-        ${out.eyes || ''}${out.hat || ''}</g></g></svg>`;
+      <g class="m-head"${mood === 'think' ? ' transform="rotate(-6 100 200)"' : ''}>${ears}${head}${shine}${over}
+        ${cheeks(eyeY + 16, id)}${eyes(mood, eyeY)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? mouth(mood, mouthY) : ''}${lowerMouth}
+        ${out.eyes || ''}${out.hat || ''}</g>${sparkle}</g></svg>`;
   };
   G.CHF = C;
 })(typeof window !== 'undefined' ? window : globalThis);

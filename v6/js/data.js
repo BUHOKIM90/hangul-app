@@ -439,19 +439,27 @@ ima|이마||body`;
   /* Instructions for the newer plays use studio recordings that say exactly the subtitle shown (v5 captions).
      No device/synthetic voice is ever used: a line without a recording is shown as text only. */
   const PROMPT_CLIP = {
-    p_fish: ['ui4_balloon', '들은 글자를 눌러 봐!'],
-    p_shop: ['ui_match', '낱말 카드를 그림에 데려다 줄래?'],
-    p_hide: ['ui_find', '어디 있을까?'],
-    p_speak: ['ui4_echo2', '이번엔 려원이가 혼자 읽어 볼까?'],
-    p_new: ['ui4_echo2', '이번엔 려원이가 혼자 읽어 볼까?'],
-    p_order: ['ui4_hint', '여기 반짝이는 데를 봐!'],
-    p_dir: ['ui4_hint', '여기 반짝이는 데를 봐!'],
-    p_twin: ['ui_listen', '잘 듣고 골라 봐.'],
-    p_cvow: ['ui_merge', '블록을 합쳐서 만들어 볼까?']
+    p_fish: ['v_fish', '들은 글자 물고기를 잡아 봐!'],
+    p_shop: ['v_shop', '손님이 원하는 물건 이름표를 건네 줘!'],
+    p_hide: ['v_hide', '숨어 있는 글자를 모두 찾아 봐!'],
+    p_speak: ['v_speak', '이번엔 려원이가 소리 내서 읽어 볼까?'],
+    p_order: ['v_order', '번호 순서대로 써 볼까?'],
+    p_dir: ['v_dir', '화살표 쪽으로 써 볼까?'],
+    p_twin: ['v_twin', '똑같은 글자 둘이 붙으면 더 세게 소리 나! 잘 듣고 골라 봐.'],
+    p_cvow: ['v_cvow', '모음 두 개를 합쳐서 만들어 볼까?'],
+    p_look: ['v_look', '잘 보고 기억해!'],
+    p_alone: ['v_alone', '이제 혼자 써 볼까?'],
+    p_same: ['v_same', '똑같이 읽었어?'],
+    p_mine: ['v_mine', '려원이 목소리 들어 보자.'],
+    p_deco: ['v_deco', '스티커를 끌어서 그림을 꾸며 봐!']
   };
   /* Lines a family member may record in the parent menu (otherwise shown as text, silent). */
   const PROMPTS = {};
-  WORLD_ORDER.forEach(w => { PROMPTS['p_w' + w] = STORY[w][0]; PROMPTS['p_wd' + w] = STORY[w][1]; });
+  WORLD_ORDER.forEach(w => {
+    PROMPTS['p_w' + w] = STORY[w][0]; PROMPTS['p_wd' + w] = STORY[w][1];
+    PROMPT_CLIP['p_w' + w] = ['v_w' + w, STORY[w][0]]; PROMPT_CLIP['p_wd' + w] = ['v_wd' + w, STORY[w][1]];
+  });
+  const sub = k => (PROMPT_CLIP[k] ? PROMPT_CLIP[k][1] : '');
   /* Things to do together away from the screen; {j} is filled with a letter the child finds hard. */
   const TIPS = {
     1: ['저녁 식탁에서 반찬 이름을 말하며 박수를 쳐 보세요. "김-치" 두 번!', '가족 이름을 부르면서 손뼉 치기 놀이를 해 보세요.'],
@@ -468,7 +476,7 @@ ima|이마||body`;
   G.D = {
     CHO, JUNG, split, join, hex, syKey, fyKey, dyKey, jKey, has, SY, WORDS, HY, HW, CLAP, noBatchim,
     BASIC_V, VROW, JNAME, JPIC, STROKES, strokesFor, WORLDS: W, STAGES: ST, PHRASES, SENTENCES,
-    clash, WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
+    clash, sub, WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
     PRAISE_VOICE, CHEERS, PRAISE_FIT, STICKER_SETS, STICKERS, OUTFITS, FRIENDS
   };
 })(window);

@@ -984,3 +984,56 @@ html:has(#main[data-screen="decorate"]) #scene .sun { display: none; }
   .play-body.first .card .pic { font-size: 20vmin; }
   .first-top .pic-l { font-size: 18vmin; }
 }
+
+/* =====================================================================
+   v6.4 — cuter finish: sticker shine on colored pieces, polka-dot board, flowers & twinkles,
+   fish details, balloon knots, gold chest.
+   ===================================================================== */
+.blk, .mbtn, .next-btn, .play-go, .home-tile, .speaker, .hud-home, .car:not(.empty), .drum, .twin-card.strong, .deco-go, .mic-btn, .same-btn.yes, .cell.lit { position: relative; }
+.blk::after, .mbtn::after, .next-btn::after, .play-go::after, .home-tile::after, .speaker::after, .hud-home::after, .car:not(.empty)::after, .drum::after, .mic-btn::after, .same-btn.yes::after, .deco-go::after {
+  content: ''; position: absolute; left: 13%; top: 10%; width: 24%; height: 13%; max-height: 2.4vmin; border-radius: 99px;
+  background: rgba(255, 255, 255, .6); transform: rotate(-10deg); pointer-events: none; }
+.home-tile::after, .speaker::after, .hud-home::after { left: 22%; top: 16%; width: 22%; height: 10%; }
+.play-go::after { left: 6%; top: 12%; width: 16%; }
+.blk { overflow: visible; }
+/* the play board: a soft sheet of polka dots */
+.play-body, .play[data-play="chest"] .chest-wrap, .intro {
+  background-color: rgba(255, 252, 248, .92);
+  background-image: radial-gradient(circle, rgba(255, 157, 182, .13) 0 .7vmin, transparent .8vmin), radial-gradient(circle, rgba(165, 212, 243, .13) 0 .7vmin, transparent .8vmin);
+  background-size: 9vmin 9vmin; background-position: 0 0, 4.5vmin 4.5vmin; }
+.play-body.hide, .play-body.fish { background-image: none; }
+/* white cards get a pastel inner ring so they read as cards, not holes */
+.card, .cell, .carbtn, .count, .tag, .mcard .face, .twin-card:not(.strong) { background-image: linear-gradient(#fff, #fff); box-shadow: var(--step), inset 0 0 0 .9vmin #FFF3EC !important; }
+.card.right, .count.right, .cell.done { box-shadow: var(--step), 0 0 0 1vmin var(--mi2) !important; }
+.cell.lit { box-shadow: var(--step), 0 0 0 1.6vmin rgba(255, 216, 115, .5) !important; background: var(--bu2); }
+.hint { box-shadow: var(--step), 0 0 0 1.4vmin var(--bu2) !important; }
+/* scene: flowers on the hills, twinkles in the sky */
+#scene .flowers { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 9vh; }
+#scene .flowers .pet ellipse { stroke: #4B3642; stroke-width: 2; }
+#scene .flowers .grass path { fill: none; stroke: #6FBF73; stroke-width: 3; stroke-linecap: round; }
+#scene .tw { position: absolute; width: 2.4vmin; height: 2.4vmin; background: #FFE066; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 2.6s ease-in-out infinite; }
+#scene .tw.t1 { left: 30vw; top: 9vh; } #scene .tw.t2 { left: 72vw; top: 6vh; animation-delay: -.9s; width: 1.8vmin; height: 1.8vmin; } #scene .tw.t3 { left: 12vw; top: 26vh; animation-delay: -1.7s; width: 1.6vmin; height: 1.6vmin; }
+@keyframes twinkle { 50% { transform: scale(.5) rotate(30deg); opacity: .5; } }
+html[data-world="8"] #scene .tw { background: #fff; }
+/* fish pond: bubbles and seaweed */
+.pond { background: linear-gradient(180deg, #D8EFFC, #A5D4F3 70%, #8FC8EE); }
+.pond .bub { position: absolute; bottom: -4vmin; width: 3vmin; height: 3vmin; border-radius: 50%; border: .5vmin solid rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .25); animation: bubble 6s linear infinite; pointer-events: none; }
+.pond .b1 { left: 12%; } .pond .b2 { left: 38%; animation-delay: -2s; width: 2vmin; height: 2vmin; } .pond .b3 { left: 66%; animation-delay: -4s; } .pond .b4 { left: 88%; animation-delay: -1s; width: 2.2vmin; height: 2.2vmin; }
+@keyframes bubble { to { transform: translateY(-60vh) translateX(2vmin); opacity: 0; } }
+.pond .weed { position: absolute; bottom: 0; width: 4vmin; height: 14vmin; border-radius: 4vmin 4vmin 0 0; background: #7FCB8C; border: .45vmin solid #4B3642; border-bottom: 0; transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite alternate; pointer-events: none; }
+.pond .w1 { left: 4%; } .pond .w2 { right: 6%; height: 10vmin; animation-delay: -1.4s; }
+@keyframes sway { to { transform: rotate(8deg); } }
+.fishy .tail { stroke-linecap: round; }
+.fishy span { left: 30%; right: 22%; text-shadow: 0 .3vmin 0 rgba(255, 255, 255, .7); }
+/* balloons: a little knot under each */
+.balloon .knot { position: absolute; left: 50%; bottom: -1.6vmin; width: 3vmin; height: 2.2vmin; margin-left: -1.5vmin; background: inherit; clip-path: polygon(50% 0, 100% 100%, 0 100%); filter: brightness(.92); }
+/* treasure chest: gold band and lock plate */
+.chest .box::before { content: ''; position: absolute; left: 0; right: 0; top: 18%; height: 18%; background: #FFD873; border-top: .45vmin solid #4B3642; border-bottom: .45vmin solid #4B3642; }
+.chest .lid::after { content: ''; position: absolute; left: 44%; right: 44%; top: 0; bottom: 0; background: #FFD873; border-left: .45vmin solid #4B3642; border-right: .45vmin solid #4B3642; }
+/* friends feel alive: a gentle bob for the corner buddy */
+.buddy .mascot-svg { animation: breathe 2.8s ease-in-out infinite; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: reduce) { #scene .tw, .pond .bub, .pond .weed, .buddy .mascot-svg { animation: none !important; } }
+/* our own people drawings have built-in margins: show them a little larger */
+.pic img.em.own { width: 1.3em; height: 1.3em; margin: -.15em; }
+/* shop name tags: keep the word clear of the tag hole */
+.tag { padding-left: 7vmin; padding-right: 3.6vmin; white-space: nowrap; }
