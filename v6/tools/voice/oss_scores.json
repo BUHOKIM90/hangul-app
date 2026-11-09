@@ -10,6 +10,8 @@
     "span": 0.61,
     "runs": 1,
     "mos": 3.175,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "sy_B098": {
@@ -19,6 +21,8 @@
     "span": 0.57,
     "runs": 1,
     "mos": 3.625,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "sy_B5A1": {
@@ -28,6 +32,8 @@
     "span": 0.4,
     "runs": 1,
     "mos": 2.51,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "sy_BAA8": {
@@ -37,6 +43,8 @@
     "span": 0.58,
     "runs": 1,
     "mos": 2.166,
+    "right": false,
+    "how": "forced-choice",
     "ok": false
    },
    "sy_BE57": {
@@ -46,6 +54,8 @@
     "span": 0.5,
     "runs": 1,
     "mos": 3.546,
+    "right": false,
+    "how": "forced-choice",
     "ok": false
    },
    "sy_C545": {
@@ -55,6 +65,8 @@
     "span": 0.45,
     "runs": 1,
     "mos": 2.024,
+    "right": false,
+    "how": "forced-choice",
     "ok": false
    },
    "sy_C800": {
@@ -64,6 +76,8 @@
     "span": 0.59,
     "runs": 1,
     "mos": 3.349,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "sy_D0A4": {
@@ -73,6 +87,8 @@
     "span": 0.61,
     "runs": 1,
     "mos": 4.024,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "w_ageo": {
@@ -82,6 +98,8 @@
     "span": 0.79,
     "runs": 1,
     "mos": 3.772,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "w_geobuk": {
@@ -91,6 +109,8 @@
     "span": 0.66,
     "runs": 1,
     "mos": 3.576,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "w_ip": {
@@ -100,6 +120,8 @@
     "span": 0.4,
     "runs": 1,
     "mos": 2.052,
+    "right": false,
+    "how": "forced-choice",
     "ok": false
    },
    "w_pija": {
@@ -109,6 +131,8 @@
     "span": 0.75,
     "runs": 1,
     "mos": 4.318,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "j_3131": {
@@ -118,6 +142,8 @@
     "span": 2.29,
     "runs": 2,
     "mos": 3.706,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "j_3148": {
@@ -127,6 +153,8 @@
     "span": 2.06,
     "runs": 2,
     "mos": 4.093,
+    "right": false,
+    "how": "misheard",
     "ok": false
    },
    "j_3155": {
@@ -136,6 +164,8 @@
     "span": 2.02,
     "runs": 1,
     "mos": 3.65,
+    "right": false,
+    "how": "misheard",
     "ok": false
    },
    "dy_AC00": {
@@ -145,6 +175,8 @@
     "span": 1.46,
     "runs": 1,
     "mos": 4.028,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "dy_B8E8": {
@@ -154,6 +186,8 @@
     "span": 1.49,
     "runs": 1,
     "mos": 3.998,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "dy_C218": {
@@ -163,6 +197,8 @@
     "span": 1.43,
     "runs": 1,
     "mos": 3.898,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "fy_AC70": {
@@ -172,6 +208,8 @@
     "span": 1.72,
     "runs": 1,
     "mos": 3.993,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "fy_BD80": {
@@ -181,7 +219,9 @@
     "span": 1.63,
     "runs": 1,
     "mos": 3.929,
-    "ok": false
+    "right": true,
+    "how": "likelihood",
+    "ok": true
    },
    "hy_agi": {
     "text": "그건 아기야!",
@@ -190,6 +230,8 @@
     "span": 1.11,
     "runs": 1,
     "mos": 4.1,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "hy_keikeu": {
@@ -199,6 +241,8 @@
     "span": 1.37,
     "runs": 1,
     "mos": 4.139,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "ui_clapq": {
@@ -208,6 +252,8 @@
     "span": 1.6,
     "runs": 1,
     "mos": 4.026,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "ui_levelup": {
@@ -217,6 +263,8 @@
     "span": 2.27,
     "runs": 1,
     "mos": 3.409,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "ui4_balloon": {
@@ -226,6 +274,8 @@
     "span": 1.77,
     "runs": 1,
     "mos": 3.802,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "ui4_proc17": {
@@ -235,6 +285,8 @@
     "span": 2.04,
     "runs": 1,
     "mos": 3.846,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "v_alone": {
@@ -244,6 +296,8 @@
     "span": 1.64,
     "runs": 1,
     "mos": 3.978,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "v_w3": {
@@ -253,6 +307,8 @@
     "span": 6.4,
     "runs": 2,
     "mos": 3.457,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "c_appa": {
@@ -262,6 +318,8 @@
     "span": 3.35,
     "runs": 3,
     "mos": 4.007,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    "s_1": {
@@ -271,6 +329,8 @@
     "span": 1.26,
     "runs": 1,
     "mos": 4.04,
+    "right": true,
+    "how": "heard",
     "ok": true
    }
   },
@@ -282,6 +342,8 @@
     "span": 4.04,
     "runs": 2,
     "mos": 3.94,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    {
@@ -291,6 +353,8 @@
     "span": 1.46,
     "runs": 1,
     "mos": 3.942,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    {
@@ -300,6 +364,8 @@
     "span": 0.74,
     "runs": 1,
     "mos": 4.039,
+    "right": true,
+    "how": "heard",
     "ok": true
    },
    {
@@ -309,20 +375,1023 @@
     "span": 2.93,
     "runs": 2,
     "mos": 4.277,
+    "right": true,
+    "how": "heard",
     "ok": true
    }
   ],
   "score": {
    "n": 30,
-   "ok": 23,
+   "ok": 24,
+   "right": 24,
    "cer": 0.171,
    "mos": 3.608
   },
   "score_letters": {
    "n": 8,
    "ok": 5,
+   "right": 5,
    "cer": 0.375,
    "mos": 3.052
+  },
+  "all_letters": {
+   "n": 211,
+   "ok": 121,
+   "right": 121,
+   "cer": 0.573,
+   "mos": 3.187
+  },
+  "letters_wrong": {
+   "sy_AC38": {
+    "text": "갸.",
+    "heard": "캬",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.622,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_ACA8": {
+    "text": "겨.",
+    "heard": "겨우",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.338,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_ACF0": {
+    "text": "곰.",
+    "heard": "공",
+    "cer": 1.0,
+    "span": 0.73,
+    "runs": 1,
+    "mos": 2.756,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_AD50": {
+    "text": "교.",
+    "heard": "쿨",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.464,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_AD6D": {
+    "text": "국.",
+    "heard": "9",
+    "cer": 1.0,
+    "span": 0.49,
+    "runs": 1,
+    "mos": 2.081,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_ADDC": {
+    "text": "규.",
+    "heard": "Q",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.628,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_AF2C": {
+    "text": "꼬.",
+    "heard": "고",
+    "cer": 1.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 3.208,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_AFB8": {
+    "text": "꾸.",
+    "heard": "고",
+    "cer": 1.0,
+    "span": 0.54,
+    "runs": 1,
+    "mos": 3.171,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B07C": {
+    "text": "끼.",
+    "heard": "키",
+    "cer": 1.0,
+    "span": 0.54,
+    "runs": 1,
+    "mos": 4.084,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B0B4": {
+    "text": "내.",
+    "heard": "네",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.701,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B178": {
+    "text": "노.",
+    "heard": "도",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.779,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B1E8": {
+    "text": "뇨.",
+    "heard": "료",
+    "cer": 1.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 3.803,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B204": {
+    "text": "누.",
+    "heard": "두",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.671,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B274": {
+    "text": "뉴.",
+    "heard": "료",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.605,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B290": {
+    "text": "느.",
+    "heard": "2.",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.729,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B298": {
+    "text": "늘.",
+    "heard": "네",
+    "cer": 1.0,
+    "span": 0.65,
+    "runs": 1,
+    "mos": 3.751,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B450": {
+    "text": "두.",
+    "heard": "툴",
+    "cer": 1.0,
+    "span": 0.54,
+    "runs": 1,
+    "mos": 3.436,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B4DC": {
+    "text": "드.",
+    "heard": "그",
+    "cer": 1.0,
+    "span": 0.49,
+    "runs": 1,
+    "mos": 3.686,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B514": {
+    "text": "디.",
+    "heard": "T",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.869,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B530": {
+    "text": "따.",
+    "heard": "다",
+    "cer": 1.0,
+    "span": 0.51,
+    "runs": 1,
+    "mos": 3.069,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B5A0": {
+    "text": "떠.",
+    "heard": "더",
+    "cer": 1.0,
+    "span": 0.52,
+    "runs": 1,
+    "mos": 3.592,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B610": {
+    "text": "또.",
+    "heard": "도",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.497,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B69C": {
+    "text": "뚜.",
+    "heard": "도",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.6,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B760": {
+    "text": "띠.",
+    "heard": "게",
+    "cer": 1.0,
+    "span": 0.51,
+    "runs": 1,
+    "mos": 3.929,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B798": {
+    "text": "래.",
+    "heard": "레",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.173,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B7EC": {
+    "text": "러.",
+    "heard": "랄",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.477,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B801": {
+    "text": "렁.",
+    "heard": "롱",
+    "cer": 1.0,
+    "span": 0.72,
+    "runs": 1,
+    "mos": 3.238,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B9B4": {
+    "text": "릴.",
+    "heard": "리",
+    "cer": 1.0,
+    "span": 0.77,
+    "runs": 1,
+    "mos": 3.385,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_B9E4": {
+    "text": "매.",
+    "heard": "배",
+    "cer": 1.0,
+    "span": 0.57,
+    "runs": 1,
+    "mos": 2.84,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BA00": {
+    "text": "먀.",
+    "heard": "미아",
+    "cer": 2.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.594,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BA38": {
+    "text": "머.",
+    "heard": "뭐",
+    "cer": 1.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 3.158,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BA54": {
+    "text": "메.",
+    "heard": "배",
+    "cer": 1.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 3.644,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BA70": {
+    "text": "며.",
+    "heard": "묘",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 2.958,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BAA8": {
+    "text": "모.",
+    "heard": "뭐",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 2.166,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BABD": {
+    "text": "몽.",
+    "heard": "BOOM!",
+    "cer": 1.0,
+    "span": 0.69,
+    "runs": 1,
+    "mos": 2.482,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BB18": {
+    "text": "묘.",
+    "heard": "뼈",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.496,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BB34": {
+    "text": "무.",
+    "heard": "부",
+    "cer": 1.0,
+    "span": 0.57,
+    "runs": 1,
+    "mos": 3.102,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BBA4": {
+    "text": "뮤.",
+    "heard": "B.O.",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.778,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BBC0": {
+    "text": "므.",
+    "heard": "B.",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.638,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BBF8": {
+    "text": "미.",
+    "heard": "B",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.813,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BC14": {
+    "text": "바.",
+    "heard": "다",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 2.156,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BC1C": {
+    "text": "발.",
+    "heard": "달",
+    "cer": 1.0,
+    "span": 0.75,
+    "runs": 1,
+    "mos": 3.428,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BC25": {
+    "text": "밥.",
+    "heard": "닭",
+    "cer": 1.0,
+    "span": 0.48,
+    "runs": 1,
+    "mos": 1.668,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BC84": {
+    "text": "버.",
+    "heard": "펄",
+    "cer": 1.0,
+    "span": 0.62,
+    "runs": 1,
+    "mos": 2.897,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BD07": {
+    "text": "봇.",
+    "heard": "곧",
+    "cer": 1.0,
+    "span": 0.48,
+    "runs": 1,
+    "mos": 3.006,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BD80": {
+    "text": "부.",
+    "heard": "POOL",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 2.911,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BD81": {
+    "text": "북.",
+    "heard": "후",
+    "cer": 1.0,
+    "span": 0.48,
+    "runs": 1,
+    "mos": 2.443,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BD84": {
+    "text": "분.",
+    "heard": "군",
+    "cer": 1.0,
+    "span": 0.73,
+    "runs": 1,
+    "mos": 2.941,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BE0C": {
+    "text": "브.",
+    "heard": "그",
+    "cer": 1.0,
+    "span": 0.63,
+    "runs": 1,
+    "mos": 3.268,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BE44": {
+    "text": "비.",
+    "heard": "P",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.786,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BE57": {
+    "text": "빗.",
+    "heard": "빛",
+    "cer": 1.0,
+    "span": 0.5,
+    "runs": 1,
+    "mos": 3.546,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BE60": {
+    "text": "빠.",
+    "heard": "바",
+    "cer": 1.0,
+    "span": 0.55,
+    "runs": 1,
+    "mos": 2.391,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BF40": {
+    "text": "뽀.",
+    "heard": "고",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.077,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_BFCC": {
+    "text": "뿌.",
+    "heard": "부",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.096,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C090": {
+    "text": "삐.",
+    "heard": "B",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.393,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C0C1": {
+    "text": "상.",
+    "heard": "창",
+    "cer": 1.0,
+    "span": 0.68,
+    "runs": 1,
+    "mos": 3.34,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C22D": {
+    "text": "숭.",
+    "heard": "송",
+    "cer": 1.0,
+    "span": 0.7,
+    "runs": 1,
+    "mos": 3.547,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C2F8": {
+    "text": "싸.",
+    "heard": "4",
+    "cer": 1.0,
+    "span": 0.69,
+    "runs": 1,
+    "mos": 3.583,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C314": {
+    "text": "쌔.",
+    "heard": "3.",
+    "cer": 1.0,
+    "span": 0.64,
+    "runs": 1,
+    "mos": 3.431,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C3D8": {
+    "text": "쏘.",
+    "heard": "쑤",
+    "cer": 1.0,
+    "span": 0.68,
+    "runs": 1,
+    "mos": 3.79,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C464": {
+    "text": "쑤.",
+    "heard": "수",
+    "cer": 1.0,
+    "span": 0.73,
+    "runs": 1,
+    "mos": 3.787,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C545": {
+    "text": "악.",
+    "heard": "아",
+    "cer": 1.0,
+    "span": 0.45,
+    "runs": 1,
+    "mos": 2.024,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C557": {
+    "text": "앗.",
+    "heard": "아",
+    "cer": 1.0,
+    "span": 0.46,
+    "runs": 1,
+    "mos": 1.736,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C560": {
+    "text": "애.",
+    "heard": "에",
+    "cer": 1.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 2.993,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C5EC": {
+    "text": "여.",
+    "heard": "요",
+    "cer": 1.0,
+    "span": 0.5,
+    "runs": 1,
+    "mos": 3.319,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C678": {
+    "text": "외.",
+    "heard": "왜?",
+    "cer": 1.0,
+    "span": 0.57,
+    "runs": 1,
+    "mos": 3.665,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C6B0": {
+    "text": "우.",
+    "heard": "루",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 2.698,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C720": {
+    "text": "유.",
+    "heard": "이오",
+    "cer": 2.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 3.702,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C73C": {
+    "text": "으.",
+    "heard": "응.",
+    "cer": 1.0,
+    "span": 0.52,
+    "runs": 1,
+    "mos": 2.108,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C785": {
+    "text": "입.",
+    "heard": "1.",
+    "cer": 1.0,
+    "span": 0.4,
+    "runs": 1,
+    "mos": 2.059,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C870": {
+    "text": "조.",
+    "heard": "초",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.988,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C988": {
+    "text": "즈.",
+    "heard": "즉,",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.719,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_C9DC": {
+    "text": "짜.",
+    "heard": "자",
+    "cer": 1.0,
+    "span": 0.58,
+    "runs": 1,
+    "mos": 3.632,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CB48": {
+    "text": "쭈.",
+    "heard": "쪼",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.867,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CC0C": {
+    "text": "찌.",
+    "heard": "지",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 3.973,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CD94": {
+    "text": "추.",
+    "heard": "쪄",
+    "cer": 1.0,
+    "span": 0.64,
+    "runs": 1,
+    "mos": 3.693,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CE20": {
+    "text": "츠.",
+    "heard": "7.",
+    "cer": 1.0,
+    "span": 0.63,
+    "runs": 1,
+    "mos": 3.625,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CE74": {
+    "text": "카.",
+    "heard": "가",
+    "cer": 1.0,
+    "span": 0.63,
+    "runs": 1,
+    "mos": 1.506,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CF00": {
+    "text": "케.",
+    "heard": "개",
+    "cer": 1.0,
+    "span": 0.57,
+    "runs": 1,
+    "mos": 3.172,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_CFE0": {
+    "text": "쿠.",
+    "heard": "쿨",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 3.114,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D0C0": {
+    "text": "타.",
+    "heard": "다",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 2.076,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D130": {
+    "text": "터.",
+    "heard": "더",
+    "cer": 1.0,
+    "span": 0.64,
+    "runs": 1,
+    "mos": 3.03,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D30C": {
+    "text": "파.",
+    "heard": "다",
+    "cer": 1.0,
+    "span": 0.61,
+    "runs": 1,
+    "mos": 1.818,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D478": {
+    "text": "푸.",
+    "heard": "4",
+    "cer": 1.0,
+    "span": 0.59,
+    "runs": 1,
+    "mos": 3.194,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D504": {
+    "text": "프.",
+    "heard": "히힛",
+    "cer": 2.0,
+    "span": 0.56,
+    "runs": 1,
+    "mos": 2.231,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D590": {
+    "text": "햐.",
+    "heard": "혀",
+    "cer": 1.0,
+    "span": 0.64,
+    "runs": 1,
+    "mos": 2.011,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D5C8": {
+    "text": "허.",
+    "heard": "하",
+    "cer": 1.0,
+    "span": 0.63,
+    "runs": 1,
+    "mos": 3.266,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D5E4": {
+    "text": "헤.",
+    "heard": "해",
+    "cer": 1.0,
+    "span": 0.6,
+    "runs": 1,
+    "mos": 2.858,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D6A8": {
+    "text": "효.",
+    "heard": "쇼",
+    "cer": 1.0,
+    "span": 0.62,
+    "runs": 1,
+    "mos": 3.518,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   },
+   "sy_D734": {
+    "text": "휴.",
+    "heard": "쇼",
+    "cer": 1.0,
+    "span": 0.62,
+    "runs": 1,
+    "mos": 3.751,
+    "right": false,
+    "how": "forced-choice",
+    "ok": false
+   }
   }
  }
 }
