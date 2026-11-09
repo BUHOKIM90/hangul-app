@@ -8,6 +8,7 @@ on:
       - 'v6/tools/voice/lines.json'
       - 'v6/tools/voice/make_voice.py'
       - '.github/workflows/voice.yml'
+      - 'v6/tools/trim.py'
 permissions:
   contents: write
 concurrency: voice
