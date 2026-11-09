@@ -170,6 +170,16 @@
   /* Friends: unlocked by level, or met at the end of their world. */
   St.hasFriend = f => f.lv <= S.reward.level || (S.reward.met || []).includes(f.id);
   St.meet = function (id) { const m = S.reward.met = S.reward.met || []; if (!m.includes(id)) { m.push(id); St.save(); return true; } return false; };
+  /* worlds already finished (e.g. before v6.3): their friend has joined, without a popup */
+  D.WORLD_ORDER.forEach(w => {
+    const all = D.STAGES.filter(x => x.w === w);
+    if (all.length && all.every(x => S.learn.done[x.id])) {
+      const m = S.reward.met = S.reward.met || [];
+      if (!m.includes('w' + w)) { m.push('w' + w); if (D.WORLDS[w].guide && !m.includes(D.WORLDS[w].guide)) m.push(D.WORLDS[w].guide); }
+      const t = S.reward.told = S.reward.told || [];
+      if (!t.includes(w)) t.push(w);
+    }
+  });
   St.setStage = function (id) { S.learn.stage = Math.max(1, Math.min(D.STAGES.length, id)); St.save(); };
 
   G.St = St;

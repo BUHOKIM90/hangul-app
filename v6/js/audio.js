@@ -28,8 +28,6 @@
       ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, kick, true));
       document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
     }
-    /* iOS: the first speechSynthesis utterance must come from a user gesture too. */
-    try { if (G.speechSynthesis && !A._ttsPrimed) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); A._ttsPrimed = true; } } catch (e) { /* no tts */ }
     /* iOS unlock: a 1-sample silent buffer started inside the user gesture. */
     const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource();
     s.buffer = b; s.connect(master); s.start(0);
@@ -65,25 +63,15 @@
   };
   A.hasCustom = key => custom.has(key);
   A.decode = ab => (ctx ? decode(ab.slice(0)) : Promise.reject(new Error('no audio')));
-  /* Text for a key that has no recording: the device voice can say it. */
-  A.textFor = function (key) {
-    const D = G.D;
-    if (!key || !D) return null;
-    if (key.startsWith('t:')) return key.slice(2);
-    if (D.PROMPTS && D.PROMPTS[key]) return D.PROMPTS[key];
-    const m = key.match(/^(sy|fy|dy|j)_([0-9A-F]{4})$/);
-    if (m) {
-      const ch = String.fromCharCode(parseInt(m[2], 16));
-      if (m[1] === 'j') return D.JNAME[ch] || D.VROW[ch] || ch;
-      if (m[1] === 'fy') return ch + ' 찾아봐!';
-      if (m[1] === 'dy') return '그건 ' + ch + '야';
-      return ch;
-    }
-    const w = key.match(/^(w|hy|hw)_(.+)$/);
-    if (w && D.WORDS[w[2]]) return w[1] === 'hy' ? '그건 ' + D.WORDS[w[2]].w + '야' : D.WORDS[w[2]].w;
-    return null;
-  };
+  /* p_* instruction keys map to studio clips (data.js PROMPT_CLIP) unless a family recording exists for the key. */
+  function realKey(key) {
+    if (!key || custom.has(key)) return key;
+    const D = G.D, m = D && D.PROMPT_CLIP && D.PROMPT_CLIP[key];
+    return m ? m[0] : key;
+  }
+  A.realKey = realKey;
   A.load = function (key) {
+    key = realKey(key);
     if (!key) return Promise.resolve(null);
     if (bufs.has(key)) return Promise.resolve(bufs.get(key));
     if (pending.has(key)) return pending.get(key);
@@ -136,42 +124,12 @@
   A.dur = function (key) {
     const b = bufs.get(key);
     if (b) return clipSpan(key, b)[1];
+    key = realKey(key);
     const t = TRIM[key];
     if (t && !custom.has(key)) return t[1] - t[0];
-    const tx = A.textFor(key);
-    return tx ? 0.35 + tx.length * 0.16 : 0.8;
+    return 0.8;
   };
 
-  /* ---------- device voice (no recording yet) ---------- */
-  let koVoice = null;
-  function pickVoice() {
-    if (koVoice || !G.speechSynthesis) return koVoice;
-    const vs = speechSynthesis.getVoices().filter(v => /^ko(-|_|$)/i.test(v.lang));
-    koVoice = vs.find(v => /yuna|유나/i.test(v.name)) || vs.find(v => v.localService) || vs[0] || null;
-    return koVoice;
-  }
-  if (G.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { koVoice = null; pickVoice(); }; } catch (e) { /* old */ } }
-  A.canSpeak = () => !!G.speechSynthesis;
-  A.speak = function (text, opt) {
-    opt = opt || {};
-    const myGen = gen;
-    if (!G.speechSynthesis || settings.voice <= 0) { if (opt.onStart) opt.onStart(); return sleep(Math.min(2500, 300 + text.length * 90)).then(() => myGen === gen); }
-    return new Promise(res => {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR'; const v = pickVoice(); if (v) u.voice = v;
-      u.rate = 0.92; u.pitch = 1.15; u.volume = Math.min(1, settings.voice);
-      let done = false, started = false;
-      const fin = ok => { if (done) return; done = true; voices.delete(node); lastEnd = performance.now(); res(ok && myGen === gen); };
-      const node = { tts: true, res: fin };
-      voices.add(node);
-      u.onstart = () => { started = true; if (opt.onStart && myGen === gen) opt.onStart(); };
-      u.onend = () => fin(true);
-      u.onerror = () => fin(false);
-      /* Safari sometimes never fires onend: give up after a generous estimate. */
-      setTimeout(() => { if (!started && opt.onStart && myGen === gen) opt.onStart(); fin(true); }, 1500 + text.length * 260);
-      try { speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) { fin(false); }
-    });
-  };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   /* Play a clip. opt: at (ctx time), onStart(), keep (do not stop others). Resolves true when it ends. */
@@ -180,17 +138,11 @@
     if (!opt.keep) A.stop();
     const myGen = gen;
     if (!ctx) { if (opt.onStart) opt.onStart(); return false; }
+    key = realKey(key);
     const b = await A.load(key);
     if (myGen !== gen) return false;
-    if (!b) {
-      const tx = A.textFor(key);
-      if (tx) {
-        if (opt.at) await sleep(Math.max(0, (opt.at - ctx.currentTime) * 1000));
-        if (myGen !== gen) return false;
-        return A.speak(tx, { onStart: opt.onStart ? () => opt.onStart(ctx.currentTime) : null });
-      }
-      if (opt.onStart) opt.onStart(); return false;
-    }
+    /* no recording: stay silent (never a synthetic voice) */
+    if (!b) { if (opt.onStart) opt.onStart(); return false; }
     return playBuf(key, b, clipSpan(key, b), opt, myGen);
   };
   /* A decoded buffer that is not a named clip (the child's own recording). */
@@ -225,13 +177,8 @@
   A.say = (key, opt) => A.play(key, opt);
   A.stop = function () {
     gen++;
-    let tts = false;
-    voices.forEach(n => {
-      if (n.tts) { tts = true; if (n.res) n.res(false); return; }
-      try { n.src.onended = null; n.src.stop(); } catch (e) { /* already stopped */ } if (n.res) n.res(false);
-    });
+    voices.forEach(n => { try { n.src.onended = null; n.src.stop(); } catch (e) { /* already stopped */ } if (n.res) n.res(false); });
     voices.clear();
-    if (tts && G.speechSynthesis) { try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
   };
   A.gen = () => gen;
   let lastEnd = 0;
@@ -246,6 +193,7 @@
     await A.preload(keys);
     if (myGen !== gen || !ctx) return false;
     const g = gap === undefined ? 0.12 : gap;
+    keys = keys.map(realKey);
     if (keys.some(k => !bufs.has(k))) return oneByOne(keys, onEach, g, myGen);
     let t = ctx.currentTime + 0.05;
     const ps = keys.map((k, i) => {
@@ -273,6 +221,7 @@
     const myGen = gen;
     await A.preload(keys);
     if (myGen !== gen || !ctx) return false;
+    keys = keys.map(realKey);
     if (keys.some(k => !bufs.has(k))) return oneByOne(keys, (i) => { drum(ctx.currentTime + 0.003, i % 2 === 0); if (onEach) onEach(i); }, 0.15, myGen);
     let t = ctx.currentTime + 0.08;
     const ps = keys.map((k, i) => {

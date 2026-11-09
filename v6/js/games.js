@@ -163,7 +163,7 @@
     const clip = cfg.clip || (D.has.j(j) ? D.jKey(j) : jamoClip(j));
     head(host, cfg.title || '새 글자 친구', clip);
     const b = body(host, 'meet');
-    const card = el('button', 'tap meet-card' + (j.length > 1 ? ' word' : ''), `<span class="meet-letter">${esc(j)}</span>${w && w.pic ? `<span class="meet-pic">${w.pic}</span>${j.length > 1 ? '' : `<span class="meet-word">${esc(w.w)}</span>`}` : ''}`);
+    const card = el('button', 'tap meet-card' + (j.length > 1 ? ' word' : ''), `<span class="meet-letter">${esc(j)}</span>${w && w.pic ? `<span class="meet-pic">${UI.picFace(w.pic)}</span>${j.length > 1 ? '' : `<span class="meet-word">${esc(w.w)}</span>`}` : ''}`);
     card.type = 'button';
     b.appendChild(card);
     const go = btn('next-btn', '다음 ▶', null, '다음');
@@ -556,8 +556,7 @@
         /* show the letter once more, then hide it */
         const peek = el('div', 'peek', esc(ch));
         area.appendChild(peek);
-        await A.play('p_look');
-        await sleep(900);
+        await sleep(1800);
         if (!ctx.alive()) return;
         peek.classList.add('gone');
         await sleep(350);
@@ -568,7 +567,7 @@
       eraser.onpointerdown = e => { e.preventDefault(); A.sfx('whoosh'); bd.clear(); };
       const c = clipOf(ch);
       /* not awaited: a quick child may finish before the instruction ends */
-      A.sequence((hid ? ['p_alone'] : i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
+      A.sequence((!hid && i === 0 ? ['ui_trace'] : []).concat(c ? [c] : []), null, 0.25);
       const r = await Promise.race([bd.done, ctx.aborted]);
       if (!r || !ctx.alive()) { bd.destroy(); return; }
       prog.children[i].classList.add('on');
@@ -639,7 +638,8 @@
     const b = body(host, 'memory');
     const ws = cfg.words.slice(0, cfg.pairs || 3);
     await A.preload(ws.map(k => 'w_' + k));
-    say(ctx, 'ui4_memory');
+    await say(ctx, 'ui4_memory');
+    if (!ctx.alive()) return;
     const cards = shuffle(ws.flatMap(k => [{ k, t: 'p' }, { k, t: 'w' }]));
     const grid = el('div', 'mem n' + cards.length);
     const nodes = cards.map(c => {
@@ -647,6 +647,16 @@
       n.type = 'button'; n.dataset.k = c.k; grid.appendChild(n); return n;
     });
     b.appendChild(grid);
+    /* square cards that always fit the board (short Safari screens included) */
+    const fit = () => {
+      const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length || 3, rows = Math.ceil(cards.length / cols);
+      const r = b.getBoundingClientRect(), cs = getComputedStyle(b), gap = parseFloat(getComputedStyle(grid).rowGap) || 10;
+      const h = r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4, w = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const side = Math.max(40, Math.min((h - gap * (rows - 1)) / rows, (w * 0.96 - gap * (cols - 1)) / cols));
+      grid.style.width = (side * cols + gap * (cols - 1)) + 'px';
+    };
+    fit();
+    addEventListener('resize', fit);
     let open = null, found = 0;
     await choose(nodes, async (n, e) => {
       if (n.classList.contains('open')) return false;
@@ -767,7 +777,7 @@
     let target = null;
     const promptOf = t => (cfg.jamo ? jamoClip(t) : (findClip(t) || sayKey(t)));
     const thatOf = t => (cfg.jamo ? jamoClip(t) : (D.has.dy(t) ? D.dyKey(t) : sayKey(t)));
-    head(host, cfg.title || '글자 낚시', () => target && promptOf(target), '들은 글자 물고기를 잡아 봐!');
+    head(host, cfg.title || '글자 낚시', () => target && promptOf(target), '들은 글자를 눌러 봐!');
     const b = body(host, 'fish');
     const qs = cfg.targets.slice(0, cfg.n || 4);
     await A.preload(qs.map(promptOf));
@@ -815,7 +825,7 @@
   /* ---------- 13. shop: a friend wants something — hand over its name tag (reading) ---------- */
   P.shop = async function (host, cfg, ctx) {
     let cur = null;
-    head(host, cfg.title || '글자 가게', () => cur && 'w_' + cur, '손님이 갖고 싶은 물건의 이름표를 건네 줘!');
+    head(host, cfg.title || '글자 가게', () => cur && 'w_' + cur, '낱말 카드를 그림에 데려다 줄래?');
     const b = body(host, 'shop');
     const qs = cfg.words.slice(0, cfg.n || 3);
     await A.preload(qs.map(k => 'w_' + k));
@@ -857,7 +867,7 @@
   P.hide = async function (host, cfg, ctx) {
     const t = cfg.target, count = cfg.count || 3;
     const clipOf = x => (cfg.jamo ? jamoClip(x) : sayKey(x));
-    head(host, cfg.title || '숨은 글자 찾기', clipOf(t), `'${t}' 를 모두 찾아 봐!`);
+    head(host, cfg.title || '숨은 글자 찾기', clipOf(t), '어디 있을까?');
     const b = body(host, 'hide');
     await say(ctx, 'p_hide');
     if (!ctx.alive()) return;
@@ -922,11 +932,11 @@
       return A.play(it.clip, { onStart: () => textEl.classList.add('lit') }).then(() => textEl.classList.remove('lit'));
     };
     const h = head(host, cfg.title || (cfg.novel ? '처음 보는 글자' : '내가 읽어 볼게'), () => { if (cur) playAnswer(cur, UI.$('.speak-text', host)); return null; },
-      cfg.novel ? '처음 보는 글자야. 읽을 수 있을까?' : '소리 내서 읽어 볼까?');
+      '이번엔 려원이가 혼자 읽어 볼까?');
     if (h.say) h.say.dataset.role = 'answer';
     const b = body(host, 'speak');
     let useMic = St.s.settings.mic !== false && !!G.Rec && G.Rec.micOk();
-    await say(ctx, cfg.novel ? 'p_new' : (useMic ? 'p_speak' : 'p_speak2'));
+    await say(ctx, 'p_speak');
     try {
       for (const it of items) {
         if (!ctx.alive()) return;
@@ -957,6 +967,7 @@
               const rec = await G.Rec.record({ maxMs: it.text.length > 4 ? 6000 : 3500, onLevel: v => { meter.style.transform = `scale(${1 + v * 0.6})`; } });
               UI.tap(mic, () => rec.stop());
               const blob = await rec.done;
+              G.Rec.close();
               mine = await A.decode(await blob.arrayBuffer());
             } catch (err) {
               useMic = false;
@@ -985,7 +996,6 @@
           const again = el('button', 'tap same-btn again', '🔁<span>다시</span>'); again.type = 'button';
           row.append(yes, again);
           ans('same');
-          A.play('p_same');
           const v = await new Promise(r => { UI.tap(yes, e => r(e)); UI.tap(again, () => r(null)); });
           tries++;
           St.s.learn.says = (St.s.learn.says || 0) + 1;
@@ -1003,7 +1013,7 @@
 
   /* ---------- 16. twin: plain vs twin consonant (가 → 까) ---------- */
   P.twin = async function (host, cfg, ctx) {
-    head(host, cfg.title || '쌍둥이 소리', null, '어떻게 다를까? 눌러서 들어 봐!');
+    head(host, cfg.title || '쌍둥이 소리', null, '잘 듣고 골라 봐.');
     const b = body(host, 'twin');
     const pairs = cfg.pairs;
     await A.preload(pairs.flat().map(sayKey));
@@ -1051,7 +1061,7 @@
   P.vmerge = async function (host, cfg, ctx) {
     const cv = cfg.v, [h0, v0] = D.COMPLEX[cv];
     let target = cv;
-    head(host, cfg.title || '모음 미끄럼', () => (target === cv ? jamoClip(cv) : sayKey(target)), '모음 둘을 붙여 봐!');
+    head(host, cfg.title || '모음 미끄럼', () => (target === cv ? jamoClip(cv) : sayKey(target)), '블록을 합쳐서 만들어 볼까?');
     const b = body(host, 'block');
     await say(ctx, 'p_cvow');
     const steps = [[h0, v0, cv, 'vow', jamoClip(cv)]].concat((cfg.cons || []).map(c => [c, cv, D.join(c, cv, ''), 'cons', null]));
@@ -1293,19 +1303,21 @@
       }
       case 'twin': {
         const t = stage.c, base = D.TWINS[t];
-        const pairs = ['ㅏ', 'ㅗ', 'ㅣ'].map(v => [D.join(base, v, ''), D.join(t, v, '')]);
+        /* only pairs where both syllables have a studio recording (가/까, 바/빠, 달/딸, 시/씨, 지/찌 …) */
+        const pairs = D.SY.split('').filter(x => { const p0 = D.split(x); return p0 && p0.cho === t && D.has.sy(D.join(base, p0.jung, p0.jong)); })
+          .map(x => { const p0 = D.split(x); return [D.join(base, p0.jung, p0.jong), x]; }).slice(0, 3);
         out.push({ t: 'meet', cfg: { j: t, title: t + ' (' + D.JNAME[t] + ')' } });
-        out.push({ t: 'twin', cfg: { pairs, n: 3 } });
+        if (pairs.length) out.push({ t: 'twin', cfg: { pairs, n: Math.min(3, pairs.length * 2) } });
         const tw = pics().filter(w => w.syl.some(x => D.split(x).cho === t)).map(w => w.key);
         if (tw.length) out.push({ t: 'pick', cfg: { words: shuffle(tw), pool: tw.concat(listenWords(6)), n: Math.min(3, tw.length), title: t + ' 소리 낱말' } });
         out.push({ t: 'hide', cfg: { target: t, jamo: true, decoys: [base, base, base].concat(Object.keys(D.TWINS).filter(x => x !== t), Object.values(D.TWINS).filter(x => x !== base)), count: 3 } });
-        out.push({ t: 'trace', cfg: { chars: [t, pairs[0][1]] } });
-        out.push({ t: 'speak', cfg: { items: pairs.slice(1, 3).map(p => sayItem(p[1])), novel: true, n: 2 } });
+        out.push({ t: 'trace', cfg: { chars: [t].concat(pairs.length ? [pairs[0][1]] : []) } });
+        if (pairs.length) out.push({ t: 'speak', cfg: { items: pairs.slice(-2).map(p => sayItem(p[1])), novel: true, n: 2 } });
         break;
       }
       case 'twrev': {
         const ts = Array.from(L.c).filter(c => D.TWINS[c]);
-        const pool = ts.flatMap(t => ['ㅏ', 'ㅗ', 'ㅣ'].flatMap(v => [D.join(t, v, ''), D.join(D.TWINS[t], v, '')]));
+        const pool = ts.flatMap(t => ['ㅏ', 'ㅗ', 'ㅣ'].flatMap(v => [D.join(t, v, ''), D.join(D.TWINS[t], v, '')])).filter(x => D.has.sy(x));
         out.push({ t: 'fish', cfg: { targets: shuffle(pool.filter(x => D.TWINS[D.split(x).cho])).slice(0, 4), pool, n: 4, k: 3, title: '쌍둥이 낚시' } });
         const tw = pics().filter(w => w.syl.some(x => ts.includes(D.split(x).cho))).map(w => w.key);
         if (tw.length >= 2) out.push({ t: 'memory', cfg: { words: shuffle(tw), pairs: Math.min(3, tw.length) } });
@@ -1315,7 +1327,7 @@
       }
       case 'cvow': {
         const cv = stage.v;
-        const CONS = { 'ㅘ': ['ㄱ', 'ㅎ'], 'ㅝ': ['ㅇ', 'ㄱ'], 'ㅢ': ['ㅇ'], 'ㅟ': ['ㄱ', 'ㅇ'] };
+        const CONS = { 'ㅘ': ['ㄱ', 'ㅎ'], 'ㅝ': ['ㅇ'], 'ㅢ': ['ㅇ'], 'ㅟ': ['ㄱ', 'ㅇ'] };
         out.push({ t: 'meet', cfg: { j: cv, title: cv + ' 친구를 만나요' } });
         out.push({ t: 'vmerge', cfg: { v: cv, cons: CONS[cv] || ['ㅇ'] } });
         const has = w => w.syl.some(x => { const j = D.split(x).jung; return j === cv || (cv === 'ㅟ' && j === 'ㅚ'); });

@@ -340,7 +340,7 @@
     const own = g && St.hasFriend(g);
     const p = UI.modal(`<div class="arrive"><div class="arrive-row"><div class="arrive-ico">${UI.em(W.icon)}</div>${g ? `<div class="arrive-pal${own ? '' : ' shadow'}">${UI.mascot(own ? 'wave' : 'think', {}, g.id)}</div>` : ''}</div>
       <h3>${quiet ? '모험 시작!' : '새 마을 도착!'}</h3><p class="arrive-name">${esc(W.name)}</p><p class="arrive-story">${esc(D.STORY[w][0])}</p></div>`, [['출발!', 1, 'go']], 'arrive-m');
-    A.play('p_w' + w);
+    if (A.hasCustom('p_w' + w)) A.play('p_w' + w);
     await p;
     A.stop();
   }
@@ -355,7 +355,7 @@
     const stk = St.pickSticker(2);
     const p = UI.modal(`<div class="arrive done"><div class="arrive-pal big">${UI.mascot('cheer', {}, g ? g.id : undefined)}</div>
       <h3>${esc(W.name)} 끝!</h3><p class="arrive-story">${esc(D.STORY[w][1])}</p>${g ? `<p class="outfit-got">${esc(g.name)}가 친구가 됐어!</p>` : ''}<div class="reveal-row">${stickerHtml(stk, 'big')}</div></div>`, [['우와!', 1, 'go']], 'arrive-m');
-    A.play('p_wd' + w);
+    if (A.hasCustom('p_wd' + w)) A.play('p_wd' + w);
     await p;
     A.stop();
   }
@@ -544,7 +544,6 @@
     }
     placed.forEach(put);
     trayFill();
-    A.play('p_deco');
   };
 
   /* ---------- closet ---------- */
@@ -682,7 +681,7 @@
           <button type="button" class="pm-btn" id="pmMicTest">마이크 미리 허용하기</button> <span id="pmMicMsg" class="pm-small"></span>
         </section>
         <section><h3>가족 목소리</h3>
-          <p>엄마·아빠 목소리로 녹음하면 앱이 그 목소리로 말합니다. 녹음이 없는 말은 기기 목소리로 나옵니다. 녹음은 이 기기에만 저장됩니다.</p>
+          <p>엄마·아빠 목소리로 녹음하면 앱이 그 목소리로 말합니다(녹음이 없으면 원래 녹음된 목소리, 이야기는 글자만). 녹음은 이 기기에만 저장됩니다.</p>
           <div id="pmVoices"></div>
           <h4>우리 가족 문장</h4>
           <p class="pm-small">'이야기 하늘'과 '소리 내어 읽기'에서 아이가 이 문장을 읽게 됩니다. 짧게(두세 낱말) 쓰고 그대로 녹음해 주세요.</p>
@@ -801,9 +800,7 @@
   }
   const VOICE_GROUPS = [
     ['가족 낱말', ['ryeowon', 'eomma', 'appa', 'halmeoni', 'harabeoji', 'nuna', 'agi'].map(k => ['w_' + k, D.WORDS[k].w])],
-    ['안내 말 (지금은 기기 목소리)', Object.keys(D.PROMPTS).filter(k => !/^p_w/.test(k)).map(k => [k, D.PROMPTS[k]])],
-    ['모험 이야기', D.WORLD_ORDER.flatMap(w => [['p_w' + w, D.STORY[w][0]], ['p_wd' + w, D.STORY[w][1]]])],
-    ['녹음 없는 글자', Array.from(new Set(['따', '또', '띠', '뚜', '싸', '쏘', '쑤', '짜', '쪼', '쭈', '뿌', '삐', '꾸', '와', '외', '궈', '뭐', '회'])).filter(c => !D.has.sy(c)).map(c => [D.syKey(c), c])]
+    ['모험 이야기 (녹음하면 구역에 들어갈 때 들려줍니다)', D.WORLD_ORDER.flatMap(w => [['p_w' + w, D.STORY[w][0]], ['p_wd' + w, D.STORY[w][1]]])]
   ];
   let recNow = null;
   function voiceUi() {
@@ -855,6 +852,7 @@
     ['자음', 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ'.split('')],
     ['글자', '가나다라마바사아자차카타파하'.split('')],
     ['받침 글자', '강눈곰달책밥옷'.split('')],
+    ['쌍자음·미끄럼 모음', '까빠씨찌딸과워의귀'.split('')],
     ['낱말', ['나비', '오리', '바나나', '모자', '사과', '강아지']]
   ];
   function checkTable(list) {

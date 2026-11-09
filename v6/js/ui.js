@@ -203,22 +203,44 @@
   UI.modal = function (html, buttons, cls) {
     return new Promise(res => {
       const m = UI.el('div', 'modal ' + (cls || ''));
-      const card = UI.el('div', 'modal-card', html);
+      const card = UI.el('div', 'modal-card scroll', html);
       A.sfx('open');
       const row = UI.el('div', 'modal-btns');
-      (buttons || [['좋아!', true]]).forEach(([label, val, c]) => {
-        row.appendChild(UI.btn('mbtn ' + (c || ''), label, () => { m.remove(); res(val); }));
+      let done = false;
+      const finish = val => { if (done) return; done = true; m.remove(); res(val); };
+      const list = buttons || [['좋아!', true]];
+      list.forEach(([label, val, c]) => {
+        row.appendChild(UI.btn('mbtn ' + (c || ''), label, () => finish(val)));
       });
       card.appendChild(row);
       m.appendChild(card);
       document.body.appendChild(m);
+      /* Never let the button fall off a short screen (Safari toolbars): shrink pictures, then text. */
+      const fit = () => {
+        if (!m.isConnected) return;
+        m.classList.remove('compact', 'tiny');
+        const lim = innerHeight * 0.94;
+        if (card.getBoundingClientRect().height > lim) m.classList.add('compact');
+        if (card.getBoundingClientRect().height > lim) m.classList.add('tiny');
+      };
+      fit();
+      requestAnimationFrame(fit);
+      setTimeout(fit, 400);
+      addEventListener('resize', fit);
+      /* A one-button popup (rewards, news) also closes when the child taps anywhere after a moment. */
+      if (list.length === 1) {
+        const t0 = performance.now();
+        UI.tap(m, e => { if (performance.now() - t0 > 900 && !e.target.closest('.mbtn')) { A.sfx('tap'); finish(list[0][1]); } });
+      }
     });
   };
 
   /* Picture card face for a word. */
+  /* A word picture: our own drawings (svg:name, v6/img/w) for people, otherwise the outlined emoji picture. */
+  UI.picFace = pic => (pic && pic.startsWith('svg:') ? `<img class="em own" src="v6/img/w/${pic.slice(4)}.svg" alt="" draggable="false">` : UI.em(pic || '❓'));
   UI.pic = function (w, cls) {
     const W = D.WORDS[w];
-    return `<span class="pic ${cls || ''}" aria-label="${W ? W.w : ''}">${UI.em(W && W.pic ? W.pic : '❓')}</span>`;
+    return `<span class="pic ${cls || ''}" aria-label="${W ? W.w : ''}">${UI.picFace(W && W.pic)}</span>`;
   };
   UI.live = function (t) { const l = UI.$('#live'); if (l) l.textContent = t; };
 

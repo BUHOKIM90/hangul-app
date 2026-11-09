@@ -29,14 +29,14 @@
 
   /* key|hangul|picture|group. Picture = colour emoji glyph (vector font, offline). '' = no picture card. */
   const WORD_ROWS = `
-ryeowon|려원|👧|fam
-eomma|엄마|👩|fam
-appa|아빠|👨|fam
-agi|아기|👶|fam
-nuna|누나|👧🏻|fam
-halmeoni|할머니|👵|fam
-harabeoji|할아버지|👴|fam
-ai|아이|🧒|fam
+ryeowon|려원|svg:ryeowon|fam
+eomma|엄마|svg:eomma|fam
+appa|아빠|svg:appa|fam
+agi|아기|svg:agi|fam
+nuna|누나|svg:nuna|fam
+halmeoni|할머니|svg:halmeoni|fam
+harabeoji|할아버지|svg:harabeoji|fam
+ai|아이|svg:ai|fam
 oi|오이|🥒|food
 uyu|우유|🥛|food
 banana|바나나|🍌|food
@@ -139,7 +139,7 @@ gwi|귀|👂|body
 ip|입|👄|body
 son|손|✋|body
 bal|발|🦶|body
-eobu|어부|🎣|fam
+eobu|어부|svg:eobu|fam
 eureureong|으르렁|🐯|ani
 dubu|두부||food
 jadu|자두||food
@@ -170,8 +170,8 @@ ima|이마||body`;
     'ㅏ': 'agi', 'ㅓ': 'eobu', 'ㅗ': 'ori', 'ㅜ': 'uyu', 'ㅡ': 'eureureong', 'ㅣ': 'i_tooth',
     'ㄱ': 'gicha', 'ㄴ': 'nabi', 'ㄷ': 'dari', 'ㄹ': 'radio', 'ㅁ': 'moja', 'ㅂ': 'banana', 'ㅅ': 'lion', 'ㅇ': 'oi', 'ㅈ': 'jido', 'ㅎ': 'hama',
     'ㅊ': 'chima', 'ㅋ': 'kokkiri', 'ㅌ': 'tomato', 'ㅍ': 'podo', 'ㅑ': 'yagu', 'ㅕ': 'yeou', 'ㅛ': 'yoyo', 'ㅠ': 'uyu', 'ㅐ': 'gae', 'ㅔ': 'ge',
-    'ㄲ': 'kkachi', 'ㄸ': 'ttalgi', 'ㅃ': 'ppang', 'ㅆ': 'ssiat', 'ㅉ': 'tteok',
-    'ㅘ': 'gwaja', 'ㅝ': 'wonsungi', 'ㅢ': 'uija', 'ㅟ': 'gwi', 'ㅚ': 'gwi'
+    'ㄲ': 'kkachi', 'ㄸ': 'ttalgi', 'ㅃ': 'ppang', 'ㅆ': 'ssiat',
+    'ㅘ': 'gwaja', 'ㅝ': 'wonsungi', 'ㅢ': 'uija', 'ㅟ': 'gwi'
   };
 
   /* Strokes on a 100×100 box: polyline [[x,y],…] or circle {c:[cx,cy,r]}. */
@@ -430,27 +430,21 @@ ima|이마||body`;
     { id: 'pang', name: '대나무판다 팡팡', short: '팡팡', lv: 9 },
     { id: 'yuni', name: '무지개유니콘 유니', short: '유니', lv: 11 }
   ];
-  /* Spoken lines that have no studio recording yet. They are spoken by a family recording (어른 메뉴 → 가족 목소리)
-     when there is one, otherwise by the device voice (speechSynthesis, ko-KR). */
-  const PROMPTS = {
-    p_fish: '들은 글자 물고기를 잡아 봐!',
-    p_shop: '손님이 갖고 싶은 물건의 이름표를 끌어서 건네 줘!',
-    p_hide: '숨어 있는 글자를 모두 찾아 봐!',
-    p_speak: '이번엔 려원이가 소리 내서 읽어 볼까? 빨간 버튼을 누르고 말해 봐!',
-    p_speak2: '혼자 읽어 봐. 다 읽으면 스피커를 눌러서 맞았는지 들어 보자.',
-    p_mine: '려원이 목소리 들어 보자.',
-    p_answer: '정답은',
-    p_same: '똑같이 읽었어?',
-    p_drag: '블록을 끌어서 빈칸에 쏙 넣어 봐!',
-    p_order: '번호 순서대로 써 볼까?',
-    p_dir: '화살표 쪽으로 써 볼까?',
-    p_look: '잘 보고 기억해!',
-    p_alone: '이제 혼자 써 볼까?',
-    p_deco: '스티커를 끌어서 그림을 꾸며 봐!',
-    p_twin: '똑같은 글자 둘이 붙으면 더 세게 소리 나!',
-    p_cvow: '모음 둘이 미끄럼을 타고 하나가 됐어!',
-    p_new: '처음 보는 글자야. 읽을 수 있을까?'
+  /* Instructions for the newer plays use studio recordings that say exactly the subtitle shown (v5 captions).
+     No device/synthetic voice is ever used: a line without a recording is shown as text only. */
+  const PROMPT_CLIP = {
+    p_fish: ['ui4_balloon', '들은 글자를 눌러 봐!'],
+    p_shop: ['ui_match', '낱말 카드를 그림에 데려다 줄래?'],
+    p_hide: ['ui_find', '어디 있을까?'],
+    p_speak: ['ui4_echo2', '이번엔 려원이가 혼자 읽어 볼까?'],
+    p_new: ['ui4_echo2', '이번엔 려원이가 혼자 읽어 볼까?'],
+    p_order: ['ui4_hint', '여기 반짝이는 데를 봐!'],
+    p_dir: ['ui4_hint', '여기 반짝이는 데를 봐!'],
+    p_twin: ['ui_listen', '잘 듣고 골라 봐.'],
+    p_cvow: ['ui_merge', '블록을 합쳐서 만들어 볼까?']
   };
+  /* Lines a family member may record in the parent menu (otherwise shown as text, silent). */
+  const PROMPTS = {};
   WORLD_ORDER.forEach(w => { PROMPTS['p_w' + w] = STORY[w][0]; PROMPTS['p_wd' + w] = STORY[w][1]; });
   /* Things to do together away from the screen; {j} is filled with a letter the child finds hard. */
   const TIPS = {
@@ -468,7 +462,7 @@ ima|이마||body`;
   G.D = {
     CHO, JUNG, split, join, hex, syKey, fyKey, dyKey, jKey, has, SY, WORDS, HY, HW, CLAP, noBatchim,
     BASIC_V, VROW, JNAME, JPIC, STROKES, strokesFor, WORLDS: W, STAGES: ST, PHRASES, SENTENCES,
-    WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, TIPS, TWINS, COMPLEX,
+    WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
     PRAISE_VOICE, CHEERS, PRAISE_FIT, STICKER_SETS, STICKERS, OUTFITS, FRIENDS
   };
 })(window);

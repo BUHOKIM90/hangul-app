@@ -958,3 +958,21 @@ details summary { cursor: pointer; padding: 8px 0; font-size: 16px; }
 .arrive-m .arrive-story { font-size: min(4.6vmin, 3.6vh); }
 html:has(#main[data-screen="decorate"]) #scene .sun { display: none; }
 @media (orientation: portrait) { .deco-back { flex: none; width: 22vmin; flex-direction: column; border-radius: 4vmin; padding: 1vmin; font-size: 3.4vmin; } }
+
+/* popups fit any screen: pictures are sized by the screen height, and shrink further when needed */
+.modal { padding: max(2vmin, env(safe-area-inset-top)) 3vmin max(2vmin, env(safe-area-inset-bottom)); }
+.modal-card { max-height: calc(100% - 2vmin); overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.lv-mascot { width: auto; height: min(36vmin, 30vh); }
+.lv-mascot svg { width: auto; height: 100%; margin: 0 auto; }
+.modal-card .stk.big { width: min(26vmin, 20vh); }
+.modal-card .stk.big span { font-size: min(17vmin, 13vh); }
+.modal-card h3 { font-size: min(7vmin, 6vh); }
+.modal-card p { font-size: min(4.6vmin, 3.8vh); }
+.mbtn { font-size: min(6vmin, 5vh); min-height: max(56px, min(var(--tap), 9vh)); }
+.modal.compact .lv-mascot, .modal.compact .arrive-pal, .modal.compact .arrive-ico { height: 18vh !important; width: auto !important; }
+.modal.compact .arrive-pal svg { height: 100%; width: auto; }
+.modal.compact .stk.big { width: 14vh; }
+.modal.compact .stk.big span { font-size: 9vh; }
+.modal.compact .modal-card { padding-top: 1.4vh; padding-bottom: 1.4vh; }
+.modal.compact .modal-btns { margin-top: 1.2vh; }
+.modal.tiny .lv-mascot, .modal.tiny .arrive-pal, .modal.tiny .arrive-ico, .modal.tiny .arrive-story { display: none; }
