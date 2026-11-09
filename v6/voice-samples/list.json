@@ -116,6 +116,96 @@
     "vivienne_2.mp3",
     "vivienne_3.mp3"
    ]
+  },
+  {
+   "id": "mg_sofia",
+   "voice": "magpie:Sofia",
+   "label": "엔비디아 Magpie · Sofia (자연스러움 3.9점)",
+   "files": [
+    "mg_sofia_0.mp3",
+    "mg_sofia_1.mp3",
+    "mg_sofia_2.mp3",
+    "mg_sofia_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 22,
+    "right": 22,
+    "cer": 0.225,
+    "mos": 3.894
+   }
+  },
+  {
+   "id": "mg_john",
+   "voice": "magpie:John",
+   "label": "엔비디아 Magpie · John (자연스러움 3.8점)",
+   "files": [
+    "mg_john_0.mp3",
+    "mg_john_1.mp3",
+    "mg_john_2.mp3",
+    "mg_john_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 21,
+    "right": 22,
+    "cer": 0.633,
+    "mos": 3.802
+   }
+  },
+  {
+   "id": "mg_aria",
+   "voice": "magpie:Aria",
+   "label": "엔비디아 Magpie · Aria (자연스러움 3.6점)",
+   "files": [
+    "mg_aria_0.mp3",
+    "mg_aria_1.mp3",
+    "mg_aria_2.mp3",
+    "mg_aria_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 19,
+    "right": 19,
+    "cer": 0.624,
+    "mos": 3.624
+   }
+  },
+  {
+   "id": "ov_f_young",
+   "voice": "omnivoice:f_young",
+   "label": "OmniVoice · 젊은 여성 (자연스러움 3.3점)",
+   "files": [
+    "ov_f_young_0.mp3",
+    "ov_f_young_1.mp3",
+    "ov_f_young_2.mp3",
+    "ov_f_young_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 21,
+    "right": 21,
+    "cer": 0.226,
+    "mos": 3.339
+   }
+  },
+  {
+   "id": "ov_f_high",
+   "voice": "omnivoice:f_high",
+   "label": "OmniVoice · 밝은 여성 (자연스러움 2.7점)",
+   "files": [
+    "ov_f_high_0.mp3",
+    "ov_f_high_1.mp3",
+    "ov_f_high_2.mp3",
+    "ov_f_high_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 16,
+    "right": 16,
+    "cer": 1.144,
+    "mos": 2.719
+   }
   }
  ]
 }
