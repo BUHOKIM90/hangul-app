@@ -96,6 +96,7 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || req.method !== 'GET') return;
+  if (url.pathname.includes('/voice-samples/')) return;   // samples to compare voices: always fresh from the network
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const hit = await cache.match(req, { ignoreSearch: true }) || (req.mode === 'navigate' ? await cache.match('./') : null);
