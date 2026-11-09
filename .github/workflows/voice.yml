@@ -3,7 +3,7 @@ name: voice
 on:
   workflow_dispatch:
   push:
-    branches: [main, 'v6.*']
+    branches: ['v6.*']   # work branches only: main only ever gets voices that were checked first
     paths:
       - 'v6/tools/voice/lines.json'
       - 'v6/tools/voice/make_voice.py'

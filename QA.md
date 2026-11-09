@@ -97,3 +97,7 @@
 1. 배포 전: `python3 -m http.server 8767` 후 `python3 v6/tools/qa.py http://localhost:8767/ --sizes 1180x740,820x1100 --stages kinds` — 모든 단계 종류(22개, 복습 포함)를 끝까지 플레이. 오류·멈춤·화면 밖 버튼·녹음 없는 소리 0이어야 배포.
 2. 배포 후: `git archive <배포된 커밋> | tar -x -C deployed` 후 같은 검사(.nojekyll이라 저장소 파일이 그대로 배포됨).
 3. 음성: `v6/tools/voice/report.json`에서 suspect 0, errors 0 확인.
+
+## 음성 바꾸는 순서 (v6.4~)
+1. 작업 브랜치(`v6.x`)에서 `v6/tools/voice/lines.json`·`make_voice.py`를 바꿔 올리면 GitHub이 그 브랜치에서 음성을 만들고 검사(report.json)한 뒤 커밋합니다. main에서는 음성을 만들지 않습니다.
+2. 브랜치를 내려받아 qa.py로 검수(녹음 없는 소리 0 포함) → 통과하면 main에 합쳐 배포 → 배포된 커밋으로 다시 검수.
