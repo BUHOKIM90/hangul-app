@@ -88,7 +88,7 @@ def _fc_load():
         from transformers import WhisperForConditionalGeneration, WhisperProcessor
         pr = WhisperProcessor.from_pretrained('openai/whisper-large-v3-turbo')
         pr.tokenizer.set_prefix_tokens(language='korean', task='transcribe', predict_timestamps=False)
-        _fc = (pr, WhisperForConditionalGeneration.from_pretrained('openai/whisper-large-v3-turbo').eval())
+        _fc = (pr, WhisperForConditionalGeneration.from_pretrained('openai/whisper-large-v3-turbo').float().eval())
     return _fc
 
 def logp(path, texts):
@@ -99,7 +99,7 @@ def logp(path, texts):
     feat = pr(wav, sampling_rate=16000, return_tensors='pt').input_features
     out = []
     with torch.no_grad():
-        enc = m.model.encoder(feat).last_hidden_state
+        enc = m.model.encoder(feat.float()).last_hidden_state
         for i in range(0, len(texts), 24):
             ids = [pr.tokenizer(t).input_ids for t in texts[i:i + 24]]
             L = max(map(len, ids)); eot = pr.tokenizer.eos_token_id
