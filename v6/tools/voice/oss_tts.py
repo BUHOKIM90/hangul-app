@@ -227,11 +227,42 @@ def check(path, text, wav=None, sr=None):
     r['ok'] = bool(r['right']) and lo <= span <= hi and runs <= max_runs + 1
     return r
 
+def last_word(wav, sr):
+    """From 'X, X, X.' keep the last X (said with a natural ending), cut at the silences between them."""
+    hop = int(sr * 0.01); n = len(wav) // hop
+    if n < 10: return None
+    rms = np.sqrt(np.mean(wav[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
+    loud = 20 * np.log10(rms / (rms.max() + 1e-12)) > -32
+    runs, i = [], 0
+    while i < n:
+        if loud[i]:
+            j = i
+            while j < n and loud[j]: j += 1
+            runs.append([i, j]); i = j
+        else: i += 1
+    merged = []
+    for r in runs:                       # gaps under 0.12 s are inside one word
+        if merged and r[0] - merged[-1][1] < 12: merged[-1][1] = r[1]
+        else: merged.append(r)
+    merged = [r for r in merged if r[1] - r[0] >= 8]
+    if len(merged) != 3: return None
+    a, b = merged[-1]
+    return wav[max(0, (a - 6) * hop):min(len(wav), (b + 12) * hop)]
+
+def short(text): return len(hangul(text)) <= 2 and ',' not in text
+
 def best_of(eng, text, voice, tries, path):
     """Generate up to `tries` takes; keep the first fully clean one, else the one heard best (then most natural)."""
     best = None
     for t in range(tries):
-        try: wav, sr = eng.say(text, voice, seed=1234 + t * 7919)
+        try:
+            if isinstance(eng, Qwen) and short(text):   # one short sound alone makes the model ramble: say it 3 times, keep the last
+                w = text.rstrip('.!?')
+                wav, sr = eng.say(f'{w}, {w}, {w}.', voice, seed=1234 + t * 7919)
+                wav = last_word(wav, sr)
+                if wav is None: print('  no 3 parts', text); continue
+            else:
+                wav, sr = eng.say(text, voice, seed=1234 + t * 7919)
         except Exception as e:
             print('  fail', voice, text, repr(e)[:160]); continue
         if len(wav) < sr * 0.1: continue
