@@ -7,11 +7,29 @@
  ],
  "voices": [
   {
+   "id": "qw_sohee",
+   "voice": "qwen:sohee",
+   "label": "Qwen3 · 소희 (지금 앱 목소리)",
+   "files": [
+    "qw_sohee_0.mp3",
+    "qw_sohee_1.mp3",
+    "qw_sohee_2.mp3",
+    "qw_sohee_3.mp3"
+   ],
+   "score": {
+    "n": 30,
+    "ok": 12,
+    "right": 15,
+    "cer": 2.349,
+    "mos": 3.165
+   }
+  },
+  {
    "id": "sunhi",
    "voice": "ko-KR-SunHiNeural",
    "rate": "-6%",
    "pitch": "+6Hz",
-   "label": "선희 (지금 목소리, 여성) (자연스러움 3.6점)",
+   "label": "선희 (이전 앱 목소리, Microsoft)",
    "files": [
     "sunhi_0.mp3",
     "sunhi_1.mp3",
@@ -27,27 +45,20 @@
    }
   },
   {
-   "id": "qw_sohee",
-   "voice": "qwen:sohee",
-   "label": "Qwen3 · 소희 (한국어 원어민 여성) (자연스러움 3.2점)",
+   "id": "mg_sofia",
+   "voice": "mg_sofia",
    "files": [
-    "qw_sohee_0.mp3",
-    "qw_sohee_1.mp3",
-    "qw_sohee_2.mp3",
-    "qw_sohee_3.mp3"
+    "mg_sofia_0.mp3",
+    "mg_sofia_1.mp3",
+    "mg_sofia_2.mp3",
+    "mg_sofia_3.mp3"
    ],
-   "score": {
-    "n": 22,
-    "ok": 15,
-    "right": 17,
-    "cer": 0.244,
-    "mos": 3.207
-   }
+   "label": "엔비디아 Magpie · Sofia (자연스러움 3.9점)"
   },
   {
    "id": "qw_kss",
    "voice": "qwen:kss",
-   "label": "Qwen3 · 성우 목소리 (실제 한국인 성우 녹음 기반) (자연스러움 3.7점)",
+   "label": "Qwen3 · 실제 한국인 성우 녹음 기반 (자연스러움 3.4점)",
    "files": [
     "qw_kss_0.mp3",
     "qw_kss_1.mp3",
@@ -55,11 +66,11 @@
     "qw_kss_3.mp3"
    ],
    "score": {
-    "n": 21,
-    "ok": 15,
-    "right": 15,
-    "cer": 1.837,
-    "mos": 3.711
+    "n": 30,
+    "ok": 19,
+    "right": 19,
+    "cer": 1.902,
+    "mos": 3.361
    }
   }
  ]

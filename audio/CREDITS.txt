@@ -1,7 +1,8 @@
 앱 음성 (audio/*.mp3)
-- v6.6부터: NVIDIA Magpie TTS Multilingual 357M (Sofia 목소리)로 만든 음성.
-  Model: https://huggingface.co/nvidia/magpie_tts_multilingual_357m
-  Licensed by NVIDIA Corporation under the NVIDIA Open Model License.
-- 자동 검사에서 더 분명하지 않았던 일부 글자는 이전 음성(Microsoft ko-KR-SunHiNeural)을 그대로 둠
+- v6.6부터: Qwen3-TTS (Alibaba Qwen, Apache 2.0) 의 한국어 원어민 목소리 '소희(Sohee)'로 만든 음성.
+  Model: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+  만드는 법: v6/tools/voice/oss_tts.py (GitHub Actions: voice-oss-full.yml, 설정 v6/tools/voice/oss_full.json)
+  모든 소리는 Whisper로 다시 받아 적어 확인했고, 한숨·덧붙은 소리가 들리거나 발음이 틀린 것은 쓰지 않음.
+- 자동 검사를 끝내 통과하지 못한 일부 소리는 이전 음성(Microsoft ko-KR-SunHiNeural)을 그대로 둠
   (목록: v6/tools/voice/report_oss.json 의 kept_old).
-- 가족이 녹음한 목소리는 이 파일들이 아니라 그 기기(IndexedDB)에만 저장됨.
+- 가족이 녹음한 목소리는 이 파일들이 아니라 그 기기(IndexedDB)에만 저장되며, 녹음이 있으면 그 소리가 먼저 나옴.
