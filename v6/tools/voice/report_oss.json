@@ -1,7 +1,7 @@
 {
  "engine": "qwen",
  "voice": "sohee",
- "right": 602,
+ "right": 601,
  "total": 628,
  "kept_old": [
   "dy_B85C",
@@ -12,6 +12,7 @@
   "dy_C6B0",
   "fy_B9C8",
   "fy_BA38",
+  "fy_BB34",
   "j_3149",
   "j_314D",
   "j_3150",
