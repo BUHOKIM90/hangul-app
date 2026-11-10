@@ -24,11 +24,21 @@ def better(r):
     if r.get('old_margin') is not None: return r.get('margin') is not None and r['margin'] >= min(r['old_margin'], 0.0)
     if r.get('how') in ('extra-sound', 'misheard'): return False
     return bool(r.get('right')) or heard_right(r)
+CFG = json.load(open(os.path.join(ROOT, 'v6/tools/voice/oss_full.json')))
+RP = os.path.join(ROOT, 'v6/tools/voice/report_oss.json')
+if CFG.get('keys'):        # a second pass over the lines that kept the old voice: merge into the last report
+    prev = json.load(open(RP, encoding='utf8'))
+    LINES = {k: LINES[k] for k in CFG['keys']}
 good = [k for k in LINES if k in rep and k in src and better(rep[k])]
 kept = sorted(set(LINES) - set(good))
 print(f'right {len(good)}/{len(LINES)}; kept old voice: {kept[:80]}')
-out = {'engine': os.environ.get('ENGINE'), 'voice': os.environ.get('VOICE'), 'right': len(good), 'total': len(LINES), 'kept_old': kept, 'clips': rep}
+if CFG.get('keys'):
+    kept = sorted(set(prev['kept_old']) - set(good)); prev['clips'].update(rep); rep = prev['clips']
+    total = prev['total']; good_all = total - len(kept)
+else:
+    good_all, total = len(good), len(LINES)
+out = {'engine': os.environ.get('ENGINE'), 'voice': os.environ.get('VOICE'), 'right': good_all, 'total': total, 'kept_old': kept, 'clips': rep}
 json.dump(out, open(os.path.join(ROOT, 'v6/tools/voice/report_oss.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
-if len(good) < len(LINES) * MIN_PASS:
+if not CFG.get('keys') and len(good) < len(LINES) * MIN_PASS:
     print('too many clips not right; not applying'); sys.exit(1)
 for k in good: shutil.copy(src[k], os.path.join(ROOT, 'audio', k + '.mp3'))

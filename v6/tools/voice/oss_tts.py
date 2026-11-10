@@ -277,7 +277,7 @@ def best_of(eng, text, voice, tries, path):
     best = None
     for t in range(tries):
         try:
-            if isinstance(eng, Qwen) and short(text):   # one short sound alone makes the model ramble: say it 3 times, keep the last
+            if isinstance(eng, Qwen) and short(text) and t % 2 == 0:   # one short sound alone makes the model ramble: say it 3 times, keep the last
                 w = text.rstrip('.!?')
                 wav, sr = eng.say(f'{w}, {w}, {w}.', voice, seed=1234 + t * 7919)
                 wav = last_word(wav, sr)
@@ -349,7 +349,8 @@ def cmd_baseline(a):
 def cmd_full(a):
     eng = ENGINES[a.engine]()
     i, n = map(int, a.shard.split('/'))
-    keys = sorted(LINES)[i::n]
+    only = json.load(open(os.path.join(ROOT, 'v6/tools/voice/oss_full.json'))).get('keys')
+    keys = sorted(only or LINES)[i::n]
     os.makedirs(os.path.join(OUT, 'audio'), exist_ok=True)
     rep = {}
     for k in keys:

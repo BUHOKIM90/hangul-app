@@ -32,7 +32,7 @@ jobs:
         run: pip install -q qwen-tts pyarrow huggingface_hub
       - if: steps.cfg.outputs.engine == 'omnivoice'
         run: pip install -q omnivoice
-      - run: python v6/tools/voice/oss_tts.py full --engine ${{ steps.cfg.outputs.engine }} --voice ${{ steps.cfg.outputs.voice }} --shard ${{ matrix.shard }}/16 --tries 6
+      - run: python v6/tools/voice/oss_tts.py full --engine ${{ steps.cfg.outputs.engine }} --voice ${{ steps.cfg.outputs.voice }} --shard ${{ matrix.shard }}/16 --tries 10
       - if: always()
         uses: actions/upload-artifact@v4
         with: { name: 'full-${{ matrix.shard }}', path: out, if-no-files-found: ignore }
