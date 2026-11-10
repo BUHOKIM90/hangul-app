@@ -167,7 +167,7 @@
     const src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = b;
     const fadeIn = 0.006, fadeOut = Math.min(0.025, dur / 4);
-    const lvl = customGain.get(b) || 1;
+    const lvl = customGain.get(b) || (!custom.has(key) && TRIM[key] && TRIM[key][3]) || 1;   /* every clip at the same loudness */
     g.gain.setValueAtTime(0, when);
     g.gain.linearRampToValueAtTime(lvl, when + fadeIn);
     g.gain.setValueAtTime(lvl, when + dur - fadeOut);

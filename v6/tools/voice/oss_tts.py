@@ -283,6 +283,7 @@ def trim_edges(wav, sr):
 
 def short(text): return len(hangul(text)) <= 2 and ',' not in text
 
+SEED0 = 4321 + 100003 * int(json.load(open(os.path.join(ROOT, 'v6/tools/voice/oss_full.json'))).get('run', 0))
 def best_of(eng, text, voice, tries, path, key=None):
     """Generate up to `tries` takes; keep the first fully clean one, else the one heard best (then most natural)."""
     best = None
@@ -294,7 +295,7 @@ def best_of(eng, text, voice, tries, path, key=None):
                 wav = last_word(wav, sr)
                 if wav is None: print('  no 3 parts', text); continue
             else:
-                wav, sr = eng.say(text, voice, seed=4321 + t * 7919, key=key) if isinstance(eng, Qwen) else eng.say(text, voice, seed=1234 + t * 7919)
+                wav, sr = eng.say(text, voice, seed=SEED0 + t * 7919, key=key) if isinstance(eng, Qwen) else eng.say(text, voice, seed=1234 + t * 7919)
         except Exception as e:
             print('  fail', voice, text, repr(e)[:160]); continue
         if isinstance(eng, Qwen): wav = trim_edges(wav, sr)

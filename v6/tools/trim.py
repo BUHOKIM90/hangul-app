@@ -23,6 +23,10 @@ for f in sorted(os.listdir(d)):
     s0=loud[0][0]; s1=loud[-1][1]
     if segs[0][0]<s0 or segs[-1][1]>s1: dropped.append(k)
     st=max(0,s0*0.01-0.02); en=min(dur,s1*0.01+0.07)
-    out[k]=[round(st,3),round(en,3),round(dur,3)]
+    # 4th value: playback gain so every clip is heard at the same loudness (speech RMS -20 dBFS), never clipping
+    seg=x[int(st*sr):int(en*sr)]; fr=db[s0:s1]; voiced=fr[fr>peak-25]
+    rms=10**(float(np.mean(voiced))/20) if len(voiced) else 0.1; pk=float(np.abs(seg).max()) if len(seg) else 1
+    g=min(0.1/max(rms,1e-4), 0.97/max(pk,1e-4)); g=max(0.4,min(4.0,g))
+    out[k]=[round(st,3),round(en,3),round(dur,3),round(g,2)]
 json.dump(out,open(sys.argv[2],'w'),separators=(',',':'))
 print(len(out),'noise-dropped',len(dropped),dropped[:30])
