@@ -1136,3 +1136,5 @@ body:not(.singing) .song-pal { animation-play-state: paused; }
 .song-again[hidden] { display: block; visibility: hidden; }
 @media (orientation: portrait) { .song-stage { flex-direction: column-reverse; align-items: center; gap: 1vmin; } .song-big { width: 44vmin; height: 44vmin; } .song-big span { font-size: 31vmin; } .song-cell { width: 12vmin; height: 12vmin; } }
 @media (prefers-reduced-motion: reduce) { .m-head, .m-mouth, .song-pal, .buddy, .rainc, .yay { animation: none !important; } }
+/* portrait: three picture-pair cards with words under them always fit the height */
+@media (orientation: portrait) { .cards.wide .card.pair { aspect-ratio: auto; height: min(31.8vmin, 17.5vh); } .cards.wide { gap: 2vmin; } }
