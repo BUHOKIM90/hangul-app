@@ -19,7 +19,13 @@ def norm(t):
     return re.sub(r'[^가-힣]', '', t)
 def heard_right(r):
     return bool(r.get('heard') is not None and norm(r['text']) == norm(r['heard']))
+def fits(r):
+    # one clean utterance of sensible length (a clip that rambles on is never used, however well it starts)
+    t = r.get('text') or ''; n = len(re.sub(r'[^가-힣]', '', t)); p = sum(t.count(c) for c in ',.!?')
+    return r.get('span') is not None and 0.15 <= r['span'] <= 0.55 + n * 0.3 + p * 0.5 and r.get('runs', 9) <= p + 2
 def better(r):
+    return fits(r) and _better(r)
+def _better(r):
     # single letters: at least as clearly that letter (vs every look-alike letter) as the clip used now
     if r.get('old_margin') is not None: return r.get('margin') is not None and r['margin'] >= min(r['old_margin'], 0.0)
     if r.get('how') in ('extra-sound', 'misheard'): return False
