@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
     inputs:
       parts: { default: '["qwen:sohee","qwen:kss"]' }
-  push:
-    branches: ['v6.*']
-    paths: ['v6/tools/voice/oss_tts.py', 'v6/tools/voice/oss_merge.py', '.github/workflows/voice-oss.yml']
 permissions:
   contents: write
 concurrency: voice-oss
