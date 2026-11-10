@@ -1097,3 +1097,42 @@ html[data-world="8"] #scene .tw { background: #fff; }
 .play:has(.explain) ~ .buddy { display: none; }
 .play:has(.explain) .play-sub { visibility: hidden; }
 @media (orientation: portrait) { .ex-bubble::before { top: -2.5vmin; border-bottom: 0; border-top: var(--line); } }
+
+/* ---------- v6.8 살아 있는 친구들 · 글자 노래 · 축하 ---------- */
+/* friends move: the head sways a little while idle, nods and the mouth moves while the app is speaking, and they dance to songs */
+.mascot-svg .m-head { transform-origin: 100px 205px; }
+.buddy .m-head, .home-buddy .m-head, .ex-pal .m-head, .closet-model .m-head { animation: headsway 3.6s ease-in-out infinite; }
+@keyframes headsway { 0%, 100% { transform: rotate(-2.2deg); } 50% { transform: rotate(2.2deg); } }
+.mascot-svg .m-mouth { transform-box: fill-box; transform-origin: 50% 20%; }
+body.talking .buddy .m-mouth, body.talking .ex-pal .m-mouth, body.talking .home-buddy .m-mouth { animation: talk .26s ease-in-out infinite; }
+@keyframes talk { 0%, 100% { transform: scale(1, .55); } 50% { transform: scale(1.15, 1.5); } }
+body.talking .buddy .m-head, body.talking .ex-pal .m-head { animation: nod .52s ease-in-out infinite; }
+@keyframes nod { 0%, 100% { transform: rotate(0) translateY(0); } 50% { transform: rotate(1.5deg) translateY(1.2%); } }
+body.singing .buddy, .song-pal, .buddy.dance { animation: dance 1.2s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes dance { 0%, 100% { transform: rotate(-7deg) translateY(0); } 25% { transform: rotate(0) translateY(-7%) scale(1.03, .97); } 50% { transform: rotate(7deg) translateY(0); } 75% { transform: rotate(0) translateY(-7%) scale(1.03, .97); } }
+.buddy.jump { animation: hop .7s cubic-bezier(.3, 1.4, .5, 1); transform-origin: 50% 100%; }
+@keyframes hop { 0% { transform: scale(1.08, .86); } 35% { transform: translateY(-22%) scale(.95, 1.08); } 65% { transform: translateY(0) scale(1.1, .88); } 82% { transform: translateY(-5%) scale(.99, 1.02); } 100% { transform: none; } }
+/* the right answer pops and glows */
+.yay { animation: yay .65s cubic-bezier(.3, 1.6, .5, 1) !important; z-index: 2; }
+@keyframes yay { 0% { transform: scale(1); filter: none; } 35% { transform: scale(1.14) rotate(-2deg); filter: drop-shadow(0 0 2.4vmin #FFD84A) brightness(1.06); } 70% { transform: scale(.98) rotate(1deg); filter: drop-shadow(0 0 1.2vmin #FFD84A); } 100% { transform: scale(1); filter: none; } }
+/* confetti rain when a stage is finished */
+.rainc { position: absolute; top: -4vh; width: 1.8vmin; height: 2.8vmin; border-radius: .5vmin; animation: rain linear forwards; pointer-events: none; }
+.rainc.star { width: auto; height: auto; color: #FFC93C; font-size: 4vmin; line-height: 1; }
+@keyframes rain { to { transform: translate(var(--sx), 112vh) rotate(720deg); } }
+/* letter songs */
+.songbox { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.4vmin; padding: 0 2vmin 2vmin; min-height: 0; }
+.song-title { margin: 0; font-size: 6vmin; font-weight: 400; background: #fff; border: var(--line); border-radius: 99px; padding: .6vmin 4vmin; }
+.song-stage { display: flex; align-items: flex-end; justify-content: center; gap: 4vmin; }
+.song-pals { display: flex; align-items: flex-end; gap: 1vmin; }
+.song-pal { width: 15vmin; aspect-ratio: 200 / 312; } .song-pal svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.song-pal:nth-child(2) { animation-delay: -.3s; } .song-pal:nth-child(3) { animation-delay: -.6s; }
+body:not(.singing) .song-pal { animation-play-state: paused; }
+.song-big { width: 34vmin; height: 34vmin; border-radius: 6vmin; background: #fff; border: var(--line); box-shadow: var(--step, var(--shadow)); display: grid; place-items: center; }
+.song-big span { font-size: 24vmin; line-height: 1; } .song-big span.pop { animation: yay .5s cubic-bezier(.3, 1.6, .5, 1); display: inline-block; }
+.song-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2vmin; max-width: 96vw; }
+.song-cell { width: min(10.5vmin, 6.3vw); height: min(10.5vmin, 6.3vw); min-width: 44px; min-height: 44px; border-radius: 2.4vmin; background: #fff; border: var(--line); font-size: 6vmin; display: grid; place-items: center; transition: transform .12s; }
+.song-cell.lit { background: #FFD84A; transform: translateY(-1.6vmin) scale(1.12); }
+.song-again { font-size: 5vmin; background: #8EDDBE; border: var(--line); border-radius: 99px; padding: 1.6vmin 5vmin; min-height: var(--tap); }
+.song-again[hidden] { display: block; visibility: hidden; }
+@media (orientation: portrait) { .song-stage { flex-direction: column-reverse; align-items: center; gap: 1vmin; } .song-big { width: 44vmin; height: 44vmin; } .song-big span { font-size: 31vmin; } .song-cell { width: 12vmin; height: 12vmin; } }
+@media (prefers-reduced-motion: reduce) { .m-head, .m-mouth, .song-pal, .buddy, .rainc, .yay { animation: none !important; } }

@@ -176,7 +176,7 @@
       ${back}${out.back || ''}
       <g class="m-body">${k === 'lumi' ? bodyRig(sp.dress, mood, gem(sp, 100, 234), '#FF8FBF', `<path d="M72 198 C66 220 46 252 44 264 C70 274 130 274 156 264 C154 252 134 220 128 198Z" fill="${sp.dress}" ${sw()}/><path d="M48 258 q13 10 26 2 q13 10 26 2 q13 10 26 2 q13 10 26 2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`) : bodyRig(tint, mood, bodyExtra + gem(sp, 100, 238), f)}${out.neck || ''}</g>
       <g class="m-head"${mood === 'think' ? ' transform="rotate(-6 100 200)"' : ''}>${ears}${head}${shine}${over}
-        ${cheeks(eyeY + 16, id)}${eyes(mood, eyeY, id, sp.iris)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? mouth(mood, mouthY) : ''}${lowerMouth}
+        ${cheeks(eyeY + 16, id)}${eyes(mood, eyeY, id, sp.iris)}${(k === 'lumi' || k === 'yuni' || k === 'pomi') && !/joy|cheer|wink|think/.test(mood) ? `<path d="M64 ${eyeY - 6} l-6 -4 M136 ${eyeY - 6} l6 -4" ${sw(3)}/>` : ''}${face}${mouthY < 999 ? `<g class="m-mouth">${mouth(mood, mouthY)}</g>` : ''}${lowerMouth}
         ${out.eyes || ''}${out.hat || ''}</g>${sparkle}</g></svg>`;
   };
   G.CHF = C;

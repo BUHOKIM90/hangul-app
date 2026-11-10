@@ -88,6 +88,17 @@ def kss_reference(out_dir):
 INSTRUCT = ('Speak standard Seoul Korean clearly and warmly, like a kind kindergarten teacher, at a calm, slightly slow pace. '
             'Pronounce every syllable precisely. Read only the given text: no sighs, no breaths, no laughs, no filler sounds.')
 
+BASE = ' 표준 서울말로 또박또박. 한숨, 숨소리, 웃음, 군소리 없이 쓰인 글자만 읽기.'
+def direct(key, text):
+    """Director's note for one line: who is speaking to whom, the feeling, the pace, how the end goes."""
+    k = key.split('_')[0] if key else ''
+    if k in ('sy', 'w', 'j'): return INSTRUCT
+    if text.endswith('?'): return '유치원 선생님이 다섯 살 아이에게 궁금한 듯 다정하게 물어보듯이, 밝게, 조금 천천히, 끝을 살짝 올려서.' + BASE
+    if k in ('hy', 'dy'): return '유치원 선생님이 다섯 살 아이에게 다정하게 알려 주듯이, 미소 띤 목소리로, 조금 천천히, 끝은 부드럽게 내려서.' + BASE
+    if k in ('v', 's'): return '엄마가 그림책을 읽어 주듯이 따뜻하고 생생하게, 조금 천천히, 쉼표에서는 사람처럼 잠깐 쉬고.' + BASE
+    if text.endswith('!'): return '다섯 살 아이를 칭찬하듯 밝고 다정하게, 신나는 목소리로, 조금 천천히, 끝을 살짝 올려서.' + BASE
+    return '유치원 선생님이 다섯 살 아이에게 다정하게 말하듯이, 조금 천천히.' + BASE
+
 class Qwen:
     """Qwen3-TTS (Apache 2.0). 'sohee' = its built-in native Korean female voice; 'kss' = clone of a real Korean
     voice actress (KSS dataset)."""
@@ -98,11 +109,11 @@ class Qwen:
             from qwen_tts import Qwen3TTSModel
             self.m[kind] = Qwen3TTSModel.from_pretrained(f'Qwen/Qwen3-TTS-12Hz-1.7B-{kind}', device_map='cpu', dtype=torch.float32)
         return self.m[kind]
-    def say(self, text, voice, seed):
+    def say(self, text, voice, seed, key=None):
         torch.manual_seed(seed)
         if voice == 'sohee':
             m = self._model('CustomVoice')
-            try: wavs, sr = m.generate_custom_voice(text=text, language='Korean', speaker='Sohee', instruct=INSTRUCT)
+            try: wavs, sr = m.generate_custom_voice(text=text, language='Korean', speaker='Sohee', instruct=direct(key, text))
             except TypeError: wavs, sr = m.generate_custom_voice(text=text, language='Korean', speaker='Sohee')
         else:
             m = self._model('Base')
@@ -272,7 +283,7 @@ def trim_edges(wav, sr):
 
 def short(text): return len(hangul(text)) <= 2 and ',' not in text
 
-def best_of(eng, text, voice, tries, path):
+def best_of(eng, text, voice, tries, path, key=None):
     """Generate up to `tries` takes; keep the first fully clean one, else the one heard best (then most natural)."""
     best = None
     for t in range(tries):
@@ -283,7 +294,7 @@ def best_of(eng, text, voice, tries, path):
                 wav = last_word(wav, sr)
                 if wav is None: print('  no 3 parts', text); continue
             else:
-                wav, sr = eng.say(text, voice, seed=1234 + t * 7919)
+                wav, sr = eng.say(text, voice, seed=4321 + t * 7919, key=key) if isinstance(eng, Qwen) else eng.say(text, voice, seed=1234 + t * 7919)
         except Exception as e:
             print('  fail', voice, text, repr(e)[:160]); continue
         if isinstance(eng, Qwen): wav = trim_edges(wav, sr)
@@ -354,7 +365,7 @@ def cmd_full(a):
     os.makedirs(os.path.join(OUT, 'audio'), exist_ok=True)
     rep = {}
     for k in keys:
-        r = best_of(eng, LINES[k], a.voice, a.tries, os.path.join(OUT, 'audio', k + '.mp3'))
+        r = best_of(eng, LINES[k], a.voice, a.tries, os.path.join(OUT, 'audio', k + '.mp3'), key=k)
         rep[k] = r or {'text': LINES[k], 'ok': False, 'failed': True}
         if r and len(hangul(LINES[k])) == 1:   # how clearly the clip the app uses now says this letter
             old = os.path.join(ROOT, 'audio', k + '.mp3')

@@ -4,10 +4,10 @@
 (function (G) {
   const A = { ready: false, log: [] };
   const TRIM = G.TRIM || {};
-  let ctx = null, master, voiceBus, sfxBus;
+  let ctx = null, master, voiceBus, sfxBus, musicBus, duck;
   const bufs = new Map(), pending = new Map(), voices = new Set();
   let gen = 0;
-  const settings = { voice: 1, sfx: 0.6 };
+  const settings = { voice: 1, sfx: 0.6, music: 0.5 };
   /* Family recordings (IndexedDB, see rec.js) override studio clips with the same key; spans are measured on decode. */
   const custom = new Map(), customSpan = new Map();
 
@@ -24,6 +24,9 @@
       master = ctx.createGain(); master.connect(ctx.destination);
       voiceBus = ctx.createGain(); voiceBus.gain.value = settings.voice; voiceBus.connect(master);
       sfxBus = ctx.createGain(); sfxBus.gain.value = settings.sfx; sfxBus.connect(master);
+      /* music goes through `duck`, which drops while a voice speaks and comes back after */
+      duck = ctx.createGain(); duck.connect(master);
+      musicBus = ctx.createGain(); musicBus.gain.value = settings.music * Math.min(1, settings.sfx * 1.6); musicBus.connect(duck);
       const kick = () => { if (ctx.state !== 'running') ctx.resume().catch(() => {}); };
       ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, kick, true));
       document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
@@ -36,7 +39,7 @@
   };
   A.setVolume = function (voice, sfx) {
     settings.voice = voice; settings.sfx = sfx;
-    if (voiceBus) { voiceBus.gain.value = voice; sfxBus.gain.value = sfx; }
+    if (voiceBus) { voiceBus.gain.value = voice; sfxBus.gain.value = sfx; musicBus.gain.value = settings.music * Math.min(1, sfx * 1.6); }
   };
 
   function decode(ab) {
@@ -173,19 +176,23 @@
     src.start(when, off, dur);
     const node = { src, g, when, end: when + dur };
     voices.add(node);
+    if (!opt.sing) atHeard(when, () => { if (voices.has(node)) document.body.classList.add('talking'); }, myGen);
+    if (!opt.sing) { duck.gain.cancelScheduledValues(when); duck.gain.setTargetAtTime(0.22, Math.max(ctx.currentTime, when - 0.05), 0.04); A.ducked = true; }
     if (opt.onStart) atHeard(when, () => opt.onStart(when), myGen);
     A.log.push({ key, when, dur });
     if (A.log.length > 200) A.log.splice(0, 100);
     return new Promise(res => {
       node.res = res;
-      src.onended = () => { voices.delete(node); lastEnd = performance.now(); res(myGen === gen); };
+      src.onended = () => { voices.delete(node); lastEnd = performance.now(); unduck(); res(myGen === gen); };
     });
   }
+  function unduck() { if (!voices.size) document.body.classList.remove('talking'); if (ctx && !voices.size && A.ducked) { A.ducked = false; duck.gain.cancelScheduledValues(ctx.currentTime); duck.gain.setTargetAtTime(1, ctx.currentTime + 0.08, 0.22); } }
   A.say = (key, opt) => A.play(key, opt);
   A.stop = function () {
     gen++;
     voices.forEach(n => { try { n.src.onended = null; n.src.stop(); } catch (e) { /* already stopped */ } if (n.res) n.res(false); });
     voices.clear();
+    unduck();
   };
   A.gen = () => gen;
   let lastEnd = 0;
@@ -222,23 +229,36 @@
     }
     return myGen === gen;
   }
-  /* Beat song: clip i starts on beat i (beat grows if a clip is longer). Drum on each beat. */
+  /* Letter song: clip i starts on beat i (the beat grows if a clip is longer), over a little tune:
+     a melody note with every letter, bass on the strong beats, a soft chord after it, and a closing "짠". */
+  const SONG_MEL = [[0, 2, 4, 2, 5, 4, 2, 0], [4, 2, 0, 2, 4, 4, 4, 2], [0, 0, 4, 4, 5, 5, 4, 2], [0, 2, 4, 7, 5, 4, 2, 4]];
+  const SCALE = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];   /* C pentatonic, two octaves */
+  let songNo = 0;
   A.song = async function (keys, onEach, beat) {
     A.stop();
     const myGen = gen;
     await A.preload(keys);
     if (myGen !== gen || !ctx) return false;
     keys = keys.map(realKey);
-    if (keys.some(k => !bufs.has(k))) return oneByOne(keys, (i) => { drum(ctx.currentTime + 0.003, i % 2 === 0); if (onEach) onEach(i); }, 0.15, myGen);
+    const mel = SONG_MEL[songNo++ % SONG_MEL.length];
+    document.body.classList.add('singing');
+    const endSong = () => document.body.classList.remove('singing');
+    if (keys.some(k => !bufs.has(k))) return oneByOne(keys, (i) => { drum(ctx.currentTime + 0.003, i % 2 === 0); if (onEach) onEach(i); }, 0.15, myGen).then(r => { endSong(); return r; });
     let t = ctx.currentTime + 0.08;
     const ps = keys.map((k, i) => {
-      const d = A.dur(k);
+      const d = A.dur(k), step = Math.max(beat || 0.62, d + 0.1), f = SCALE[mel[i % mel.length]];
       drum(t, i % 2 === 0);
-      const p = A.play(k, { at: t, keep: true, onStart: () => onEach && onEach(i) });
-      t += Math.max(beat || 0.62, d + 0.1);
+      mnote(f * 2, t, step * 0.8, 'triangle', 0.11);
+      if (i % 2 === 0) mnote(f / 2, t, step * 1.6, 'sine', 0.16);
+      else { mnote(SCALE[0] * 2, t + step * 0.5, 0.14, 'sine', 0.05); mnote(SCALE[2] * 2, t + step * 0.5, 0.14, 'sine', 0.05); }
+      const p = A.play(k, { at: t, keep: true, sing: true, onStart: () => onEach && onEach(i) });
+      t += step;
       return p;
     });
+    [SCALE[3], SCALE[5]].forEach((f, i) => mnote(f * 2, t + i * 0.12, i ? 0.5 : 0.14, 'triangle', 0.12));
+    mnote(SCALE[0], t + 0.12, 0.6, 'sine', 0.14);
     const r = await Promise.all(ps);
+    endSong();
     return r.every(Boolean) && myGen === gen;
   };
 
@@ -297,18 +317,46 @@
       default: tone(800, t, 0.06, 'sine', 0.15);
     }
   };
-  /* Soft background tune for home screens only (never during learning plays). */
-  let bgmTimer = null, bgmStep = 0;
-  const TUNE = [N.C5, N.E5, N.G5, N.E5, N.A5, N.G5, N.E5, N.D5, N.C5, N.E5, N.G5, N.C6, N.A5, N.G5, N.E5, 0];
-  A.bgm = function (on) {
-    clearInterval(bgmTimer); bgmTimer = null;
+  /* a soft musical note on the music bus (ducked under voices) */
+  function mnote(f, t, d, type, peak) {
+    if (!ctx || !f) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak || 0.1, t + 0.015);
+    g.gain.exponentialRampToValueAtTime((peak || 0.1) * 0.5, t + d * 0.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(musicBus);
+    o.start(t); o.stop(t + d + 0.05);
+  }
+  /* Background music for the home screens: three gentle tunes (melody, bass, off-beat chord), scheduled on the audio clock.
+     It keeps playing under voices but ducks (see playBuf). Never during learning plays. */
+  const M = n => 440 * Math.pow(2, (n - 69) / 12);
+  const TUNES = [
+    { step: 0.3, mel: [72, 0, 76, 79, 0, 76, 72, 0, 74, 0, 77, 81, 0, 77, 74, 0, 76, 0, 79, 84, 0, 79, 76, 0, 77, 76, 74, 72, 0, 67, 72, 0], bass: [48, 53, 48, 55] },
+    { step: 0.34, mel: [79, 76, 72, 0, 76, 79, 81, 0, 79, 76, 74, 0, 72, 74, 76, 0, 77, 74, 72, 0, 69, 72, 74, 0, 76, 74, 72, 0, 67, 0, 72, 0], bass: [48, 45, 53, 55] },
+    { step: 0.28, mel: [67, 72, 76, 72, 79, 0, 76, 0, 65, 69, 72, 69, 77, 0, 72, 0, 67, 71, 74, 71, 79, 0, 74, 0, 72, 76, 79, 76, 84, 0, 0, 0], bass: [48, 53, 55, 48] }
+  ];
+  let bgmTimer = null, bgmOn = false;
+  A.bgm = function (on, n) {
+    clearInterval(bgmTimer); bgmTimer = null; bgmOn = false;
     if (!on || !ctx) return;
-    bgmTimer = setInterval(() => {
-      if (ctx.state !== 'running' || voices.size) return;
-      const f = TUNE[bgmStep++ % TUNE.length], t = ctx.currentTime + 0.02;
-      if (f) { tone(f, t, 0.32, 'sine', 0.045); if (bgmStep % 4 === 1) tone(f / 2, t, 0.5, 'triangle', 0.03); }
-    }, 360);
+    const T = TUNES[(n === undefined ? Math.floor(Math.random() * TUNES.length) : n) % TUNES.length];
+    let i = 0, next = ctx.currentTime + 0.3;
+    bgmOn = true;
+    const run = () => {
+      if (!bgmOn || ctx.state !== 'running') { next = Math.max(next, ctx.currentTime + 0.1); return; }
+      while (next < ctx.currentTime + 0.5) {
+        const k = i % T.mel.length, m = T.mel[k];
+        if (m) mnote(M(m), next, T.step * 1.7, 'triangle', 0.075);
+        if (k % 8 === 0) mnote(M(T.bass[(k / 8) % T.bass.length]), next, T.step * 7, 'sine', 0.1);
+        if (k % 4 === 2) { const r = T.bass[Math.floor(k / 8) % T.bass.length] + 12; [0, 4, 7].forEach(x => mnote(M(r + x), next, T.step * 1.2, 'sine', 0.028)); }
+        next += T.step; i++;
+      }
+    };
+    bgmTimer = setInterval(run, 120); run();
   };
+  A.musicOn = () => bgmOn;
   A.drum = strong => { if (ctx) drum(ctx.currentTime + 0.003, strong); };
 
   G.A = A;

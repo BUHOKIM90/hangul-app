@@ -394,6 +394,8 @@
     ch.classList.add('open');
     A.sfx('fanfare');
     UI.burst(UI.pointOf(null, ch), 30);
+    UI.rain();
+    UI.buddy('cheer', 'dance');
     await sleep(500);
     if (!ctx.alive()) return;
     const n = ctx.wrong === 0 && ctx.right >= 8 ? 2 : 1;
@@ -610,6 +612,11 @@
     const rv = btn('pg-item review', '<span>🔁</span><b>복습 모험<br><small>할 때마다 새 문제!</small></b>', () => App.runStage({ id: 0, w: cur.w, k: 'review', title: '복습 모험' }, true), '복습 모험');
     rv.style.setProperty('--wc', '#FF8FB8');
     wrap.appendChild(rv);
+    SONGS.forEach((sg, i) => {
+      const sb = btn('pg-item songc', `<span>🎵</span><b>${esc(sg[0])}<br><small>같이 불러요!</small></b>`, () => App.songPlay(i), sg[0]);
+      sb.style.setProperty('--wc', '#8FD3FF');
+      wrap.appendChild(sb);
+    });
     if (!doneIds.length) wrap.appendChild(el('p', 'pg-empty', '모험을 하나 끝내면 여기서 다시 놀 수 있어!'));
     doneIds.slice(-24).reverse().forEach(id => {
       const s = D.STAGES[id - 1], w = D.WORLDS[s.w];
@@ -618,6 +625,50 @@
       wrap.appendChild(b);
     });
     m.appendChild(wrap);
+  };
+
+  /* ---------- letter songs: big letter on every beat, friends dance ---------- */
+  const SONGS = [['가나다 노래', '가나다라마바사아자차카타파하'.split('')], ['아야어여 노래', '아야어여오요우유으이'.split('')]];
+  App.songPlay = async function (n) {
+    leave(); const my = ++App.sess; A.stop(); A.bgm(false);
+    App.screen = 'song';
+    const [title, syl] = SONGS[n];
+    const m = main();
+    m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
+    m.dataset.screen = 'song';
+    m.appendChild(hud({ home: true }));
+    const pals = UI.shuffle(UI.friendsOwned()).slice(0, 3);
+    const box = el('div', 'songbox', `<h2 class="song-title">${esc(title)}</h2>
+      <div class="song-stage"><div class="song-pals">${pals.map(f => `<div class="song-pal">${UI.mascot('joy', {}, f.id)}</div>`).join('')}</div><div class="song-big"><span></span></div></div>
+      <div class="song-row">${syl.map(s => `<button type="button" class="tap song-cell"><span>${esc(s)}</span></button>`).join('')}</div>`);
+    m.appendChild(box);
+    const big = box.querySelector('.song-big span'), cells = Array.from(box.querySelectorAll('.song-cell'));
+    const keys = syl.map(D.syKey);
+    const light = i => {
+      cells.forEach((c, k) => c.classList.toggle('lit', k === i));
+      if (i < 0) return;
+      big.textContent = syl[i];
+      big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+    };
+    cells.forEach((c, i) => UI.tap(c, () => { A.play(keys[i], { onStart: () => light(i) }); }));
+    const again = btn('song-again', '🎵 한 번 더!', null, '노래 한 번 더');
+    again.hidden = true;
+    box.appendChild(again);
+    const sing = async () => {
+      again.hidden = true;
+      await A.preload(keys);
+      if (my !== App.sess) return;
+      const ok = await A.song(keys, light, 0.6);
+      if (my !== App.sess) return;
+      light(-1);
+      if (ok) { UI.rain(24); A.sfx('yay2'); }
+      again.hidden = false;
+    };
+    UI.tap(again, sing);
+    await UI.sleep(500);
+    if (my === App.sess) sing();
   };
 
   /* ---------- parent gate + menu ---------- */

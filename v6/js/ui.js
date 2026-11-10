@@ -181,6 +181,22 @@
       setTimeout(() => s.remove(), 1000);
     }
   };
+  /* Confetti falling over the whole screen (a stage is finished). */
+  UI.rain = function (n) {
+    const fx = UI.$('#fx');
+    if (!fx) return;
+    for (let i = 0; i < (n || 46); i++) {
+      const s = UI.el('i', 'rainc' + (i % 4 === 0 ? ' star' : ''));
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.background = i % 4 === 0 ? 'none' : COLORS[i % COLORS.length];
+      s.style.animationDelay = Math.random() * 0.9 + 's';
+      s.style.animationDuration = 1.6 + Math.random() * 1.2 + 's';
+      s.style.setProperty('--sx', (Math.random() * 30 - 15) + 'vw');
+      if (i % 4 === 0) s.textContent = '★';
+      fx.appendChild(s);
+      setTimeout(() => s.remove(), 3800);
+    }
+  };
   UI.pointOf = function (e, el) {
     if (e && e.clientX !== undefined && e.clientX !== 0) return { x: e.clientX, y: e.clientY };
     if (el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }

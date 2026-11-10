@@ -42,6 +42,7 @@
     ctx.right++;
     ctx.streakWrong = 0;
     const at = UI.pointOf(e, node);
+    if (node && node.classList) { node.classList.remove('yay'); void node.offsetWidth; node.classList.add('yay'); setTimeout(() => node.classList.remove('yay'), 700); }
     const p = UI.praise(type, at, { lead });
     UI.flyStar(at).then(() => ctx.star());
     await p;
