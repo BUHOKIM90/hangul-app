@@ -1068,3 +1068,32 @@ html[data-world="8"] #scene .tw { background: #fff; }
   .dots-prog i { width: 2.8vmin; height: 2.8vmin; }
   .hud-lock { width: 46px; height: 46px; min-width: 46px; min-height: 46px; margin-left: auto; }
 }
+
+/* ---------- v6.7 우리 집 녹음실 ---------- */
+.pm-studio { background: #FFF6E0; border-radius: 14px; padding: 12px 14px; }
+.pm-btn.go { background: #FFD45C; font-weight: 700; }
+.studio { position: fixed; inset: 0; z-index: 80; background: #FFFBF3; color: #3A2E2A; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; padding: 0 max(14px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+.st-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; position: sticky; top: 0; background: #FFFBF3; padding: max(10px, env(safe-area-inset-top)) 0 8px; z-index: 1; }
+.st-top .pm-btn { margin: 0; } .st-top b { font-size: 19px; } .st-top span { font-variant-numeric: tabular-nums; color: #7A6A60; }
+.st-body, .st-line { max-width: 640px; margin: 0 auto; }
+.st-lead { line-height: 1.55; margin: 6px 0 10px; } .st-tips { margin: 0 0 14px 1.1em; line-height: 1.6; color: #5C4E46; font-size: 15px; }
+.st-chaps { display: grid; gap: 10px; }
+.st-chap { position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; font: inherit; font-size: 18px; text-align: left; background: #fff; border: 2px solid #E8DCCB; border-radius: 16px; padding: 16px 18px; min-height: 60px; }
+.st-chap i { position: absolute; left: 0; bottom: 0; height: 5px; background: #6CCB8A; } .st-chap.full { border-color: #6CCB8A; } .st-chap span { color: #7A6A60; font-variant-numeric: tabular-nums; }
+.st-foot { margin-top: 20px; border-top: 1px solid #EADFCF; padding-top: 12px; }
+.st-line { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.st-hint { color: #7A6A60; margin: 6px 0 0; }
+.st-text { font-size: clamp(34px, 9vmin, 64px); line-height: 1.3; font-weight: 700; padding: 18px 12px; min-height: 2.6em; display: flex; align-items: center; justify-content: center; word-break: keep-all; }
+.st-text.one { font-size: clamp(110px, 34vmin, 220px); line-height: 1.05; min-height: 0; } .st-text.long { font-size: clamp(24px, 6vmin, 40px); }
+.st-meter { width: min(320px, 80%); height: 8px; border-radius: 4px; background: #EEE4D4; overflow: hidden; } .st-meter i { display: block; height: 100%; width: 0; background: #FF7A8A; transition: width .06s; }
+.st-state { min-height: 1.5em; margin: 0; color: #5C4E46; }
+.st-rec { width: 104px; height: 104px; border-radius: 50%; border: 0; background: #FF5A70; color: #fff; font-size: 44px; line-height: 1; box-shadow: 0 6px 0 #C93A52; }
+.st-rec:active { transform: translateY(3px); box-shadow: 0 3px 0 #C93A52; } .st-rec.on { background: #3A2E2A; box-shadow: 0 6px 0 #000; animation: stpulse 1s infinite; }
+@keyframes stpulse { 50% { transform: scale(1.06); } }
+.st-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; } .st-row .pm-btn { margin: 0; min-width: 84px; } .st-row .pm-btn:disabled, .st-foot .pm-btn:disabled { opacity: .4; }
+
+/* ---------- v6.7 polish ---------- */
+/* while the friend explains a game: one friend only, and the words are not repeated above */
+.play:has(.explain) ~ .buddy { display: none; }
+.play:has(.explain) .play-sub { visibility: hidden; }
+@media (orientation: portrait) { .ex-bubble::before { top: -2.5vmin; border-bottom: 0; border-top: var(--line); } }

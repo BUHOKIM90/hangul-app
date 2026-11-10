@@ -55,12 +55,16 @@
   let stream = null;
   Rec.micOk = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && G.MediaRecorder && G.isSecureContext !== false);
   function session(t) { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) { /* not supported */ } }
-  Rec.open = async function () {
+  /* raw = the recording studio: the phone's call processing (noise/echo removal) dulls consonants, so it is turned off there */
+  Rec.open = async function (raw) {
     if (stream && stream.getAudioTracks().some(t => t.readyState === 'live')) return stream;
     session('play-and-record');
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    const on = !raw;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: on, noiseSuppression: on, autoGainControl: true, channelCount: 1 } });
     return stream;
   };
+  /* every stored recording with its sound (for the studio's export) */
+  Rec.all = () => tx('readonly', s => s.getAll()).then(a => a || []).catch(() => []);
   /* Stop the microphone so the red indicator goes away and playback returns to the speaker. */
   Rec.close = function () {
     if (stream) stream.getTracks().forEach(t => t.stop());
@@ -76,7 +80,7 @@
   /* Record until stop() or maxMs. Resolves with a Blob. onLevel(0..1) drives the little meter. */
   Rec.record = async function (opt) {
     opt = opt || {};
-    const s = await Rec.open();
+    const s = await Rec.open(opt.raw);
     const type = mime();
     const mr = new MediaRecorder(s, type ? { mimeType: type } : undefined);
     const chunks = [];

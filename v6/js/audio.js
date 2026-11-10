@@ -55,8 +55,14 @@
     while (a < n && Math.abs(ch[a]) < th) a += win;
     while (z > a && Math.abs(ch[z]) < th) z -= win;
     const pad = 0.06;
+    /* home recordings differ in loudness: bring each to about the level of the app's clips (never clipping) */
+    let sum = 0, cnt = 0;
+    for (let i = a; i <= z; i += 2) { sum += ch[i] * ch[i]; cnt++; }
+    const rms = Math.sqrt(sum / Math.max(1, cnt));
+    customGain.set(b, Math.max(0.4, Math.min(5, 0.11 / Math.max(1e-4, rms), 0.98 / Math.max(1e-4, peak))));
     return [Math.max(0, a / b.sampleRate - pad), Math.min(b.duration, z / b.sampleRate + pad)];
   }
+  const customGain = new WeakMap();
   A.setCustom = function (key, ab) {
     bufs.delete(key); customSpan.delete(key);
     if (ab) custom.set(key, ab); else custom.delete(key);
@@ -158,9 +164,10 @@
     const src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = b;
     const fadeIn = 0.006, fadeOut = Math.min(0.025, dur / 4);
+    const lvl = customGain.get(b) || 1;
     g.gain.setValueAtTime(0, when);
-    g.gain.linearRampToValueAtTime(1, when + fadeIn);
-    g.gain.setValueAtTime(1, when + dur - fadeOut);
+    g.gain.linearRampToValueAtTime(lvl, when + fadeIn);
+    g.gain.setValueAtTime(lvl, when + dur - fadeOut);
     g.gain.linearRampToValueAtTime(0, when + dur);
     src.connect(g); g.connect(voiceBus);
     src.start(when, off, dur);

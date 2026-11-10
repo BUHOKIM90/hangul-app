@@ -240,6 +240,8 @@
   /* Picture card face for a word. */
   /* A word picture: our own drawings (svg:name, v6/img/w) for people, otherwise the outlined emoji picture. */
   UI.picFace = pic => (pic && pic.startsWith('svg:') ? `<img class="em own" src="v6/img/w/${pic.slice(4)}.svg" alt="" draggable="false">` : UI.em(pic || '❓'));
+  /* family drawings are fetched ahead so a card never shows up empty the first time */
+  ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'nuna', 'ryeowon', 'ai', 'eobu'].forEach(n => { const i = new Image(); i.src = 'v6/img/w/' + n + '.svg'; });
   UI.pic = function (w, cls) {
     const W = D.WORDS[w];
     return `<span class="pic ${cls || ''}" aria-label="${W ? W.w : ''}">${UI.picFace(W && W.pic)}</span>`;

@@ -685,6 +685,10 @@
           <p>같은 문장을 여러 목소리로 들어 볼 수 있습니다. 마음에 드는 목소리를 고르고 알려 주시면 앱의 모든 음성을 그 목소리로 다시 만듭니다.</p>
           <div id="pmVoicePick"><p class="pm-small">불러오는 중…</p></div>
         </section>
+        <section class="pm-studio"><h3>우리 집 녹음실 — 진짜 엄마·아빠 목소리로</h3>
+          <p>기계 목소리 대신, 앱이 하는 모든 말(글자 소리·낱말·칭찬 628줄)을 엄마·아빠 목소리로 바꿀 수 있습니다. 한 줄에 한 번 누르면 되고, 나눠서 해도 됩니다. 글자 소리 211개만 먼저 해도(약 15분) 가장 큰 차이가 납니다.</p>
+          <button type="button" class="pm-btn go" id="pmStudio">녹음실 열기</button> <span class="pm-small" id="pmStudioN"></span>
+        </section>
         <section><h3>가족 목소리</h3>
           <p>엄마·아빠 목소리로 녹음하면 앱이 그 목소리로 말합니다(녹음이 없으면 원래 녹음된 목소리, 이야기는 글자만). 녹음은 이 기기에만 저장됩니다.</p>
           <div id="pmVoices"></div>
@@ -729,6 +733,12 @@
     });
     voiceUi();
     voicePick();
+    const sb = $('#pmStudio');
+    if (sb && G.Studio) {
+      const n = G.Rec ? Array.from(G.Rec.items.values()).filter(i => i.kind === 'studio').length : 0;
+      $('#pmStudioN').textContent = n ? `지금까지 ${n}줄 녹음` : '';
+      sb.onclick = () => { G.Studio.onClose = () => App.parent(); G.Studio.open(); };
+    }
     $('#pmCheck').addEventListener('click', runCheck);
     $('#pmResetR').addEventListener('click', () => {
       if (!confirm('스티커와 옷을 모두 지울까요? 학습 진도는 남습니다.')) return;

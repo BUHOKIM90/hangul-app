@@ -42,7 +42,7 @@ if (noTrim.length) { console.error('NO TRIM', noTrim); process.exit(1); }
 const used = {};
 [...clips].sort().forEach(k => { used[k] = TRIM[k]; });
 const appFiles = ['./', 'index.html', 'manifest.json', 'v6/css/app.css', 'v6/js/trim.js', 'v6/js/data.js', 'v6/js/audio.js', 'v6/js/rec.js', 'v6/js/store.js',
-  'v6/js/chars.js', 'v6/js/ui.js', 'v6/js/write.js', 'v6/js/games.js', 'v6/js/app.js', 'fonts/Jua-Regular.woff2', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png'];
+  'v6/js/chars.js', 'v6/js/ui.js', 'v6/js/write.js', 'v6/js/games.js', 'v6/js/studio.js', 'v6/js/app.js', 'v6/tools/voice/lines.json', 'fonts/Jua-Regular.woff2', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png'];
 const audioFiles = [...clips].sort().map(k => 'audio/' + k + '.mp3');
 // every emoji the app shows must have its Fluent 3D picture
 const EMO = /\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*/gu;
