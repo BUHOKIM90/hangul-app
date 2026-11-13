@@ -25,7 +25,7 @@
 
   /* Fast tap: fires on pointerdown (no click delay), one fire per 280 ms per element. */
   UI.tap = function (el, fn) {
-    let last = 0;
+    let last = -Infinity;
     el.addEventListener('pointerdown', e => {
       if (e.button > 0) return;
       const now = performance.now();
