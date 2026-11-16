@@ -16,7 +16,12 @@ const TRIM = JSON.parse(fs.readFileSync(trimJson, 'utf8'));
 // pictures get the characters' brown outline (idempotent)
 execFileSync(process.execPath, [path.join(here, 'outline.mjs'), root], { stdio: 'inherit' });
 
-const win = {};
+// R3: new words/sentences/sticker names wait for their recording. A key is READY once its mp3 exists AND the voice pipeline
+// listed it in v6/tools/voice/ready_new.txt (one key per line, added after the Sulafat take passed the check).
+const readyFile = path.join(root, 'v6/tools/voice/ready_new.txt');
+const READY = (fs.existsSync(readyFile) ? fs.readFileSync(readyFile, 'utf8').split(/\s+/).filter(Boolean) : [])
+  .filter(k => fs.existsSync(path.join(root, 'audio', k + '.mp3')) && TRIM[k]);
+const win = { READY };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'v6/js/data.js'), 'utf8'), { window: win, console });
 const D = win.D;
 const clips = new Set(['ui_good1', 'ui_good2', 'ui_good3', 'ui_found', 'ui_same', 'ui_hiname', 'ui_sticker', 'ui_levelup', 'ui4_treasure',
@@ -33,6 +38,7 @@ Object.keys(D.WORDS).forEach(k => clips.add('w_' + k));
 D.HY.forEach(k => clips.add('hy_' + k));
 D.CLAP.forEach(k => clips.add('c_' + k));
 D.SENTENCES.forEach(s => clips.add(s.clip));
+READY.forEach(k => clips.add(k));              // recorded sticker names / aquarium words / new lines
 
 const missing = [...clips].filter(k => !fs.existsSync(path.join(root, 'audio', k + '.mp3')));
 if (missing.length) { console.error('MISSING AUDIO', missing); process.exit(1); }
@@ -41,21 +47,25 @@ if (noTrim.length) { console.error('NO TRIM', noTrim); process.exit(1); }
 
 const used = {};
 [...clips].sort().forEach(k => { used[k] = TRIM[k]; });
-const appFiles = ['./', 'index.html', 'manifest.json', 'v6/css/app.css', 'v6/js/trim.js', 'v6/js/data.js', 'v6/js/audio.js', 'v6/js/rec.js', 'v6/js/store.js',
-  'v6/js/chars.js', 'v6/js/ui.js', 'v6/js/write.js', 'v6/js/games.js', 'v6/js/studio.js', 'v6/js/app.js', 'v6/tools/voice/lines.json', 'fonts/Jua-Regular.woff2', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png'];
+const appFiles = ['./', 'index.html', 'manifest.json', 'v6/css/app.css', 'v6/js/trim.js', 'v6/js/data.js', 'v6/js/coach.js', 'v6/js/audio.js', 'v6/js/rec.js', 'v6/js/store.js',
+  'v6/js/chars.js', 'v6/js/ui.js', 'v6/js/write.js', 'v6/js/games.js', 'v6/js/aqua.js', 'v6/js/studio.js', 'v6/js/app.js', 'v6/tools/voice/lines.json', 'fonts/Jua-Regular.woff2', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png'];
 const audioFiles = [...clips].sort().map(k => 'audio/' + k + '.mp3');
 // every emoji the app shows must have its Fluent 3D picture
 const EMO = /\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*/gu;
 const SKIP = /[\uFE0F\u200D\u{1F3FB}-\u{1F3FF}]/gu;
 const keyOf = e => Array.from(e.replace(SKIP, '')).map(c => c.codePointAt(0).toString(16)).join('-');
-const src = ['data.js', 'app.js', 'games.js', 'ui.js', 'chars.js'].map(f => fs.readFileSync(path.join(root, 'v6/js', f), 'utf8')).join('\n')
+const src = ['data.js', 'coach.js', 'app.js', 'games.js', 'aqua.js', 'ui.js', 'chars.js'].map(f => fs.readFileSync(path.join(root, 'v6/js', f), 'utf8')).join('\n')
   .replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/hat_[a-z]+: '[^\n]*/g, '').replace(/back_[a-z]+: '[^\n]*/g, '');
 const usedEmo = new Set((src.match(EMO) || []).map(keyOf));
 const PLAIN = new Set(['25b6', '2194', 'a9', '2713', '2715', '2717', '2605']);
 const noPic = [...usedEmo].filter(k => !PLAIN.has(k) && !fs.existsSync(path.join(root, 'v6/img/e', k + '.svg')));
 if (noPic.length) { console.error('EMOJI WITHOUT PICTURE', noPic.map(k => k.split('-').map(h => String.fromCodePoint(parseInt(h, 16))).join(''))); process.exit(1); }
 const imgFiles = fs.readdirSync(path.join(root, 'v6/img/e')).filter(f => f.endsWith('.svg')).sort().map(f => 'v6/img/e/' + f)
-  .concat(fs.readdirSync(path.join(root, 'v6/img/w')).filter(f => f.endsWith('.svg')).sort().map(f => 'v6/img/w/' + f));
+  .concat(fs.readdirSync(path.join(root, 'v6/img/w')).filter(f => f.endsWith('.svg')).sort().map(f => 'v6/img/w/' + f))
+  .concat(fs.readdirSync(path.join(root, 'v6/img/p')).filter(f => f.endsWith('.webp')).sort().map(f => 'v6/img/p/' + f));
+const allWords = Object.values(D.WORDS).concat(Object.values(D.WORDS_WAITING || {}));
+const noImg = allWords.filter(w => w.pic && w.pic.startsWith('img:') && !fs.existsSync(path.join(root, 'v6/img/p', w.pic.slice(4) + '.webp')));
+if (noImg.length) { console.error('WORD PICTURE MISSING', noImg.map(w => w.key)); process.exit(1); }
 // every svg: picture a word uses must exist
 const noOwn = Object.values(D.WORDS).filter(w => w.pic && w.pic.startsWith('svg:') && !fs.existsSync(path.join(root, 'v6/img/w', w.pic.slice(4) + '.svg')));
 if (noOwn.length) { console.error('WORD PICTURE MISSING', noOwn.map(w => w.key)); process.exit(1); }
@@ -64,7 +74,7 @@ if (noOwn.length) { console.error('WORD PICTURE MISSING', noOwn.map(w => w.key))
 const FILES = appFiles.concat(imgFiles, audioFiles);
 fs.writeFileSync(path.join(root, 'v6/js/trim.js'),
   "'use strict';\n/* Generated by v6/tools/build.mjs. [speechStart, speechEnd, fileLength] in seconds; leading/trailing silence and breath are skipped at play time. */\n" +
-  'window.SW_FILES_COUNT = ' + FILES.length + ';\nwindow.EMOJI_KEYS = ' + JSON.stringify(fs.readdirSync(path.join(root, 'v6/img/e')).filter(f => f.endsWith('.svg')).map(f => f.slice(0, -4)).sort()) + ';\nwindow.TRIM = ' + JSON.stringify(used) + ';\n');
+  'window.SW_FILES_COUNT = ' + FILES.length + ';\nwindow.READY = ' + JSON.stringify(READY) + ';\nwindow.EMOJI_KEYS = ' + JSON.stringify(fs.readdirSync(path.join(root, 'v6/img/e')).filter(f => f.endsWith('.svg')).map(f => f.slice(0, -4)).sort()) + ';\nwindow.TRIM = ' + JSON.stringify(used) + ';\n');
 const bad = FILES.filter(f => f !== './' && !fs.existsSync(path.join(root, f)));
 if (bad.length) { console.error('CACHE LIST HAS MISSING FILES', bad); process.exit(1); }
 const h = crypto.createHash('sha1');
@@ -74,21 +84,41 @@ const sw = `'use strict';
 /* Generated by v6/tools/build.mjs — every file below exists in the repo. */
 const CACHE = 'hangul-v6-${ver}';
 const FILES = ${JSON.stringify(FILES)};
+/* P1: install retries each file with backoff, skips files an earlier attempt already cached, reports progress to the page
+   ({type:'precache', done, total}) and FAILS if any file is still missing — so a flaky first visit never leaves a half-offline
+   app behind; the browser simply tries the install again on the next visit (the page also asks again after 30 s). */
+const OWN = k => k.startsWith('hangul-v') || k.startsWith('hangul-play');   /* this app's cache families only */
+async function tell(msg) { (await self.clients.matchAll({ includeUncontrolled: true, type: 'window' })).forEach(c => c.postMessage(msg)); }
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await Promise.all(FILES.map(async url => {
-      for (let i = 0; i < 3; i++) {
-        try { const res = await fetch(new Request(url, { cache: 'reload' })); if (res.ok) { await cache.put(url, res); return; } } catch (e) { /* retry */ }
+    let done = 0, last = 0;
+    const failed = [];
+    const one = async url => {
+      if (url !== './' && await cache.match(url)) return true;
+      for (let i = 0; i < 4; i++) {
+        try { const res = await fetch(new Request(url, { cache: 'reload' })); if (res.ok) { await cache.put(url, res); return true; } } catch (e) { /* retry */ }
+        await new Promise(r => setTimeout(r, 400 * (i + 1) * (i + 1)));
+      }
+      return false;
+    };
+    let next = 0;
+    await Promise.all(Array.from({ length: 12 }, async () => {
+      while (next < FILES.length) {
+        const url = FILES[next++];
+        if (!(await one(url))) failed.push(url);
+        done++;
+        if (done - last >= 20 || done === FILES.length) { last = done; tell({ type: 'precache', done, total: FILES.length, failed: failed.length }); }
       }
     }));
+    if (failed.length) { await tell({ type: 'precache-failed', failed: failed.length, total: FILES.length }); throw new Error('precache failed: ' + failed.slice(0, 5).join(', ')); }
     await self.skipWaiting();
   })());
 });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k.startsWith('hangul-') && k !== CACHE).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => OWN(k) && k !== CACHE).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });

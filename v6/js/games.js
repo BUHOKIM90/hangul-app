@@ -40,22 +40,96 @@
   async function right(ctx, type, e, node, item, lead) {
     St.mark(item, true);
     ctx.right++;
+    /* R2 mastery: only questions opened with ask() count (ones that can be answered wrong); first try = no wrong tap since ask() */
+    if (ctx.helpClear) ctx.helpClear();
+    const graded = ctx.open != null, missed = !!ctx.missed;
+    if (ctx.open != null) {
+      ctx.q = (ctx.q || 0) + 1; if (!ctx.missed) ctx.ft = (ctx.ft || 0) + 1;
+      (ctx.chances = ctx.chances || []).push(ctx.open);
+      ctx.open = null;
+    }
+    ctx.missed = false;
     ctx.streakWrong = 0;
+    /* Nihon #4 placement: first-try result per item; #5 the thing she made today (traced letter with her own ink, or built syllable) */
+    if (graded) (ctx.firstLog = ctx.firstLog || []).push([item, !missed]);
+    if (item) ctx.lastItem = item;
+    if (item && item.startsWith('write:')) {
+      let ink = null;
+      try { const cv = node && node.querySelector && node.querySelector('canvas.write-ink'); if (cv) ink = cv.toDataURL('image/png'); } catch (err) { /* tainted or no canvas */ }
+      ctx.made = { kind: 'write', ch: item.slice(6), ink };
+    } else if (item && (type === 'block' || type === 'batchim') && item.startsWith('sy:') && !(ctx.made && ctx.made.kind === 'write')) ctx.made = { kind: 'block', ch: item.slice(3) };
     const at = UI.pointOf(e, node);
     if (node && node.classList) { node.classList.remove('yay'); void node.offsetWidth; node.classList.add('yay'); setTimeout(() => node.classList.remove('yay'), 700); }
+    /* R3 §5: praise always (< 0.2 s), a star only for a first-try answer that no hint pointed at (Lepper 1973; Deci 1999:
+       a reward for every tap, guessed or not, teaches tapping). */
+    const earned = !(graded && (missed || ctx.hinted));
     const p = UI.praise(type, at, { lead });
-    UI.flyStar(at).then(() => ctx.star());
+    if (earned) UI.flyStar(at).then(() => ctx.star());
+    ctx.hinted = false;
     await p;
     if (ctx.alive()) await ctx.gift();
   }
-  function wrong(ctx, node, item, clip) {
+  function wrong(ctx, node, item, clip, force) {
     St.mark(item, false);
     ctx.wrong++;
+    ctx.missed = true;
     ctx.streakWrong = (ctx.streakWrong || 0) + 1;
     UI.oops(node);
-    /* after two misses in a row: name what was pressed, then "괜찮아. 같이 해 보자." */
-    const seq = [clip].concat(ctx.streakWrong === 2 ? ['ui4_try'] : []).filter(Boolean);
-    if (seq.length) setTimeout(() => { if (ctx.alive()) A.sequence(seq, null, 0.2); }, 250);
+    /* R3 §5: name what was pressed ("그건 X 글자야"), rest ~1.5 s (choices do not take taps), and after a 2nd miss in a row
+       or a miss that came < 0.6 s after the choices opened (a guess, not a choice) say the question again. */
+    const fast = performance.now() - Guard.openAt < FAST_MS;
+    const again = (ctx.streakWrong >= 2 || fast || force) && Guard.again;
+    const seq = [].concat(clip || []).concat(ctx.streakWrong === 2 ? ['ui4_try'] : []).filter(Boolean);
+    const len = seq.reduce((t, k) => t + A.dur(k) * 1000 + 200, 250);
+    lock(Math.max(REST_MS, Math.min(len, 3500)));
+    Guard.misses++; if (fast) Guard.fast++;
+    setTimeout(() => {
+      if (!ctx.alive()) return;
+      const p = seq.length ? A.sequence(seq, null, 0.2) : Promise.resolve(true);
+      if (again) p.then(ok => { if (ok !== false && ctx.alive()) { lock(Math.min(LOCK_MAX, again.dur() + 150)); again.play(); } });
+    }, 250);
+  }
+  /* ---------- R3 §5 tap guard (one stage at a time, so one guard) ----------
+     - while the question is spoken the choices do not take taps (max 2.5 s), shown by .play.listen;
+     - after a miss: a ~1.5 s rest while "그건 X" plays;
+     - Guard.openAt = when the choices last opened (for the too-fast rule). Ignored taps are counted, never punished. */
+  const LOCK_MAX = 2500, REST_MS = 1500, FAST_MS = 600;
+  const Guard = { until: 0, openAt: 0, again: null, ignored: 0, misses: 0, fast: 0, t: null };
+  function lock(ms) {
+    const now = performance.now(), until = now + ms;
+    if (until <= Guard.until) return;
+    Guard.until = until; Guard.openAt = until;
+    const area = UI.$('.play') || UI.$('.aqua');
+    if (area) area.classList.add('listen');
+    clearTimeout(Guard.t);
+    Guard.t = setTimeout(() => { const a = UI.$('.play') || UI.$('.aqua'); if (a) a.classList.remove('listen'); }, ms);
+  }
+  const locked = () => performance.now() < Guard.until;
+  /* The question sound: plays it and keeps the choices shut until it has been heard (capped). `again` replays it later. */
+  function prompt(key, opt) {
+    const k = typeof key === 'function' ? null : key;
+    Guard.again = k ? { play: () => A.play(k), dur: () => A.dur(k) * 1000 } : (key ? { play: key, dur: () => 1500 } : null);
+    if (!k) return Promise.resolve(true);
+    lock(Math.min(LOCK_MAX, A.dur(k) * 1000 + 150));
+    return A.play(k, opt);
+  }
+  /* a question asked with an already-finished sound (clap, first, train …): only remember how to say it again */
+  function promptDone(key) { Guard.again = key ? { play: typeof key === 'function' ? key : () => A.play(key), dur: () => (typeof key === 'function' ? 1500 : A.dur(key) * 1000) } : null; }
+  /* R2 mastery: open a question that can be answered wrong. `chance` = the odds that a random tap is right on the first try
+     (1/3 for three cards), so the stage result can be compared with pure guessing. In help mode (a stage failed twice) the
+     right answer starts to glow soon after the question, so a child who keeps failing can follow it and move on. */
+  function ask(ctx, chance, hintNode) {
+    ctx.open = Math.max(0.0001, Math.min(1, chance));
+    ctx.missed = false;
+    ctx.hinted = false;
+    Guard.openAt = Math.max(Guard.until, performance.now());
+    if (ctx.help && hintNode) helpGlow(ctx, hintNode);
+  }
+  /* one pending help glow at a time; cleared when the question is answered so it never lights a card of the next question */
+  function helpGlow(ctx, node) {
+    if (ctx.helpClear) ctx.helpClear();
+    const stop = hintAfter(ctx, node, ctx.helpMs || 1200);
+    ctx.helpClear = () => { stop(); node.classList.remove('hint'); ctx.helpClear = null; };
   }
   const syClip = ch => (D.has.sy(ch) ? D.syKey(ch) : null);
   const findClip = ch => (D.has.fy(ch) ? D.fyKey(ch) : syClip(ch));
@@ -63,22 +137,32 @@
   const wordThat = k => (D.HY.has(k) ? 'hy_' + k : 'w_' + k);
   const jamoClip = j => (D.VROW[j] && D.has.sy(D.VROW[j]) ? D.syKey(D.VROW[j]) : (D.has.j(j) ? D.jKey(j) : null));
   /* Wait until one of `nodes` is tapped; handler(node, e) returns true to finish. */
+  /* R2: a quick second tap on the card that was just judged (double tap / mashing) is ignored — no second "oops", no extra try. */
+  const MASH_MS = 600;
   function choose(nodes, handler) {
     return new Promise(res => {
-      let busy = false, over = false;
+      let busy = false, over = false, lastN = null, lastT = -1e9;
       nodes.forEach(n => UI.tap(n, async e => {
         if (busy || over) return;
+        if (locked()) { Guard.ignored++; waitCue(n); return; }
+        if (n === lastN && performance.now() - lastT < MASH_MS) return;
         busy = true;
         const r = await handler(n, e);
         busy = false;
+        lastN = n; lastT = performance.now();
         if (r) { over = true; res(n); }
       }));
     });
   }
+  /* a tap while the choices are shut: the speaker ear wiggles ("listen first"), nothing else happens */
+  function waitCue() {
+    const s = UI.$('.play .speaker') || UI.$('.aqua .speaker');
+    if (s) { s.classList.remove('ear'); void s.offsetWidth; s.classList.add('ear'); }
+  }
   /* QA hook: the value the child should tap now (read only by the test bot). */
   const ans = v => { G.__answer = v === null || v === undefined ? null : String(v); };
   function hintAfter(ctx, node, ms) {
-    const t = setTimeout(() => { if (ctx.alive() && node.isConnected) node.classList.add('hint'); }, ms);
+    const t = setTimeout(() => { if (ctx.alive() && node.isConnected) { node.classList.add('hint'); ctx.hinted = true; } }, ms);
     return () => clearTimeout(t);
   }
 
@@ -114,11 +198,12 @@
   /* Like choose(), but the child can drag a piece onto dropOf(node). handler(node, e) returns true to finish. */
   function chooseDrag(nodes, dropOf, handler) {
     return new Promise(res => {
-      let busy = false, over = false;
+      let busy = false, over = false, lastN = null, lastT = -1e9;
       const run = async (n, e) => {
         busy = true;
         const r = await handler(n, e);
         busy = false;
+        lastN = n; lastT = performance.now();
         if (r) { over = true; res(n); }
       };
       nodes.forEach(n => {
@@ -127,6 +212,8 @@
         n.addEventListener('pointerdown', e => {
           if (busy || over || e.button > 0 || n.style.visibility === 'hidden') return;
           e.preventDefault();
+          if (locked()) { Guard.ignored++; waitCue(n); return; }
+          if (n === lastN && performance.now() - lastT < MASH_MS) return;
           const id = e.pointerId, sx = e.clientX, sy = e.clientY;
           let g = null, zone = null;
           try { n.setPointerCapture(id); } catch (err) { /* old browsers */ }
@@ -148,8 +235,8 @@
             if (busy || over) { if (g) { g.remove(); n.classList.remove('lifted'); } return; }
             const z = dropOf(n);
             if (!g) {
-              busy = true;
-              if (z) await fly(n, z);
+              /* R2: judge on finger-up at once (the piece still flies into its slot) so praise comes < 0.2 s from finger-down */
+              if (z) fly(n, z);
               run(n, ev);
               return;
             }
@@ -244,16 +331,18 @@
     songBtn.hidden = false;
     UI.tap(songBtn, () => { if (qNow >= 0) A.play(keys[qNow]); else A.song(keys, light, cfg.beat || 0.66).then(() => light(-1)); });
     const uniq = syl.map((s, i) => i).filter(i => syl.indexOf(syl[i]) === i);
-    const qs = shuffle(uniq).slice(0, Math.min(cfg.quiz || 2, uniq.length));
+    const calmU = uniq.filter(i => !D.SHAKY.has(syl[i]));
+    const qs = shuffle(calmU.length >= Math.min(cfg.quiz || 2, uniq.length) ? calmU : uniq).slice(0, Math.min(cfg.quiz || 2, uniq.length));
     for (const qi of qs) {
       if (!ctx.alive()) return;
       qNow = qi;
       const want = syl[qi];
       const same = cells.filter((c, k) => syl[k] === want);
       await sleep(300);
-      A.play(keys[qi]);
+      prompt(keys[qi]);
       let tries = 0;
       const stop = hintAfter(ctx, same[0], 6000);
+      ask(ctx, same.length / cells.length, same[0]);
       ans('i' + qi);
       await choose(cells, async (c, e) => {
         const k = +c.dataset.i;
@@ -291,9 +380,10 @@
         b.appendChild(n); return n;
       });
       await sleep(200);
-      A.play(promptOf(t));
+      prompt(promptOf(t));
       let tries = 0;
       const item = (cfg.jamo ? 'j:' : 'sy:') + t;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === t));
       ans(t);
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === t) {
@@ -328,8 +418,9 @@
       const nodes = opts.map(o => { const n = el('button', 'tap card', UI.picW(o)); n.type = 'button'; n.dataset.v = o; grid.appendChild(n); return n; });
       b.appendChild(grid);
       await sleep(200);
-      if (!read) { if (qs.indexOf(k) === 0) await say(ctx, 'ui_which'); A.play('w_' + k); }
+      if (!read) { if (qs.indexOf(k) === 0) await say(ctx, 'ui_which'); prompt('w_' + k); } else promptDone(null);
       let tries = 0;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === k));
       ans(k);
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === k) {
@@ -405,6 +496,8 @@
       await sleep(200);
       await A.play('w_' + k);
       await say(ctx, 'ui_clapq');
+      promptDone('w_' + k);
+      ask(ctx, 1 / nodes.length, nodes.find(x => +x.dataset.v === n));
       ans(n);
       await choose(nodes, async (c, e) => {
         if (+c.dataset.v === n) {
@@ -436,7 +529,9 @@
       await A.play('w_' + a);
       if (!ctx.alive()) return;
       await A.play('ui_same');
+      promptDone('w_' + a);
       let tries = 0;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === m));
       ans(m);
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === m) {
@@ -501,7 +596,8 @@
       return;
     }
     /* make mode */
-    const qs = shuffle(vs).slice(0, cfg.n || 4);
+    const calmV = vs.filter(v => !D.SHAKY.has(D.join(c, v, '')));
+    const qs = shuffle(calmV.length >= Math.min(cfg.n || 4, vs.length) ? calmV : vs).slice(0, cfg.n || 4);
     for (const v of qs) {
       if (!ctx.alive()) return;
       const s = D.join(c, v, '');
@@ -518,8 +614,9 @@
       const nodes = opts.map(o => { const n = el('button', 'tap vblock', blockFace(o, 'vow')); n.type = 'button'; n.dataset.v = o; tray.appendChild(n); return n; });
       b.appendChild(tray);
       await sleep(200);
-      A.play(findClip(s));
+      prompt(findClip(s));
       let tries = 0;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === v));
       ans(v);
       await chooseDrag(nodes, () => slot, async (n, e) => {
         if (n.dataset.v === v) {
@@ -620,7 +717,12 @@
       b.appendChild(tray);
       await sleep(200);
       await A.play('w_' + k);
+      promptDone('w_' + k);
       let i = 0;
+      /* first try = every car right the first time; a random tapper does that with p = product of (fitting cars / cars left) */
+      { let left = cars.slice(), pr = 1; W0.syl.forEach(sy => { pr *= left.filter(x => x === sy).length / left.length; left.splice(left.indexOf(sy), 1); }); ask(ctx, pr, null); }
+      const helpCar = () => { if (ctx.help) { const nx = nodes.find(x => x.dataset.v === W0.syl[i] && x.style.visibility !== 'hidden'); if (nx) helpGlow(ctx, nx); } };
+      helpCar();
       ans(W0.syl[0]);
       await chooseDrag(nodes, () => slots[i] || slots[slots.length - 1], async (n, e) => {
         const need = W0.syl[i];
@@ -634,6 +736,7 @@
           else { slot.textContent = need; slot.classList.remove('empty'); }
           i++;
           ans(W0.syl[i]);
+          if (i < W0.syl.length) helpCar();
           if (i === W0.syl.length) {
             slot.textContent = need; slot.classList.remove('empty');
             track.classList.add('go');
@@ -719,8 +822,9 @@
       const nodes = opts.map(o => { const n = el('button', 'tap vblock', blockFace(o, 'coda')); n.type = 'button'; n.dataset.v = o; tray.appendChild(n); return n; });
       b.appendChild(tray);
       await sleep(200);
-      if (cfg.mode === 'make') A.play(D.syKey(s)); else { if (syClip(bd)) await A.play(syClip(bd)); nodes[0].classList.add('next'); }
+      if (cfg.mode === 'make') prompt(D.syKey(s)); else { if (syClip(bd)) await A.play(syClip(bd)); nodes[0].classList.add('next'); }
       let tries = 0;
+      if (cfg.mode === 'make') ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === bb));
       ans(bb);
       await chooseDrag(nodes, () => slot, async (n, e) => {
         if (n.dataset.v === bb) {
@@ -762,7 +866,7 @@
       onEach = i => wordsEls.forEach((w, k) => w.classList.toggle('lit', k === i));
       replay = () => A.sequence(clips, onEach, 0.18).then(() => onEach(-1));
       const pics = it.clip ? it.pics : it.words;
-      const decoyPool = cfg.decoys.filter(d => d.join() !== pics.join() && !d.some(x => pics.some(y => x !== y && D.clash(x, y))));
+      const decoyPool = cfg.decoys.filter(d => d.join() !== pics.join() && !d.some(x => pics.some(y => x !== y && D.clash(x, y))) && (pics.length > 1 || !d.includes(pics[0])));
       const opts = shuffle([pics].concat(shuffle(decoyPool).slice(0, 2)));
       const grid = el('div', 'cards wide');
       const nodes = opts.map(o => { const n = el('button', 'tap card pair', o.map(k => UI.picW(k)).join('')); n.type = 'button'; n.dataset.v = o.join(); grid.appendChild(n); return n; });
@@ -771,7 +875,9 @@
       await sleep(250);
       if (!cfg.alone) await replay();
       if (!ctx.alive()) return;
+      promptDone(replay);
       let tries = 0;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === pics.join()));
       ans(pics.join());
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === pics.join()) {
@@ -780,8 +886,10 @@
           return true;
         }
         tries++;
-        wrong(ctx, n, 'story:' + pics.join(), null);
-        if (tries === 1 && cfg.alone) replay();
+        /* R3 B10: name the pictures that were tapped (그건 X야), like every other play */
+        const tapped = n.dataset.v.split(',');
+        /* reading alone: after the first miss the sentence is read to her (after "그건 X") */
+        wrong(ctx, n, 'story:' + pics.join(), tapped.length === 1 ? wordThat(tapped[0]) : tapped.map(x => 'w_' + x), tries === 1 && cfg.alone);
         if (tries >= 2) nodes.find(x => x.dataset.v === pics.join()).classList.add('hint');
         return false;
       });
@@ -819,9 +927,10 @@
       const fitSwim = () => nodes.forEach(f => { const lw = f.parentElement.getBoundingClientRect().width, fw = f.getBoundingClientRect().width; f.style.setProperty('--d', Math.max(0, lw - fw - 8) + 'px'); });
       fitSwim();
       await sleep(250);
-      A.play(promptOf(t));
+      prompt(promptOf(t));
       let tries = 0;
       const item = (cfg.jamo ? 'j:' : 'sy:') + t;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === t));
       ans(t);
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === t) {
@@ -859,8 +968,9 @@
       const nodes = opts.map(o => { const n = el('button', 'tap tag', `<span>${esc(D.WORDS[o].w)}</span>`); n.type = 'button'; n.dataset.v = o; shelf.appendChild(n); return n; });
       b.append(cust, shelf);
       await sleep(200);
-      A.play('w_' + k);
+      prompt('w_' + k);
       let tries = 0;
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === k));
       ans(k);
       await chooseDrag(nodes, () => cust, async (n, e) => {
         if (n.dataset.v === k) {
@@ -893,9 +1003,17 @@
     await sleep(30);
     const r = field.getBoundingClientRect();
     const wide = r.width >= r.height;
-    const cols = wide ? 6 : 4, rows = wide ? 3 : 5, cells = shuffle(Array.from({ length: cols * rows }, (_, i) => i));
+    const cols = wide ? 6 : 4, rows = wide ? 3 : 5;
+    /* P1: never under the mascot — drop grid cells that its box covers (it sits at the bottom-right of the screen) */
+    const bud = UI.$('#buddy'), br = bud ? bud.getBoundingClientRect() : null, cw0 = r.width / cols, ch0 = r.height / rows;
+    const free = Array.from({ length: cols * rows }, (_, i) => i).filter(i => {
+      if (!br || !br.width) return true;
+      const x0 = r.left + (i % cols) * cw0, y0 = r.top + Math.floor(i / cols) * ch0;
+      return !(x0 + cw0 > br.left + br.width * 0.25 && y0 + ch0 > br.top + br.height * 0.2);
+    });
+    const cells = shuffle(free.length >= count + 6 ? free : Array.from({ length: cols * rows }, (_, i) => i));
     const decoys = cfg.decoys.filter(x => x !== t);
-    const nDecor = 3, nDecoy = cols * rows - count - nDecor;
+    const nDecor = 3, nDecoy = Math.max(2, cells.length - count - nDecor);
     const list = Array(count).fill(t).map(x => ({ x, t: true }))
       .concat(Array.from({ length: nDecoy }, (_, i) => ({ x: decoys[i % decoys.length] })))
       .concat(shuffle(HIDE_DECOR).slice(0, nDecor).map(x => ({ x, deco: true })));
@@ -906,27 +1024,39 @@
       const n = el('button', 'tap hid' + (it.deco ? ' deco' : ''), it.deco ? UI.em(it.x) : esc(it.x));
       n.type = 'button';
       if (!it.deco) n.dataset.v = it.x;
-      n.style.left = (cx + (Math.random() - 0.5) * 0.35 / cols) * 100 + '%';
-      n.style.top = (cy + (Math.random() - 0.5) * 0.3 / rows) * 100 + '%';
-      n.style.setProperty('--rot', (Math.random() * 50 - 25).toFixed(0) + 'deg');
+      /* P1: letters used to be 10–13 vmin with a free jitter, so touch areas overlapped by up to 30 %. Now each letter is sized
+         from its own cell and only wiggles inside the room the cell leaves, so no two buttons can overlap. */
+      const fs = Math.min(cw0, ch0) * (0.5 + Math.random() * 0.12);     /* glyph px; the button is about 1.15 × this */
+      const vm = Math.min(innerWidth, innerHeight) / 100, bw = Math.max(fs * 1.05 + 3.2 * vm, 9 * vm), bh = Math.max(fs * 1.05 + 2 * vm, 9 * vm);
+      const slackX = Math.max(0, (cw0 - bw) / 2), slackY = Math.max(0, (ch0 - bh) / 2);
+      n.style.left = (cx * r.width + (Math.random() - 0.5) * 2 * slackX * 0.8) / r.width * 100 + '%';
+      n.style.top = (cy * r.height + (Math.random() - 0.5) * 2 * slackY * 0.8) / r.height * 100 + '%';
+      n.style.setProperty('--rot', (Math.random() * 30 - 15).toFixed(0) + 'deg');
       n.style.color = COL[i % COL.length];
-      n.style.fontSize = (wide ? 10 : 9) + Math.random() * 3 + 'vmin';
+      n.style.fontSize = fs.toFixed(1) + 'px';
       field.appendChild(n);
       nodes.push(n);
     });
-    A.play(clipOf(t));
+    prompt(clipOf(t));
     let found = 0, miss = 0;
+    /* first try = all copies found without tapping another letter (decorations do not count) */
+    { const nT = nodes.filter(x => x.dataset.v === t).length, nD = nodes.filter(x => x.dataset.v && x.dataset.v !== t).length; let pr = 1; for (let i = 0; i < nT; i++) pr *= (nT - i) / (nT + nD - i); ask(ctx, pr, null); }
+    const helpNext = () => { if (ctx.help) { const nx = nodes.find(x => x.dataset.v === t); if (nx) helpGlow(ctx, nx); } };
+    helpNext();
     ans(t);
     await choose(nodes, async (n, e) => {
       if (n.classList.contains('deco')) { n.classList.remove('wiggle'); void n.offsetWidth; n.classList.add('wiggle'); A.sfx('pop'); return false; }
       if (n.classList.contains('found')) return false;
       if (n.dataset.v === t) {
+        if (ctx.helpClear) ctx.helpClear();
+        n.classList.remove('hint');
         n.classList.add('found'); delete n.dataset.v; n.dataset.f = t;
         bar.querySelectorAll('.hide-n i')[found].classList.add('on');
         found++; miss = 0;
         if (found >= count) { await right(ctx, 'pop', e, n, (cfg.jamo ? 'j:' : 'sy:') + t, () => A.play(clipOf(t))); return true; }
         A.sfx('correct');
         St.mark((cfg.jamo ? 'j:' : 'sy:') + t, true);
+        helpNext();
         return false;
       }
       miss++;
@@ -1064,9 +1194,10 @@
       const nodes = shuffle(p).map(x => { const n = el('button', 'tap twin-card', esc(x)); n.type = 'button'; n.dataset.v = x; row.appendChild(n); return n; });
       b.appendChild(row);
       const want = p[i];
+      ask(ctx, 1 / nodes.length, nodes.find(x => x.dataset.v === want));
       ans(want);
       await sleep(250);
-      A.play(sayKey(want));
+      prompt(sayKey(want));
       await choose(nodes, async (n, e) => {
         if (n.dataset.v === want) { n.classList.add('right'); await right(ctx, 'pop', e, n, 'sy:' + want, () => A.play(sayKey(want))); return true; }
         wrong(ctx, n, 'sy:' + want, sayKey(n.dataset.v));
@@ -1140,6 +1271,14 @@
       return [a, m, decoys];
     });
   }
+  /* a 'first' question for word a: another picture word with the same first syllable + 2 decoys */
+  function firstSetFor(a) {
+    const W0 = D.WORDS[a];
+    if (!W0) return null;
+    const m = shuffle(pics().filter(w => w.key !== a && w.syl[0] === W0.syl[0]).map(w => w.key))[0];
+    if (!m) return null;
+    return [a, m, apart(shuffle(pics().map(w => w.key).filter(k => D.WORDS[k].syl[0] !== W0.syl[0])), 2, [a, m])];
+  }
   const vRow = (c, vs) => vs.map(v => D.join(c, v, '')).filter(s => D.has.sy(s));
   function weakSy(f) { return St.weak(k => k.startsWith('sy:') && (!f || f(k.slice(3))), 3).map(k => k.slice(3)); }
 
@@ -1163,6 +1302,44 @@
     const out = [];
     const listenWords = n => shuffle(pics().map(w => w.key)).slice(0, n);
     switch (stage.k) {
+      case 'warm': {
+        /* Nihon #3: 1–3 due items, one question each, grouped by kind (letters, syllables, words, sound games) */
+        const ks = stage.keys, of = k => ks.filter(x => x.startsWith(k + ':')).map(x => x.slice(k.length + 1));
+        const L2 = learnedAt(Math.max(1, St.s.learn.stage - 1));
+        const sy = of('sy'), jm = of('j'), ws = of('w'), ct = of('count'), fs = of('first');
+        if (ct.length) out.push({ t: 'clap', cfg: { words: ct, pool: ct, n: ct.length, quiz: ct.length, title: '몸풀기 박수' } });
+        if (fs.length) out.push({ t: 'first', cfg: { sets: fs.map(firstSetFor).filter(Boolean), title: '몸풀기 첫소리' } });
+        if (jm.length) out.push({ t: 'pop', cfg: { jamo: true, targets: jm, pool: Array.from(new Set(jm.concat(Array.from(L2.c), D.BASIC_V))), n: jm.length, k: 3, title: '몸풀기 풍선' } });
+        if (sy.length) {
+          const cs = Array.from(L2.c), pool = Array.from(new Set(sy.concat(cs.flatMap(c => vRow(c, D.BASIC_V))))).filter(x => D.has.sy(x));
+          out.push({ t: 'pop', cfg: { targets: sy, pool: pool.length >= 3 ? pool : sy.concat(['가', '나', '마']), n: sy.length, k: 3, title: '몸풀기 풍선' } });
+        }
+        if (ws.length) out.push({ t: 'pick', cfg: { words: ws, pool: pics().map(w => w.key), n: ws.length, title: '몸풀기 그림' } });
+        break;
+      }
+      case 'whole': {
+        /* Nihon #4 통글자 path (≤ 2 vowels known): her name, family words and five concrete words as whole words + sound-forest games */
+        const fam = ['eomma', 'appa', 'agi', 'halmeoni', 'harabeoji', 'nuna'].filter(k => D.WORDS[k]);
+        const five = ['nabi', 'ori', 'banana', 'podo', 'agi'].filter(k => D.WORDS[k]);
+        const n = stage.n || 1;
+        if (n === 1) out.push({ t: 'meet', cfg: { j: '려원', word: 'ryeowon', clip: 'w_ryeowon', title: '내 이름' } });
+        out.push({ t: 'pick', cfg: { mode: 'read', words: ['ryeowon'].concat(shuffle(fam).slice(0, 2)), pool: fam.concat(['ryeowon']), n: 3, title: '이름 카드' } });
+        out.push({ t: 'clap', cfg: { words: shuffle(five).slice(0, 2), n: 2, quiz: 1, pool: shuffle(['nabi', 'banana', 'ori', 'appa', 'eomma', 'kokkiri']) } });
+        out.push({ t: 'memory', cfg: { words: shuffle(n % 2 ? fam : five), pairs: 3 } });
+        out.push({ t: 'pick', cfg: { mode: 'read', words: shuffle(five), pool: five.concat(fam), n: 3, title: '낱말 카드' } });
+        if (n >= 2) out.push({ t: 'first', cfg: { sets: firstSets(2) } });
+        break;
+      }
+      case 'place': {
+        /* Nihon #4 placement (≤ 5 min, never scored on screen): 6 basic vowels by sound, 10 basic consonants by name,
+           6 no-받침 syllables she has not been taught (pick by sound) */
+        const C10 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ'];
+        out.push({ t: 'pop', cfg: { jamo: true, targets: shuffle(D.BASIC_V.slice()), pool: D.BASIC_V, n: 6, k: 3, title: '소리 풍선' } });
+        out.push({ t: 'fish', cfg: { jamo: true, targets: shuffle(C10.slice()), pool: C10, n: 10, k: 3, title: '이름 낚시' } });
+        const syl = shuffle(C10.flatMap(c => vRow(c, D.BASIC_V)).filter(x => !St.s.learn.items['sy:' + x] && !D.SHAKY.has(x)));
+        out.push({ t: 'pop', cfg: { targets: syl.slice(0, 6), pool: syl.slice(0, 12), n: 6, k: 3, title: '글자 풍선' } });
+        break;
+      }
       case 'review': {
         /* Endless review from what is already learned; weak items first. */
         const L2 = learnedAt(Math.max(1, St.s.learn.stage - 1));
@@ -1307,7 +1484,9 @@
         break;
       }
       case 'word': {
-        let ws = wordsFor(L, w => stage.g === 'mix' || w.grp === stage.g || (stage.g === 'ride' && w.grp === 'thing'));
+        const noBat = w => w.syl.every(x => { const p0 = D.split(x); return p0 && !p0.jong; });
+        let ws = wordsFor(L, w => (stage.g === 'cv' ? noBat(w) : stage.g === 'mix' || w.grp === stage.g || (stage.g === 'ride' && w.grp === 'thing')));
+        if (stage.g === 'cv' && ws.length < 4) ws = Array.from(new Set(ws.concat(['nabi', 'ori', 'banana', 'podo', 'agi', 'moja', 'namu', 'uyu'].filter(k => D.WORDS[k]))));
         if (ws.length < 4) ws = wordsFor(L);
         const tw = ws.filter(k => allSy(D.WORDS[k]) && D.WORDS[k].syl.length >= 2);
         if (tw.length) out.push({ t: 'train', cfg: { words: shuffle(tw), n: 3 } });
@@ -1385,8 +1564,80 @@
         break;
       }
     }
-    return out.filter(p => validPlay(p));
+    calm(out);
+    const plays = out.filter(p => validPlay(p));
+    if (!['review', 'warm', 'whole', 'place'].includes(stage.k)) topUp(stage, plays);
+    return plays;
   };
+  /* Nihon #3: can a warm-up still show this item (recording + picture exist)? */
+  Plan.warmable = function (k) {
+    const i = k.indexOf(':'), kind = k.slice(0, i), x = k.slice(i + 1);
+    if (kind === 'j') return !!jamoClip(x);
+    if (kind === 'sy') return D.has.sy(x) && !D.SHAKY.has(x);
+    if (kind === 'w') return !!(D.WORDS[x] && D.WORDS[x].pic);
+    if (kind === 'count') return !!D.WORDS[x];
+    if (kind === 'first') return !!(D.WORDS[x] && pics().some(w => w.key !== x && w.syl[0] === D.WORDS[x].syl[0]));
+    return false;
+  };
+  /* R3 (AUDIT B4, Lily #2): syllables whose old recording sounds like a neighbour are left out of listening quizzes
+     (as target and as decoy) when enough others remain. */
+  function calm(plays) {
+    const ok = x => !D.SHAKY.has(x);
+    plays.forEach(({ t, cfg: c }) => {
+      if ((t === 'pop' || t === 'fish') && !c.jamo && c.pool) {
+        const pool = c.pool.filter(ok);
+        if (pool.length < Math.min(3, c.pool.length)) return;
+        c.pool = pool;
+        const want = Math.min(c.n || 4, c.targets.length);
+        const tg = c.targets.filter(ok);
+        c.targets = tg.concat(shuffle(pool.filter(x => !tg.includes(x)))).slice(0, Math.max(want, tg.length));
+      }
+    });
+  }
+  /* R2: the questions a play will ask that can be answered wrong, with a random tap's odds of getting each right first time
+     (an estimate for planning; the stage result uses the real odds recorded by ask()). */
+  function gradedOdds(p) {
+    const c = p.cfg, m = (n, d) => Math.max(0, Math.min(n, d));
+    switch (p.t) {
+      case 'pop': case 'fish': return Array(m(c.n || 4, c.targets.length)).fill(1 / Math.min(c.k || 3, c.pool.length));
+      case 'pick': return Array(m(c.n || 4, c.words.length)).fill(1 / 3);
+      case 'clap': return Array(m(c.quiz || 2, (c.pool || c.words).length)).fill(1 / 3);
+      case 'chant': { const u = new Set(c.syl.filter(x => D.has.sy(x))); return Array(m(c.quiz || 2, u.size)).fill(1 / Math.max(2, u.size)); }
+      case 'first': return Array(m(c.n || 3, c.sets.length)).fill(1 / 3);
+      case 'block': return c.mode === 'make' ? Array(m(c.n || 4, c.vowels.length)).fill(1 / 3) : [];
+      case 'train': return Array(m(c.n || 3, c.words.length)).fill(1 / 6);
+      case 'batchim': return c.mode === 'make' ? Array(m(c.n || 4, c.items.length)).fill(1 / 3) : [];
+      case 'story': case 'shop': return Array(m(c.n || 3, (c.items || c.words).length)).fill(1 / 3);
+      case 'hide': return [0.01];
+      case 'twin': return Array(m(c.n || 3, c.pairs.length * 2)).fill(1 / 2);
+      default: return [];
+    }
+  }
+  Plan.graded = plays => plays.flatMap(gradedOdds);
+  /* A new stage needs App.MIN_Q questions and room for App.SLIPS slips (a guesser must not reach q-SLIPS of q, see App.judge).
+     Short stages (받침 1, 미끄럼 모음, 이름 …) get a short listening quiz with words that use the stage's letter. */
+  function topUp(stage, plays) {
+    const App = G.App;
+    if (!App || !App.guessP) return;
+    const odds = Plan.graded(plays);
+    let add = 0;
+    const ok = n => { const o = odds.concat(Array(n).fill(1 / 3)), q = o.length, ft = q - (App.SLIPS || 1); return q >= App.MIN_Q && ft / q >= App.MASTERY && App.guessP(o, ft) <= App.GUESS_P; };
+    while (!ok(add) && add < 12) add++;
+    if (!add) return;
+    add = Math.max(2, add);
+    const has = w => w.syl.some(x => { const s = D.split(x); return s && ((stage.v && (s.jung === stage.v || (stage.v === 'ㅟ' && s.jung === 'ㅚ'))) || (stage.c && s.cho === stage.c) || (stage.b && s.jong === stage.b)); });
+    const all = pics().map(w => w.key);
+    const mine = stage.v || stage.c || stage.b ? pics().filter(has).map(w => w.key) : [];
+    const words = shuffle(mine).concat(shuffle(all.filter(k => !mine.includes(k)))).slice(0, add);
+    const quiz = ws => ({ t: 'pick', cfg: { words: ws, pool: shuffle(all).slice(0, 12).concat(ws), n: ws.length, title: '귀 쫑긋 퀴즈' } });
+    const at = plays.length && plays[plays.length - 1].t === 'trace' ? plays.length - 1 : plays.length;
+    /* more than 5 extra questions: two short quizzes (one in the middle of the stage, one at the end) instead of one long one */
+    if (add > 5) {
+      const h = Math.ceil(add / 2);
+      plays.splice(at, 0, quiz(words.slice(h)));
+      plays.splice(Math.max(1, Math.floor(at / 2)), 0, quiz(words.slice(0, h)));
+    } else plays.splice(at, 0, quiz(words));
+  }
   function validPlay(p) {
     const c = p.cfg;
     if (p.t === 'trace') return c.chars && c.chars.filter(ch => D.strokesFor(ch)).length > 0;
@@ -1421,6 +1672,8 @@
     return Array.from(out);
   };
 
+  /* shared with 려원이가 만든 게임 (aqua.js): same praise, miss and tap-guard rules as the stages */
+  P._kit = { right, wrong, ask, choose, prompt, lock, ans, Guard, sayKey, thatClip: ch => (D.has.dy(ch) ? D.dyKey(ch) : sayKey(ch)), jamoClip, findClip };
   G.P = P;
   G.Plan = Plan;
 })(window);

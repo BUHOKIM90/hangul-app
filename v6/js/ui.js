@@ -23,7 +23,8 @@
   UI.pick = a => a[Math.floor(Math.random() * a.length)];
   UI.esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  /* Fast tap: fires on pointerdown (no click delay), one fire per 280 ms per element. */
+  /* Fast tap: fires on pointerdown (no click delay), one fire per 280 ms per element.
+     last starts at -Infinity: performance.now() is 0 at page load, so `last = 0` dropped every first tap in the first 280 ms. */
   UI.tap = function (el, fn) {
     let last = -Infinity;
     el.addEventListener('pointerdown', e => {
@@ -52,17 +53,24 @@
   /* outfits drawn in the character's own 200×312 space: head top ≈ y92, eyes y160 (x74/126), neck y200 */
   const WEAR = {
     back: {
+      back_butterfly: `<g ${sw}><path d="M70 214 C24 168 6 214 30 236 C42 246 60 236 70 226Z" fill="#FF9DC4"/><path d="M130 214 C176 168 194 214 170 236 C158 246 140 236 130 226Z" fill="#FF9DC4"/><path d="M68 230 C34 240 34 268 54 268 C64 268 70 254 72 240Z" fill="#B9A6FF"/><path d="M132 230 C166 240 166 268 146 268 C136 268 130 254 128 240Z" fill="#B9A6FF"/></g><circle cx="40" cy="214" r="6" fill="#fff" opacity=".8"/><circle cx="160" cy="214" r="6" fill="#fff" opacity=".8"/>`,
+      back_rainbow: `<path d="M64 200 L36 272 L164 272 L136 200Z" fill="#FF8FA8"/><path d="M59 212 L141 212 L147 228 L53 228Z" fill="#FFD36E"/><path d="M51 232 L149 232 L155 248 L45 248Z" fill="#8FE0B4"/><path d="M43 252 L157 252 L163 268 L37 268Z" fill="#8CC8FF"/><path d="M64 200 L36 272 L164 272 L136 200Z" fill="none" ${sw}/>`,
+      back_pink: `<path d="M64 200 L38 272 L162 272 L136 200Z" fill="#FFB3D1" ${sw}/><path d="M100 206 L100 266" stroke="#F58BB4" stroke-width="3"/><path d="M70 259 l-7 -6.6 a3.9 3.9 0 0 1 7 -4.9 a3.9 3.9 0 0 1 7 4.9z" fill="#fff" opacity=".8"/><path d="M132 252 l-6 -5.7 a3.4 3.4 0 0 1 6 -4.2 a3.4 3.4 0 0 1 6 4.2z" fill="#fff" opacity=".8"/>`,
       back_cape: `<path d="M64 200 L38 272 L162 272 L136 200Z" fill="#FF6B7A" ${sw}/><path d="M100 206 L100 266" stroke="#E04E5F" stroke-width="3"/>`,
       back_star: `<path d="M64 200 L38 272 L162 272 L136 200Z" fill="#7C8CFF" ${sw}/><path d="M60 252 l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z M140 236 l3 6 7 1-5 4 1 7-6-3-6 3 1-7-5-4 7-1z" fill="#FFE066"/>`,
       back_wing: `<g fill="#F4FBFF" ${sw}><path d="M66 214 C20 172 0 236 34 250 C48 256 62 240 68 230Z"/><path d="M134 214 C180 172 200 236 166 250 C152 256 138 240 132 230Z"/></g><path d="M40 222 q10 4 16 12 M160 222 q-10 4 -16 12" stroke="#B9DDF7" stroke-width="3" fill="none"/>`
     },
     neck: {
+      neck_lei: '<g stroke="#4B3642" stroke-width="2.2">' + [0, 1, 2, 3, 4, 5, 6, 7].map(i => `<circle cx="${66 + i * 9.7}" cy="${200 + Math.sin(i / 7 * Math.PI) * 12}" r="6.4" fill="${['#FF8FB0', '#FFE066', '#B5F0DA', '#C9B8FF'][i % 4]}"/>`).join('') + '</g>',
+      neck_star: `<path d="M78 198 Q100 216 122 198" fill="none" stroke="#E0A800" stroke-width="3"/><path d="M100 210 l3.5 7.2 7.9 1.2 -5.8 5.5 1.4 7.9 -7.1 -3.7 -7.1 3.7 1.4 -7.9 -5.8 -5.5 7.9 -1.2z" fill="#FFE066" stroke="#4B3642" stroke-width="3.4" stroke-linejoin="round"/>`,
       neck_bow: `<g fill="#FF5A7A" ${sw}><path d="M100 204 l-20 -11 v22z"/><path d="M100 204 l20 -11 v22z"/><circle cx="100" cy="204" r="6"/></g>`,
       neck_scarf: `<path d="M60 196 Q100 214 140 196 L142 210 Q100 228 58 210Z" fill="#FF9548" ${sw}/><path d="M122 212 l6 26 h-16z" fill="#FF9548" ${sw}/>`,
       neck_pearl: '<g fill="#fff" stroke="#C8C0D8" stroke-width="2">' + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<circle cx="${68 + i * 8}" cy="${200 + Math.sin(i / 8 * Math.PI) * 9}" r="4.6"/>`).join('') + '</g>',
       neck_medal: `<path d="M86 196 L100 218 L114 196" fill="none" stroke="#3A7BD5" stroke-width="6"/><circle cx="118" cy="222" r="0"/><circle cx="100" cy="224" r="11" fill="#FFD23F" ${sw}/><text x="100" y="229" font-size="13" font-weight="900" text-anchor="middle" fill="#B07D00">1</text>`
     },
     eyes: {
+      eyes_rainbow: '<g fill="none" stroke-width="3.2">' + [74, 126].map(x => `<circle cx="${x}" cy="160" r="17" stroke="#FF6F91"/><circle cx="${x}" cy="160" r="13.6" stroke="#FFC93C"/><circle cx="${x}" cy="160" r="10.2" stroke="#5FBDF5" opacity=".8"/>`).join('') + '<path d="M91 158 h18" stroke="#4B3642"/></g>',
+      eyes_goggle: `<path d="M40 156 Q100 140 160 156" fill="none" stroke="#7A5C4A" stroke-width="7"/><g fill="#BFE8FF" fill-opacity=".75" ${sw}><rect x="54" y="144" width="40" height="30" rx="14"/><rect x="106" y="144" width="40" height="30" rx="14"/></g><path d="M94 158 h12" stroke="#4B3642" stroke-width="4"/><path d="M62 152 l8 -3 M114 152 l8 -3" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
       eyes_round: `<g fill="none" stroke="#4B3642" stroke-width="4"><circle cx="74" cy="160" r="16"/><circle cx="126" cy="160" r="16"/><path d="M90 158 h20"/></g>`,
       eyes_star: '<g fill="#FFE066" fill-opacity=".6" stroke="#E0A800" stroke-width="3.4" stroke-linejoin="round">' + [74, 126].map(x => `<path d="M${x} 142 l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/>`).join('') + '<path d="M90 158 h20" fill="none"/></g>',
       eyes_heart: '<g fill="#FF6F91" fill-opacity=".55" stroke="#E0446F" stroke-width="3.4" stroke-linejoin="round">' + [74, 126].map(x => `<path d="M${x} 176 l-16 -15 a9 9 0 0 1 16 -11 a9 9 0 0 1 16 11z"/>`).join('') + '<path d="M90 158 h20" fill="none"/></g>',
@@ -77,8 +85,35 @@
       hat_beret: `<ellipse cx="96" cy="96" rx="50" ry="18" fill="#E04E5F" ${sw}/><circle cx="96" cy="76" r="5" fill="#B23443"/>`,
       hat_chef: `<path d="M66 104 V84 Q58 60 82 62 Q92 46 110 58 Q136 52 136 78 V104Z" fill="#fff" ${sw}/><path d="M66 96 h70" stroke="#DDE3EE" stroke-width="3"/>`,
       hat_wizard: `<path d="M100 26 L68 104 L132 104Z" fill="#7A5CE8" ${sw}/><ellipse cx="100" cy="104" rx="46" ry="9" fill="#5A3FC0" ${sw}/><path d="M100 70 l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#FFE066"/>`,
+      hat_tiara: `<path d="M72 102 L78 78 L90 92 L100 70 L110 92 L122 78 L128 102Z" fill="#EEF4FF" ${sw}/><circle cx="100" cy="88" r="6" fill="#FF7EB3" ${sw}/><circle cx="80" cy="94" r="3.4" fill="#7FD9F2"/><circle cx="120" cy="94" r="3.4" fill="#7FD9F2"/>`,
+      hat_band: `<path d="M50 118 Q100 70 150 118" fill="none" stroke="#4B3642" stroke-width="12" stroke-linecap="round"/><path d="M50 118 Q100 70 150 118" fill="none" stroke="#FF8FB0" stroke-width="7" stroke-linecap="round"/><g fill="#FF5A7A" ${sw}><path d="M132 92 l-18 -10 v20z"/><path d="M132 92 l18 -10 v20z"/><circle cx="132" cy="92" r="6"/></g>`,
+      hat_sun: '<g transform="translate(54 112)">' + [0, 45, 90, 135, 180, 225, 270, 315].map(r => `<ellipse rx="6" ry="11" transform="rotate(${r}) translate(0 -12)" fill="#FFD23F" stroke="#4B3642" stroke-width="2.4"/>`).join('') + '<circle r="9" fill="#8B5A2B" stroke="#4B3642" stroke-width="2.6"/></g>',
+      hat_pirate: `<path d="M48 106 Q62 56 100 54 Q138 56 152 106 Q100 88 48 106Z" fill="#3A3346" ${sw}/><circle cx="100" cy="80" r="8" fill="#fff"/><path d="M90 92 l20 -6 M90 86 l20 6" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M52 104 Q100 86 148 104" fill="none" stroke="#FFD23F" stroke-width="3"/>`,
+      hat_whale: `<path d="M136 80 L160 62 L158 82 L162 98Z" fill="#3877CB" ${sw}/><path d="M56 100 C56 66 90 56 112 60 C136 64 146 82 140 100Z" fill="#5A9BE6" ${sw}/><path d="M62 97 C80 92 120 92 138 97" fill="none" stroke="#EDF6FF" stroke-width="4"/><circle cx="76" cy="80" r="4" fill="#4B3642"/><path d="M90 58 q-6 -14 -14 -12 M90 58 q2 -16 10 -16 M90 58 q8 -10 16 -6" fill="none" stroke="#7FC7EE" stroke-width="4" stroke-linecap="round"/>`,
       hat_crown: `<path d="M68 106 L70 70 L86 88 L100 60 L114 88 L130 70 L132 106Z" fill="#FFD95A" ${sw}/><circle cx="100" cy="92" r="5.4" fill="#FF5A7A" ${sw}/>`
     }
+  };
+  /* R3 §6: things held in the right hand (prop) and sparkle effects around the friend (fx; FXB = drawn behind the friend). */
+  function twS(x, y, r, c) { return `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="${c || '#FFE066'}"/>`; }
+  function heartS(x, y, r) { return `<path d="M${x} ${y + r} l-${r} -${r * 0.95} a${r * 0.56} ${r * 0.56} 0 0 1 ${r} -${r * 0.7} a${r * 0.56} ${r * 0.56} 0 0 1 ${r} ${r * 0.7}z" fill="#FF8FB0" stroke="#E0446F" stroke-width="1.6"/>`; }
+  const PROP = {
+    prop_wand: `<path d="M144 238 L170 178" stroke="#4B3642" stroke-width="9" stroke-linecap="round"/><path d="M144 238 L170 178" stroke="#C99B6D" stroke-width="5" stroke-linecap="round"/><g class="fx-tw"><path d="M172 155 l4.3 9.0 9.9 1.5 -7.2 6.9 1.8 9.9 -8.8 -4.7 -8.8 4.7 1.8 -9.9 -7.2 -6.9 9.9 -1.5z" fill="#FFE066" stroke="#4B3642" stroke-width="3.4" stroke-linejoin="round"/></g><g class="fx-tw d2"><path d="M190 143 Q190 150 197 150 Q190 150 190 157 Q190 150 183 150 Q190 150 190 143Z" fill="#FFE066"/><path d="M152 149 Q152 154 157 154 Q152 154 152 159 Q152 154 147 154 Q152 154 152 149Z" fill="#FFF5B8"/></g>`,
+    prop_star: `<path d="M144 238 L166 172" stroke="#4B3642" stroke-width="9" stroke-linecap="round"/><path d="M144 238 L166 172" stroke="#FF8FB0" stroke-width="5" stroke-linecap="round"/><g class="fx-tw"><path d="M168 138 l6.4 13.2 14.5 2.2 -10.6 10.1 2.6 14.5 -13.0 -6.8 -13.0 6.8 2.6 -14.5 -10.6 -10.1 14.5 -2.2z" fill="#FFD23F" stroke="#4B3642" stroke-width="3.4" stroke-linejoin="round"/></g><circle cx="162" cy="154" r="3.6" fill="#fff"/>`,
+    prop_heart: `<path d="M144 238 L166 176" stroke="#4B3642" stroke-width="9" stroke-linecap="round"/><path d="M144 238 L166 176" stroke="#FFE7A6" stroke-width="5" stroke-linecap="round"/><g class="fx-tw"><path d="M168 176 l-16 -15.2 a9.0 9.0 0 0 1 16 -11.2 a9.0 9.0 0 0 1 16 11.2z" fill="#FF6F91" stroke="#4B3642" stroke-width="3.4" stroke-linejoin="round"/></g><g class="fx-tw d2"><path d="M192 142 Q192 148 198 148 Q192 148 192 154 Q192 148 186 148 Q192 148 192 142Z" fill="#FFE066"/></g>`,
+    prop_balloon: `<path d="M144 236 C158 214 150 184 166 156" fill="none" stroke="#4B3642" stroke-width="2.6"/><g class="fx-bob"><ellipse cx="168" cy="126" rx="22" ry="27" fill="#FF6F91" stroke="#4B3642" stroke-width="3.6"/><path d="M164 154 l4 -4 4 4z" fill="#FF6F91" stroke="#4B3642" stroke-width="2.4"/><ellipse cx="160" cy="116" rx="5" ry="9" fill="#fff" opacity=".6"/></g>`,
+    prop_bouquet: `<path d="M136 244 L150 206 L170 214Z" fill="#B5F0DA" stroke="#4B3642" stroke-width="3.4" stroke-linejoin="round"/>` + [[150, 200, '#FF8FB0'], [166, 204, '#FFE066'], [158, 188, '#C9B8FF'], [174, 190, '#FF9548']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="9" fill="${c}" stroke="#4B3642" stroke-width="2.6"/><circle cx="${x}" cy="${y}" r="3" fill="#fff" opacity=".8"/>`).join(''),
+    prop_umbrella: `<path d="M146 238 L158 104" stroke="#4B3642" stroke-width="5" stroke-linecap="round"/><path d="M146 238 q-2 8 -10 6" fill="none" stroke="#4B3642" stroke-width="5" stroke-linecap="round"/><path d="M106 104 A52 44 0 0 1 210 104Z" fill="#FF8FA8"/><path d="M123 104 A35 32 0 0 1 193 104Z" fill="#FFD36E"/><path d="M140 104 A18 20 0 0 1 176 104Z" fill="#8CC8FF"/><path d="M106 104 A52 44 0 0 1 210 104Z" fill="none" stroke="#4B3642" stroke-width="3.6"/>`,
+    prop_lolly: `<path d="M144 238 L162 192" stroke="#4B3642" stroke-width="8" stroke-linecap="round"/><path d="M144 238 L162 192" stroke="#fff" stroke-width="4.4" stroke-linecap="round"/><circle cx="166" cy="176" r="19" fill="#FFB3D1" stroke="#4B3642" stroke-width="3.6"/><path d="M154 176 a12 12 0 1 1 12 12 a8 8 0 1 1 -8 -8 a4 4 0 1 1 4 4" fill="none" stroke="#FF5A8A" stroke-width="3.4" stroke-linecap="round"/>`,
+    prop_teddy: `<g stroke="#4B3642" stroke-width="3" stroke-linejoin="round"><circle cx="152" cy="208" r="7" fill="#C9935F"/><circle cx="178" cy="208" r="7" fill="#C9935F"/><ellipse cx="165" cy="246" rx="17" ry="18" fill="#C9935F"/><circle cx="165" cy="220" r="15" fill="#C9935F"/></g><ellipse cx="165" cy="225" rx="6" ry="4.4" fill="#F3D2A8"/><circle cx="160" cy="217" r="2" fill="#4B3642"/><circle cx="170" cy="217" r="2" fill="#4B3642"/><path d="M163 225 h4" stroke="#4B3642" stroke-width="2.4" stroke-linecap="round"/>`
+  };
+  const FX = {
+    fx_sparkle: [[26, 110, 9], [176, 96, 7], [184, 214, 8], [18, 216, 6], [100, 40, 7], [150, 270, 6]].map(([x, y, r], i) => `<g class="fx-tw d${i % 3}">${twS(x, y, r)}</g>`).join(''),
+    fx_hearts: [[30, 250, 8], [168, 236, 7], [46, 180, 6], [178, 170, 6]].map(([x, y, r], i) => `<g class="fx-up d${i % 3}">${heartS(x, y, r)}</g>`).join(''),
+    fx_stardust: Array.from({ length: 14 }, (_, i) => `<circle class="fx-fall d${i % 3}" cx="${16 + (i * 53) % 172}" cy="${40 + (i * 37) % 120}" r="${2 + (i % 3)}" fill="${i % 2 ? '#FFE066' : '#FFF5B8'}" stroke="#E0A800" stroke-width=".8"/>`).join(''),
+    fx_bubbles: [[28, 230, 9], [172, 220, 11], [40, 160, 7], [162, 150, 6], [100, 30, 6]].map(([x, y, r], i) => `<g class="fx-up d${i % 3}"><circle cx="${x}" cy="${y}" r="${r}" fill="#DDF4FF" fill-opacity=".45" stroke="#7FC7EE" stroke-width="2.4"/><circle cx="${x - r * 0.35}" cy="${y - r * 0.35}" r="${r * 0.25}" fill="#fff"/></g>`).join('')
+  };
+  const FXB = {
+    fx_rainbow: `<g class="fx-glow" fill="none" stroke-width="9" stroke-linecap="round" opacity=".75"><path d="M10 214 A90 116 0 0 1 190 214" stroke="#FF8FA8"/><path d="M20 214 A80 104 0 0 1 180 214" stroke="#FFD36E"/><path d="M30 214 A70 92 0 0 1 170 214" stroke="#8FE0B4"/><path d="M40 214 A60 80 0 0 1 160 214" stroke="#8CC8FF"/></g>`
   };
   UI.friendId = id => (window.CHF.SPEC[id] ? id : (window.CHF.ALIAS[id] || 'lumi'));
   UI.mascot = function (mood, wear, who) {
@@ -93,7 +128,11 @@
         out.tint = `url(#${id})`;
       } else out.tint = body.color;
     }
-    return window.CHF.draw(who, mood || 'happy', wear, out);
+    let svg = window.CHF.draw(who, mood || 'happy', wear, out);
+    const front = (PROP[wear.prop] || '') + (FX[wear.fx] || '');
+    if (front) svg = svg.replace(/<\/g><\/svg>$/, front + '</g></svg>');
+    if (FXB[wear.fx]) svg = svg.replace('<g transform="translate(0 6)">', '<g transform="translate(0 6)">' + FXB[wear.fx]);
+    return svg;
   };
   /* every friend wears a letter on the belly; tapping a friend says that letter's name (기역, 아 …) */
   UI.sayGem = function (id) {
@@ -255,7 +294,8 @@
 
   /* Picture card face for a word. */
   /* A word picture: our own drawings (svg:name, v6/img/w) for people, otherwise the outlined emoji picture. */
-  UI.picFace = pic => (pic && pic.startsWith('svg:') ? `<img class="em own" src="v6/img/w/${pic.slice(4)}.svg" alt="" draggable="false">` : UI.em(pic || '❓'));
+  UI.picFace = pic => (pic && pic.startsWith('svg:') ? `<img class="em own" src="v6/img/w/${pic.slice(4)}.svg" alt="" draggable="false">`
+    : pic && pic.startsWith('img:') ? `<img class="em own" src="v6/img/p/${pic.slice(4)}.webp" alt="" draggable="false">` : UI.em(pic || '❓'));
   /* family drawings are fetched ahead so a card never shows up empty the first time */
   ['eomma', 'appa', 'halmeoni', 'harabeoji', 'agi', 'nuna', 'ryeowon', 'ai', 'eobu'].forEach(n => { const i = new Image(); i.src = 'v6/img/w/' + n + '.svg'; });
   UI.pic = function (w, cls) {

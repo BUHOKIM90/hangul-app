@@ -1,7 +1,7 @@
 'use strict';
 /* v6 app: screens, stage flow, rewards, sticker book, closet, parent menu, zoom guard, service worker. */
 (function (G) {
-  const D = G.D, A = G.A, UI = G.UI, St = G.St, P = G.P, Plan = G.Plan;
+  const D = G.D, A = G.A, UI = G.UI, St = G.St, P = G.P, Plan = G.Plan, Coach = G.Coach, F = D.FLAGS;
   const { el, btn, sleep, esc, $ } = UI;
   const App = { sess: 0, screen: '' };
   G.App = App;
@@ -11,6 +11,29 @@
   const KID_VP = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
   const ADULT_VP = 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover';
   App.adult = false;
+  /* R2 mastery rule for a NEW stage (replays and reviews are never gated):
+     - at least MIN_Q questions that can be answered wrong (the planner tops a short stage up to this),
+     - at least MASTERY of them right on the first try,
+     - and a result that pure guessing reaches with probability <= GUESS_P (exact, from each question's odds).
+     The last line is what makes random tapping fail: 9 of 11 three-card questions is 82 % but a guesser gets there 0.14 % of the time,
+     so it is not enough; 10 of 12 (0.05 %) is. (R2 first used 1 %: a random bot cleared stage 10 once in ~30 runs.)
+     HELP_AFTER failed tries in a row → the next try is a help round (the right answer glows), see games.js ask(). */
+  App.MASTERY = 0.7;
+  App.MIN_Q = 6;
+  App.GUESS_P = 0.001;
+  App.HELP_AFTER = 2;
+  App.SLIPS = 2;        /* the planner adds a short quiz to a stage until a child may miss this many and still pass */
+  /* P(a guesser gets >= ft first-try right) for questions with these odds (Poisson-binomial, exact). */
+  App.guessP = function (chances, ft) {
+    let d = [1];
+    chances.forEach(p => { const n = new Array(d.length + 1).fill(0); d.forEach((v, i) => { n[i] += v * (1 - p); n[i + 1] += v * p; }); d = n; });
+    return d.slice(Math.max(0, ft)).reduce((a, b) => a + b, 0);
+  };
+  App.judge = function (q, ft, chances) {
+    const guess = App.guessP(chances || [], ft);
+    return { q, ft, firstTry: q ? Math.round(ft / q * 100) / 100 : 0, guess: Math.round(guess * 10000) / 10000,
+      mastered: q >= App.MIN_Q && ft / q >= App.MASTERY && guess <= App.GUESS_P };
+  };
   function setAdult(on) {
     App.adult = on;
     $('meta[name=viewport]').setAttribute('content', on ? ADULT_VP : KID_VP);
@@ -41,7 +64,7 @@
     const pct = Math.round(R.xp / St.levelNeed() * 100);
     h.appendChild(el('div', 'hud-lv', `<span class="crown">👑</span><b>${R.level}</b><i class="bar"><i style="width:${pct}%"></i></i>`));
     h.appendChild(el('div', 'hud-star', `⭐ <b id="starCount">${R.stars}</b>`));
-    h.appendChild(el('div', 'hud-fire', `🔥 <b>${R.streak.count}</b>`));
+    if (!F.calmRewards) h.appendChild(el('div', 'hud-fire', `🔥 <b>${R.streak.count}</b>`)); /* Nihon #1: streak only in the parent menu */
     if (opts && opts.dots) h.appendChild(opts.dots);
     const lock = btn('hud-lock', '<span class="ring"></span>🔒', null, '어른 메뉴 (길게 누르기)');
     h.appendChild(lock);
@@ -125,11 +148,32 @@
       cast.appendChild(c);
     });
     dock.appendChild(cast);
-    const done = St.todayCount() >= St.s.settings.perDay;
+    const closed = App.closed();
+    const sess = App.todayStage();
+    if (closed) {
+      /* Nihon #2: the day is over — a calm goodbye; no route to any play screen without the parent gate */
+      dock.innerHTML = '';
+      /* UPDATE 3: while the #5 end-of-day screens are up, the closing line waits (shown at the closing step) */
+      dock.appendChild(el('div', 'closing' + (App._eodActive ? ' wait' : ''), `<div class="closing-pal">${UI.mascot('wave')}</div><p class="closing-say">오늘은 여기까지.<br>내일 또 하자!</p>`));
+      const row0 = el('div', 'home-row');
+      const nN = St.s.reward.newStickers.length;
+      row0.appendChild(btn('home-tile t-book', `<span>📒</span><b>스티커</b>${nN ? `<i class="badge">${nN}</i>` : ''}`, () => App.stickers(), '스티커북'));
+      row0.appendChild(btn('home-tile t-closet', '<span>👗</span><b>옷장</b>', () => App.closet(), '옷장'));
+      dock.appendChild(row0);
+      wrap.appendChild(dock);
+      m.appendChild(wrap);
+      const drawR = () => { const r = road.getBoundingClientRect(); road.innerHTML = roadSvg(stage, r.width, r.height); };
+      drawR();
+      App._drawRoad = drawR;
+      UI.tap(dock.querySelector('.closing-pal'), () => A.play('ui4_bye'));
+      if (first) A.sequence(['ui_hiname', 'ui4_bye'], null, 0.3);
+      return;
+    }
+    const done = !F.dailyStop && St.todayCount() >= St.s.settings.perDay;
     const play = btn('play-go' + (done ? ' rest' : ''), done
       ? '<span class="pg-ico">🎠</span><span class="pg-txt">놀이터</span><small>오늘 모험 끝! 더 놀자</small>'
-      : `<span class="pg-ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 7 L34 20 L12 33Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg></span><span class="pg-txt">놀자!</span><small>${esc(stage.title)}</small>`,
-    () => (done ? App.playground() : App.runStage(stage)), '놀자');
+      : `<span class="pg-ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 7 L34 20 L12 33Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg></span><span class="pg-txt">놀자!</span><small>${esc(sess.title)}</small>`,
+    () => (done ? App.playground() : App.runStage(sess, false, { home: true })), '놀자');
     dock.appendChild(play);
     const row = el('div', 'home-row');
     const newN = St.s.reward.newStickers.length;
@@ -143,12 +187,38 @@
     drawRoad();
     App._drawRoad = drawRoad;
     if (first) {
-      const d = St.checkDaily();
-      if (d) { await dailyGift(d); if (App.screen === 'home') { await App.home(); } }
+      /* P1 first minute: at most ONE pop-up before the first letter sound. The daily gift (2 pop-ups) now comes after the first
+         stage of the day (App.runStage → afterStageGift); only a new world's short story may show here. */
       if (!(St.s.reward.told || []).includes(stage.w) && App.screen === 'home') { await worldArrive(stage.w, true); }
-      A.sequence(['ui_hiname', St.todayCount() >= St.s.settings.perDay ? 'ui4_free' : 'ui4_today'], null, 0.3);
+      A.sequence(['ui_hiname', !F.dailyStop && St.todayCount() >= St.s.settings.perDay ? 'ui4_free' : 'ui4_today'], null, 0.3);
     }
   };
+  /* ---------- Nihon: what 놀자 starts today, daily stop, whole-app clock ---------- */
+  App.capMin = () => +St.s.settings.capMin || 15;
+  App.closed = () => (App._pgOpen === St.day() ? '' : Coach.closed({ on: F.dailyStop, count: St.todayCount(), perDay: St.s.settings.perDay, secs: St.secsToday(), capMin: App.capMin() }));
+  App.overCap = () => F.dailyStop && St.secsToday() >= App.capMin() * 60 && App._pgOpen !== St.day();
+  App.batOpen = () => !!St.s.learn.batOpen || App.checkpoints().B.status === 'pass';
+  App.todayStage = function () {
+    const L = St.s.learn, st = St.stage();
+    if (F.placement) {
+      const P0 = L.place;
+      const fresh = !Object.keys(L.done).length && L.stage === 1;
+      if ((!P0 && fresh) || L.placeAgain || (P0 && P0.path === 'whole' && P0.until && St.day() >= P0.until)) return { id: st.id, w: 1, k: 'place', title: '소리 찾기 놀이' };
+      if (P0 && P0.path === 'whole') return { id: st.id, w: 1, k: 'whole', n: ((L.wholeN || 0) % 4) + 1, title: '통글자 놀이 ' + (((L.wholeN || 0) % 4) + 1) };
+      if (st.w === 6 && !App.batOpen()) return { id: 0, w: st.w, k: 'review', title: '복습 모험' };
+    }
+    return st;
+  };
+  /* whole-app time (visible, child side, not on the closing screen, not while the show-a-parent screen is up) */
+  let tick = 0;
+  setInterval(() => {
+    if (!F.dailyStop || !A.ready || document.hidden || App.adult || App._noClock || !App.screen) return;
+    if (App.screen === 'home' && App.closed()) return;
+    if (++tick >= 5) { St.addSecs(tick); tick = 0; }
+    /* cap reached outside a stage (stages stop by themselves after the current play): back to the closing screen */
+    if (App.overCap() && !['home', 'stage'].includes(App.screen) && !document.querySelector('.modal')) App.home();
+  }, 1000);
+
   /* The adventure road: 7 stepping stones on a winding path; the buddy stands on today's stone. */
   /* The road is drawn to fit its box: wide boxes get a left-to-right road with as many stones as fit,
      tall boxes get a road climbing upwards. */
@@ -239,19 +309,48 @@
     await revealStickers(got, extra);
   }
   function stickerHtml(s, cls) { return `<span class="stk r${s.r} ${cls || ''}"><span>${UI.em(s.e)}</span></span>`; }
+  /* R3 §6: a sticker's name, big, over everything (never inside the clipped book slot); read aloud once recorded */
+  App.stickerName = function (s, from) {
+    document.querySelectorAll('.stk-name').forEach(n => n.remove());
+    const r = from ? from.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+    const n = el('div', 'stk-name', `<span>${UI.em(s.e)}</span><b>${esc(s.name)}</b>`);
+    n.style.left = Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px';
+    n.style.top = Math.max(70, r.top) + 'px';
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 1800);
+    if (D.ready(s.clip)) A.play(s.clip);
+    UI.live(s.name);
+  };
+  /* A whole theme collected → gold page + that theme's outfit (once). */
+  async function themeCheck() {
+    const R = St.s.reward;
+    R.themes = R.themes || [];
+    for (let i = 0; i < D.STICKER_SETS.length; i++) {
+      if (R.themes.includes(i) || !St.themeDone(i)) continue;
+      R.themes.push(i); St.save();
+      const o = St.giveSpecial(D.THEME_PRIZE[i]);
+      A.sfx('fanfare'); UI.burst(null, 50); UI.rain(30);
+      await UI.modal(`<div class="theme-done"><h3>${esc(D.STICKER_SETS[i][0])} 스티커 다 모았어!</h3><p>스티커북이 황금 페이지가 됐어 ✨</p>${o ? `<span class="cprev big">${UI.mascot('cheer', { [o.slot]: o.id })}</span><p class="outfit-got">선물: ${esc(o.name)}!</p>` : ''}</div>`, [['우와!', 1, 'go']], 'theme-m');
+    }
+  }
+  App.themeCheck = themeCheck;
   async function revealStickers(list, extra) {
     A.sfx('sparkle');
     UI.burst(null, 30);
     const rare = Math.max.apply(null, list.map(s => s.r));
     const title = rare === 2 ? '황금 스티커!' : rare === 1 ? '반짝 스티커!' : '스티커 받았어!';
-    const p = UI.modal(`<div class="reveal"><h3>${title}</h3><div class="reveal-row">${list.map(s => stickerHtml(s, 'big')).join('')}</div>${extra || ''}</div>`, [['좋아!', 1, 'go']], 'reveal-m');
+    const p = UI.modal(`<div class="reveal"><h3>${title}</h3><div class="reveal-row">${list.map(s => `<span class="reveal-one">${stickerHtml(s, 'big')}<b class="stk-cap">${esc(s.name)}</b></span>`).join('')}</div>${extra || ''}</div>`, [['좋아!', 1, 'go']], 'reveal-m');
     A.play('ui_sticker');
     await p;
+    await themeCheck();
   }
 
   /* ---------- stage ---------- */
-  App.runStage = async function (stage, replay) {
+  App.runStage = async function (stage, replay, from) {
     const my = ++App.sess;
+    const fromHome = !!(from && from.home);
+    /* special sessions are never mastery-gated and never move the road: review, warm-up, 통글자 path, placement */
+    const special = ['review', 'whole', 'place'].includes(stage.k);
     A.stop();
     App.screen = 'stage';
     A.bgm(false);
@@ -262,8 +361,21 @@
     m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
     App._screenAt = performance.now();
     m.dataset.screen = 'stage';
+    /* R2: a NEW stage failed HELP_AFTER times in a row is played as a help round (the right answer glows after ~1 s) */
+    const failed = (St.s.learn.tries || {})[stage.id] || 0;
+    const help = !special && !St.s.learn.done[stage.id] && failed >= App.HELP_AFTER;
     const plays = Plan.make(stage);
-    const dots = el('div', 'dots-prog', plays.map(() => '<i></i>').join(''));
+    /* Nihon #3: the first stage of a day's session begins with 1–3 due review items (oldest first, one sound game) */
+    let warm = [];
+    if (!replay && stage.k !== 'place' && App._warm !== St.day()) {
+      App._warm = St.day();
+      const L0 = St.s.learn, keys = Coach.pickWarm(L0.srs || {}, St.day(), Plan.warmable, 3);
+      if (keys.length) {
+        warm = Plan.make({ k: 'warm', keys });
+        if (warm.length) { Coach.shown(L0.srs, keys, St.day()); St.save(); App.lastWarm = keys; }
+      }
+    }
+    const dots = el('div', 'dots-prog', warm.map(() => '<i class="wu"></i>').join('') + plays.map(() => '<i></i>').join(''));
     m.appendChild(hud({ home: true, dots }));
     const area = el('div', 'play');
     m.appendChild(area);
@@ -272,14 +384,48 @@
     m.appendChild(buddy);
     let abort;
     const ctx = {
-      right: 0, wrong: 0, giftUsed: false,
+      right: 0, wrong: 0, giftUsed: false, help, helpMs: 1100,
       alive: () => App.sess === my,
       star: () => { if (App.sess === my) App.star(1); },
       aborted: new Promise(r => { abort = r; })
     };
     App._abort = () => abort(false);
     ctx.gift = () => maybeGift(ctx);
-    const pre = A.preload(Plan.clips(plays));
+    if (stage.k === 'place') ctx.noScore = true;
+    const pre = A.preload(Plan.clips(warm.concat(plays)));
+    let capped = false;
+    if (warm.length) {
+      /* warm-up: a short card, then one question per item; answers update the date boxes (wrong → box 1, silently) and
+         never count toward the stage's mastery */
+      area.innerHTML = '';
+      const wi = el('div', 'intro warm');
+      wi.style.setProperty('--wc', '#B9A9EA');
+      wi.appendChild(el('div', 'intro-world', '🔁 몸풀기'));
+      wi.appendChild(el('h2', 'intro-title', '같이 해 보자!'));
+      const wgo = btn('next-btn big', '출발! ▶', null, '출발');
+      wi.appendChild(wgo);
+      area.appendChild(wi);
+      const wt = new Promise(r => UI.tap(wgo, r));
+      await Promise.race([wt, (async () => { await Promise.race([pre, sleep(1500)]); if (ctx.alive()) await A.play('ui_together'); await sleep(500); })()]);
+      if (!ctx.alive()) return;
+      A.stop();
+      for (let i = 0; i < warm.length; i++) {
+        if (!ctx.alive()) return;
+        dots.children[i].classList.add('now');
+        area.innerHTML = '';
+        area.dataset.play = warm[i].t;
+        UI.buddy('happy');
+        try { await P[warm[i].t](area, warm[i].cfg, ctx); } catch (err) { console.error(err); }
+        if (!ctx.alive()) return;
+        dots.children[i].classList.remove('now'); dots.children[i].classList.add('done');
+        A.sfx('whoosh');
+        await sleep(200);
+        if (App.overCap()) { capped = true; break; }
+      }
+      ctx.warmRight = ctx.right; ctx.warmWrong = ctx.wrong;
+      Object.assign(ctx, { right: 0, wrong: 0, q: 0, ft: 0, chances: [], open: null, missed: false, firstLog: [] });
+    }
+    const off = warm.length;
     /* intro */
     const world = D.WORLDS[stage.w];
     area.innerHTML = '';
@@ -288,44 +434,151 @@
     intro.appendChild(el('div', 'intro-world', `${world.icon} ${esc(world.name)}`));
     intro.appendChild(el('h2', 'intro-title', esc(stage.title)));
     intro.appendChild(el('div', 'intro-plays', plays.map(p => `<span>${PLAY_ICON[p.t] || '🎲'}</span>`).join('')));
+    if (help) intro.appendChild(el('p', 'intro-help', '✨ 반짝이는 걸 보고 같이 해 보자!'));
     const go = btn('next-btn big', '출발! ▶', null, '출발');
     intro.appendChild(go);
     area.appendChild(intro);
-    await Promise.race([pre, sleep(2500)]);
-    await new Promise(r => UI.tap(go, r));
+    /* P1: the intro card speaks right away (inside the 놀자 tap, so iOS lets it play) and the stage starts by itself after it;
+       출발 still starts it sooner. Before, the card was silent and waited for a second tap. */
+    const tapped = new Promise(r => UI.tap(go, r));
+    const auto = (async () => {
+      await Promise.race([pre, sleep(1500)]);
+      if (!ctx.alive()) return;
+      await A.play(introClip(stage));
+      if (help && ctx.alive()) { await sleep(250); await A.play('ui4_try'); }
+      await sleep(700);
+    })();
+    if (!capped) await Promise.race([tapped, auto]);
+    if (!ctx.alive()) return;
+    A.stop();
     A.sfx('whoosh');
     const t0 = performance.now();
-    for (let i = 0; i < plays.length; i++) {
+    for (let i = 0; i < plays.length && !capped; i++) {
       if (!ctx.alive()) return;
-      dots.children[i].classList.add('now');
+      dots.children[off + i].classList.add('now');
       area.innerHTML = '';
       area.dataset.play = plays[i].t;
       UI.buddy('happy');
       try { await P[plays[i].t](area, plays[i].cfg, ctx); } catch (err) { console.error(err); }
       if (!ctx.alive()) return;
-      dots.children[i].classList.remove('now');
-      dots.children[i].classList.add('done');
+      dots.children[off + i].classList.remove('now');
+      dots.children[off + i].classList.add('done');
       A.sfx('whoosh');
       await sleep(200);
+      /* Nihon #2: whole-app cap reached → the current play is finished, then the day closes (the stage stays for tomorrow) */
+      if (i < plays.length - 1 && App.overCap()) capped = true;
+      /* Nihon #4: placement never runs longer than 5 minutes */
+      if (stage.k === 'place' && performance.now() - t0 > 300000) break;
     }
     if (!ctx.alive()) return;
     const secs = (performance.now() - t0) / 1000;
+    if (capped) {
+      St.logDay(ctx.right, ctx.wrong, 0, secs);
+      App.lastResult = { id: stage.id, capped: true };
+      ctx.dayEnd = App.isDayEnd(replay, true);
+      await chest(ctx);
+      if (!ctx.alive()) return;
+      if (ctx.dayEnd) await endOfDay(ctx, stage);
+      if (!ctx.alive()) return;
+      await App.home();
+      return;
+    }
+    if (stage.k === 'place') placementDone(ctx);
+    if (stage.k === 'whole') { St.s.learn.wholeN = (St.s.learn.wholeN || 0) + 1; St.save(); }
+    if (special && fromHome && F.dailyStop) St.countToday();
+    if (special && !(fromHome && F.dailyStop)) replay = true; /* uncounted review/replay: never the day's end */
     let firstTime = false;
-    if (stage.k === 'review') { St.s.learn.reviews = (St.s.learn.reviews || 0) + 1; St.logDay(ctx.right, ctx.wrong, 0, secs); }
-    else { firstTime = St.finishStage(stage.id, ctx.right, ctx.wrong); St.logDay(0, 0, 0, secs); }
+    /* Mastery (gentle, for a 4-year-old; rule in App.judge at the top): a NEW stage that is not mastered still opens the chest
+       (stars were earned), a friendly "한 번 더 해 보자" follows and the same stage stays on the road; after HELP_AFTER such tries
+       the next one is a help round. Replays and reviews are not gated. */
+    const gated = !special && !St.s.learn.done[stage.id];
+    const J = App.judge(ctx.q || 0, ctx.ft || 0, ctx.chances);
+    const cleared = !gated || J.mastered;
+    const L = St.s.learn;
+    App.lastResult = Object.assign({ id: stage.id, cleared, gated, help }, J);
+    if (special) { if (stage.k === 'review') L.reviews = (L.reviews || 0) + 1; St.logDay(ctx.right, ctx.wrong, 0, secs); }
+    else if (!cleared) {
+      L.tries = L.tries || {}; L.tries[stage.id] = (L.tries[stage.id] || 0) + 1;
+      L.score[stage.id] = { right: ctx.right, wrong: ctx.wrong, date: St.day(), notYet: true, tries: L.tries[stage.id], ft: J.ft, q: J.q, help };
+      St.logDay(ctx.right, ctx.wrong, 0, secs);
+    }
+    else {
+      const tries = gated ? ((L.tries || {})[stage.id] || 0) : 0;
+      firstTime = St.finishStage(stage.id, ctx.right, ctx.wrong);
+      const sc = L.score[stage.id];
+      Object.assign(sc, { ft: J.ft, q: J.q });
+      if (gated) {
+        /* passed with the glow's help: the road opens, but the parent sees "아직 연습 중" and the missed items stay weak for review */
+        if (help) { L.helped = L.helped || {}; L.helped[stage.id] = 1; sc.helped = true; }
+        sc.tries = tries + 1;
+        if (L.tries) delete L.tries[stage.id];
+      } else if (L.helped && L.helped[stage.id]) {
+        /* a helped stage replayed later: mastered on her own now → "통과"; otherwise it stays "아직 연습 중" */
+        if (J.mastered) delete L.helped[stage.id]; else sc.helped = true;
+      }
+      St.save();
+      St.logDay(0, 0, 0, secs);
+    }
+    if (!cleared) {
+      await chest(ctx);
+      if (!ctx.alive()) return;
+      const nextHelp = (L.tries[stage.id] || 0) >= App.HELP_AFTER;
+      const p = UI.modal(`<div class="again"><div class="again-pal">${UI.mascot('cheer')}</div><h3>잘했어! 한 번 더 해 보자</h3><p>${nextHelp ? '다음엔 반짝이는 걸 보고 같이 해 보자!' : '천천히 잘 듣고 골라 봐!'}</p></div>`, [['좋아!', 1, 'go']], 'again-m');
+      A.play('ui4_try');
+      await p;
+      if (!ctx.alive()) return;
+      await afterStageGift();
+      if (!ctx.alive()) return;
+      await App.home();
+      return;
+    }
+    ctx.dayEnd = App.isDayEnd(replay, false);
     await chest(ctx);
     if (!ctx.alive()) return;
     if (App._levelUp) await levelUp();
     if (!ctx.alive()) return;
+    await afterStageGift();
+    if (!ctx.alive()) return;
     /* last stage of a world: the friend waiting at the end of the road joins */
-    const lastOfWorld = stage.k !== 'review' && D.STAGES.filter(x => x.w === stage.w).every(x => St.s.learn.done[x.id]);
+    const lastOfWorld = !special && D.STAGES.filter(x => x.w === stage.w).every(x => St.s.learn.done[x.id]);
     if (lastOfWorld && firstTime && !(St.s.reward.met || []).includes('w' + stage.w)) await worldDone(stage.w);
+    if (!ctx.alive()) return;
+    if (ctx.dayEnd) await endOfDay(ctx, stage);
     if (!ctx.alive()) return;
     await App.home();
     const nx = St.stage();
-    if (stage.k !== 'review' && nx.w !== stage.w && !(St.s.reward.told || []).includes(nx.w)) await worldArrive(nx.w);
-    if (stage.k !== 'review' && St.todayCount() === St.s.settings.perDay) A.play('ui4_bye');
+    if (!special && nx.w !== stage.w && !(St.s.reward.told || []).includes(nx.w)) await worldArrive(nx.w);
+    if ((!special || (F.dailyStop && fromHome)) && St.todayCount() === St.s.settings.perDay) A.play('ui4_bye');
   };
+  /* Nihon #4: placement result (parent menu only). Known = right on the first try. */
+  function placementDone(ctx) {
+    const firstOk = {};
+    (ctx.firstLog || []).forEach(([k, ok]) => { if (!(k in firstOk)) firstOk[k] = ok; });
+    const cnt = f => Object.entries(firstOk).filter(([k, ok]) => ok && f(k)).length;
+    const V = D.BASIC_V, C10 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ'];
+    const v = cnt(k => k.startsWith('j:') && V.includes(k.slice(2))), c = cnt(k => k.startsWith('j:') && C10.includes(k.slice(2))), sy = cnt(k => k.startsWith('sy:'));
+    const L = St.s.learn, t = St.day();
+    const path = v <= 2 ? 'whole' : 'normal';
+    L.place = { date: t, v, c, s: sy, path, until: path === 'whole' ? Coach.addDays(t, 14) : null, skip: v >= 5 && St.stage().w <= 2 ? 'offer' : null };
+    delete L.placeAgain;
+    L.places = (L.places || []).concat([{ date: t, v, c, s: sy, path }]).slice(-6);
+    if (!L.start) L.start = t;
+    St.save();
+    App.lastPlacement = L.place;
+  }
+  App.placementDone = placementDone;
+  /* What the intro card says: the stage's letter (ㅏ, ㄱ, 받침 ㅇ …); stages without one say "같이 해 보자!". */
+  function introClip(stage) {
+    const j = stage.v || stage.c || stage.b;
+    if (j && D.has.j(j)) return D.jKey(j);
+    return 'ui_together';
+  }
+  /* The daily gift + streak, after the first finished stage of the day (moved out of the first minute). */
+  async function afterStageGift() {
+    if (F.calmRewards) { St.checkDaily(); return; } /* Nihon #1: streak still counted for the parent menu, nothing shown */
+    const d = St.checkDaily();
+    if (d) await dailyGift(d);
+  }
   const MIC_ICO = '<svg viewBox="0 0 40 40" class="ico-svg" aria-hidden="true"><rect x="13" y="4" width="14" height="21" rx="7" fill="#FF9DB6" stroke="#4B3642" stroke-width="3"/><path d="M8 19 a12 12 0 0 0 24 0 M20 31 v5 M13 36 h14" fill="none" stroke="#4B3642" stroke-width="3" stroke-linecap="round"/></svg>';
   const PLAY_ICON = { meet: '🔤', chant: '🎵', pop: '🎈', pick: '🖼️', clap: '🥁', first: '👂', block: '🧱', trace: '✏️', train: '🚂', memory: '🃏', batchim: '💎', story: '📖',
     fish: '🐟', shop: '🎁', hide: '🔭', speak: MIC_ICO, twin: '🌱', vmerge: '🎢' };
@@ -352,14 +605,16 @@
     if (g) St.meet(g.id);
     St.save();
     A.sfx('fanfare'); UI.burst(null, 50);
-    const stk = St.pickSticker(2);
+    const stk = F.calmRewards ? null : St.pickSticker(2);
     const p = UI.modal(`<div class="arrive done"><div class="arrive-pal big">${UI.mascot('cheer', {}, g ? g.id : undefined)}</div>
-      <h3>${esc(W.name)} 끝!</h3><p class="arrive-story">${esc(D.STORY[w][1])}</p>${g ? `<p class="outfit-got">${esc(g.name)}가 친구가 됐어!</p>` : ''}<div class="reveal-row">${stickerHtml(stk, 'big')}</div></div>`, [['우와!', 1, 'go']], 'arrive-m');
+      <h3>${esc(W.name)} 끝!</h3><p class="arrive-story">${esc(D.STORY[w][1])}</p>${g ? `<p class="outfit-got">${esc(g.name)}가 친구가 됐어!</p>` : ''}${stk ? `<div class="reveal-row">${stickerHtml(stk, 'big')}</div>` : ''}</div>`, [['우와!', 1, 'go']], 'arrive-m');
     A.play('p_wd' + w);
     await p;
     A.stop();
+    await themeCheck();
   }
   async function maybeGift(ctx) {
+    if (F.calmRewards) return; /* Nihon #1: no random surprise gift */
     if (ctx.giftUsed || ctx.right < 3 || Math.random() > (App.giftRate !== undefined ? App.giftRate : 0.15)) return;
     ctx.giftUsed = true;
     A.sfx('whoosh');
@@ -381,7 +636,9 @@
     wrap.appendChild(el('h2', 'play-title', '보물 상자를 열어 봐!'));
     const ch = btn('chest', '<span class="lid"></span><span class="box"></span><span class="lock">⭐</span>', null, '보물 상자');
     wrap.appendChild(ch);
-    wrap.appendChild(el('p', 'chest-score', `⭐ ${ctx.right}개 맞혔어!`));
+    /* UPDATE 3: with calm rewards the child sees effort praise, never a count (the count is in the parent menu) */
+    if (F.calmRewards) { wrap.appendChild(el('p', 'chest-score effort', '끝까지 해 냈구나!')); if (D.ready('ui_effort')) setTimeout(() => { if (ctx.alive()) A.play('ui_effort'); }, 1600); }
+    else if (!ctx.noScore) wrap.appendChild(el('p', 'chest-score', `⭐ ${ctx.right}개 맞혔어!`));
     area.appendChild(wrap);
     A.play('ui4_treasure');
     let taps = 0;
@@ -398,11 +655,80 @@
     UI.buddy('cheer', 'dance');
     await sleep(500);
     if (!ctx.alive()) return;
+    if (F.calmRewards) { if (!ctx.dayEnd) await chooseSticker(); return; } /* last stage of the day: the sticker comes in the end screen */
     const n = ctx.wrong === 0 && ctx.right >= 8 ? 2 : 1;
     const got = [];
     for (let i = 0; i < n; i++) got.push(St.pickSticker());
     await revealStickers(got, n === 2 ? '<p class="outfit-got">하나도 안 틀려서 2장!</p>' : '');
   }
+  /* Nihon #1: finishing a session = exactly one sticker, which she chooses from three (St.stickerChoices: no dice, no rarity) */
+  async function chooseSticker() {
+    if (St.s.reward.stickerDay === St.day()) return; /* one sticker a day (Nihon #5.3) */
+    const ch = St.stickerChoices();
+    const plain = s => `<span class="stk r0 big"><span>${UI.em(s.e)}</span></span><b class="stk-cap">${esc(s.name)}</b>`;
+    A.sfx('sparkle');
+    const id = await UI.modal('<div class="reveal choose"><h3>스티커 하나 골라 봐!</h3></div>', ch.map(s => [plain(s), s.id, 'go stk-pick']), 'reveal-m choose-m');
+    const s = St.takeSticker(D.STICKERS.find(x => x.id === id) || ch[0]);
+    UI.burst(null, 30);
+    const p = UI.modal(`<div class="reveal"><h3>스티커 받았어!</h3><div class="reveal-row"><span class="reveal-one">${plain(s)}</span></div></div>`, [['좋아!', 1, 'go']], 'reveal-m');
+    A.play('ui_sticker');
+    await p;
+    await themeCheck();
+  }
+  App.chooseSticker = chooseSticker;
+  /* Nihon #5 (Nihon's spec, 2026-11-15 23:03): only after the day's LAST stage (quota reached, or the time cap).
+     1 「엄마·아빠한테 보여 줄까?」 보여 줄래! / 다음에 (다음에 = no penalty: the day's sticker, then the calm closing screen)
+     2 show-off: today's 2–3 syllables/words as big cards (tap = her recorded sound, if any) + 「려원이가 읽어 줄래?」
+     3 parent taps 「끝까지 해 냈구나!」 → she picks the day's ONE sticker (#1 choice; never a second one the same day)
+     4 last line 「오늘 궁금한 거 있었어?」 (parent hint: the paper question note)
+     No score, %, streak, timer or "more play". Text + pictures, so it works with the sound off. New lines are text only
+     until recorded (nihon/needed_voice_lines_nihon.md). The whole-app clock is paused. */
+  App.isDayEnd = (replay, capped) => !replay && St.s.learn.endDay !== St.day() && (capped || St.todayCount() >= St.s.settings.perDay);
+  function todayCards(ctx, stage) {
+    const L = Plan.learnedAt(St.s.learn.stage), t = St.day(), srs = St.s.learn.srs || {};
+    const fromCtx = (ctx.firstLog || []).filter(x => x[1]).map(x => x[0]);
+    const fromDay = Object.keys(srs).filter(k => srs[k].l === t && srs[k].ok);
+    const keys = Array.from(new Set(fromCtx.concat(fromDay)));
+    /* child-facing: only what she can read at her level (no 받침 she has not learned), with a recording */
+    const words = keys.filter(k => k.startsWith('w:')).map(k => k.slice(2)).filter(k => D.WORDS[k] && D.WORDS[k].pic && Plan.readable(D.WORDS[k].w, L));
+    const syl = keys.filter(k => k.startsWith('sy:')).map(k => k.slice(3)).filter(x => x.length === 1 && D.has.sy(x) && Plan.readable(x, L));
+    const out = words.slice(0, 2).map(k => ({ text: D.WORDS[k].w, word: k, clip: 'w_' + k }));
+    syl.forEach(x => { if (out.length < 3 && !out.some(o => o.text === x)) out.push({ text: x, clip: D.syKey(x) }); });
+    if (out.length < 2) {
+      const mk = ctx.made && ctx.made.ch;
+      if (mk && mk.length === 1 && D.has.sy(mk) && !out.some(o => o.text === mk)) out.push({ text: mk, clip: D.syKey(mk) });
+      if (out.length < 2) out.push({ text: '려원', word: 'ryeowon', clip: 'w_ryeowon' });
+    }
+    return out.slice(0, 3);
+  }
+  App.todayCards = todayCards;
+  async function endOfDay(ctx, stage) {
+    St.s.learn.endDay = St.day(); St.save();
+    App._noClock = true; App._eodActive = true;
+    document.querySelectorAll('.closing').forEach(n => n.classList.add('wait'));
+    try {
+      const yes = await UI.modal(`<div class="showp ask"><div class="showp-pal">${UI.mascot('cheer')}</div><h3>엄마·아빠한테 보여 줄까?</h3></div>`,
+        [['보여 줄래!', true, 'go'], ['다음에', false, 'later']], 'showp-m');
+      if (yes) {
+        const cards = todayCards(ctx, stage);
+        const p = UI.modal(`<div class="showp off"><div class="showp-cards">${cards.map((c, i) => `<button type="button" class="tap showp-c" data-i="${i}">${c.word ? UI.pic(c.word) : ''}<b>${esc(c.text)}</b></button>`).join('')}</div>
+          <p class="showp-ask">려원이가 읽어 줄래?</p></div>`, [['끝까지 해 냈구나!', 1, 'go parent']], 'showp-m off-m');
+        document.querySelectorAll('.showp-c').forEach(n => UI.tap(n, () => {
+          const c = cards[+n.dataset.i];
+          n.classList.remove('yay'); void n.offsetWidth; n.classList.add('yay');
+          if (c.clip && (window.TRIM[c.clip] || A.hasCustom(c.clip))) A.play(c.clip);
+        }));
+        await p;
+        A.sfx('fanfare'); UI.burst(null, 24);
+      }
+      await chooseSticker();
+      if (yes) await UI.modal('<div class="showp q"><h3>오늘 궁금한 거 있었어?</h3><p class="showp-note">엄마·아빠께: 아이가 물어본 것을 종이 질문 노트에 적어 주세요.</p></div>', [['안녕!', 1, 'go']], 'showp-m');
+    } finally {
+      App._noClock = false; App._eodActive = false;
+      document.querySelectorAll('.closing.wait').forEach(n => n.classList.remove('wait'));
+    }
+  }
+  App.endOfDay = endOfDay;
   async function levelUp() {
     App._levelUp = false;
     A.sfx('fanfare');
@@ -431,15 +757,15 @@
     const tabs = el('div', 'book-tabs');
     D.STICKER_SETS.forEach(([name, s], i) => {
       const have = D.STICKERS.filter(x => x.set === i && owned[x.id]).length;
-      tabs.appendChild(btn('book-tab' + (i === tab ? ' on' : ''), `<span>${Array.from(s)[0]}</span><small>${have}/20</small>`, () => { A.sfx('tap'); App.stickers(i); }, name));
+      tabs.appendChild(btn('book-tab' + (i === tab ? ' on' : '') + (have === 20 ? ' gold' : ''), `<span>${Array.from(s)[0]}</span><small>${have}/20</small>`, () => { A.sfx('tap'); App.stickers(i); }, name));
     });
     book.appendChild(tabs);
-    const page = el('div', 'book-page');
+    const page = el('div', 'book-page' + (St.themeDone(tab) ? ' gold' : ''));
     D.STICKERS.filter(x => x.set === tab).forEach(x => {
       const has = owned[x.id];
-      const c = el('button', 'tap slot' + (has ? ' has' : '') + (fresh.has(x.id) ? ' new' : ''), has ? stickerHtml(x) + (has > 1 ? `<i class="cnt">×${has}</i>` : '') : '<span class="q">?</span>');
+      const c = el('button', 'tap slot' + (has ? ' has' : '') + (fresh.has(x.id) ? ' new' : ''), has ? stickerHtml(x) + `<b class="slot-name">${esc(x.name)}</b>` + (has > 1 ? `<i class="cnt">×${has}</i>` : '') + (fresh.has(x.id) ? '<i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i>' : '') : '<span class="q">?</span>');
       c.type = 'button';
-      if (has) UI.tap(c, () => { A.sfx('pop'); c.classList.remove('wig'); void c.offsetWidth; c.classList.add('wig'); });
+      if (has) { c.setAttribute('aria-label', x.name); UI.tap(c, () => { A.sfx('pop'); c.classList.remove('wig'); void c.offsetWidth; c.classList.add('wig'); App.stickerName(x, c); }); }
       page.appendChild(c);
     });
     book.appendChild(page);
@@ -480,9 +806,20 @@
     side.appendChild(btn('deco-back', '📒<span>스티커북</span>', () => App.stickers(tab), '스티커북으로'));
     const tray = el('div', 'deco-tray scroll');
     side.appendChild(tray);
+    const story = el('p', 'deco-story');
+    scene.appendChild(story);
     wrap.append(scene, side);
     m.appendChild(wrap);
-    const save = () => St.save();
+    /* R3 §6: the picture tells its own little story from the stickers on it — "강아지랑 고양이가 있어요" */
+    const tell = () => {
+      const names = [];
+      placed.forEach(p => { const n = D.STICKERS[p.id].name; if (!names.includes(n)) names.push(n); });
+      const ns = names.slice(-3);
+      story.textContent = !ns.length ? '스티커를 끌어다 붙여 봐!'
+        : ns.length === 1 ? D.josa(ns[0], '이', '가') + ' 있어요'
+        : ns.slice(0, -1).map((n, i, a) => (i === a.length - 1 ? D.josa(n, '이랑', '랑') : n + ',')).join(' ') + ' ' + D.josa(ns[ns.length - 1], '이', '가') + ' 있어요';
+    };
+    const save = () => { tell(); St.save(); };
     const MAX = 40;
     function put(item) {
       const s0 = D.STICKERS[item.id];
@@ -525,7 +862,7 @@
           if (ev.pointerId !== pid) return;
           node.removeEventListener('pointermove', mv); node.removeEventListener('pointerup', upv); node.removeEventListener('pointercancel', upv);
           if (!g) {
-            if (item) { item.s = item.s >= 1.6 ? 0.8 : (item.s || 1) + 0.4; node.style.setProperty('--s', item.s); A.sfx('pop'); save(); }
+            if (item) { item.s = item.s >= 1.6 ? 0.8 : (item.s || 1) + 0.4; node.style.setProperty('--s', item.s); A.sfx('pop'); App.stickerName(D.STICKERS[id], node); save(); }
             return;
           }
           g.remove();
@@ -546,11 +883,12 @@
     }
     placed.forEach(put);
     trayFill();
+    tell();
     A.play('p_deco');
   };
 
   /* ---------- closet ---------- */
-  const SLOTS = [['friend', '친구', '🐰'], ['hat', '모자', '🎩'], ['eyes', '안경', '👓'], ['neck', '목', '🎀'], ['back', '망토', '✨'], ['body', '색', '🎨']];
+  const SLOTS = [['friend', '친구', '🐰'], ['hat', '모자', '🎩'], ['eyes', '안경', '👓'], ['neck', '목', '🎀'], ['back', '망토', '🦋'], ['body', '색', '🎨'], ['prop', '소품', '🪄'], ['fx', '반짝', '✨']];
   App.closet = function (slot) {
     leave(); App.sess++; A.stop();
     App.screen = 'closet';
@@ -579,8 +917,9 @@
     });
     D.OUTFITS.filter(o => o.slot === slot).forEach(o => {
       const own = R.outfits.includes(o.id), on = R.wear[o.slot] === o.id;
-      const locked = !own && o.lv && R.level < o.lv;
-      const tag = own ? (on ? '입는 중' : '입기') : locked ? `🔒 레벨 ${o.lv}` : `⭐ ${o.cost}`;
+      const special = !own && (o.theme !== undefined || o.aqua);
+      const locked = special || (!own && o.lv && R.level < o.lv);
+      const tag = own ? (on ? '입는 중' : '입기') : o.theme !== undefined ? `🔒 ${D.STICKER_SETS[o.theme][0]} 20장` : o.aqua ? '🔒 고래 되기' : locked ? `🔒 레벨 ${o.lv}` : `⭐ ${o.cost}`;
       const it = btn('citem' + (own ? ' own' : '') + (on ? ' on' : '') + (locked ? ' locked' : ''),
         `<span class="cprev">${UI.mascot('happy', { [o.slot]: o.id })}</span><b>${esc(o.name)}</b><small>${tag}</small>`, async () => {
           if (own) { St.wear(o); A.sfx('snap'); App.closet(slot); return; }
@@ -596,6 +935,20 @@
     m.appendChild(wrap);
   };
 
+  /* R3: a plain full screen with the HUD (used by 려원이가 만든 게임, aqua.js) */
+  App.openScreen = function (name) {
+    leave(); const my = ++App.sess; A.stop(); A.bgm(false);
+    App.screen = name;
+    const m = main();
+    m.innerHTML = '';
+    m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter');
+    App._screenAt = performance.now();
+    m.dataset.screen = name;
+    m.appendChild(hud({ home: true }));
+    return { m, my };
+  };
+  App.reveal = (list, extra) => revealStickers(list, extra);
+  App.chest = ctx => chest(ctx); /* QA hook (UPDATE 3 chest screenshot) */
   /* ---------- playground: replay finished stages ---------- */
   App.playground = function () {
     leave(); App.sess++; A.stop();
@@ -612,6 +965,9 @@
     const rv = btn('pg-item review', '<span>🔁</span><b>복습 모험<br><small>할 때마다 새 문제!</small></b>', () => App.runStage({ id: 0, w: cur.w, k: 'review', title: '복습 모험' }, true), '복습 모험');
     rv.style.setProperty('--wc', '#FF8FB8');
     wrap.appendChild(rv);
+    const aq = btn('pg-item aqua-card', '<span>🐠</span><b>아쿠아리움<br><small>려원이가 만든 게임</small></b>', () => App.aqua(), '려원이가 만든 게임');
+    aq.style.setProperty('--wc', '#4FB6E8');
+    wrap.appendChild(aq);
     SONGS.forEach((sg, i) => {
       const sb = btn('pg-item songc', `<span>🎵</span><b>${esc(sg[0])}<br><small>같이 불러요!</small></b>`, () => App.songPlay(i), sg[0]);
       sb.style.setProperty('--wc', '#8FD3FF');
@@ -685,7 +1041,7 @@
     const v = await UI.modal(`<p class="gate">어른 확인<br><b>${a} + ${c} = ?</b></p>`, opts.map(o => [String(o), o, 'num']).concat([['닫기', null, 'no']]), 'gate-m');
     if (v === ans) App.parent();
   }
-  App.parent = function () {
+  App.parent = function (tab) {
     A.bgm(false);
     setAdult(true);
     leave(); App.sess++; A.stop();
@@ -696,20 +1052,30 @@
     const stage = St.stage();
     const scores = Object.entries(L.score).map(([id, v]) => [+id, v]).sort((a, b) => b[0] - a[0]);
     const redo = scores.filter(([, v]) => v.wrong / Math.max(1, v.right + v.wrong) > 0.4).slice(0, 6);
+    /* R2: a stage that is not mastered yet (failed tries, or passed only with the glowing hints) is shown apart, not as a score */
+    const practising = scores.filter(([id, v]) => v.notYet || v.helped || (L.helped || {})[id]);
+    const badge = (id, v) => {
+      if (v.notYet) return `<span class="pm-practice">아직 연습 중</span><span class="pm-small"> ${v.tries || 1}번 해 봄${v.help ? ' · 도움 받으며' : ''}${v.q ? ` · 첫 번에 ${v.ft}/${v.q}` : ''}</span>`;
+      if (v.helped || (L.helped || {})[id]) return `<span class="pm-practice helped">아직 연습 중</span><span class="pm-small"> 도움 받아 통과${v.q ? ` · 첫 번에 ${v.ft}/${v.q}` : ''}</span>`;
+      return `<span class="pm-ok">통과</span>${v.q ? `<span class="pm-small"> 첫 번에 ${v.ft}/${v.q}</span>` : ''}`;
+    };
     const rows = scores.slice(0, 10).map(([id, v]) => {
       const s = D.STAGES[id - 1], pct = Math.round(v.right / Math.max(1, v.right + v.wrong) * 100);
-      return `<tr><td>${id}</td><td>${esc(s.title)}</td><td>${v.right}/${v.right + v.wrong} (${pct}%)</td><td>${v.date}</td></tr>`;
+      return `<tr class="${v.notYet || v.helped || (L.helped || {})[id] ? 'pm-row-practice' : ''}"><td>${id}</td><td>${esc(s.title)}</td><td>${badge(id, v)}</td><td>${v.right}/${v.right + v.wrong} (${pct}%)</td><td>${v.date}</td></tr>`;
     }).join('');
     const opts = D.STAGES.map(s => `<option value="${s.id}" ${s.id === stage.id ? 'selected' : ''}>${s.id}. ${esc(D.WORLDS[s.w].name)} · ${esc(s.title)}</option>`).join('');
     box.innerHTML = `
-      <div class="pm scroll">
+      <div class="pm scroll${tab === 'check' ? ' tab-check' : ''}">
         <header class="pm-head"><h2>어른 메뉴</h2><button type="button" class="pm-close" id="pmClose">닫기 ✕</button></header>
+        <nav class="pm-tabs"><button type="button" class="pm-tab${tab === 'check' ? '' : ' on'}" data-t="main">진도·설정</button><button type="button" class="pm-tab${tab === 'check' ? ' on' : ''}" data-t="check">점검 A·B·C</button></nav>
+        ${checkpointHtml()}
         <p class="pm-note">이 화면에서는 두 손가락으로 확대할 수 있습니다. 닫으면 아이 화면은 다시 확대가 막힙니다.</p>
         <section><h3>진도</h3>
           <p>현재 단계: <b>${stage.id} / ${D.STAGES.length}</b> · ${esc(D.WORLDS[stage.w].name)} · ${esc(stage.title)}</p>
           <p>끝낸 단계 ${Object.keys(L.done).length}개 · 오늘 ${St.todayCount()}개 · 별 ${R.stars}개 · 레벨 ${R.level} · 연속 ${R.streak.count}일(최고 ${R.streak.best}일) · 스티커 ${St.stickerCount()}/120</p>
+          ${practising.length ? `<p class="pm-practice-note"><b>아직 연습 중</b> ${practising.map(([id, v]) => id + '. ' + esc(D.STAGES[id - 1].title) + (v.notYet ? ` (${v.tries || 1}번 해 봄)` : ' (도움 받아 통과)')).join(', ')}<br><span class="pm-small">혼자서 첫 번에 70% 이상 맞혀야 통과입니다(아무거나 눌러서는 통과할 수 없습니다). 두 번 안 되면 다음 번에는 정답이 반짝이며 도와줍니다. 이런 단계는 옆에서 같이 해 주세요.</span></p>` : ''}
           ${redo.length ? `<p class="pm-warn">다시 하면 좋은 단계: ${redo.map(([id]) => id + '. ' + esc(D.STAGES[id - 1].title)).join(', ')}</p>` : ''}
-          <table class="pm-table"><thead><tr><th>#</th><th>단계</th><th>맞힘</th><th>날짜</th></tr></thead><tbody>${rows || '<tr><td colspan="4">아직 기록이 없습니다.</td></tr>'}</tbody></table>
+          <table class="pm-table"><thead><tr><th>#</th><th>단계</th><th>결과</th><th>맞힘</th><th>날짜</th></tr></thead><tbody>${rows || '<tr><td colspan="5">아직 기록이 없습니다.</td></tr>'}</tbody></table>
           <label class="pm-row">단계 바꾸기 <select id="pmStage">${opts}</select></label>
           <button type="button" class="pm-btn" id="pmGo">이 단계로 이동</button>
         </section>
@@ -719,11 +1085,14 @@
           ${heatHtml()}
           ${novelHtml()}
         </section>
-        <section><h3>오늘 같이 해 볼 것</h3><p class="pm-tip">${esc(tipText())}</p>
+        <section><h3>오늘 같이 해 볼 것</h3><p class="pm-tip">${esc(tipText(St.stage()))}</p>
         </section>
         <section><h3>설정</h3>
           <label class="pm-row">하루 모험 수
-            <select id="pmPer">${[1, 2, 3, 4].map(n => `<option ${n === S.perDay ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+            <select id="pmPer">${(F.dailyStop ? [1, 2, 3] : [1, 2, 3, 4]).map(n => `<option ${n === S.perDay ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+          ${F.dailyStop ? `<label class="pm-row">하루 전체 시간 (놀이터 포함)
+            <select id="pmCap">${[10, 15, 20].map(n => `<option value="${n}" ${n === App.capMin() ? 'selected' : ''}>${n}분</option>`).join('')}</select></label>
+          <p class="pm-small">정한 모험을 끝내거나 시간이 다 되면(하던 놀이는 끝까지 하고) "오늘은 여기까지" 화면이 나옵니다. 아이에게 남은 시간은 보이지 않습니다.${App.closed() ? ' <b>오늘은 끝났습니다.</b> <button type="button" class="pm-btn sm" id="pmPg">오늘만 놀이터 열어 주기</button>' : ''}</p>` : ''}
           <label class="pm-row">목소리 크기 <input id="pmVoice" type="range" min="0" max="1" step="0.1" value="${S.voice}"></label>
           <label class="pm-row">효과음 크기 <input id="pmSfx" type="range" min="0" max="1" step="0.1" value="${S.sfx}"></label>
           <label class="pm-row"><input id="pmBgm" type="checkbox" ${S.bgm ? 'checked' : ''}> 홈 화면 배경 음악 (놀이 중에는 꺼짐)</label>
@@ -750,7 +1119,7 @@
         </section>
         <section><h3>글자 점검 (2~4주마다 한 번)</h3>
           <p>앱 밖에서 실제로 읽을 수 있는지 확인합니다. 글자를 크게 보여 주면 아이가 소리 내어 읽고, 어른이 ✓/✗를 누릅니다. 소리는 나오지 않습니다(약 3분).</p>
-          <button type="button" class="pm-btn" id="pmCheck">점검 시작</button>
+          <button type="button" class="pm-btn" id="pmCheck">점검 시작</button> <span class="pm-small">점검 A·B·C는 위의 '점검 A·B·C' 탭에서 합니다.</span>
           ${checkTable(L.checks || [])}
         </section>
         <section><h3>초기화</h3>
@@ -764,7 +1133,8 @@
           <ul class="pm-tips">
             <li>따라 쓰기가 끝나면 종이에 같은 글자를 한 번 같이 써 보세요. 손으로 직접 쓰는 경험이 글자 알아보기에 도움이 된다는 연구가 있습니다.</li>
             <li>아이가 틀려도 앱이 "그건 나야"처럼 들은 글자를 알려 줍니다. 정답을 대신 눌러 주기보다 스피커 버튼을 다시 눌러 주세요.</li>
-            <li>하루 1~2단계(8~15분)가 적당합니다.</li>
+            <li>${F.dailyStop ? '하루 1단계, 15분 안팎이 적당합니다.' : '하루 1~2단계(8~15분)가 적당합니다.'}</li>
+            <li>처음 한 문제는 아이 옆에 앉아 같이 해 주세요. 그날 마지막 모험이 끝나면 "엄마·아빠한테 보여 줄까?" 화면이 나옵니다. 오늘 배운 글자 카드를 아이가 읽어 주면 "끝까지 해 냈구나!"를 눌러 주세요.</li>
           </ul>
         </section>
         <section><h3>정보</h3><p id="pmInfo">버전 v6.3 · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
@@ -772,6 +1142,18 @@
     $('#pmClose').addEventListener('click', closeParent);
     $('#pmGo').addEventListener('click', () => { St.setStage(+$('#pmStage').value); msg('단계를 바꿨습니다.'); });
     $('#pmPer').addEventListener('change', e => { S.perDay = +e.target.value; St.save(); });
+    if ($('#pmCap')) $('#pmCap').addEventListener('change', e => { S.capMin = +e.target.value; St.save(); });
+    if ($('#pmPg')) $('#pmPg').addEventListener('click', () => { App._pgOpen = St.day(); closeParent(true); App.playground(); });
+    document.querySelectorAll('.pm-tab').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.pm-tab').forEach(x => x.classList.toggle('on', x === b));
+      $('.pm').classList.toggle('tab-check', b.dataset.t === 'check'); $('.pm').scrollTop = 0;
+    }));
+    document.querySelectorAll('[data-ck]').forEach(b => b.addEventListener('click', () => runCheck(ckList(b.dataset.ck), 'check')));
+    if ($('#pmPlaceAgain')) $('#pmPlaceAgain').addEventListener('click', () => { L.placeAgain = 1; St.save(); msg2('다음 "놀자"에서 소리 찾기 놀이(약 5분)로 다시 점검합니다.'); });
+    if ($('#pmSkipV')) $('#pmSkipV').addEventListener('click', () => {
+      const s3 = D.STAGES.find(x => x.w === 3); St.setStage(s3.id); L.place.skip = 'done'; St.save(); msg2('자음 마을부터 시작합니다. 모음 바다는 놀이터·복습에서 다시 할 수 있습니다.');
+    });
+    if ($('#pmBat')) $('#pmBat').addEventListener('click', () => { L.batOpen = 1; St.save(); msg2('받침 동굴을 열었습니다.'); });
     $('#pmVoice').addEventListener('input', e => { S.voice = +e.target.value; A.setVolume(S.voice, S.sfx); St.save(); });
     $('#pmSfx').addEventListener('input', e => { S.sfx = +e.target.value; A.setVolume(S.voice, S.sfx); St.save(); A.sfx('correct'); });
     $('#pmBgm').addEventListener('change', e => { S.bgm = e.target.checked; St.save(); });
@@ -790,7 +1172,7 @@
       $('#pmStudioN').textContent = n ? `지금까지 ${n}줄 녹음` : '';
       sb.onclick = () => { G.Studio.onClose = () => App.parent(); G.Studio.open(); };
     }
-    $('#pmCheck').addEventListener('click', runCheck);
+    $('#pmCheck').addEventListener('click', () => runCheck());
     $('#pmResetR').addEventListener('click', () => {
       if (!confirm('스티커와 옷을 모두 지울까요? 학습 진도는 남습니다.')) return;
       St.resetRewards(); msg('스티커와 옷을 지웠습니다. 학습 진도는 그대로입니다.');
@@ -818,7 +1200,10 @@
       return `<div class="wk-day"><div class="wk-bar"><i style="height:${h}%"></i></div><b>${Math.round(v[3] / 60)}분</b><small>${WD[new Date(d + 'T12:00').getDay()]}${pct !== null ? ' · ' + pct + '%' : ''}</small></div>`;
     }).join('');
     const pct = x => (x[0] + x[1] ? Math.round(x[0] / (x[0] + x[1]) * 100) + '%' : '-');
-    return `<div class="wk">${bars}</div><p>이번 주: 단계 <b>${w[2]}</b>개 · <b>${Math.round(w[3] / 60)}</b>분 · 정답률 <b>${pct(w)}</b> &nbsp;|&nbsp; 지난주: 단계 ${p[2]}개 · ${Math.round(p[3] / 60)}분 · 정답률 ${pct(p)}</p>`;
+    const today = Math.round((log[St.day()] || [0, 0, 0, 0])[3] / 60);
+    /* R3 §8: today's minutes next to the WHO (2019) / AAP (2016) guidance for 2–5-year-olds */
+    const guide = `<p class="pm-small">오늘 <b>${today}분</b>. WHO(2019)와 미국소아과학회(AAP 2016)는 2~5세 화면 시간을 <b>하루 1시간 이하</b>, 되도록 어른과 함께 보기를 권합니다. ${F.dailyStop ? `이 앱은 하루 모험 ${St.s.settings.perDay}개, 전체 ${App.capMin()}분에서 멈춥니다.` : '이 앱의 기본(하루 모험 2개)은 보통 10~20분입니다.'}${today >= 45 ? ' <b>오늘은 충분히 했어요. 화면 밖 놀이로 이어 주세요.</b>' : ''}</p>`;
+    return `<div class="wk">${bars}</div>${guide}<p>이번 주: 단계 <b>${w[2]}</b>개 · <b>${Math.round(w[3] / 60)}</b>분 · 정답률 <b>${pct(w)}</b> &nbsp;|&nbsp; 지난주: 단계 ${p[2]}개 · ${Math.round(p[3] / 60)}분 · 정답률 ${pct(p)}</p>`;
   }
   /* rights/wrongs per letter, from every item the plays record */
   function letterStats() {
@@ -857,13 +1242,13 @@
     return `<p>소리 내어 읽기 <b>${said}</b>번 · 처음 보는 글자 스스로 읽기 <b>${n}</b>번 중 아이가 "똑같아"라고 한 것 <b>${ok}</b>번${n ? ` (${Math.round(ok / n * 100)}%)` : ''}</p>
       ${last ? `<p class="pm-small">최근: ${last} — 아이 스스로 판단한 결과이므로, 녹음을 같이 들어 보시거나 '글자 점검'으로 확인해 주세요.</p>` : ''}`;
   }
-  function tipText() {
-    const stage = St.stage(), st = letterStats(), L = Plan.learnedAt(stage.id);
+  function tipText(at) {
+    const stage = at && at.id ? at : St.stage(), st = letterStats(), L = Plan.learnedAt(stage.id);
     const cand = Array.from(L.c).filter(c => c !== 'ㅇ');
     const weak = cand.map(c => [c, st[c] ? st[c][0] / Math.max(1, st[c][0] + st[c][1]) : 1]).sort((a, b) => a[1] - b[1])[0];
     const j = weak ? weak[0] : 'ㄱ';
     const list = D.TIPS[stage.w] || D.TIPS[1];
-    return list[new Date().getDate() % list.length].replace('{j}', j);
+    return list[(at && at.id ? at.id : new Date().getDate()) % list.length].replace('{j}', j);
   }
   const VOICE_GROUPS = [
     ['가족 낱말', ['ryeowon', 'eomma', 'appa', 'halmeoni', 'harabeoji', 'nuna', 'agi'].map(k => ['w_' + k, D.WORDS[k].w])],
@@ -938,28 +1323,74 @@
     ['쌍자음·미끄럼 모음', '까빠씨찌딸과워의귀'.split('')],
     ['낱말', ['나비', '오리', '바나나', '모자', '사과', '강아지']]
   ];
+  /* ---------- Nihon #5: checkpoints A/B/C (parent only) + #4 placement result ---------- */
+  function appVowels() {
+    const it = St.s.learn.items;
+    const seen = D.BASIC_V.filter(v => it['j:' + v]);
+    if (!seen.length) return null;
+    const got = D.BASIC_V.filter(v => { const x = it['j:' + v]; return x && x[0] >= 2 && x[0] / (x[0] + x[1]) >= 0.8; }).length;
+    return { got, of: 6, date: St.day(), src: '앱 기록(소리 듣고 고르기)' };
+  }
+  App.checkpoints = () => Coach.checkpoints(St.s.learn.checks || [], appVowels());
+  const C10 = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅎ'];
+  function ckList(id) {
+    const it = St.s.learn.items;
+    if (id === 'A') return [['A모음', 'ㅏㅓㅗㅜㅡㅣ'.split('')]];
+    if (id === 'B') {
+      const all = C10.filter(c => c !== 'ㅇ').flatMap(c => D.BASIC_V.map(v => D.join(c, v, '')));
+      const fresh = all.filter(x => !it['sy:' + x] && !it['say:' + x] && !it['write:' + x]);
+      return [['B자음', C10.slice()], ['B새글자', UI.shuffle(fresh.length >= 10 ? fresh : all).slice(0, 10)]];
+    }
+    const two = Object.values(D.WORDS).filter(w => w.syl.length === 2 && w.syl.every(x => { const p0 = D.split(x); return p0 && !p0.jong; }) && w.key !== 'ryeowon').map(w => w.w);
+    return [['C낱말', UI.shuffle(two).slice(0, 10)], ['C이름', ['려원']]];
+  }
+  const CK_NAME = { A모음: '모음', B자음: '자음 이름', B새글자: '처음 보는 글자', C낱말: '두 글자 낱말(그림 없이)', C이름: '이름 혼자 쓰기' };
+  const CK_HOW = { A: '모음 6개를 하나씩 보여 주고 소리를 말하게 해 주세요(약 1분).', B: '자음 10개는 이름(기역, 니은…)을, 처음 보는 글자 10개는 소리 내어 읽게 해 주세요(약 3분).', C: '그림 없이 낱말 10개를 읽게 하고, 마지막으로 종이에 이름을 보지 않고 혼자 쓰게 해 주세요(약 4분).' };
+  function checkpointHtml() {
+    const L = St.s.learn, cp = App.checkpoints(), t = St.day();
+    const first = L.start || Object.keys(L.log || {}).sort()[0] || t;
+    const wk = Math.max(1, Math.floor(Coach.diff(first, t) / 7) + 1);
+    const ST = { pass: ['통과', 'pm-ok'], practice: ['아직 연습 중', 'pm-practice'], none: ['아직 점검 전', 'pm-small'] };
+    const card = c => `<div class="ck-card s-${c.status}"><h4>${c.id} · ${esc(c.title)} <small>권장 시기 약 ${c.week}주째</small></h4>
+      <p><span class="${ST[c.status][1]}">${ST[c.status][0]}</span></p>
+      <ul>${c.parts.map(p => `<li>${esc(p.label)}: <b>${p.got || '-'}</b> <span class="pm-small">(기준 ${p.need}${p.date ? ' · ' + p.date : ''}${p.src && p.src !== '점검' ? ' · ' + esc(p.src) : ''})</span></li>`).join('')}</ul>
+      <p class="pm-tip">${esc(c.tip)}</p><p class="pm-small">${esc(CK_HOW[c.id])}</p><button type="button" class="pm-btn" data-ck="${c.id}">${c.id} 점검 하기</button></div>`;
+    const P0 = L.place;
+    const pl = !F.placement ? '' : `<div class="ck-card"><h4>처음 점검 (소리 찾기 놀이)</h4>${P0 ? `<p>${P0.date} · 모음 <b>${P0.v}/6</b> · 자음 이름 <b>${P0.c}/10</b> · 처음 보는 글자 <b>${P0.s}/6</b> (첫 번에 맞힌 수)</p>
+      <p>${P0.path === 'whole' ? `<b>통글자 길</b>: ${P0.until}까지 이름·가족 낱말·쉬운 낱말 5개를 통째로 익히고 소리 놀이를 합니다. 그날 다시 점검합니다.` : '보통 길로 갑니다.'}</p>
+      ${P0.skip === 'offer' ? '<p>모음을 이미 잘 압니다(5/6 이상). <button type="button" class="pm-btn sm" id="pmSkipV">모음 바다 건너뛰고 자음 마을로</button></p>' : ''}` : '<p class="pm-small">아직 기록이 없습니다(새로 설치하면 첫 "놀자"에서 한 번, 약 5분).</p>'}
+      <button type="button" class="pm-btn" id="pmPlaceAgain">다시 점검</button>
+      ${St.stage().w === 6 || D.STAGES.some(x => x.w === 6 && x.id > St.s.learn.stage) ? `<p class="pm-small">받침 동굴은 점검 B를 통과하면 열립니다. ${App.batOpen() ? '<b>지금 열려 있습니다.</b>' : '<button type="button" class="pm-btn sm" id="pmBat">지금 열기</button>'}</p>` : ''}</div>`;
+    const recs = (L.checks || []).filter(r => Object.keys(CK_NAME).some(k => r[k])).slice(-6).reverse();
+    const tbl = recs.length ? `<table class="pm-table"><tr><th>날짜</th>${Object.values(CK_NAME).map(n => `<th>${esc(n)}</th>`).join('')}</tr>${recs.map(r => `<tr><td>${r.date}</td>${Object.keys(CK_NAME).map(k => `<td>${r[k] || '-'}</td>`).join('')}</tr>`).join('')}</table>` : '';
+    return `<section class="pm-ck"><h3>점검 A·B·C <small class="pm-small">아이 화면에는 나오지 않습니다</small></h3>
+      <p class="pm-small">시작한 지 <b>${wk}주째</b>. 아래 기준은 대략의 시기입니다. 처음 한 문제는 옆에 앉아 같이 해 주세요.</p>
+      ${card(cp.A)}${card(cp.B)}${card(cp.C)}${pl}${tbl}<p id="pmMsg2" class="pm-msg" role="status"></p></section>`;
+  }
+  function msg2(t) { const m = $('#pmMsg2'); if (m) m.textContent = t; }
   function checkTable(list) {
     if (!list.length) return '<p class="pm-small">아직 점검 기록이 없습니다.</p>';
     const head = '<tr><th>날짜</th>' + CHECK.map(c => `<th>${c[0]}</th>`).join('') + '</tr>';
     const rows = list.slice(-8).reverse().map(r => `<tr><td>${r.date}</td>` + CHECK.map(c => `<td>${r[c[0]] || '-'}</td>`).join('') + '</tr>').join('');
     return `<table class="pm-table">${head}${rows}</table>`;
   }
-  function runCheck() {
-    const items = CHECK.flatMap(([g, xs]) => UI.shuffle(xs).map(x => [g, x]));
+  function runCheck(groups, back) {
+    groups = groups || CHECK;
+    const items = groups.flatMap(([g, xs]) => UI.shuffle(xs).map(x => [g, x]));
     const res = {};
-    CHECK.forEach(([g, xs]) => { res[g] = [0, xs.length]; });
+    groups.forEach(([g, xs]) => { res[g] = [0, xs.length]; });
     let i = 0;
     const box = el('div', 'check');
     document.body.appendChild(box);
     const show = () => {
       if (i >= items.length) {
         const rec = { date: St.day() };
-        CHECK.forEach(([g]) => { rec[g] = res[g][0] + '/' + res[g][1]; });
+        groups.forEach(([g]) => { rec[g] = res[g][0] + '/' + res[g][1]; });
         St.s.learn.checks = (St.s.learn.checks || []).concat([rec]); St.save();
-        box.remove(); App.parent(); return;
+        box.remove(); App.parent(back); return;
       }
       const [g, x] = items[i];
-      box.innerHTML = `<p class="check-g">${g} · ${i + 1}/${items.length}</p><div class="check-x">${esc(x)}</div>
+      box.innerHTML = `<p class="check-g">${esc(CK_NAME[g] || g)} · ${i + 1}/${items.length}${g === 'C이름' ? ' · 종이에 보지 않고 혼자 쓰게 해 주세요' : ''}</p><div class="check-x">${esc(x)}</div>
         <div class="check-btns"><button type="button" class="ck yes">✓ 읽었어요</button><button type="button" class="ck no">✗ 못 읽었어요</button><button type="button" class="ck stop">그만</button></div>`;
       box.querySelector('.yes').onclick = () => { res[g][0]++; i++; show(); };
       box.querySelector('.no').onclick = () => { i++; show(); };
@@ -968,14 +1399,14 @@
     show();
   }
   function msg(t) { const m = $('#pmMsg'); if (m) m.textContent = t; }
-  function closeParent() {
+  function closeParent(stay) {
     if (recNow) { recNow.stop(); recNow = null; }
     if (G.Rec) G.Rec.close();
     const box = $('#parent');
     box.hidden = true;
     box.innerHTML = '';
     setAdult(false);
-    App.home();
+    if (stay !== true) App.home();
   }
   async function offlineInfo() {
     const info = $('#pmInfo');
@@ -1038,6 +1469,22 @@
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
     let had = !!navigator.serviceWorker.controller;
+    /* P1: first visit — show how far the offline copy is (small pill, bottom-left); after a failed install try again in 30 s */
+    navigator.serviceWorker.addEventListener('message', e => {
+      const m = e.data || {};
+      if (m.type !== 'precache' && m.type !== 'precache-failed') return;
+      if (had && m.type === 'precache') return;              /* updates of an installed app stay silent */
+      let p = $('#cachebar');
+      if (!p) { p = el('div', 'cachebar'); p.id = 'cachebar'; p.setAttribute('role', 'status'); document.body.appendChild(p); }
+      if (m.type === 'precache-failed') {
+        p.textContent = '인터넷 없이 놀 준비를 다 못 했어요. 곧 다시 할게요.';
+        setTimeout(() => { navigator.serviceWorker.register('sw.js').catch(() => {}); }, 30000);
+        return;
+      }
+      const pct = Math.floor(m.done / m.total * 100);
+      p.innerHTML = `<span>인터넷 없이 놀 준비 ${pct}%</span><i><b style="width:${pct}%"></b></i>`;
+      if (m.done >= m.total) { p.innerHTML = '<span>준비 끝! 이제 인터넷 없이도 놀 수 있어요</span>'; setTimeout(() => p.remove(), 3500); }
+    });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!had) { had = true; return; }
       if (App.screen === 'home' || App.screen === '') location.reload(); else App._reload = true;

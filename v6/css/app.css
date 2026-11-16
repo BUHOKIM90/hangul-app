@@ -110,6 +110,7 @@ button { font-family: inherit; color: inherit; border: 0; background: none; padd
 .intro-title { margin: 0; font-weight: 400; font-size: 10vmin; }
 .intro-plays { display: flex; gap: 2vmin; font-family: var(--emoji); font-size: 7vmin; }
 .intro-plays span { background: #fff; border-radius: 2.4vmin; padding: 1.4vmin; box-shadow: var(--shadow); }
+.intro-help { margin: 0; background: #FFF4C7; color: #6B4A00; font-weight: 800; font-size: clamp(16px, 3.4vmin, 30px); padding: 1vmin 2.6vmin; border-radius: 999px; box-shadow: var(--shadow); }
 
 /* meet */
 .meet-card { background: #fff; border-radius: 6vmin; box-shadow: var(--shadow); padding: 3vmin 7vmin; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; align-items: center; column-gap: 5vmin; }
@@ -390,6 +391,12 @@ button { font-family: inherit; color: inherit; border: 0; background: none; padd
 .pm-table td, .pm-table th { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
 .pm-note, .pm-small { color: #666; font-size: 14px; }
 .pm-warn { background: #FFF6E0; padding: 8px; border-radius: 8px; }
+/* R2: stages not mastered yet, apart from normal score rows */
+.pm-practice { display: inline-block; background: #FFE3EC; color: #A2264F; border: 1px solid #F3A6BF; font-weight: 700; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.pm-practice.helped { background: #FFF1D6; color: #8A5300; border-color: #F2C77A; }
+.pm-ok { display: inline-block; background: #E2F5EC; color: #1F6B4A; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.pm-row-practice td { background: #FFF7FA; }
+.pm-practice-note { background: #FFE9F0; border-left: 4px solid #E8789A; padding: 8px 10px; border-radius: 8px; }
 .pm-msg { color: #0A7A3A; font-weight: 600; min-height: 1.2em; }
 .pm-tips li { margin: 6px 0; }
 
@@ -843,7 +850,7 @@ img.em, .pic img.em { filter: none; }
 .hide-field { flex: 1; width: 100%; min-height: 0; position: relative; border-radius: 4vmin; border: var(--line);
   background: radial-gradient(circle at 20% 30%, #FFF3D6 0 12%, transparent 12.5%), radial-gradient(circle at 75% 70%, #E4F6EC 0 14%, transparent 14.5%), radial-gradient(circle at 80% 20%, #FCE4EC 0 10%, transparent 10.5%), #FFFBF4; overflow: hidden; }
 .hid { position: absolute; transform: translate(-50%, -50%) rotate(var(--rot)); line-height: 1; padding: 1vmin 1.6vmin; border-radius: 50%; border: 0 !important; box-shadow: none !important; background: none; min-width: 9vmin; min-height: 9vmin; }
-.hid.deco { font-size: 9vmin !important; }
+.hid.deco img.em { width: .95em; height: .95em; }
 .hid.found { box-shadow: 0 0 0 .8vmin var(--mi2) !important; background: rgba(196, 238, 223, .7); animation: popin .35s; }
 .hid.hint { box-shadow: 0 0 0 1.2vmin var(--bu2) !important; }
 .hid.wiggle { animation: wiggle .5s; }
@@ -1138,3 +1145,190 @@ body:not(.singing) .song-pal { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .m-head, .m-mouth, .song-pal, .buddy, .rainc, .yay { animation: none !important; } }
 /* portrait: three picture-pair cards with words under them always fit the height */
 @media (orientation: portrait) { .cards.wide .card.pair { aspect-ratio: auto; height: min(31.8vmin, 17.5vh); } .cards.wide { gap: 2vmin; } }
+
+/* P1: the mascot shrinks on the two board games so it never covers a card or a hidden letter (hidden letters also skip
+   the cells under it). */
+.play[data-play="hide"] ~ .buddy, .play[data-play="memory"] ~ .buddy { width: 8vmin; opacity: .9; }
+
+/* P1 (from Hangul Buddy QA, Fable 0c527ad): landscape layout.
+   1) Word train: picture + track + tray stacked were taller than the play area in landscape (picture covered the title,
+      answer cars were cut off at the bottom). Picture now sits to the left of track + tray.
+   2) Home dock on tablets in landscape: tiles did not fit beside the play button. Tiles become a 2-column block. */
+@media (orientation: landscape) {
+  .play-body.train { display: grid; grid-template-columns: auto auto; justify-content: center; align-content: center; align-items: center; justify-items: center; column-gap: 5vmin; row-gap: 2vmin; }
+  .play-body.train .train-pic { grid-row: 1 / span 2; }
+  .play-body.train .tray { min-height: 0; justify-content: center; }
+}
+@media (orientation: landscape) and (min-height: 501px) {
+  .home-row { display: grid; grid-template-columns: repeat(2, auto); gap: 1.6vmin; justify-content: end; }
+  .home-tile { width: 11.5vmin; height: 11.5vmin; min-width: 64px; min-height: 64px; }
+  .home-tile span { font-size: 5.2vmin; }
+  .home-tile b { font-size: 2.4vmin; }
+}
+/* P1: "한 번 더 해 보자" after a stage that was not yet mastered */
+.again { text-align: center; }
+.again-pal svg { height: 26vmin; width: auto; }
+.again h3 { font-weight: 400; font-size: max(22px, 6vmin); margin: 1vmin 0; }
+.again p { margin: 0; font-size: max(16px, 3.6vmin); }
+/* P1: offline-copy progress on the first visit */
+.cachebar { position: fixed; left: max(10px, env(safe-area-inset-left)); bottom: max(10px, env(safe-area-inset-bottom)); z-index: 80; background: rgba(255, 255, 255, .92); border-radius: 999px; padding: 6px 14px; font-size: 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); display: flex; align-items: center; gap: 10px; pointer-events: none; max-width: 70vw; }
+.cachebar i { display: block; width: 90px; height: 8px; border-radius: 4px; background: #EEE; overflow: hidden; }
+.cachebar b { display: block; height: 100%; background: #4FD89A; }
+/* R2 (QA_r1_fable): landscape — "첫소리 친구" and "박수 짝짝" sit side by side so nothing hangs over the panel or covers the
+   instruction line (phone 844×390: answer cards and the drum used to hang below the panel; iPad 1180×820: the picture card
+   covered the instruction). */
+@media (orientation: landscape) {
+  .play-body.first, .play-body.clap { flex-direction: row; gap: 5vmin; }
+  .play-body.first .cards { width: auto; grid-template-columns: repeat(3, minmax(0, min(24vmin, 30vh))); }
+  .play-body.first .card .pic { font-size: min(13vmin, 16vh); }
+  .play-body.first .first-top { flex-direction: column; gap: 1vmin; padding: 2vmin 4vmin; }
+  .play-body.first .first-top .pic-l, .play-body.first .first-top .picw.pic-l .pic { font-size: min(15vmin, 19vh); }
+  .play-body.first .first-syl { font-size: min(10vmin, 12vh); }
+  .play-body.clap .clap-top { flex-direction: column; gap: 2vmin; }
+  .play-body.clap .clap-top .picw.pic-l .pic, .play-body.clap .clap-top .pic-l { font-size: min(15vmin, 18vh); }
+  .play-body.clap .drum { flex: none; }
+  .play-body.clap .counts { flex-direction: column; gap: 2vmin; }
+  .play-body.clap .count { min-height: 0; padding: 1.4vmin 4vmin; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .play-body.first .first-top .picw.pic-l .cap, .play-body.clap .clap-top .picw.pic-l .cap { font-size: max(14px, 4vmin); }
+  .play-body.clap .dot { width: 10vmin; height: 10vmin; font-size: 6vmin; }
+  .play-body.clap .drum { width: 26vmin; height: 22vmin; font-size: 12vmin; }
+}
+
+/* ===================== R3 (2026-11-15) ===================== */
+/* §5 tap guard: while the question is spoken the choices rest (taps ignored); the speaker glows; a tap then wiggles the ear */
+.play.listen .play-body .tap, .aqua.listen .aq-pond .tap { filter: saturate(.75) brightness(.97); transition: filter .15s; }
+.play.listen .speaker, .aqua.listen .speaker { box-shadow: 0 0 0 1.2vmin rgba(255, 214, 90, .45), var(--hi, 0 0 0 transparent); }
+.speaker.ear { animation: wiggle .45s; }
+/* portrait: the friend never covers the 4th train car (Lily) */
+@media (orientation: portrait) { .play[data-play="train"] ~ .buddy, .play[data-play="hide"] ~ .buddy { display: none; } }
+/* B7: playground cards never overflow in portrait */
+.pg-item { min-width: 0; height: auto; }
+.pg-item b { min-width: 0; flex: 1; display: block; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pg-item b small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pg-item b br { display: none; }
+@media (orientation: portrait) { .pg { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pg-item { font-size: 3.6vmin; padding: 2vmin; } .pg-item span { font-size: 5.4vmin; } }
+
+/* §6 stickers: names, big name pop (outside the clipped slot), sparkle for new ones, gold page */
+.book-page .slot { flex-direction: column; }
+.book-page .slot.has { display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: .6vmin .4vmin .4vmin; }
+.book-page .slot .stk { height: 100%; min-height: 0; }
+.slot-name { font-weight: 400; font-size: min(2.6vmin, 15px); line-height: 1.1; color: var(--ink, #4B3642); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.stk-name { position: fixed; z-index: 60; transform: translate(-50%, -110%); background: #fff; border: .6vmin solid #4B3642; border-radius: 4vmin; padding: 1.4vmin 3vmin; display: flex; align-items: center; gap: 1.6vmin; box-shadow: 0 1vmin 0 rgba(75, 54, 66, .25); pointer-events: none; animation: namepop 1.8s ease forwards; }
+.stk-name span .em { width: 9vmin; height: 9vmin; }
+.stk-name b { font-weight: 400; font-size: min(9vmin, 56px); white-space: nowrap; }
+.stk-name::after { content: ''; position: absolute; left: 50%; bottom: -2vmin; width: 3vmin; height: 3vmin; background: #fff; border: .6vmin solid #4B3642; border-top: 0; border-left: 0; transform: translateX(-50%) rotate(45deg); }
+@keyframes namepop { 0% { transform: translate(-50%, -80%) scale(.4); opacity: 0; } 12% { transform: translate(-50%, -112%) scale(1.06); opacity: 1; } 20%, 85% { transform: translate(-50%, -110%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -120%) scale(.96); opacity: 0; } }
+.slot .spark { position: absolute; width: 2.6vmin; height: 2.6vmin; background: #FFD23F; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 1.2s ease-in-out infinite; pointer-events: none; }
+.slot .spark.s1 { left: 8%; top: 8%; } .slot .spark.s2 { right: 8%; top: 20%; animation-delay: -.4s; } .slot .spark.s3 { left: 20%; bottom: 22%; animation-delay: -.8s; width: 2vmin; height: 2vmin; }
+.book-page.gold { background: linear-gradient(135deg, #FFF3B8, #FFE07A 45%, #FFF6D0) !important; box-shadow: 0 0 0 .8vmin #E8B400, 0 0 4vmin rgba(255, 201, 60, .7) !important; }
+.book-tab.gold { background: linear-gradient(180deg, #FFF0A8, #FFD84D) !important; }
+.reveal-one { display: inline-flex; flex-direction: column; align-items: center; gap: 1vmin; }
+.stk-cap { font-weight: 400; font-size: min(6vmin, 36px); }
+.deco-scene .deco-story { position: absolute; left: 50%; top: 2.4%; transform: translateX(-50%); margin: 0; z-index: 3; pointer-events: none; background: rgba(255, 255, 255, .92); border: .5vmin solid #4B3642; border-radius: 3vmin; padding: .8vmin 2.6vmin; font-size: min(4.4vmin, 30px); white-space: nowrap; max-width: 94%; overflow: hidden; text-overflow: ellipsis; }
+.theme-done { text-align: center; } .theme-done .cprev.big { display: block; width: min(30vmin, 22vh); margin: 0 auto; }
+
+/* §6 wardrobe effects (inside the friend's SVG) */
+.mascot-svg .fx-tw, .mascot-svg .fx-up, .mascot-svg .fx-fall, .mascot-svg .fx-bob, .mascot-svg .fx-glow { transform-box: fill-box; transform-origin: center; }
+.mascot-svg .fx-tw { animation: fxtw 1.6s ease-in-out infinite; }
+.mascot-svg .fx-up { animation: fxup 3.2s ease-in infinite; }
+.mascot-svg .fx-fall { animation: fxfall 2.6s linear infinite; }
+.mascot-svg .fx-bob { animation: fxbob 2.4s ease-in-out infinite; }
+.mascot-svg .fx-glow { animation: fxglow 2.4s ease-in-out infinite; }
+.mascot-svg .d1 { animation-delay: -.6s; } .mascot-svg .d2 { animation-delay: -1.2s; }
+@keyframes fxtw { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.55) rotate(25deg); opacity: .55; } }
+@keyframes fxup { 0% { transform: translateY(10px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-70px); opacity: 0; } }
+@keyframes fxfall { 0% { transform: translateY(-20px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(60px); opacity: 0; } }
+@keyframes fxbob { 50% { transform: translateY(-6px) rotate(4deg); } }
+@keyframes fxglow { 50% { opacity: .45; } }
+.citem .cprev .fx-up, .citem .cprev .fx-fall { animation-duration: 4s; }
+.closet-tabs { flex-wrap: nowrap; }
+@media (orientation: portrait) { .closet-tabs { flex-wrap: wrap; } .closet-tabs .ctab { flex: 1 0 22%; } }
+.citem small { overflow-wrap: anywhere; word-break: keep-all; line-height: 1.1; }
+
+/* item 9: 려원이가 만든 게임 — 무럭무럭 아쿠아리움 */
+#main[data-screen="aqua"] { display: flex; flex-direction: column; }
+.aqua { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 1.6vmin; padding: 0 2.4vmin 2.4vmin; }
+.aq-top { display: flex; align-items: center; gap: 2vmin; flex-wrap: wrap; }
+.aq-credit { display: flex; flex-direction: column; line-height: 1.1; }
+.aq-credit b { font-weight: 400; font-size: min(5.4vmin, 34px); }
+.aq-badge { align-self: flex-start; background: #FFE07A; border: .45vmin solid #4B3642; border-radius: 3vmin; padding: .3vmin 1.6vmin; font-size: min(3.2vmin, 20px); }
+.aq-grow { display: flex; gap: .8vmin; flex: 1; justify-content: center; }
+.aq-grow i { font-style: normal; display: grid; place-items: center; min-width: 9vmin; padding: .6vmin 1vmin; border-radius: 3vmin; background: rgba(255, 255, 255, .7); border: .4vmin dashed #9FB7C9; font-size: min(2.8vmin, 18px); }
+.aq-grow i.on { background: #8FD0F2; border: .4vmin solid #4B3642; }
+.aq-clock { width: 16vmin; height: 2.4vmin; border-radius: 2vmin; background: rgba(255, 255, 255, .7); border: .4vmin solid #4B3642; overflow: hidden; }
+.aq-clock i { display: block; height: 100%; width: 100%; background: #6ED39C; transition: width .25s linear; }
+.aq-tank { position: relative; flex: 1; min-height: 0; border-radius: 4vmin; border: .6vmin solid #4B3642; overflow: hidden; display: flex; background: linear-gradient(180deg, #CFEFFF, #8CCBF0 60%, #6DB6E6); }
+.aq-tank .bub { position: absolute; bottom: -4vmin; width: 3vmin; height: 3vmin; border-radius: 50%; border: .5vmin solid rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .25); animation: bubble 6s linear infinite; }
+.aq-tank .b1 { left: 30%; } .aq-tank .b2 { left: 62%; animation-delay: -2s; } .aq-tank .b3 { left: 86%; animation-delay: -4s; }
+.aq-tank .weed { position: absolute; bottom: 0; width: 4vmin; height: 16vmin; border-radius: 4vmin 4vmin 0 0; background: #5FBE8A; border: .45vmin solid #4B3642; border-bottom: 0; transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite alternate; }
+.aq-tank .w1 { left: 3%; } .aq-tank .w2 { left: 24%; height: 11vmin; animation-delay: -1s; } .aq-tank .w3 { right: 4%; height: 13vmin; animation-delay: -2s; }
+.aq-me { position: relative; z-index: 2; flex: none; width: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; --sc: 1; }
+.aq-fish { width: calc(14vmin * var(--sc)); max-width: 100%; aspect-ratio: 200 / 120; transition: width .5s cubic-bezier(.3, 1.6, .5, 1); animation: fxbob 2.6s ease-in-out infinite; }
+.aq-fish svg { width: 100%; height: 100%; overflow: visible; }
+.aq-name { font-weight: 400; font-size: min(4.6vmin, 30px); background: rgba(255, 255, 255, .85); border-radius: 3vmin; padding: .2vmin 2vmin; margin-top: 1vmin; }
+.aq-me.gulp .aq-fish { animation: gulp .45s; }
+.aq-me.evo .aq-fish { animation: evo .9s; }
+@keyframes gulp { 40% { transform: translateX(4vmin) scale(1.12, .9); } }
+@keyframes evo { 0% { transform: scale(.4) rotate(-20deg); } 60% { transform: scale(1.25) rotate(6deg); } 100% { transform: scale(1); } }
+.aq-pond { flex: 1; border: 0 !important; background: none !important; border-radius: 0; z-index: 1; }
+.aq-pond .fishy { height: min(17vmin, 88%); }
+.aq-pond .fishy.bounce { animation: shake .5s !important; }
+.aq-pic { left: 26% !important; right: 26% !important; }
+.aq-pic .pic, .aq-pic .em { width: 100%; height: 100%; object-fit: contain; display: block; }
+.aq-toast { position: absolute; left: 50%; top: 12%; transform: translateX(-50%); z-index: 4; background: #fff; border: .6vmin solid #4B3642; border-radius: 4vmin; padding: 1.6vmin 4vmin; text-align: center; display: flex; flex-direction: column; }
+.aq-toast b { font-weight: 400; font-size: min(7vmin, 44px); color: #2A5FA8; }
+.aq-toast small { font-size: min(3.6vmin, 22px); }
+.aq-toast.show { animation: popin .5s; }
+.aq-intro { text-align: center; } .aq-intro-fish { width: min(34vmin, 26vh); margin: 0 auto; } .aq-intro-fish svg { width: 100%; height: auto; }
+.aq-again { font-size: 6vmin; text-align: center; }
+@media (orientation: portrait) { .aq-tank { flex-direction: column; } .aq-me { width: 100%; height: 26%; } .aq-fish { width: calc(16vmin * var(--sc)); max-height: 100%; } }
+@media (prefers-reduced-motion: reduce) { .mascot-svg .fx-tw, .mascot-svg .fx-up, .mascot-svg .fx-fall, .mascot-svg .fx-bob, .mascot-svg .fx-glow, .aq-fish, .aq-tank .bub, .aq-tank .weed, .slot .spark { animation: none !important; } }
+
+/* ---------- Nihon 2026-11-15 ---------- */
+/* #3 warm-up: its progress dots are smaller and lilac */
+.dots-prog i.wu { width: 2.6vmin; height: 2.6vmin; background: #E4DBFB; }
+.dots-prog i.wu.done { background: #B9A9EA; }
+.intro.warm .intro-world { font-size: 4.4vmin; }
+/* #1 sticker choice: three big buttons */
+.choose-m .modal-btns { display: flex; gap: 2.4vmin; justify-content: center; flex-wrap: wrap; }
+.mbtn.stk-pick { display: flex; flex-direction: column; align-items: center; gap: .6vmin; min-width: 22vmin; padding: 1.6vmin 2vmin; background: #fff; color: var(--ink, #4B3642); }
+.mbtn.stk-pick .stk.big { font-size: 13vmin; }
+.mbtn.stk-pick .stk-cap { font-size: 3.2vmin; }
+/* #2 closing screen */
+.closing { display: flex; align-items: center; justify-content: center; gap: 3vmin; background: rgba(255, 255, 255, .92); border-radius: 5vmin; padding: 2vmin 4vmin; box-shadow: 0 1vmin 3vmin rgba(75, 54, 66, .12); }
+.closing-pal { width: 18vmin; height: 26vmin; }
+.closing-pal svg { width: 100%; height: 100%; }
+.closing-say { font-family: var(--font); font-size: 6vmin; line-height: 1.25; margin: 0; color: var(--ink, #4B3642); }
+/* #5 end of the day (Nihon spec 23:03) */
+.showp h3 { font-size: 6vmin; margin: 0 0 1.6vmin; }
+.showp-pal { width: 22vmin; height: 30vmin; margin: 0 auto 1vmin; }
+.showp-pal svg { width: 100%; height: 100%; }
+.mbtn.later { background: #fff; color: var(--ink, #4B3642); box-shadow: inset 0 0 0 .5vmin #E4DBFB; text-shadow: none; }
+.showp-cards { display: flex; gap: 3vmin; justify-content: center; flex-wrap: wrap; }
+.showp-c { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vmin; min-width: 24vmin; min-height: 28vmin; padding: 2vmin 3vmin; background: #FFFDF6; border-radius: 4vmin; box-shadow: inset 0 0 0 .6vmin #F3E7C9, 0 1vmin 0 #EADCB8; }
+.showp-c b { font-family: var(--font); font-size: 12vmin; line-height: 1; color: var(--ink, #4B3642); }
+.showp-c .pic { font-size: 11vmin; line-height: 1; }
+.showp-c.yay { animation: bump .5s; }
+.showp-ask { font-size: 5vmin; font-family: var(--font); margin: 2.4vmin 0 0; }
+.mbtn.parent { font-size: 5vmin; }
+.showp-note { font-size: 3vmin; background: #F4F0FB; border-radius: 2vmin; padding: 1.2vmin 2vmin; color: #5D4A78; }
+/* #5 parent menu tabs + checkpoints */
+.pm-tabs { display: flex; gap: 8px; margin: 4px 0 10px; position: sticky; top: 48px; background: #fff; z-index: 1; padding-bottom: 6px; }
+.pm-tab { flex: 1; font: inherit; font-weight: 700; padding: 10px; border-radius: 12px; border: 2px solid #E4DBFB; background: #fff; }
+.pm-tab.on { background: #7A5FB0; border-color: #7A5FB0; color: #fff; }
+.pm.tab-check > section:not(.pm-ck) { display: none; }
+.pm:not(.tab-check) > section.pm-ck { display: none; }
+.ck-card { border: 2px solid #EEE6F7; border-radius: 14px; padding: 10px 14px; margin: 10px 0; }
+.ck-card h4 { margin: 0 0 4px; font-size: 18px; }
+.ck-card h4 small { font-weight: 400; color: #8a7f88; font-size: 13px; }
+.ck-card ul { margin: 6px 0; padding-left: 20px; }
+.ck-card.s-pass { border-color: #9ED9B4; background: #F3FBF6; }
+.ck-card.s-practice { border-color: #F3C2D2; background: #FFF7FA; }
+.dock .closing { grid-column: span 2; justify-self: stretch; }
+.closing-say { white-space: nowrap; }
+@media (orientation: portrait) { .dock .closing { grid-column: auto; } }
+
+/* UPDATE 3: closing line hidden behind the #5 screens */
+.closing.wait .closing-say { visibility: hidden; }

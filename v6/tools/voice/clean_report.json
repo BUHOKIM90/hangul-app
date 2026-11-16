@@ -1,0 +1,3729 @@
+{
+ "median": null,
+ "applied": true,
+ "clips": {
+  "c_appa": {
+   "text": "아, 빠! 두 번 쳤어!",
+   "dur_before": 2.27,
+   "actions": []
+  },
+  "c_banana": {
+   "text": "바, 나, 나! 세 번 쳤어!",
+   "dur_before": 2.28,
+   "actions": []
+  },
+  "c_eomma": {
+   "text": "엄, 마! 두 번 쳤어!",
+   "dur_before": 2.03,
+   "actions": []
+  },
+  "c_goguma": {
+   "text": "고, 구, 마! 세 번 쳤어!",
+   "dur_before": 1.95,
+   "actions": [],
+   "asr_full": "고구마! 세 번 쳤어!",
+   "asr_lead": "고구마",
+   "asr_wo_lead": "3번 쳤어",
+   "asr_tail": "3번 쳤어",
+   "asr_wo_tail": "고구마"
+  },
+  "c_halmeoni": {
+   "text": "할, 머, 니! 세 번 쳤어!",
+   "dur_before": 2.52,
+   "actions": []
+  },
+  "c_hama": {
+   "text": "하, 마! 두 번 쳤어!",
+   "dur_before": 1.8,
+   "actions": [],
+   "asr_full": "아마 두 번 쳤어.",
+   "asr_lead": "하마?",
+   "asr_wo_lead": "두 번 쳤어.",
+   "asr_tail": "두 번 쳤어.",
+   "asr_wo_tail": "하마?"
+  },
+  "c_harabeoji": {
+   "text": "할, 아, 버, 지! 네 번 쳤어!",
+   "dur_before": 3.48,
+   "actions": [],
+   "asr_full": "할, 아버, 시, 네 번 쳤어",
+   "asr_tail": "4번 쳤어",
+   "asr_wo_tail": "아버지"
+  },
+  "c_kokkiri": {
+   "text": "코, 끼, 리! 세 번 쳤어!",
+   "dur_before": 2.28,
+   "actions": []
+  },
+  "c_nabi": {
+   "text": "나, 비! 두 번 쳤어!",
+   "dur_before": 2.03,
+   "actions": []
+  },
+  "c_ori": {
+   "text": "오, 리! 두 번 쳤어!",
+   "dur_before": 2.2,
+   "actions": [],
+   "asr_full": "오리, 두 번 쳤어",
+   "asr_lead": "오리",
+   "asr_wo_lead": "두 번 쳤어",
+   "asr_tail": "두 번 쳤어",
+   "asr_wo_tail": "오오오리"
+  },
+  "c_ryeowon": {
+   "text": "려, 원! 두 번 쳤어!",
+   "dur_before": 2.58,
+   "actions": [],
+   "asr_full": "려, 워, 두 번 쳤어",
+   "asr_tail": "두 번 쳤어",
+   "asr_wo_tail": "려원"
+  },
+  "c_so": {
+   "text": "소! 한 번 쳤어!",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "dy_AC00": {
+   "text": "그건 가 글자야.",
+   "dur_before": 2.52,
+   "actions": [
+    "drop lead burst 0.04-0.43s"
+   ],
+   "asr_full": "그건 가글자야",
+   "asr_lead": "아",
+   "asr_wo_lead": "그건 가글자야",
+   "dur_after": 1.31
+  },
+  "dy_AC70": {
+   "text": "그건 거 글자야.",
+   "dur_before": 1.96,
+   "actions": []
+  },
+  "dy_ACE0": {
+   "text": "그건 고 글자야.",
+   "dur_before": 2.75,
+   "actions": [
+    "drop lead burst 0.04-0.42s"
+   ],
+   "asr_full": "그건 고글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 고글자야",
+   "dur_after": 1.54
+  },
+  "dy_AD6C": {
+   "text": "그건 구 글자야.",
+   "dur_before": 2.75,
+   "actions": [
+    "drop lead burst 0.04-0.59s"
+   ],
+   "asr_full": "그건 9글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 9글자야",
+   "dur_after": 1.54
+  },
+  "dy_ADF8": {
+   "text": "그건 그 글자야.",
+   "dur_before": 1.79,
+   "actions": []
+  },
+  "dy_AE30": {
+   "text": "그건 기 글자야.",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "dy_B098": {
+   "text": "그건 나 글자야.",
+   "dur_before": 2.76,
+   "actions": [
+    "drop lead burst 0.04-0.35s"
+   ],
+   "asr_full": "그건 나 글자야",
+   "asr_lead": "아",
+   "asr_wo_lead": "그건 나 글자야",
+   "dur_after": 1.58
+  },
+  "dy_B108": {
+   "text": "그건 너 글자야.",
+   "dur_before": 2.44,
+   "actions": [
+    "drop lead burst 0.04-0.40s"
+   ],
+   "asr_full": "그건 너 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 너 글자야",
+   "dur_after": 1.41
+  },
+  "dy_B178": {
+   "text": "그건 노 글자야.",
+   "dur_before": 2.92,
+   "actions": [
+    "drop lead burst 0.04-0.82s"
+   ],
+   "asr_full": "그건 노글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 노글자야",
+   "dur_after": 1.53
+  },
+  "dy_B204": {
+   "text": "그건 누 글자야.",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "dy_B290": {
+   "text": "그건 느 글자야.",
+   "dur_before": 3.0,
+   "actions": [
+    "drop lead burst 0.04-0.37s",
+    "pause 0.83s -> 0.30s at 1.44s"
+   ],
+   "asr_full": "그건 누 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 누 글자야",
+   "asr_tail": "누글자야",
+   "asr_wo_tail": "그건",
+   "dur_after": 1.62
+  },
+  "dy_B2C8": {
+   "text": "그건 니 글자야.",
+   "dur_before": 2.92,
+   "actions": [],
+   "asr_full": "그건 네 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 네 글자야",
+   "dur_after": 1.54,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (drop lead burst 0.04-0.40s)"
+  },
+  "dy_B2E4": {
+   "text": "그건 다 글자야.",
+   "dur_before": 2.75,
+   "actions": [
+    "drop lead burst 0.04-0.48s"
+   ],
+   "asr_full": "그건 다 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 다 글자야",
+   "dur_after": 1.37
+  },
+  "dy_B354": {
+   "text": "그건 더 글자야.",
+   "dur_before": 2.52,
+   "actions": [
+    "drop lead burst 0.04-0.50s",
+    "compressor + limiter (peak-capped gain left it 5.4 dB quiet as played)"
+   ],
+   "asr_full": "그건 더 굴짜야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 더 글자야",
+   "dur_after": 1.14
+  },
+  "dy_B3C4": {
+   "text": "그건 도 글자야.",
+   "dur_before": 1.47,
+   "actions": []
+  },
+  "dy_B450": {
+   "text": "그건 두 글자야.",
+   "dur_before": 2.76,
+   "actions": [
+    "drop lead burst 0.04-0.53s"
+   ],
+   "asr_full": "그건 두 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 두 글자야",
+   "dur_after": 1.38
+  },
+  "dy_B4DC": {
+   "text": "그건 드 글자야.",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "dy_B514": {
+   "text": "그건 디 글자야.",
+   "dur_before": 2.6,
+   "actions": [
+    "drop lead burst 0.04-0.40s"
+   ],
+   "asr_full": "그건 뒤 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 D글자야",
+   "dur_after": 1.42
+  },
+  "dy_B77C": {
+   "text": "그건 라 글자야.",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "dy_B7EC": {
+   "text": "그건 러 글자야.",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "dy_B85C": {
+   "text": "그건 로 글자야.",
+   "dur_before": 2.448,
+   "actions": []
+  },
+  "dy_B8E8": {
+   "text": "그건 루 글자야.",
+   "dur_before": 2.04,
+   "actions": []
+  },
+  "dy_B974": {
+   "text": "그건 르 글자야.",
+   "dur_before": 2.36,
+   "actions": [
+    "drop lead burst 0.04-0.35s"
+   ],
+   "asr_full": "그건 를 글자야?",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 르글자야?",
+   "dur_after": 1.51
+  },
+  "dy_B9AC": {
+   "text": "그건 리 글자야.",
+   "dur_before": 2.35,
+   "actions": []
+  },
+  "dy_B9C8": {
+   "text": "그건 마 글자야.",
+   "dur_before": 2.6,
+   "actions": [
+    "drop lead burst 0.04-0.42s"
+   ],
+   "asr_full": "그건 마글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 마글자야",
+   "dur_after": 1.39
+  },
+  "dy_BA38": {
+   "text": "그건 머 글자야.",
+   "dur_before": 2.424,
+   "actions": []
+  },
+  "dy_BAA8": {
+   "text": "그건 모 글자야.",
+   "dur_before": 1.31,
+   "actions": []
+  },
+  "dy_BB34": {
+   "text": "그건 무 글자야.",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "dy_BBC0": {
+   "text": "그건 므 글자야.",
+   "dur_before": 2.424,
+   "actions": []
+  },
+  "dy_BBF8": {
+   "text": "그건 미 글자야.",
+   "dur_before": 2.68,
+   "actions": [
+    "drop lead burst 0.04-0.41s"
+   ],
+   "asr_full": "그건 미 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 미 글자야",
+   "dur_after": 1.5
+  },
+  "dy_BC14": {
+   "text": "그건 바 글자야.",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "dy_BC15": {
+   "text": "그건 박 글자야.",
+   "dur_before": 2.92,
+   "actions": [
+    "drop lead burst 0.04-0.45s"
+   ],
+   "asr_full": "하... 그건 박글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 박글자야",
+   "dur_after": 1.54
+  },
+  "dy_BC29": {
+   "text": "그건 방 글자야.",
+   "dur_before": 2.75,
+   "actions": [
+    "drop lead burst 0.04-0.40s"
+   ],
+   "asr_full": "하... 그건 방글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 반 글자야",
+   "dur_after": 1.63
+  },
+  "dy_BC84": {
+   "text": "그건 버 글자야.",
+   "dur_before": 3.0,
+   "actions": [
+    "drop lead burst 0.04-0.44s"
+   ],
+   "asr_full": "그건 버글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그 건 버글자야",
+   "dur_after": 1.85
+  },
+  "dy_BCF4": {
+   "text": "그건 보 글자야.",
+   "dur_before": 2.11,
+   "actions": []
+  },
+  "dy_BD09": {
+   "text": "그건 봉 글자야.",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "dy_BD80": {
+   "text": "그건 부 글자야.",
+   "dur_before": 1.64,
+   "actions": []
+  },
+  "dy_BE0C": {
+   "text": "그건 브 글자야.",
+   "dur_before": 2.448,
+   "actions": []
+  },
+  "dy_BE44": {
+   "text": "그건 비 글자야.",
+   "dur_before": 2.92,
+   "actions": [
+    "drop lead burst 0.04-0.43s"
+   ],
+   "asr_full": "그건 B 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 비글자야",
+   "dur_after": 1.54
+  },
+  "dy_C0AC": {
+   "text": "그건 사 글자야.",
+   "dur_before": 2.52,
+   "actions": [
+    "pause 0.80s -> 0.30s at 0.45s"
+   ],
+   "asr_full": "",
+   "asr_lead": "",
+   "asr_wo_lead": "",
+   "dur_after": 2.02
+  },
+  "dy_C11C": {
+   "text": "그건 서 글자야.",
+   "dur_before": 2.92,
+   "actions": [
+    "drop lead burst 0.04-0.47s"
+   ],
+   "asr_full": "그건 서 글자야.",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 서 글자야",
+   "dur_after": 1.54
+  },
+  "dy_C18C": {
+   "text": "그건 소 글자야.",
+   "dur_before": 2.36,
+   "actions": [
+    "pause 0.83s -> 0.30s at 0.39s"
+   ],
+   "asr_full": "그건 소 그건 소글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "",
+   "asr_tail": "그건 속을...",
+   "asr_wo_tail": "",
+   "dur_after": 1.83
+  },
+  "dy_C218": {
+   "text": "그건 수 글자야.",
+   "dur_before": 3.0,
+   "actions": [],
+   "asr_full": ".. 이건 수글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 숫글자야",
+   "dur_after": 1.82,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (drop lead burst 0.04-0.42s)"
+  },
+  "dy_C2A4": {
+   "text": "그건 스 글자야.",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "dy_C2DC": {
+   "text": "그건 시 글자야.",
+   "dur_before": 1.56,
+   "actions": []
+  },
+  "dy_C544": {
+   "text": "그건 아 글자야.",
+   "dur_before": 1.88,
+   "actions": []
+  },
+  "dy_C5B4": {
+   "text": "그건 어 글자야.",
+   "dur_before": 2.424,
+   "actions": []
+  },
+  "dy_C624": {
+   "text": "그건 오 글자야.",
+   "dur_before": 2.44,
+   "actions": [
+    "pause 0.80s -> 0.30s at 0.44s"
+   ],
+   "asr_full": "그건 오글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "",
+   "asr_tail": "그건 5.0 글자야",
+   "asr_wo_tail": "",
+   "dur_after": 1.94
+  },
+  "dy_C6B0": {
+   "text": "그건 우 글자야.",
+   "dur_before": 2.448,
+   "actions": []
+  },
+  "dy_C73C": {
+   "text": "그건 으 글자야.",
+   "dur_before": 1.31,
+   "actions": []
+  },
+  "dy_C774": {
+   "text": "그건 이 글자야.",
+   "dur_before": 1.36,
+   "actions": []
+  },
+  "dy_C790": {
+   "text": "그건 자 글자야.",
+   "dur_before": 1.79,
+   "actions": []
+  },
+  "dy_C800": {
+   "text": "그건 저 글자야.",
+   "dur_before": 2.44,
+   "actions": [
+    "drop lead burst 0.04-0.39s"
+   ],
+   "asr_full": "그건 저 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 저 글자야",
+   "dur_after": 1.26
+  },
+  "dy_C870": {
+   "text": "그건 조 글자야.",
+   "dur_before": 2.52,
+   "actions": [
+    "drop lead burst 0.04-0.42s"
+   ],
+   "asr_full": "하... 그건 조글자야.",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 조글자야",
+   "dur_after": 1.34
+  },
+  "dy_C8FC": {
+   "text": "그건 주 글자야.",
+   "dur_before": 3.05,
+   "actions": [
+    "drop lead burst 0.04-0.42s"
+   ],
+   "asr_full": "그건 주 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 주 글자야",
+   "dur_after": 1.87
+  },
+  "dy_C988": {
+   "text": "그건 즈 글자야.",
+   "dur_before": 2.52,
+   "actions": [
+    "drop lead burst 0.04-0.46s"
+   ],
+   "asr_full": "그건 주 � 그건 주 글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 즈 글자야",
+   "dur_after": 1.6
+  },
+  "dy_C9C0": {
+   "text": "그건 지 글자야.",
+   "dur_before": 3.16,
+   "actions": [
+    "drop lead burst 0.04-0.44s"
+   ],
+   "asr_full": "하... 그건 지글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 지글자야",
+   "dur_after": 1.73
+  },
+  "dy_CD08": {
+   "text": "그건 초 글자야.",
+   "dur_before": 2.36,
+   "actions": [
+    "drop lead burst 0.04-0.37s"
+   ],
+   "asr_full": "그건 초글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 초글자야",
+   "dur_after": 1.51
+  },
+  "dy_D558": {
+   "text": "그건 하 글자야.",
+   "dur_before": 2.36,
+   "actions": [
+    "drop lead burst 0.04-0.45s"
+   ],
+   "asr_full": "그건 하글자야",
+   "asr_lead": "",
+   "asr_wo_lead": "그건 하글자야",
+   "dur_after": 1.43
+  },
+  "dy_D5C8": {
+   "text": "그건 허 글자야.",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "dy_D638": {
+   "text": "그건 호 글자야.",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "dy_D6C4": {
+   "text": "그건 후 글자야.",
+   "dur_before": 1.63,
+   "actions": []
+  },
+  "dy_D750": {
+   "text": "그건 흐 글자야.",
+   "dur_before": 2.2,
+   "actions": []
+  },
+  "dy_D788": {
+   "text": "그건 히 글자야.",
+   "dur_before": 1.48,
+   "actions": []
+  },
+  "fy_AC70": {
+   "text": "거 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_ACE0": {
+   "text": "고 글자를 찾아볼까?",
+   "dur_before": 2.44,
+   "actions": [
+    "pause 0.49s -> 0.30s at 0.76s"
+   ],
+   "asr_full": "고.. 글자를 찾아볼까?",
+   "asr_lead": "고",
+   "asr_wo_lead": "글자를 찾아볼까?",
+   "dur_after": 2.25
+  },
+  "fy_AD6C": {
+   "text": "구 글자를 찾아볼까?",
+   "dur_before": 1.72,
+   "actions": []
+  },
+  "fy_AE30": {
+   "text": "기 글자를 찾아볼까?",
+   "dur_before": 1.8,
+   "actions": []
+  },
+  "fy_B07C": {
+   "text": "끼 글자를 찾아볼까?",
+   "dur_before": 1.56,
+   "actions": []
+  },
+  "fy_B098": {
+   "text": "나 글자를 찾아볼까?",
+   "dur_before": 2.36,
+   "actions": [
+    "pause 0.65s -> 0.30s at 0.39s"
+   ],
+   "asr_full": "나 글자를 찾아볼까?",
+   "asr_lead": "아",
+   "asr_wo_lead": "나 글자를 찾아볼까?",
+   "dur_after": 2.01
+  },
+  "fy_B204": {
+   "text": "누 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_B2C8": {
+   "text": "니 글자를 찾아볼까?",
+   "dur_before": 1.7,
+   "actions": []
+  },
+  "fy_B2E4": {
+   "text": "다 글자를 찾아볼까?",
+   "dur_before": 1.63,
+   "actions": []
+  },
+  "fy_B3C4": {
+   "text": "도 글자를 찾아볼까?",
+   "dur_before": 1.47,
+   "actions": []
+  },
+  "fy_B450": {
+   "text": "두 글자를 찾아볼까?",
+   "dur_before": 2.36,
+   "actions": [
+    "drop lead burst 0.04-0.48s"
+   ],
+   "asr_full": "두 글자를 찾아볼까?",
+   "asr_lead": "",
+   "asr_wo_lead": "두 글자를 찾아볼까?",
+   "dur_after": 1.49
+  },
+  "fy_B514": {
+   "text": "디 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_B77C": {
+   "text": "라 글자를 찾아볼까?",
+   "dur_before": 1.47,
+   "actions": []
+  },
+  "fy_B824": {
+   "text": "려 글자를 찾아볼까?",
+   "dur_before": 1.4,
+   "actions": []
+  },
+  "fy_B9AC": {
+   "text": "리 글자를 찾아볼까?",
+   "dur_before": 1.69,
+   "actions": []
+  },
+  "fy_B9C8": {
+   "text": "마 글자를 찾아볼까?",
+   "dur_before": 2.664,
+   "actions": []
+  },
+  "fy_BA38": {
+   "text": "머 글자를 찾아볼까?",
+   "dur_before": 2.664,
+   "actions": []
+  },
+  "fy_BAA8": {
+   "text": "모 글자를 찾아볼까?",
+   "dur_before": 2.11,
+   "actions": []
+  },
+  "fy_BB34": {
+   "text": "무 글자를 찾아볼까?",
+   "dur_before": 2.616,
+   "actions": []
+  },
+  "fy_BBF8": {
+   "text": "미 글자를 찾아볼까?",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "fy_BC14": {
+   "text": "바 글자를 찾아볼까?",
+   "dur_before": 1.38,
+   "actions": []
+  },
+  "fy_BC29": {
+   "text": "방 글자를 찾아볼까?",
+   "dur_before": 1.94,
+   "actions": []
+  },
+  "fy_BD80": {
+   "text": "부 글자를 찾아볼까?",
+   "dur_before": 2.91,
+   "actions": [
+    "pause 0.43s -> 0.30s at 1.70s"
+   ],
+   "dur_after": 2.78
+  },
+  "fy_BE44": {
+   "text": "비 글자를 찾아볼까?",
+   "dur_before": 3.69,
+   "actions": [
+    "drop tail burst 3.27-3.69s"
+   ],
+   "asr_full": "B 글자를 찾아볼까?",
+   "asr_tail": "",
+   "asr_wo_tail": "B 글자를 찾아볼까?",
+   "dur_after": 1.71
+  },
+  "fy_BE60": {
+   "text": "빠 글자를 찾아볼까?",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "fy_C0AC": {
+   "text": "사 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_C18C": {
+   "text": "소 글자를 찾아볼까?",
+   "dur_before": 1.62,
+   "actions": []
+  },
+  "fy_C2A4": {
+   "text": "스 글자를 찾아볼까?",
+   "dur_before": 2.03,
+   "actions": []
+  },
+  "fy_C544": {
+   "text": "아 글자를 찾아볼까?",
+   "dur_before": 1.69,
+   "actions": []
+  },
+  "fy_C5B4": {
+   "text": "어 글자를 찾아볼까?",
+   "dur_before": 1.64,
+   "actions": []
+  },
+  "fy_C5C4": {
+   "text": "엄 글자를 찾아볼까?",
+   "dur_before": 3.31,
+   "actions": []
+  },
+  "fy_C5EC": {
+   "text": "여 글자를 찾아볼까?",
+   "dur_before": 1.48,
+   "actions": []
+  },
+  "fy_C624": {
+   "text": "오 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_C6B0": {
+   "text": "우 글자를 찾아볼까?",
+   "dur_before": 2.43,
+   "actions": []
+  },
+  "fy_C6D0": {
+   "text": "원 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_C720": {
+   "text": "유 글자를 찾아볼까?",
+   "dur_before": 1.38,
+   "actions": []
+  },
+  "fy_C774": {
+   "text": "이 글자를 찾아볼까?",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "fy_C790": {
+   "text": "자 글자를 찾아볼까?",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "fy_C8FC": {
+   "text": "주 글자를 찾아볼까?",
+   "dur_before": 3.16,
+   "actions": []
+  },
+  "fy_CC28": {
+   "text": "차 글자를 찾아볼까?",
+   "dur_before": 2.28,
+   "actions": [
+    "pause 0.58s -> 0.30s at 0.94s"
+   ],
+   "asr_full": "사글자를 찾아볼까?",
+   "asr_lead": "하글자를",
+   "asr_wo_lead": "찾아볼까?",
+   "dur_after": 2.0
+  },
+  "fy_CF54": {
+   "text": "코 글자를 찾아볼까?",
+   "dur_before": 1.55,
+   "actions": []
+  },
+  "fy_D3EC": {
+   "text": "포 글자를 찾아볼까?",
+   "dur_before": 1.46,
+   "actions": []
+  },
+  "fy_D558": {
+   "text": "하 글자를 찾아볼까?",
+   "dur_before": 2.28,
+   "actions": [
+    "pause 0.91s -> 0.30s at 0.31s"
+   ],
+   "asr_full": "",
+   "asr_lead": "",
+   "asr_wo_lead": "",
+   "dur_after": 1.67
+  },
+  "fy_D560": {
+   "text": "할 글자를 찾아볼까?",
+   "dur_before": 1.56,
+   "actions": []
+  },
+  "fy_D5C8": {
+   "text": "허 글자를 찾아볼까?",
+   "dur_before": 2.84,
+   "actions": [
+    "pause 0.44s -> 0.30s at 0.79s"
+   ],
+   "asr_full": "글자를 찾아볼까?",
+   "asr_lead": "",
+   "asr_wo_lead": "어? 글자를 찾아볼까?",
+   "dur_after": 2.7
+  },
+  "hy_agi": {
+   "text": "그건 아기야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_ai": {
+   "text": "그건 아이야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_appa": {
+   "text": "그건 아빠야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_bada": {
+   "text": "그건 바다야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_banana": {
+   "text": "그건 바나나야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_beoseu": {
+   "text": "그건 버스야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_cha": {
+   "text": "그건 차야!",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "hy_chijeu": {
+   "text": "그건 치즈야!",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "hy_chima": {
+   "text": "그건 치마야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_dari": {
+   "text": "그건 다리야!",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "hy_dubu": {
+   "text": "그건 두부야!",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "hy_eobu": {
+   "text": "그건 어부야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_eomma": {
+   "text": "그건 엄마야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_eureureong": {
+   "text": "그건 으르렁이야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_geobuk": {
+   "text": "그건 거북이야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_geomi": {
+   "text": "그건 거미야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_gicha": {
+   "text": "그건 기차야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_gita": {
+   "text": "그건 기타야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_gochu": {
+   "text": "그건 고추야!",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "hy_gogi": {
+   "text": "그건 고기야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_goguma": {
+   "text": "그건 고구마야!",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "hy_gorae": {
+   "text": "그건 고래야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_gudu": {
+   "text": "그건 구두야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_haema": {
+   "text": "그건 해마야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_halmeoni": {
+   "text": "그건 할머니야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_hama": {
+   "text": "그건 하마야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_harabeoji": {
+   "text": "그건 할아버지야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_heori": {
+   "text": "그건 허리야!",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "hy_hodu": {
+   "text": "그건 호두야!",
+   "dur_before": 0.9,
+   "actions": []
+  },
+  "hy_i_tooth": {
+   "text": "그건 이야!",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "hy_ima": {
+   "text": "그건 이마야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_jadu": {
+   "text": "그건 자두야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_jido": {
+   "text": "그건 지도야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_juseu": {
+   "text": "그건 주스야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_keikeu": {
+   "text": "그건 케이크야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_ki": {
+   "text": "그건 키야!",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "hy_kkot": {
+   "text": "그건 꽃이야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_ko": {
+   "text": "그건 코야!",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "hy_kokkiri": {
+   "text": "그건 코끼리야!",
+   "dur_before": 1.14,
+   "actions": []
+  },
+  "hy_lion": {
+   "text": "그건 사자야!",
+   "dur_before": 1.24,
+   "actions": []
+  },
+  "hy_meori": {
+   "text": "그건 머리야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_mogi": {
+   "text": "그건 모기야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_moja": {
+   "text": "그건 모자야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_nabi": {
+   "text": "그건 나비야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_namu": {
+   "text": "그건 나무야!",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "hy_nuna": {
+   "text": "그건 누나야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_nunsaram": {
+   "text": "그건 눈사람이야!",
+   "dur_before": 1.56,
+   "actions": []
+  },
+  "hy_oi": {
+   "text": "그건 오이야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_ojingeo": {
+   "text": "그건 오징어야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_ori": {
+   "text": "그건 오리야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_pado": {
+   "text": "그건 파도야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_pija": {
+   "text": "그건 피자야!",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "hy_podo": {
+   "text": "그건 포도야!",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "hy_pungseon": {
+   "text": "그건 풍선이야!",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "hy_radio": {
+   "text": "그건 라디오야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "hy_ryeowon": {
+   "text": "그건 려원이야!",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "hy_saeu": {
+   "text": "그건 새우야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_sangeo": {
+   "text": "그건 상어야!",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "hy_siso": {
+   "text": "그건 시소야!",
+   "dur_before": 1.31,
+   "actions": []
+  },
+  "hy_so": {
+   "text": "그건 소야!",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "hy_sobangcha": {
+   "text": "그건 소방차야!",
+   "dur_before": 1.23,
+   "actions": []
+  },
+  "hy_sora": {
+   "text": "그건 소라야!",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "hy_tajo": {
+   "text": "그건 타조야!",
+   "dur_before": 1.31,
+   "actions": []
+  },
+  "hy_tomato": {
+   "text": "그건 토마토야!",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "hy_tteokguk": {
+   "text": "그건 떡국이야!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "hy_ubi": {
+   "text": "그건 우비야!",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "hy_uyu": {
+   "text": "그건 우유야!",
+   "dur_before": 1.31,
+   "actions": []
+  },
+  "hy_yeou": {
+   "text": "그건 여우야!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "j_3131": {
+   "text": "기역, 기차 할 때 기역.",
+   "dur_before": 2.04,
+   "actions": []
+  },
+  "j_3132": {
+   "text": "쌍기역, 까치 할 때 쌍기역.",
+   "dur_before": 2.34,
+   "actions": []
+  },
+  "j_3134": {
+   "text": "니은, 나비 할 때 니은.",
+   "dur_before": 2.6,
+   "actions": [
+    "pause 0.60s -> 0.30s at 0.80s"
+   ],
+   "asr_full": "니은, 나비할 때 니은",
+   "asr_lead": "니은",
+   "asr_wo_lead": "나비할 때 니",
+   "asr_tail": "",
+   "asr_wo_tail": "니은",
+   "dur_after": 2.3
+  },
+  "j_3137": {
+   "text": "디귿, 다리 할 때 디귿.",
+   "dur_before": 2.5,
+   "actions": []
+  },
+  "j_3138": {
+   "text": "쌍디귿, 딸기 할 때 쌍디귿.",
+   "dur_before": 3.31,
+   "actions": [
+    "pause 0.53s -> 0.30s at 0.96s"
+   ],
+   "asr_full": "쌍디긋, 딸기할 때 쌍디긋",
+   "asr_lead": "쌍디그",
+   "asr_wo_lead": "딸기할때 딘지굿",
+   "dur_after": 3.08
+  },
+  "j_3139": {
+   "text": "리을, 라디오 할 때 리을.",
+   "dur_before": 2.04,
+   "actions": [
+    "pause 0.50s -> 0.30s at 0.44s"
+   ],
+   "asr_full": "리을, 라디오 할 때 리을",
+   "asr_lead": "리얼",
+   "asr_wo_lead": "라디오할 때 리",
+   "dur_after": 1.84
+  },
+  "j_3141": {
+   "text": "미음, 모자 할 때 미음.",
+   "dur_before": 3.07,
+   "actions": [
+    "pause 0.67s -> 0.30s at 0.64s"
+   ],
+   "asr_full": "미음, 모자 할 때 미음",
+   "asr_lead": "미음",
+   "asr_wo_lead": "모자 할 때 미음",
+   "dur_after": 2.7
+  },
+  "j_3142": {
+   "text": "비읍, 바나나 할 때 비읍.",
+   "dur_before": 2.2,
+   "actions": [
+    "pause 0.73s -> 0.30s at 0.30s"
+   ],
+   "asr_full": "빕, 바나나 할 때 빕",
+   "asr_lead": "",
+   "asr_wo_lead": "바나나 할 때 피읍",
+   "dur_after": 1.77
+  },
+  "j_3143": {
+   "text": "쌍비읍, 빵 할 때 쌍비읍.",
+   "dur_before": 2.51,
+   "actions": [
+    "pause 0.44s -> 0.30s at 1.03s"
+   ],
+   "dur_after": 2.37
+  },
+  "j_3145": {
+   "text": "시옷, 사자 할 때 시옷.",
+   "dur_before": 2.27,
+   "actions": [
+    "pause 0.57s -> 0.30s at 0.63s"
+   ],
+   "asr_full": "시옷, 사자할 때 시옷",
+   "asr_lead": "시오",
+   "asr_wo_lead": "사자할 때 씨옷",
+   "dur_after": 2.0
+  },
+  "j_3146": {
+   "text": "쌍시옷, 씨앗 할 때 쌍시옷.",
+   "dur_before": 2.5,
+   "actions": []
+  },
+  "j_3147": {
+   "text": "이응, 오이 할 때 이응.",
+   "dur_before": 2.12,
+   "actions": [
+    "pause 0.44s -> 0.30s at 0.49s"
+   ],
+   "asr_full": "ㅇ, 5위 할 때 ㅇ",
+   "asr_lead": "",
+   "asr_wo_lead": "5위 할 때 ㅇ",
+   "dur_after": 1.98
+  },
+  "j_3148": {
+   "text": "지읒, 지도 할 때 지읒.",
+   "dur_before": 2.41,
+   "actions": [
+    "pause 0.65s -> 0.30s at 0.51s"
+   ],
+   "asr_full": "지읒 지도할 때 지읒",
+   "asr_lead": "치유",
+   "asr_wo_lead": "지도할 때 지우",
+   "dur_after": 2.06
+  },
+  "j_3149": {
+   "text": "쌍지읒.",
+   "dur_before": 1.92,
+   "actions": []
+  },
+  "j_314A": {
+   "text": "치읓, 치마 할 때 치읓.",
+   "dur_before": 2.76,
+   "actions": [],
+   "asr_full": "치윗, 치마할 때 치윗",
+   "asr_tail": "흠",
+   "asr_wo_tail": "치읓, 치말 때 치읓",
+   "dur_after": 2.09,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (drop tail burst 2.52-2.75s)"
+  },
+  "j_314B": {
+   "text": "키읔, 코끼리 할 때 키읔.",
+   "dur_before": 2.84,
+   "actions": []
+  },
+  "j_314C": {
+   "text": "티읕, 토마토 할 때 티읕.",
+   "dur_before": 3.65,
+   "actions": [],
+   "asr_full": "티-읽, 토마토할 때 티-읽",
+   "asr_tail": "",
+   "asr_wo_tail": "치윽, 토마토할 때",
+   "dur_after": 3.18,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.77s -> 0.30s at 2.35s)"
+  },
+  "j_314D": {
+   "text": "피읖, 포도 할 때 피읖.",
+   "dur_before": 3.096,
+   "actions": [],
+   "asr_full": "피읍, 포도할 때 피읍",
+   "asr_lead": "퓨.",
+   "asr_wo_lead": "포도할 때 피읍",
+   "dur_after": 1.92,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.42s -> 0.30s at 0.58s)"
+  },
+  "j_314E": {
+   "text": "히읗, 하마 할 때 히읗.",
+   "dur_before": 2.51,
+   "actions": [
+    "pause 0.69s -> 0.30s at 0.37s"
+   ],
+   "asr_full": "",
+   "asr_lead": "큐",
+   "asr_wo_lead": "하마할때 희엿",
+   "dur_after": 2.12
+  },
+  "j_314F": {
+   "text": "아, 아기 할 때 아.",
+   "dur_before": 2.28,
+   "actions": []
+  },
+  "j_3150": {
+   "text": "애, 개 할 때 애.",
+   "dur_before": 2.976,
+   "actions": [
+    "pause 0.42s -> 0.30s at 0.57s"
+   ],
+   "asr_full": "예, 개 할 때",
+   "asr_lead": "",
+   "asr_wo_lead": "개 할 때",
+   "dur_after": 1.81
+  },
+  "j_3151": {
+   "text": "야, 야구 할 때 야.",
+   "dur_before": 2.19,
+   "actions": []
+  },
+  "j_3153": {
+   "text": "어, 어부 할 때 어.",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "j_3154": {
+   "text": "에, 게 할 때 에.",
+   "dur_before": 2.904,
+   "actions": [
+    "pause 0.44s -> 0.30s at 0.56s"
+   ],
+   "asr_full": "예, 개할떼",
+   "asr_lead": "예",
+   "asr_wo_lead": "",
+   "dur_after": 1.72
+  },
+  "j_3155": {
+   "text": "여, 여우 할 때 여.",
+   "dur_before": 1.95,
+   "actions": []
+  },
+  "j_3157": {
+   "text": "오, 오리 할 때 오.",
+   "dur_before": 2.51,
+   "actions": [
+    "drop lead burst 0.03-0.63s"
+   ],
+   "asr_full": "오리야",
+   "asr_lead": "",
+   "asr_wo_lead": "오리할때 오오오",
+   "dur_after": 2.51,
+   "reverted": "R2: restored to main — the dropped \"lead burst\" was the spoken \"오,\" (voiced, +1.8 dB re. speech); found by QA_r1_fable, confirmed by tools/recheck_edits.py"
+  },
+  "j_3158": {
+   "text": "와, 과자 할 때 와.",
+   "dur_before": 2.11,
+   "actions": [
+    "pause 0.71s -> 0.30s at 0.49s"
+   ],
+   "asr_full": "",
+   "asr_lead": "와",
+   "asr_wo_lead": "과자할 때와",
+   "dur_after": 1.7
+  },
+  "j_315A": {
+   "text": "외.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "j_315B": {
+   "text": "요, 요요 할 때 요.",
+   "dur_before": 3.14,
+   "actions": []
+  },
+  "j_315C": {
+   "text": "우, 우유 할 때 우.",
+   "dur_before": 3.0,
+   "actions": [
+    "pause 0.45s -> 0.30s at 0.49s"
+   ],
+   "asr_full": "",
+   "asr_lead": "우",
+   "asr_wo_lead": "우유할 때 우~~",
+   "dur_after": 2.85
+  },
+  "j_315D": {
+   "text": "워, 원숭이 할 때 워.",
+   "dur_before": 2.27,
+   "actions": [
+    "pause 0.71s -> 0.30s at 0.45s"
+   ],
+   "asr_full": "뭐, 원숭이 할 때고?",
+   "asr_lead": "워",
+   "asr_wo_lead": "원숭�에",
+   "dur_after": 1.86
+  },
+  "j_315F": {
+   "text": "위, 귀 할 때 위.",
+   "dur_before": 2.43,
+   "actions": [],
+   "asr_full": "위, 귀할 때 위?",
+   "asr_lead": "V",
+   "asr_wo_lead": "귀할 때 위?",
+   "dur_after": 2.18,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.55s -> 0.30s at 0.62s)"
+  },
+  "j_3160": {
+   "text": "유, 우유 할 때 유.",
+   "dur_before": 2.36,
+   "actions": [
+    "pause 0.48s -> 0.30s at 1.58s"
+   ],
+   "asr_full": "유, 우유할 때 유",
+   "asr_tail": "U",
+   "asr_wo_tail": "6. 우유할 때",
+   "dur_after": 2.18
+  },
+  "j_3161": {
+   "text": "으, 으르렁 할 때 으.",
+   "dur_before": 3.144,
+   "actions": []
+  },
+  "j_3162": {
+   "text": "의, 의자 할 때 의.",
+   "dur_before": 3.32,
+   "actions": [
+    "pause 0.92s -> 0.30s at 2.02s"
+   ],
+   "asr_full": "으뜸, 으뜸, 으뜸, 으� JAMES",
+   "asr_tail": "으이",
+   "asr_wo_tail": "의 의자할 때",
+   "dur_after": 2.7
+  },
+  "j_3163": {
+   "text": "이, 이 할 때 이.",
+   "dur_before": 2.35,
+   "actions": []
+  },
+  "s_1": {
+   "text": "나비도 나무도.",
+   "dur_before": 2.76,
+   "actions": [
+    "pause 0.64s -> 0.30s at 1.51s"
+   ],
+   "asr_full": "나비도 나무도",
+   "asr_tail": "나무도...",
+   "asr_wo_tail": "다비도",
+   "dur_after": 2.42
+  },
+  "s_2": {
+   "text": "바나나 나무.",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "s_4": {
+   "text": "나비 모자.",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "s_6": {
+   "text": "아기 모자.",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "sy_AC00": {
+   "text": "가.",
+   "dur_before": 0.45,
+   "actions": []
+  },
+  "sy_AC10": {
+   "text": "감.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "sy_AC15": {
+   "text": "강.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_AC1C": {
+   "text": "개.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "sy_AC38": {
+   "text": "갸.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "sy_AC70": {
+   "text": "거.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "sy_AC8C": {
+   "text": "게.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_ACA8": {
+   "text": "겨.",
+   "dur_before": 0.28,
+   "actions": []
+  },
+  "sy_ACE0": {
+   "text": "고.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_ACF0": {
+   "text": "곰.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "sy_ACF5": {
+   "text": "공.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "sy_ACFC": {
+   "text": "과.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_AD50": {
+   "text": "교.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_AD6C": {
+   "text": "구.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "sy_AD6D": {
+   "text": "국.",
+   "dur_before": 0.3,
+   "actions": []
+  },
+  "sy_ADC0": {
+   "text": "귀.",
+   "dur_before": 0.73,
+   "actions": []
+  },
+  "sy_ADDC": {
+   "text": "규.",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "sy_ADF8": {
+   "text": "그.",
+   "dur_before": 1.0,
+   "actions": []
+  },
+  "sy_AE00": {
+   "text": "글.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_AE30": {
+   "text": "기.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "sy_AE40": {
+   "text": "김.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "sy_AE4C": {
+   "text": "까.",
+   "dur_before": 0.72,
+   "actions": []
+  },
+  "sy_AF2C": {
+   "text": "꼬.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "sy_AF43": {
+   "text": "꽃.",
+   "dur_before": 1.4,
+   "actions": [
+    "drop tail burst 1.18-1.39s"
+   ],
+   "asr_full": "꽃",
+   "asr_lead": "꽃",
+   "asr_wo_lead": "어",
+   "asr_tail": "어",
+   "asr_wo_tail": "꽃",
+   "dur_after": 0.5
+  },
+  "sy_AFB8": {
+   "text": "꾸.",
+   "dur_before": 0.46,
+   "actions": []
+  },
+  "sy_B07C": {
+   "text": "끼.",
+   "dur_before": 0.41,
+   "actions": []
+  },
+  "sy_B098": {
+   "text": "나.",
+   "dur_before": 0.62,
+   "actions": []
+  },
+  "sy_B0B4": {
+   "text": "내.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "sy_B0D0": {
+   "text": "냐.",
+   "dur_before": 0.65,
+   "actions": []
+  },
+  "sy_B108": {
+   "text": "너.",
+   "dur_before": 0.54,
+   "actions": []
+  },
+  "sy_B124": {
+   "text": "네.",
+   "dur_before": 0.41,
+   "actions": []
+  },
+  "sy_B140": {
+   "text": "녀.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_B178": {
+   "text": "노.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_B180": {
+   "text": "놀.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_B1E8": {
+   "text": "뇨.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_B204": {
+   "text": "누.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "sy_B208": {
+   "text": "눈.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "sy_B274": {
+   "text": "뉴.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "sy_B290": {
+   "text": "느.",
+   "dur_before": 0.28,
+   "actions": []
+  },
+  "sy_B298": {
+   "text": "늘.",
+   "dur_before": 0.7,
+   "actions": []
+  },
+  "sy_B2C8": {
+   "text": "니.",
+   "dur_before": 0.33,
+   "actions": []
+  },
+  "sy_B2E4": {
+   "text": "다.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_B2EC": {
+   "text": "달.",
+   "dur_before": 0.69,
+   "actions": []
+  },
+  "sy_B354": {
+   "text": "더.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_B3C4": {
+   "text": "도.",
+   "dur_before": 0.85,
+   "actions": []
+  },
+  "sy_B3FC": {
+   "text": "돼.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_B450": {
+   "text": "두.",
+   "dur_before": 0.29,
+   "actions": []
+  },
+  "sy_B4DC": {
+   "text": "드.",
+   "dur_before": 0.31,
+   "actions": []
+  },
+  "sy_B514": {
+   "text": "디.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_B530": {
+   "text": "따.",
+   "dur_before": 0.35,
+   "actions": []
+  },
+  "sy_B538": {
+   "text": "딸.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "sy_B5A0": {
+   "text": "떠.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_B5A1": {
+   "text": "떡.",
+   "dur_before": 0.21,
+   "actions": []
+  },
+  "sy_B610": {
+   "text": "또.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_B69C": {
+   "text": "뚜.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "sy_B760": {
+   "text": "띠.",
+   "dur_before": 0.33,
+   "actions": []
+  },
+  "sy_B77C": {
+   "text": "라.",
+   "dur_before": 0.69,
+   "actions": []
+  },
+  "sy_B78C": {
+   "text": "람.",
+   "dur_before": 0.62,
+   "actions": []
+  },
+  "sy_B791": {
+   "text": "랑.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_B798": {
+   "text": "래.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "sy_B7EC": {
+   "text": "러.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_B801": {
+   "text": "렁.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "sy_B824": {
+   "text": "려.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_B85C": {
+   "text": "로.",
+   "dur_before": 0.78,
+   "actions": []
+  },
+  "sy_B8E8": {
+   "text": "루.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "sy_B974": {
+   "text": "르.",
+   "dur_before": 0.69,
+   "actions": []
+  },
+  "sy_B9AC": {
+   "text": "리.",
+   "dur_before": 0.65,
+   "actions": []
+  },
+  "sy_B9B0": {
+   "text": "린.",
+   "dur_before": 0.69,
+   "actions": []
+  },
+  "sy_B9B4": {
+   "text": "릴.",
+   "dur_before": 0.34,
+   "actions": []
+  },
+  "sy_B9BC": {
+   "text": "림.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "sy_B9C8": {
+   "text": "마.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_B9D0": {
+   "text": "말.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_B9E4": {
+   "text": "매.",
+   "dur_before": 0.35,
+   "actions": []
+  },
+  "sy_BA00": {
+   "text": "먀.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "sy_BA38": {
+   "text": "머.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_BA54": {
+   "text": "메.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_BA70": {
+   "text": "며.",
+   "dur_before": 0.93,
+   "actions": []
+  },
+  "sy_BA74": {
+   "text": "면.",
+   "dur_before": 0.62,
+   "actions": []
+  },
+  "sy_BAA8": {
+   "text": "모.",
+   "dur_before": 1.584,
+   "actions": []
+  },
+  "sy_BABD": {
+   "text": "몽.",
+   "dur_before": 0.41,
+   "actions": []
+  },
+  "sy_BB18": {
+   "text": "묘.",
+   "dur_before": 0.61,
+   "actions": []
+  },
+  "sy_BB34": {
+   "text": "무.",
+   "dur_before": 0.45,
+   "actions": []
+  },
+  "sy_BB38": {
+   "text": "문.",
+   "dur_before": 0.68,
+   "actions": []
+  },
+  "sy_BB3C": {
+   "text": "물.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_BB50": {
+   "text": "뭐.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "sy_BBA4": {
+   "text": "뮤.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_BBC0": {
+   "text": "므.",
+   "dur_before": 0.45,
+   "actions": []
+  },
+  "sy_BBF8": {
+   "text": "미.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_BC14": {
+   "text": "바.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "sy_BC15": {
+   "text": "박.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_BC1C": {
+   "text": "발.",
+   "dur_before": 0.66,
+   "actions": []
+  },
+  "sy_BC24": {
+   "text": "밤.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "sy_BC25": {
+   "text": "밥.",
+   "dur_before": 0.29,
+   "actions": []
+  },
+  "sy_BC29": {
+   "text": "방.",
+   "dur_before": 0.5,
+   "actions": []
+  },
+  "sy_BC30": {
+   "text": "배.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "sy_BC84": {
+   "text": "버.",
+   "dur_before": 1.15,
+   "actions": []
+  },
+  "sy_BCC4": {
+   "text": "별.",
+   "dur_before": 0.46,
+   "actions": []
+  },
+  "sy_BCF4": {
+   "text": "보.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_BD07": {
+   "text": "봇.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_BD80": {
+   "text": "부.",
+   "dur_before": 0.89,
+   "actions": []
+  },
+  "sy_BD81": {
+   "text": "북.",
+   "dur_before": 1.16,
+   "actions": []
+  },
+  "sy_BD84": {
+   "text": "분.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_BE0C": {
+   "text": "브.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_BE44": {
+   "text": "비.",
+   "dur_before": 0.68,
+   "actions": []
+  },
+  "sy_BE57": {
+   "text": "빗.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_BE60": {
+   "text": "빠.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_BE75": {
+   "text": "빵.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_BE7C": {
+   "text": "빼.",
+   "dur_before": 0.3,
+   "actions": []
+  },
+  "sy_BF40": {
+   "text": "뽀.",
+   "dur_before": 0.45,
+   "actions": []
+  },
+  "sy_BFCC": {
+   "text": "뿌.",
+   "dur_before": 0.61,
+   "actions": []
+  },
+  "sy_C090": {
+   "text": "삐.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_C0AC": {
+   "text": "사.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_C0B0": {
+   "text": "산.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "sy_C0C1": {
+   "text": "상.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "sy_C0C8": {
+   "text": "새.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_C11C": {
+   "text": "서.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_C120": {
+   "text": "선.",
+   "dur_before": 0.76,
+   "actions": []
+  },
+  "sy_C12F": {
+   "text": "섯.",
+   "dur_before": 0.31,
+   "actions": []
+  },
+  "sy_C18C": {
+   "text": "소.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "sy_C190": {
+   "text": "손.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "sy_C218": {
+   "text": "수.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_C22D": {
+   "text": "숭.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "sy_C2A4": {
+   "text": "스.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_C2DC": {
+   "text": "시.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_C2F8": {
+   "text": "싸.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_C314": {
+   "text": "쌔.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_C3D8": {
+   "text": "쏘.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_C464": {
+   "text": "쑤.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_C528": {
+   "text": "씨.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_C544": {
+   "text": "아.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "sy_C545": {
+   "text": "악.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "sy_C557": {
+   "text": "앗.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_C560": {
+   "text": "애.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_C57C": {
+   "text": "야.",
+   "dur_before": 0.62,
+   "actions": []
+  },
+  "sy_C591": {
+   "text": "양.",
+   "dur_before": 0.72,
+   "actions": []
+  },
+  "sy_C5B4": {
+   "text": "어.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_C5C4": {
+   "text": "엄.",
+   "dur_before": 1.34,
+   "actions": []
+  },
+  "sy_C5D0": {
+   "text": "에.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "sy_C5EC": {
+   "text": "여.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_C624": {
+   "text": "오.",
+   "dur_before": 0.25,
+   "actions": []
+  },
+  "sy_C637": {
+   "text": "옷.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "sy_C640": {
+   "text": "와.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_C678": {
+   "text": "외.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_C694": {
+   "text": "요.",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "sy_C6B0": {
+   "text": "우.",
+   "dur_before": 0.99,
+   "actions": []
+  },
+  "sy_C6CC": {
+   "text": "워.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "sy_C6D0": {
+   "text": "원.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "sy_C704": {
+   "text": "위.",
+   "dur_before": 0.46,
+   "actions": []
+  },
+  "sy_C720": {
+   "text": "유.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_C73C": {
+   "text": "으.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_C758": {
+   "text": "의.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "sy_C774": {
+   "text": "이.",
+   "dur_before": 1.21,
+   "actions": []
+  },
+  "sy_C785": {
+   "text": "입.",
+   "dur_before": 0.29,
+   "actions": []
+  },
+  "sy_C790": {
+   "text": "자.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_C794": {
+   "text": "잔.",
+   "dur_before": 0.56,
+   "actions": []
+  },
+  "sy_C7A5": {
+   "text": "장.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "sy_C800": {
+   "text": "저.",
+   "dur_before": 0.35,
+   "actions": []
+  },
+  "sy_C870": {
+   "text": "조.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_C8FC": {
+   "text": "주.",
+   "dur_before": 0.56,
+   "actions": []
+  },
+  "sy_C988": {
+   "text": "즈.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_C9C0": {
+   "text": "지.",
+   "dur_before": 0.81,
+   "actions": []
+  },
+  "sy_C9D1": {
+   "text": "집.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_C9D5": {
+   "text": "징.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_C9DC": {
+   "text": "짜.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_CABC": {
+   "text": "쪼.",
+   "dur_before": 0.24,
+   "actions": []
+  },
+  "sy_CB48": {
+   "text": "쭈.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_CC0C": {
+   "text": "찌.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "sy_CC28": {
+   "text": "차.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "sy_CC45": {
+   "text": "책.",
+   "dur_before": 0.27,
+   "actions": []
+  },
+  "sy_CC98": {
+   "text": "처.",
+   "dur_before": 0.62,
+   "actions": []
+  },
+  "sy_CD08": {
+   "text": "초.",
+   "dur_before": 0.76,
+   "actions": []
+  },
+  "sy_CD94": {
+   "text": "추.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "sy_CE20": {
+   "text": "츠.",
+   "dur_before": 0.65,
+   "actions": []
+  },
+  "sy_CE58": {
+   "text": "치.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "sy_CE74": {
+   "text": "카.",
+   "dur_before": 0.77,
+   "actions": []
+  },
+  "sy_CEE4": {
+   "text": "커.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "sy_CEF5": {
+   "text": "컵.",
+   "dur_before": 0.22,
+   "actions": []
+  },
+  "sy_CF00": {
+   "text": "케.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_CF54": {
+   "text": "코.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "sy_CF69": {
+   "text": "콩.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "sy_CFE0": {
+   "text": "쿠.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "sy_D06C": {
+   "text": "크.",
+   "dur_before": 0.31,
+   "actions": []
+  },
+  "sy_D0A4": {
+   "text": "키.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_D0C0": {
+   "text": "타.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_D0D5": {
+   "text": "탕.",
+   "dur_before": 0.77,
+   "actions": []
+  },
+  "sy_D130": {
+   "text": "터.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_D1A0": {
+   "text": "토.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "sy_D22C": {
+   "text": "투.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "sy_D2B8": {
+   "text": "트.",
+   "dur_before": 0.4,
+   "actions": []
+  },
+  "sy_D2F0": {
+   "text": "티.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "sy_D30C": {
+   "text": "파.",
+   "dur_before": 0.43,
+   "actions": []
+  },
+  "sy_D37C": {
+   "text": "퍼.",
+   "dur_before": 0.3,
+   "actions": []
+  },
+  "sy_D3EC": {
+   "text": "포.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_D478": {
+   "text": "푸.",
+   "dur_before": 0.41,
+   "actions": []
+  },
+  "sy_D48D": {
+   "text": "풍.",
+   "dur_before": 0.74,
+   "actions": []
+  },
+  "sy_D504": {
+   "text": "프.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_D53C": {
+   "text": "피.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_D558": {
+   "text": "하.",
+   "dur_before": 0.23,
+   "actions": []
+  },
+  "sy_D560": {
+   "text": "할.",
+   "dur_before": 0.34,
+   "actions": []
+  },
+  "sy_D574": {
+   "text": "해.",
+   "dur_before": 0.27,
+   "actions": []
+  },
+  "sy_D590": {
+   "text": "햐.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_D5C8": {
+   "text": "허.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "sy_D5E4": {
+   "text": "헤.",
+   "dur_before": 0.25,
+   "actions": []
+  },
+  "sy_D600": {
+   "text": "혀.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_D638": {
+   "text": "호.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "sy_D654": {
+   "text": "화.",
+   "dur_before": 0.43,
+   "actions": []
+  },
+  "sy_D6A8": {
+   "text": "효.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "sy_D6C4": {
+   "text": "후.",
+   "dur_before": 0.26,
+   "actions": []
+  },
+  "sy_D734": {
+   "text": "휴.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "sy_D750": {
+   "text": "흐.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "sy_D788": {
+   "text": "히.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "ui4_balloon": {
+   "text": "들은 글자를 눌러 봐!",
+   "dur_before": 2.12,
+   "actions": [
+    "drop lead burst 0.04-0.40s"
+   ],
+   "asr_full": "들은 �",
+   "asr_lead": "",
+   "asr_wo_lead": "들은 �",
+   "dur_after": 1.25
+  },
+  "ui4_block": {
+   "text": "블록으로 글자 만들자!",
+   "dur_before": 1.63,
+   "actions": []
+  },
+  "ui4_bye": {
+   "text": "오늘은 여기까지. 내일 또 하자!",
+   "dur_before": 2.74,
+   "actions": [
+    "pause 0.44s -> 0.30s at 1.33s"
+   ],
+   "dur_after": 2.6
+  },
+  "ui4_chant": {
+   "text": "반짝이는 칸을 눌러 봐!",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "ui4_echo2": {
+   "text": "이번엔 려원이가 혼자 읽어 볼까?",
+   "dur_before": 3.62,
+   "actions": [
+    "pause 0.51s -> 0.30s at 1.05s"
+   ],
+   "asr_full": "이번엔 려원이가 혼자 읽어볼까?",
+   "asr_lead": "이번엔",
+   "asr_wo_lead": "여원이가 혼자 읽어볼까?",
+   "dur_after": 3.41
+  },
+  "ui4_free": {
+   "text": "더 놀고 싶으면, 놀이터에서 배운 놀이를 해 볼까?",
+   "dur_before": 4.59,
+   "actions": [
+    "pause 0.81s -> 0.30s at 1.38s"
+   ],
+   "dur_after": 4.08
+  },
+  "ui4_hint": {
+   "text": "여기 반짝이는 데를 봐!",
+   "dur_before": 1.63,
+   "actions": []
+  },
+  "ui4_memory": {
+   "text": "카드를 뒤집어서 짝꿍을 찾아볼까?",
+   "dur_before": 3.48,
+   "actions": [
+    "pause 0.46s -> 0.30s at 1.53s"
+   ],
+   "dur_after": 3.32
+  },
+  "ui4_proc1": {
+   "text": "끝까지 들었네!",
+   "dur_before": 1.24,
+   "actions": []
+  },
+  "ui4_proc11": {
+   "text": "천천히 끝까지 해냈네!",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "ui4_proc12": {
+   "text": "글자를 하나하나 찾아냈네!",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "ui4_proc15": {
+   "text": "들은 글자를 쏙 잡았네!",
+   "dur_before": 2.12,
+   "actions": []
+  },
+  "ui4_proc16": {
+   "text": "어려웠는데 다시 해봤네!",
+   "dur_before": 2.11,
+   "actions": []
+  },
+  "ui4_proc17": {
+   "text": "그림을 보고 잘 생각했네!",
+   "dur_before": 2.04,
+   "actions": []
+  },
+  "ui4_proc18": {
+   "text": "한 글자씩 또박또박 읽었네!",
+   "dur_before": 2.11,
+   "actions": []
+  },
+  "ui4_proc2": {
+   "text": "순서대로 썼네!",
+   "dur_before": 1.22,
+   "actions": []
+  },
+  "ui4_proc3": {
+   "text": "혼자 읽었네!",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "ui4_proc5": {
+   "text": "끝까지 들었네!",
+   "dur_before": 1.24,
+   "actions": []
+  },
+  "ui4_proc6": {
+   "text": "두 개를 붙여서 글자를 만들었네!",
+   "dur_before": 3.48,
+   "actions": [
+    "pause 0.63s -> 0.30s at 0.51s"
+   ],
+   "asr_full": "두 개를 붙여",
+   "asr_lead": "",
+   "asr_wo_lead": "두 �",
+   "dur_after": 3.15
+  },
+  "ui4_proc7": {
+   "text": "다시 찾아냈어. 포기하지 않았네!",
+   "dur_before": 2.91,
+   "actions": [],
+   "asr_full": "다시 찾아냈어 포기하지 않았네",
+   "asr_lead": "다시 찾아냈어",
+   "asr_wo_lead": "포기하지 않았네",
+   "asr_tail": "포기하지 않았네",
+   "asr_wo_tail": "다시 찾아냈어",
+   "dur_after": 2.53,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.68s -> 0.30s at 1.19s)"
+  },
+  "ui4_proc9": {
+   "text": "같은 소리끼리 잘 모았네!",
+   "dur_before": 1.64,
+   "actions": []
+  },
+  "ui4_tapnext": {
+   "text": "여기 눌러 볼까?",
+   "dur_before": 1.71,
+   "actions": []
+  },
+  "ui4_today": {
+   "text": "오늘 뭐 할까?",
+   "dur_before": 1.23,
+   "actions": []
+  },
+  "ui4_treasure": {
+   "text": "보물 상자를 열어 볼까?",
+   "dur_before": 1.54,
+   "actions": []
+  },
+  "ui4_treasure2": {
+   "text": "반짝! 보물을 찾았어!",
+   "dur_before": 2.5,
+   "actions": [
+    "pause 0.41s -> 0.30s at 0.80s"
+   ],
+   "asr_full": "반짝! 보물을 찾았어!",
+   "asr_lead": "반, 짱!",
+   "asr_wo_lead": "보�",
+   "asr_tail": "보물을 찾았어.",
+   "asr_wo_tail": "",
+   "dur_after": 2.39
+  },
+  "ui4_try": {
+   "text": "괜찮아. 같이 해 보자.",
+   "dur_before": 2.04,
+   "actions": [
+    "pause 0.60s -> 0.30s at 0.65s"
+   ],
+   "asr_full": "괜찮아, 같이 해보자",
+   "asr_lead": "왜? 왜? 왜? 왜? 왜? 왜?",
+   "asr_wo_lead": "같이",
+   "asr_tail": "",
+   "asr_wo_tail": "괜찮아",
+   "dur_after": 1.74
+  },
+  "ui_clapq": {
+   "text": "몇 번 박수 쳤을까?",
+   "dur_before": 3.4,
+   "actions": [
+    "pause 0.94s -> 0.30s at 0.45s"
+   ],
+   "asr_full": "몇 번 박수 쳤을까?",
+   "asr_lead": "",
+   "asr_wo_lead": "những 번 박수 쳤을까?",
+   "dur_after": 2.76
+  },
+  "ui_clapyou": {
+   "text": "이제 려원이도 짝짝 쳐 볼까?",
+   "dur_before": 1.8,
+   "actions": []
+  },
+  "ui_found": {
+   "text": "찾았다!",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "ui_good1": {
+   "text": "잘했어!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "ui_good2": {
+   "text": "멋져!",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "ui_good3": {
+   "text": "최고야!",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "ui_hiname": {
+   "text": "려원아, 안녕!",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "ui_levelup": {
+   "text": "우와, 한 단계 올라갔어!",
+   "dur_before": 2.19,
+   "actions": [
+    "pause 0.41s -> 0.30s at 0.51s"
+   ],
+   "asr_full": "어.. 어...",
+   "asr_lead": "우와!",
+   "asr_wo_lead": "한단계 올라갔어",
+   "asr_tail": "한단계 올라갔어",
+   "asr_wo_tail": "우와",
+   "dur_after": 2.08
+  },
+  "ui_same": {
+   "text": "같은 소리로 시작하는 그림은 뭘까?",
+   "dur_before": 2.6,
+   "actions": []
+  },
+  "ui_sticker": {
+   "text": "스티커 받았어!",
+   "dur_before": 1.07,
+   "actions": []
+  },
+  "ui_together": {
+   "text": "같이 해 보자!",
+   "dur_before": 1.15,
+   "actions": []
+  },
+  "ui_trace": {
+   "text": "분홍 점을 따라 손가락으로 써 볼까?",
+   "dur_before": 4.58,
+   "actions": [
+    "drop lead burst 0.02-0.55s"
+   ],
+   "asr_full": "아 분홍",
+   "asr_lead": "",
+   "asr_wo_lead": "분홍 점을 따라 손가락으로 써볼까?",
+   "dur_after": 2.45
+  },
+  "ui_train": {
+   "text": "기차 칸을 눌러 봐. 무슨 소리가 날까?",
+   "dur_before": 4.04,
+   "actions": [
+    "pause 1.44s -> 0.30s at 1.46s"
+   ],
+   "asr_full": "기차칸을 눌러봐 무슨 소리가 날까?",
+   "asr_lead": "기",
+   "asr_wo_lead": "무슨 소리가 날까?",
+   "dur_after": 2.9
+  },
+  "ui_which": {
+   "text": "어떤 그림일까?",
+   "dur_before": 1.87,
+   "actions": []
+  },
+  "v_alone": {
+   "text": "이제 혼자 써 볼까?",
+   "dur_before": 1.56,
+   "actions": []
+  },
+  "v_cvow": {
+   "text": "모음 두 개를 합쳐서 만들어 볼까?",
+   "dur_before": 2.11,
+   "actions": []
+  },
+  "v_deco": {
+   "text": "스티커를 끌어서 그림을 꾸며 봐!",
+   "dur_before": 2.67,
+   "actions": []
+  },
+  "v_dir": {
+   "text": "화살표 쪽으로 써 볼까?",
+   "dur_before": 2.02,
+   "actions": []
+  },
+  "v_fish": {
+   "text": "들은 글자 물고기를 잡아 봐!",
+   "dur_before": 3.08,
+   "actions": [],
+   "asr_full": "들은 글자 물고기를 잡아봐",
+   "asr_lead": "",
+   "asr_wo_lead": "들은 글자 물고기를 잡아봐",
+   "dur_after": 1.98,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (drop lead burst 0.04-0.46s)"
+  },
+  "v_hide": {
+   "text": "숨어 있는 글자를 모두 찾아 봐!",
+   "dur_before": 2.1,
+   "actions": []
+  },
+  "v_look": {
+   "text": "잘 보고 기억해!",
+   "dur_before": 1.22,
+   "actions": []
+  },
+  "v_mine": {
+   "text": "려원이 목소리 들어 보자.",
+   "dur_before": 1.69,
+   "actions": []
+  },
+  "v_order": {
+   "text": "번호 순서대로 써 볼까?",
+   "dur_before": 1.79,
+   "actions": []
+  },
+  "v_same": {
+   "text": "똑같이 읽었어?",
+   "dur_before": 1.63,
+   "actions": []
+  },
+  "v_shop": {
+   "text": "손님이 원하는 물건 이름표를 건네 줘!",
+   "dur_before": 3.48,
+   "actions": [
+    "drop lead burst 0.04-0.45s"
+   ],
+   "asr_full": "손님이 원하는 물건 이름표를 건네줘",
+   "asr_lead": "",
+   "asr_wo_lead": "손님이 원하는 물건 이름표를 건네줘",
+   "dur_after": 2.64
+  },
+  "v_speak": {
+   "text": "이번엔 려원이가 소리 내서 읽어 볼까?",
+   "dur_before": 3.29,
+   "actions": [],
+   "asr_full": "이번엔 려원이가 소리내서 읽어볼까?",
+   "asr_lead": "이번엔",
+   "asr_wo_lead": "려원이가 소리내서 읽어볼까?",
+   "dur_after": 3.06,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.53s -> 0.30s at 1.03s)"
+  },
+  "v_twin": {
+   "text": "똑같은 글자 둘이 붙으면 더 세게 소리 나! 잘 듣고 골라 봐.",
+   "dur_before": 4.83,
+   "actions": []
+  },
+  "v_w1": {
+   "text": "소리 숲에서 몽글이가 길을 잃었대! 소리 놀이를 하면서 몽글이를 찾아 주자.",
+   "dur_before": 5.31,
+   "actions": [],
+   "asr_full": "소리숲에서 몽글이가 길을 잃었대. 소리 놀이를 하면서 몽글리를 찾아주자.",
+   "asr_tail": "소리 놀이를 하면서 몽그리를 찾아주자",
+   "asr_wo_tail": "소리숲에서 몽글이가 길을 잃었대.",
+   "dur_after": 4.89,
+   "reverted": "restored to the original: best-of-3 Whisper read the edited clip worse (pause 0.72s -> 0.30s at 2.12s)"
+  },
+  "v_w10": {
+   "text": "미끄럼 모음은 모음 둘이 미끄럼을 타고 합쳐진 거야. 도리를 찾아보자!",
+   "dur_before": 5.48,
+   "actions": [
+    "pause 0.72s -> 0.30s at 1.10s",
+    "pause 0.68s -> 0.30s at 3.88s"
+   ],
+   "asr_full": "미끄럼 모음은 모음 둘이 미끄럼을 타고 합쳐진 거야 도리를 찾아보자",
+   "asr_tail": "도리를 찾아보자",
+   "asr_wo_tail": "미끄럼 모음은 모음 둘이 미끄럼을 타고 합쳐진 거야",
+   "dur_after": 4.68
+  },
+  "v_w2": {
+   "text": "모음 바다 어딘가에 뽀미가 있대. 모음 친구들을 만나면서 찾아보자!",
+   "dur_before": 8.28,
+   "actions": [
+    "pause 0.45s -> 0.30s at 1.37s",
+    "pause 1.57s -> 0.30s at 3.53s",
+    "pause 0.41s -> 0.30s at 7.22s"
+   ],
+   "asr_full": "모음 바다 어딘가에 뽀미가 있대 모음 친구들을 만나면서 찾아보자",
+   "asr_lead": "모음 받아",
+   "asr_wo_lead": "어딘가에 뽀미가 있대 모음 친구들을 만나면서 찾아보자",
+   "dur_after": 6.75
+  },
+  "v_w3": {
+   "text": "자음 마을에 아기용 콩이가 살아. 자음 친구들을 다 만나면 콩이가 나올 거야!",
+   "dur_before": 6.99,
+   "actions": [
+    "pause 0.68s -> 0.30s at 1.14s",
+    "pause 0.64s -> 0.30s at 3.04s",
+    "pause 0.48s -> 0.30s at 5.52s"
+   ],
+   "asr_full": "자음 마을에 아기용 콩이가 살아 자음 친구들을 다 만나면 콩이가 나올 거야",
+   "asr_lead": "다음 마을에",
+   "asr_wo_lead": "아기용 콩이가 살아 자음 친구들을 다 만나면 콩이가 나올거야",
+   "asr_tail": "콩이가 나올거야",
+   "asr_wo_tail": "자음 마을에 아기 용콩이가 살아 자음 친구들을 다 만나면",
+   "dur_after": 6.09
+  },
+  "v_w4": {
+   "text": "삐약이가 자음 마을 2에서 기다리고 있어!",
+   "dur_before": 3.47,
+   "actions": []
+  },
+  "v_w5": {
+   "text": "무지개 끝에 유니콘 유니가 있대!",
+   "dur_before": 3.15,
+   "actions": []
+  },
+  "v_w6": {
+   "text": "받침 동굴 깊은 곳에 꿀곰 보리가 꿀을 숨겨 놨대!",
+   "dur_before": 3.54,
+   "actions": []
+  },
+  "v_w7": {
+   "text": "낱말 공원에서 여우 소리가 숨바꼭질을 하고 있어!",
+   "dur_before": 3.48,
+   "actions": []
+  },
+  "v_w8": {
+   "text": "이야기 하늘에서 루미 공주가 별 이야기를 들려준대!",
+   "dur_before": 4.03,
+   "actions": []
+  },
+  "v_w9": {
+   "text": "쌍둥이 숲에는 똑같은 글자 둘이 꼭 붙어 있어. 판다 팡팡을 찾아보자!",
+   "dur_before": 5.7,
+   "actions": [
+    "pause 0.48s -> 0.30s at 3.52s"
+   ],
+   "asr_full": "쌍둥이 숲에는 똑같은 글자 둘이 꼭 붙어 있어 판다팡팡을 찾아보자",
+   "asr_tail": "판다팡팡을 찾아보자",
+   "asr_wo_tail": "쌍둥이 숲에는 똑같은 글자 둘이 꼭 붙어 있어",
+   "dur_after": 5.52
+  },
+  "v_wd1": {
+   "text": "몽글이를 찾았어! 이제 같이 가자!",
+   "dur_before": 3.15,
+   "actions": [
+    "pause 0.62s -> 0.30s at 1.40s"
+   ],
+   "asr_full": "몽그리를?를 찾았어. 이제 같이 가자.",
+   "asr_lead": "몽그리를 찾았어",
+   "asr_wo_lead": "이제 같이 가자",
+   "asr_tail": "이제 같이 가자",
+   "asr_wo_tail": "몽그리를 찾았어",
+   "dur_after": 2.83
+  },
+  "v_wd10": {
+   "text": "도리를 만났어!",
+   "dur_before": 1.4,
+   "actions": []
+  },
+  "v_wd2": {
+   "text": "뽀미를 찾았어! 바다를 다 건넜어!",
+   "dur_before": 2.83,
+   "actions": [
+    "pause 0.59s -> 0.30s at 1.00s"
+   ],
+   "asr_full": "뽀미를 찾았어. 바다를 다 건넜어.",
+   "asr_lead": "호미를 찾았어",
+   "asr_wo_lead": "바다를 다 건너써",
+   "asr_tail": "바다를 다 건너써",
+   "asr_wo_tail": "뽀미를 찾았어",
+   "dur_after": 2.54
+  },
+  "v_wd3": {
+   "text": "콩이를 만났어! 자음 마을 끝!",
+   "dur_before": 2.28,
+   "actions": []
+  },
+  "v_wd4": {
+   "text": "삐약이를 만났어!",
+   "dur_before": 2.03,
+   "actions": [
+    "pause 0.53s -> 0.30s at 0.76s"
+   ],
+   "asr_full": "",
+   "asr_lead": "띠아기를",
+   "asr_wo_lead": "만났어",
+   "asr_tail": "",
+   "asr_wo_tail": "띠아기를",
+   "dur_after": 1.8
+  },
+  "v_wd5": {
+   "text": "유니를 만났어! 무지개를 다 건넜어!",
+   "dur_before": 4.8,
+   "actions": [
+    "pause 1.05s -> 0.30s at 1.34s"
+   ],
+   "asr_full": "윤희를 만났어 무지개를 다 건넜어",
+   "asr_lead": "윤희를 만났어",
+   "asr_wo_lead": "무지개를 다 건너써",
+   "asr_tail": "무지개를 다 건너써",
+   "asr_wo_tail": "윤희를 만났어",
+   "dur_after": 3.05
+  },
+  "v_wd6": {
+   "text": "보리의 꿀단지를 찾았어!",
+   "dur_before": 1.68,
+   "actions": []
+  },
+  "v_wd7": {
+   "text": "소리를 찾았어! 낱말 공원 끝!",
+   "dur_before": 2.84,
+   "actions": []
+  },
+  "v_wd8": {
+   "text": "모든 모험을 끝냈어! 려원이는 이제 한글 박사야!",
+   "dur_before": 4.6,
+   "actions": [
+    "pause 0.76s -> 0.30s at 1.66s"
+   ],
+   "asr_full": "모든 모험을 끝냈어. 려원이는 이제 한글 박사야.",
+   "asr_lead": "모든 모험을 끝냈어",
+   "asr_wo_lead": "려원이는 이제 한글박사야",
+   "dur_after": 4.14
+  },
+  "v_wd9": {
+   "text": "팡팡을 찾았어! 쌍둥이 글자 박사!",
+   "dur_before": 2.91,
+   "actions": [
+    "pause 0.52s -> 0.30s at 1.09s"
+   ],
+   "asr_full": "팡팡을 찾았어! 쌍둥이 글자박사!",
+   "asr_lead": "팡팡을 찾았어",
+   "asr_wo_lead": "쌍둥이 글자박사",
+   "asr_tail": "쌍둥이 글자박사",
+   "asr_wo_tail": "팡팡을 찾았어",
+   "dur_after": 2.69
+  },
+  "w_ageo": {
+   "text": "악어.",
+   "dur_before": 1.872,
+   "actions": []
+  },
+  "w_agi": {
+   "text": "아기.",
+   "dur_before": 0.76,
+   "actions": []
+  },
+  "w_ai": {
+   "text": "아이.",
+   "dur_before": 0.46,
+   "actions": []
+  },
+  "w_appa": {
+   "text": "아빠.",
+   "dur_before": 0.73,
+   "actions": []
+  },
+  "w_bada": {
+   "text": "바다.",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "w_bae": {
+   "text": "배.",
+   "dur_before": 0.32,
+   "actions": []
+  },
+  "w_bal": {
+   "text": "발.",
+   "dur_before": 0.66,
+   "actions": []
+  },
+  "w_banana": {
+   "text": "바나나.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "w_bap": {
+   "text": "밥.",
+   "dur_before": 0.29,
+   "actions": []
+  },
+  "w_beoseot": {
+   "text": "버섯.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "w_beoseu": {
+   "text": "버스.",
+   "dur_before": 1.65,
+   "actions": []
+  },
+  "w_byeol": {
+   "text": "별.",
+   "dur_before": 0.46,
+   "actions": []
+  },
+  "w_cha": {
+   "text": "차.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "w_chaek": {
+   "text": "책.",
+   "dur_before": 0.27,
+   "actions": []
+  },
+  "w_chijeu": {
+   "text": "치즈.",
+   "dur_before": 1.17,
+   "actions": []
+  },
+  "w_chima": {
+   "text": "치마.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "w_dal": {
+   "text": "달.",
+   "dur_before": 0.69,
+   "actions": []
+  },
+  "w_dari": {
+   "text": "다리.",
+   "dur_before": 0.54,
+   "actions": []
+  },
+  "w_dubu": {
+   "text": "두부.",
+   "dur_before": 0.79,
+   "actions": []
+  },
+  "w_dwaeji": {
+   "text": "돼지.",
+   "dur_before": 0.7,
+   "actions": []
+  },
+  "w_eobu": {
+   "text": "어부.",
+   "dur_before": 0.98,
+   "actions": []
+  },
+  "w_eomma": {
+   "text": "엄마.",
+   "dur_before": 0.97,
+   "actions": []
+  },
+  "w_eureureong": {
+   "text": "으르렁.",
+   "dur_before": 0.76,
+   "actions": []
+  },
+  "w_gabang": {
+   "text": "가방.",
+   "dur_before": 0.72,
+   "actions": []
+  },
+  "w_gae": {
+   "text": "개.",
+   "dur_before": 0.42,
+   "actions": []
+  },
+  "w_gangaji": {
+   "text": "강아지.",
+   "dur_before": 1.32,
+   "actions": []
+  },
+  "w_gawi": {
+   "text": "가위.",
+   "dur_before": 0.61,
+   "actions": []
+  },
+  "w_ge": {
+   "text": "게.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "w_geobuk": {
+   "text": "거북.",
+   "dur_before": 0.85,
+   "actions": []
+  },
+  "w_geomi": {
+   "text": "거미.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_geurim": {
+   "text": "그림.",
+   "dur_before": 0.74,
+   "actions": []
+  },
+  "w_gicha": {
+   "text": "기차.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "w_gimbap": {
+   "text": "김밥.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "w_girin": {
+   "text": "기린.",
+   "dur_before": 1.39,
+   "actions": []
+  },
+  "w_gita": {
+   "text": "기타.",
+   "dur_before": 0.54,
+   "actions": []
+  },
+  "w_gochu": {
+   "text": "고추.",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "w_gogi": {
+   "text": "고기.",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "w_goguma": {
+   "text": "고구마.",
+   "dur_before": 0.84,
+   "actions": []
+  },
+  "w_gom": {
+   "text": "곰.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_gong": {
+   "text": "공.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_gorae": {
+   "text": "고래.",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "w_gorilla": {
+   "text": "고릴라.",
+   "dur_before": 1.08,
+   "actions": []
+  },
+  "w_goyangi": {
+   "text": "고양이.",
+   "dur_before": 0.73,
+   "actions": []
+  },
+  "w_gudu": {
+   "text": "구두.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_guk": {
+   "text": "국.",
+   "dur_before": 0.3,
+   "actions": []
+  },
+  "w_gwaja": {
+   "text": "과자.",
+   "dur_before": 0.43,
+   "actions": []
+  },
+  "w_gwi": {
+   "text": "귀.",
+   "dur_before": 0.73,
+   "actions": []
+  },
+  "w_halmeoni": {
+   "text": "할머니.",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "w_hama": {
+   "text": "하마.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "w_harabeoji": {
+   "text": "할아버지.",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "w_hobak": {
+   "text": "호박.",
+   "dur_before": 0.79,
+   "actions": []
+  },
+  "w_hodu": {
+   "text": "호두.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_hwabun": {
+   "text": "화분.",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "w_hyuji": {
+   "text": "휴지.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "w_i_tooth": {
+   "text": "이.",
+   "dur_before": 1.21,
+   "actions": []
+  },
+  "w_ima": {
+   "text": "이마.",
+   "dur_before": 0.5,
+   "actions": []
+  },
+  "w_ip": {
+   "text": "입.",
+   "dur_before": 0.29,
+   "actions": []
+  },
+  "w_jadu": {
+   "text": "자두.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "w_jido": {
+   "text": "지도.",
+   "dur_before": 0.56,
+   "actions": []
+  },
+  "w_jip": {
+   "text": "집.",
+   "dur_before": 0.36,
+   "actions": []
+  },
+  "w_juseu": {
+   "text": "주스.",
+   "dur_before": 1.13,
+   "actions": []
+  },
+  "w_keikeu": {
+   "text": "케이크.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "w_keop": {
+   "text": "컵.",
+   "dur_before": 0.33,
+   "actions": []
+  },
+  "w_kkachi": {
+   "text": "까치.",
+   "dur_before": 0.92,
+   "actions": []
+  },
+  "w_kkot": {
+   "text": "꽃.",
+   "dur_before": 1.4,
+   "actions": [
+    "drop tail burst 1.18-1.39s"
+   ],
+   "asr_full": "꽃",
+   "asr_lead": "꽃",
+   "asr_wo_lead": "어",
+   "asr_tail": "어",
+   "asr_wo_tail": "곧",
+   "dur_after": 0.5
+  },
+  "w_ko": {
+   "text": "코.",
+   "dur_before": 0.44,
+   "actions": []
+  },
+  "w_kokkiri": {
+   "text": "코끼리.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_kong": {
+   "text": "콩.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "w_lion": {
+   "text": "사자.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "w_mal": {
+   "text": "말.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "w_mogi": {
+   "text": "모기.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "w_moja": {
+   "text": "모자.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_mul": {
+   "text": "물.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_mun": {
+   "text": "문.",
+   "dur_before": 0.68,
+   "actions": []
+  },
+  "w_nabi": {
+   "text": "나비.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "w_namu": {
+   "text": "나무.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_nemo": {
+   "text": "네모.",
+   "dur_before": 0.58,
+   "actions": []
+  },
+  "w_nuna": {
+   "text": "누나.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "w_nunsaram": {
+   "text": "눈사람.",
+   "dur_before": 0.91,
+   "actions": []
+  },
+  "w_oi": {
+   "text": "오이.",
+   "dur_before": 0.7,
+   "actions": []
+  },
+  "w_ojingeo": {
+   "text": "오징어.",
+   "dur_before": 0.68,
+   "actions": []
+  },
+  "w_ori": {
+   "text": "오리.",
+   "dur_before": 0.52,
+   "actions": []
+  },
+  "w_ot": {
+   "text": "옷.",
+   "dur_before": 0.51,
+   "actions": []
+  },
+  "w_pado": {
+   "text": "파도.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "w_pija": {
+   "text": "피자.",
+   "dur_before": 0.38,
+   "actions": []
+  },
+  "w_podo": {
+   "text": "포도.",
+   "dur_before": 0.47,
+   "actions": []
+  },
+  "w_ppang": {
+   "text": "빵.",
+   "dur_before": 0.57,
+   "actions": []
+  },
+  "w_pungseon": {
+   "text": "풍선.",
+   "dur_before": 0.88,
+   "actions": []
+  },
+  "w_radio": {
+   "text": "라디오.",
+   "dur_before": 0.75,
+   "actions": []
+  },
+  "w_ramyeon": {
+   "text": "라면.",
+   "dur_before": 0.53,
+   "actions": []
+  },
+  "w_robot": {
+   "text": "로봇.",
+   "dur_before": 0.54,
+   "actions": []
+  },
+  "w_ryeowon": {
+   "text": "려원.",
+   "dur_before": 1.04,
+   "actions": []
+  },
+  "w_saeu": {
+   "text": "새우.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "w_sagwa": {
+   "text": "사과.",
+   "dur_before": 0.49,
+   "actions": []
+  },
+  "w_san": {
+   "text": "산.",
+   "dur_before": 0.59,
+   "actions": []
+  },
+  "w_sangeo": {
+   "text": "상어.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_satang": {
+   "text": "사탕.",
+   "dur_before": 0.67,
+   "actions": []
+  },
+  "w_seonmul": {
+   "text": "선물.",
+   "dur_before": 0.72,
+   "actions": []
+  },
+  "w_so": {
+   "text": "소.",
+   "dur_before": 0.39,
+   "actions": []
+  },
+  "w_sobangcha": {
+   "text": "소방차.",
+   "dur_before": 0.88,
+   "actions": []
+  },
+  "w_son": {
+   "text": "손.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "w_sora": {
+   "text": "소라.",
+   "dur_before": 0.63,
+   "actions": []
+  },
+  "w_ssiat": {
+   "text": "씨앗.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "w_subak": {
+   "text": "수박.",
+   "dur_before": 0.45,
+   "actions": []
+  },
+  "w_tokki": {
+   "text": "토끼.",
+   "dur_before": 0.6,
+   "actions": []
+  },
+  "w_tomato": {
+   "text": "토마토.",
+   "dur_before": 0.76,
+   "actions": []
+  },
+  "w_ttalgi": {
+   "text": "딸기.",
+   "dur_before": 0.81,
+   "actions": []
+  },
+  "w_tteok": {
+   "text": "떡.",
+   "dur_before": 0.21,
+   "actions": []
+  },
+  "w_ubi": {
+   "text": "우비.",
+   "dur_before": 0.68,
+   "actions": []
+  },
+  "w_uija": {
+   "text": "의자.",
+   "dur_before": 0.72,
+   "actions": []
+  },
+  "w_uyu": {
+   "text": "우유.",
+   "dur_before": 0.48,
+   "actions": []
+  },
+  "w_wonsungi": {
+   "text": "원숭이.",
+   "dur_before": 0.83,
+   "actions": []
+  },
+  "w_yagu": {
+   "text": "야구.",
+   "dur_before": 0.55,
+   "actions": []
+  },
+  "w_yeou": {
+   "text": "여우.",
+   "dur_before": 0.37,
+   "actions": []
+  },
+  "w_yoyo": {
+   "text": "요요.",
+   "dur_before": 0.76,
+   "actions": []
+  }
+ },
+ "verify": "qa/verify_edits.json (ryeowon_perfect): 91 edited, 10 reverted, 81 kept; R2 re-check (qa/r2/recheck_edits.json): j_3157 reverted, 80 kept"
+}
