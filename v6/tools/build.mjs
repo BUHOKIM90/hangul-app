@@ -135,6 +135,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || req.method !== 'GET') return;
   if (url.pathname.includes('/voice-samples/')) return;   // samples to compare voices: always fresh from the network
+  if (url.pathname.includes('/review/')) return;          // R5a: grown-up listening pages (review/1118/) never enter the app cache
   /* R4 iOS: a Range request (Safari media) is answered from the FULL file (cached or fetched without Range) as a 206 slice;
      only complete 200 responses are ever cached — a 206 stored under an mp3 URL would decode as a truncated clip later. */
   const range = req.headers.get('range');

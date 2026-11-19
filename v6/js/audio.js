@@ -34,7 +34,7 @@
   }
   function rebuild() {
     const old = ctx, music = bgmOn;
-    A.stop();
+    A.stop(true);
     try { old.close(); } catch (e) { /* already closed */ }
     bufs.clear(); pending.clear();            /* decoded buffers belong to the old context */
     wire();
@@ -215,7 +215,8 @@
   };
   function playBuf(key, b, span, opt, myGen) {
     const [off, dur] = span;
-    const when = Math.max(opt.at || 0, ctx.currentTime + 0.012);
+    const after = shieldLive() ? shield.end + 0.04 : 0;     /* queued behind the greeting, never on top of it */
+    const when = Math.max(opt.at || 0, ctx.currentTime + 0.012, after);
     const src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = b;
     const fadeIn = 0.006, fadeOut = Math.min(0.025, dur / 4);
@@ -227,6 +228,7 @@
     src.connect(g); g.connect(voiceBus);
     src.start(when, off, dur);
     const node = { src, g, when, end: when + dur };
+    if (SHIELD.has(key)) shield = node;
     voices.add(node);
     if (!opt.sing) atHeard(when, () => { if (voices.has(node)) document.body.classList.add('talking'); }, myGen);
     if (!opt.sing) { duck.gain.cancelScheduledValues(when); duck.gain.setTargetAtTime(0.22, Math.max(ctx.currentTime, when - 0.05), 0.04); A.ducked = true; }
@@ -240,10 +242,19 @@
   }
   function unduck() { if (!voices.size) document.body.classList.remove('talking'); if (ctx && !voices.size && A.ducked) { A.ducked = false; duck.gain.cancelScheduledValues(ctx.currentTime); duck.gain.setTargetAtTime(1, ctx.currentTime + 0.08, 0.22); } }
   A.say = (key, opt) => A.play(key, opt);
-  A.stop = function () {
+  /* R5a (Lily live warn: 「려원아, 안녕!」 cut to ~530 of 880 ms in 2/10 WebKit runs): the greeting is never cut off.
+     While it is being heard, A.stop() leaves it alone and every new voice line is queued right after it ends. Only a hard
+     stop (rebuilding a dead audio context) ends it early. */
+  const SHIELD = new Set(['ui_hiname']);
+  let shield = null;
+  const shieldLive = () => !!(shield && ctx && voices.has(shield) && shield.end > ctx.currentTime);
+  A.shielded = () => shieldLive();
+  A.stop = function (hard) {
     gen++;
-    voices.forEach(n => { try { n.src.onended = null; n.src.stop(); } catch (e) { /* already stopped */ } if (n.res) n.res(false); });
+    const keepNode = !hard && shieldLive() ? shield : null;
+    voices.forEach(n => { if (n === keepNode) return; try { n.src.onended = null; n.src.stop(); } catch (e) { /* already stopped */ } if (n.res) n.res(false); });
     voices.clear();
+    if (keepNode) voices.add(keepNode); else shield = null;
     unduck();
   };
   A.gen = () => gen;
@@ -262,6 +273,10 @@
     keys = keys.map(realKey);
     if (keys.some(k => !bufs.has(k))) return oneByOne(keys, onEach, g, myGen);
     let t = ctx.currentTime + 0.05;
+    if (shieldLive()) {
+      t = Math.max(t, shield.end + g);
+      if (SHIELD.has(keys[0])) { keys = keys.slice(1); if (onEach) onEach(0); const o = onEach; onEach = o ? (i => o(i + 1)) : null; }
+    }
     const ps = keys.map((k, i) => {
       const p = A.play(k, { at: t, keep: true, onStart: () => onEach && onEach(i) });
       t += A.dur(k) + g;
@@ -275,6 +290,7 @@
   async function oneByOne(keys, onEach, g, myGen) {
     for (let i = 0; i < keys.length; i++) {
       if (myGen !== gen) return false;
+      if (i === 0 && SHIELD.has(keys[0]) && shieldLive()) { if (onEach) onEach(0); continue; }   /* already being said */
       await A.play(keys[i], { keep: true, onStart: () => onEach && onEach(i) });
       if (myGen !== gen) return false;
       await sleep(g * 1000);

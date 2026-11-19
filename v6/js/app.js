@@ -704,7 +704,9 @@
     const ch = St.stickerChoices();
     const plain = s => `<span class="stk r0 big"><span>${UI.em(s.e)}</span></span><b class="stk-cap">${esc(s.name)}</b>`;
     A.sfx('sparkle');
-    const id = await UI.modal('<div class="reveal choose"><h3>스티커 하나 골라 봐!</h3></div>', ch.map(s => [plain(s), s.id, 'go stk-pick']), 'reveal-m choose-m');
+    const pickP = UI.modal('<div class="reveal choose"><h3>스티커 하나 골라 봐!</h3></div>', ch.map(s => [plain(s), s.id, 'go stk-pick']), 'reveal-m choose-m');
+    if (D.ready('ui_pickone')) A.play('ui_pickone');   /* R5a: Nihon line, said once recorded */
+    const id = await pickP;
     const s = St.takeSticker(D.STICKERS.find(x => x.id === id) || ch[0]);
     UI.burst(null, 30);
     const p = UI.modal(`<div class="reveal"><h3>스티커 받았어!</h3><div class="reveal-row"><span class="reveal-one">${plain(s)}</span></div></div>`, [['좋아!', 1, 'go']], 'reveal-m');
@@ -750,6 +752,7 @@
         const cards = todayCards(ctx, stage);
         const p = UI.modal(`<div class="showp off"><div class="showp-cards">${cards.map((c, i) => `<button type="button" class="tap showp-c" data-i="${i}">${c.word ? UI.pic(c.word) : ''}<b>${esc(c.text)}</b></button>`).join('')}</div>
           <p class="showp-ask">려원이가 읽어 줄래?</p></div>`, [['끝까지 해냈구나!', 1, 'go parent']], 'showp-m off-m');
+        if (D.ready('ui_readforme')) A.play('ui_readforme');   /* R5a */
         document.querySelectorAll('.showp-c').forEach(n => UI.tap(n, () => {
           const c = cards[+n.dataset.i];
           n.classList.remove('yay'); void n.offsetWidth; n.classList.add('yay');
@@ -757,9 +760,14 @@
         }));
         await p;
         A.sfx('fanfare'); UI.burst(null, 24);
+        if (D.ready('ui_effort')) A.play('ui_effort');   /* R5a: the parent's 「끝까지 해냈구나!」 is said aloud */
       }
       await chooseSticker();
-      if (yes) await UI.modal('<div class="showp q"><h3>오늘 궁금한 거 있었어?</h3><p class="showp-note">엄마·아빠께: 아이가 물어본 것을 종이 질문 노트에 적어 주세요.</p></div>', [['안녕!', 1, 'go']], 'showp-m');
+      if (yes) {
+        const qP = UI.modal('<div class="showp q"><h3>오늘 궁금한 거 있었어?</h3><p class="showp-note">엄마·아빠께: 아이가 물어본 것을 종이 질문 노트에 적어 주세요.</p></div>', [['안녕!', 1, 'go']], 'showp-m');
+        if (D.ready('ui_question')) A.play('ui_question');   /* R5a */
+        await qP;
+      }
     } finally {
       App._noClock = false; App._eodActive = false;
       document.querySelectorAll('.closing.wait').forEach(n => n.classList.remove('wait'));
