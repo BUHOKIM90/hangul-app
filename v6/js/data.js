@@ -59,10 +59,10 @@ hodu|호두|🌰|food
 satang|사탕|🍬|food
 ppang|빵|🍞|food
 bap|밥|🍚|food
-tteok|떡|🍡|food
+tteok|떡|img:tteok|food
 guk|국|🍲|food
 ramyeon|라면|🍜|food
-gimbap|김밥|🍙|food
+gimbap|김밥|img:gimbap|food
 beoseot|버섯|🍄|food
 kong|콩|🫘|food
 nabi|나비|🦋|ani
@@ -91,7 +91,7 @@ mal|말|🐴|ani
 gae|개|🐕|ani
 ge|게|🦀|ani
 mogi|모기|🦟|ani
-kkachi|까치|🐦|ani
+kkachi|까치|img:kkachi|ani
 sora|소라|🐚|ani
 gicha|기차|🚂|ride
 cha|차|🚗|ride
@@ -114,24 +114,24 @@ yoyo|요요|🪀|thing
 uija|의자|🪑|thing
 geurim|그림|🖼️|thing
 chaek|책|📕|thing
-keop|컵|🥤|thing
+keop|컵|img:keop|thing
 ot|옷|👕|thing
 gong|공|⚽|thing
 mun|문|🚪|thing
 jip|집|🏠|thing
-ubi|우비|☔|thing
+ubi|우비|img:ubi|thing
 hwabun|화분|🪴|thing
 nemo|네모|🟥|thing
 nunsaram|눈사람|⛄|thing
 namu|나무|🌳|nature
-bada|바다|🏖️|nature
+bada|바다|img:bada|nature
 pado|파도|🌊|nature
 dal|달|🌙|nature
 byeol|별|⭐|nature
 san|산|⛰️|nature
 mul|물|💧|nature
 kkot|꽃|🌸|nature
-ssiat|씨앗|🌱|nature
+ssiat|씨앗|img:ssiat|nature
 dari|다리|🦵|body
 i_tooth|이|🦷|body
 ko|코|👃|body
@@ -243,12 +243,27 @@ mokma|목마|🎠|thing|new`;
   const HW = HY;
   /* R3 (AUDIT B4): old-voice syllable clips that sound like a neighbour (머→뭐, 보→부, 디→네 …). Until they are re-recorded in
      Sulafat they are never a target or a decoy in a listening quiz (they may still be heard inside words and songs). */
-  const SHAKY = new Set(Array.from('머모므보느거기지타찌떠디브짜버').filter(c => !ready(syKey(c))));
+  /* R4: every syllable whose own clip (sy_), "find X" (fy_) or "that's X" (dy_) is still an OLD voice is held out the same way.
+     The list lives in v6/tools/voice/old_voice_hold.txt (build.mjs → window.HOLD); a re-recorded key is simply deleted there. */
+  const HOLD = new Set(G.HOLD || []);
+  const held = k => HOLD.has(k);
+  /* SHAKY: the bare syllable clip (sy_) is old — kept out of plays that speak it (노래 퀴즈, 블록 만들기, 몸풀기).
+     quizHeld: what a listening choice really says is "X 글자를 찾아볼까?" (fy_, else sy_) and "그건 X 글자야" (dy_, else sy_). */
+  const SHAKY = new Set(Array.from('머모므보느거기지타찌떠디브짜버').filter(c => !ready(syKey(c)) && (held(syKey(c)) || !G.HOLD))
+    .concat(Array.from(SY).filter(c => held(syKey(c)))));
+  /* the 15 AUDIT-B4 look-alikes (보→부, 디→네 …) stay out of every quiz while their own clip is old, whatever line is spoken */
+  const LOOK = new Set(Array.from('머모므보느거기지타찌떠디브짜버').filter(c => !ready(syKey(c)) && (held(syKey(c)) || !G.HOLD)));
+  const quizHeld = c => SY.includes(c) && (LOOK.has(c) || held(has.fy(c) ? fyKey(c) : syKey(c)) || held(has.dy(c) ? dyKey(c) : syKey(c)));
   /* Words whose pictures a 4-year-old could mix up: never offered as choices side by side. */
   const CONFUSE = [['gae', 'gangaji'], ['ai', 'nuna', 'ryeowon', 'agi'], ['eomma', 'nuna'], ['bada', 'pado', 'mul'], ['keop', 'uyu', 'juseu'],
-    ['gorae', 'sangeo'], ['sagwa', 'tomato'], ['gwaja', 'keikeu'], ['ot', 'chima'], ['halmeoni', 'harabeoji', 'eobu']];
+    ['gorae', 'sangeo'], ['gae', 'ge'], ['sagwa', 'tomato'], ['gwaja', 'keikeu'], ['ot', 'chima'], ['halmeoni', 'harabeoji', 'eobu']];
   const GROUP = {};
   CONFUSE.forEach((g, i) => g.forEach(k => { (GROUP[k] = GROUP[k] || []).push(i); }));
+  /* R4 (EDU_r4.md): ㅐ/ㅔ, ㅒ/ㅖ and ㅚ/ㅙ/ㅞ sound the same in today's Seoul speech — a child cannot pick one by ear.
+     Two such letters are never offered side by side in a listening choice (개/게, 애/에, ㅐ/ㅔ …). */
+  const SAME_V = { 'ㅔ': 'ㅐ', 'ㅖ': 'ㅒ', 'ㅙ': 'ㅚ', 'ㅞ': 'ㅚ' };
+  const earKey = x => Array.from(String(x)).map(ch => { if (SAME_V[ch]) return SAME_V[ch]; const p = split(ch); return p ? join(p.cho, SAME_V[p.jung] || p.jung, p.jong || '') : ch; }).join('');
+  const alike = (a, b) => a !== b && earKey(a) === earKey(b);
   const clash = (a, b) => a === b || (GROUP[a] || []).some(i => (GROUP[b] || []).includes(i));
   const CLAP = new Set('appa banana eomma goguma halmeoni hama harabeoji kokkiri nabi ori ryeowon so'.split(' '));
   /* Words whose syllables are all simple CV (no batchim). */
@@ -535,7 +550,7 @@ mokma|목마|🎠|thing|new`;
   const STICKER_SETS = [
     ['동물', '🐶🐱🐰🐻🐼🦊🐯🦁🐮🐷🐸🐵🐔🐧🐤🦄🐨🦒🐘🦔', '강아지,고양이,토끼,곰,판다,여우,호랑이,사자,소,돼지,개구리,원숭이,닭,펭귄,병아리,유니콘,코알라,기린,코끼리,고슴도치'],
     ['간식', '🍎🍓🍌🍇🍉🍑🍒🥝🍞🧁🍩🍪🍦🍭🍫🍕🍔🍟🍙🥕', '사과,딸기,바나나,포도,수박,복숭아,체리,키위,빵,컵케이크,도넛,과자,아이스크림,막대사탕,초콜릿,피자,햄버거,감자튀김,주먹밥,당근'],
-    ['탈것', '🚗🚕🚌🚑🚒🚓🚜🚲🛴🚂🚀✈️🚁⛵🚤🛸🏎️🚛🚚🛻', '자동차,택시,버스,구급차,소방차,경찰차,트랙터,자전거,킥보드,기차,로켓,비행기,헬리콥터,요트,보트,비행접시,경주용 차,큰 트럭,트럭,작은 트럭'],
+    ['탈것', '🚗🚕🚌🚑🚒🚓🚜🚲🛴🚂🚀✈️🚁⛵🚤🛸🏎️🚛🚚🛻', '자동차,택시,버스,구급차,소방차,경찰차,트랙터,자전거,킥보드,기차,로켓,비행기,헬리콥터,요트,보트,비행접시,경주용 차,큰 트럭,택배차,작은 트럭'],
     ['바다', '🐳🐬🦈🐠🐡🐙🦑🦀🦞🐢🦭🐚🎣🦐🐟🌊⚓🏝️🏖️🐊', '고래,돌고래,상어,열대어,복어,문어,오징어,게,가재,거북,물개,소라,낚싯대,새우,물고기,파도,닻,섬,모래사장,악어'],
     ['하늘', '🌙⭐🌟☀️🪐🌍☄️🌈⚡❄️☁️🌠🌌🌞🌛🌝🔭🛰️👽🎆', '달,별,반짝별,해,토성,지구,혜성,무지개,번개,눈송이,구름,별똥별,은하수,웃는 해,초승달,보름달,망원경,인공위성,외계인,불꽃놀이'],
     ['장난감', '🎈🎁🎀🧸🪀🎨🎪🎠🎡🎢🪁⚽🏀🎸🥁🎺🎹🧩🪄👑', '풍선,선물,리본,곰인형,요요,물감,서커스,회전목마,관람차,롤러코스터,연,축구공,농구공,기타,북,나팔,피아노,퍼즐,요술봉,왕관']
@@ -668,6 +683,6 @@ mokma|목마|🎠|thing|new`;
     BASIC_V, VROW, JNAME, JPIC, STROKES, strokesFor, WORLDS: W, STAGES: ST, PHRASES, SENTENCES,
     clash, sub, WORLD_ORDER, STORY, MIGRATE_V1, CURRICULUM_VERSION, PROMPTS, PROMPT_CLIP, TIPS, TWINS, COMPLEX,
     PRAISE_VOICE, CHEERS, PRAISE_FIT, STICKER_SETS, STICKERS, OUTFITS, FRIENDS,
-    READY, ready, WORDS_WAITING, SENTENCES_WAITING, SHAKY, josa, THEME_PRIZE, FLAGS, stageMap, buildStages
+    alike, READY, ready, WORDS_WAITING, SENTENCES_WAITING, SHAKY, quizHeld, HOLD, held, heldW: k => held('w_' + k), josa, THEME_PRIZE, FLAGS, stageMap, buildStages
   };
 })(window);

@@ -373,7 +373,7 @@
       if (!ctx.alive()) return;
       target = t;
       b.innerHTML = '';
-      const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t)).slice(0, (cfg.k || 3) - 1)));
+      const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t && !D.alike(x, t))).slice(0, (cfg.k || 3) - 1)));
       const nodes = opts.map((o, i) => {
         const n = el('button', 'tap balloon c' + ((i + qs.indexOf(t)) % 5), `<span>${esc(o)}</span><i class="knot"></i><i class="string"></i>`);
         n.type = 'button'; n.dataset.v = o; n.style.animationDelay = (-i * 0.7) + 's';
@@ -610,7 +610,7 @@
       stage.append(left, plus, slot);
       b.appendChild(stage);
       const tray = el('div', 'tray');
-      const opts = shuffle([v].concat(shuffle(vs.filter(x => x !== v)).slice(0, 2)));
+      const opts = shuffle([v].concat(shuffle(vs.filter(x => x !== v && !D.alike(x, v))).slice(0, 2)));
       const nodes = opts.map(o => { const n = el('button', 'tap vblock', blockFace(o, 'vow')); n.type = 'button'; n.dataset.v = o; tray.appendChild(n); return n; });
       b.appendChild(tray);
       await sleep(200);
@@ -912,7 +912,7 @@
       target = t;
       b.innerHTML = '';
       const pond = el('div', 'pond', '<i class="bub b1"></i><i class="bub b2"></i><i class="bub b3"></i><i class="bub b4"></i><i class="weed w1"></i><i class="weed w2"></i>');
-      const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t)).slice(0, (cfg.k || 3) - 1)));
+      const opts = shuffle([t].concat(shuffle(cfg.pool.filter(x => x !== t && !D.alike(x, t))).slice(0, (cfg.k || 3) - 1)));
       const nodes = opts.map((o, i) => {
         const lane = el('div', 'lane');
         const f = el('button', 'tap fishy c' + ((i + qs.indexOf(t)) % 5),
@@ -1267,7 +1267,7 @@
     return shuffle(groups).slice(0, n).map(g => {
       const [a, m] = shuffle(g);
       const s0 = D.WORDS[a].syl[0];
-      const decoys = apart(shuffle(all.filter(k => D.WORDS[k].syl[0] !== s0)), 2, [a, m]);
+      const decoys = apart(shuffle(all.filter(k => D.WORDS[k].syl[0] !== s0 && !D.alike(D.WORDS[k].syl[0], s0))), 2, [a, m]);
       return [a, m, decoys];
     });
   }
@@ -1277,7 +1277,7 @@
     if (!W0) return null;
     const m = shuffle(pics().filter(w => w.key !== a && w.syl[0] === W0.syl[0]).map(w => w.key))[0];
     if (!m) return null;
-    return [a, m, apart(shuffle(pics().map(w => w.key).filter(k => D.WORDS[k].syl[0] !== W0.syl[0])), 2, [a, m])];
+    return [a, m, apart(shuffle(pics().map(w => w.key).filter(k => D.WORDS[k].syl[0] !== W0.syl[0] && !D.alike(D.WORDS[k].syl[0], W0.syl[0]))), 2, [a, m])];
   }
   const vRow = (c, vs) => vs.map(v => D.join(c, v, '')).filter(s => D.has.sy(s));
   function weakSy(f) { return St.weak(k => k.startsWith('sy:') && (!f || f(k.slice(3))), 3).map(k => k.slice(3)); }
@@ -1300,7 +1300,7 @@
   Plan.make = function (stage) {
     const L = learnedAt(stage.id);
     const out = [];
-    const listenWords = n => shuffle(pics().map(w => w.key)).slice(0, n);
+    const listenWords = n => shuffle(pics().map(w => w.key).filter(k => !D.heldW(k))).slice(0, n);   /* R4: no old-voice words */
     switch (stage.k) {
       case 'warm': {
         /* Nihon #3: 1–3 due items, one question each, grouped by kind (letters, syllables, words, sound games) */
@@ -1564,9 +1564,9 @@
         break;
       }
     }
-    calm(out);
+    calm(out, stage);
     const plays = out.filter(p => validPlay(p));
-    if (!['review', 'warm', 'whole', 'place'].includes(stage.k)) topUp(stage, plays);
+    if (!['review', 'warm', 'whole', 'place'].includes(stage.k)) { topUp(stage, plays); calm(plays, stage); }
     return plays;
   };
   /* Nihon #3: can a warm-up still show this item (recording + picture exist)? */
@@ -1574,23 +1574,48 @@
     const i = k.indexOf(':'), kind = k.slice(0, i), x = k.slice(i + 1);
     if (kind === 'j') return !!jamoClip(x);
     if (kind === 'sy') return D.has.sy(x) && !D.SHAKY.has(x);
-    if (kind === 'w') return !!(D.WORDS[x] && D.WORDS[x].pic);
+    if (kind === 'w') return !!(D.WORDS[x] && D.WORDS[x].pic) && !D.heldW(x);
     if (kind === 'count') return !!D.WORDS[x];
     if (kind === 'first') return !!(D.WORDS[x] && pics().some(w => w.key !== x && w.syl[0] === D.WORDS[x].syl[0]));
     return false;
   };
-  /* R3 (AUDIT B4, Lily #2): syllables whose old recording sounds like a neighbour are left out of listening quizzes
-     (as target and as decoy) when enough others remain. */
-  function calm(plays) {
-    const ok = x => !D.SHAKY.has(x);
-    plays.forEach(({ t, cfg: c }) => {
-      if ((t === 'pop' || t === 'fish') && !c.jamo && c.pool) {
-        const pool = c.pool.filter(ok);
-        if (pool.length < Math.min(3, c.pool.length)) return;
+  /* R3 (AUDIT B4, Lily #2) + R4: syllables and picture words whose recording is still an OLD voice (D.SHAKY, D.heldW, from
+     v6/tools/voice/old_voice_hold.txt) are left out of listening quizzes — as target and as decoy — whenever enough others remain.
+     Vowels in vowel games too, except the vowel the stage is teaching. The placement check and warm-ups keep their own items. */
+  function calm(plays, stage) {
+    const k = stage && stage.k;
+    if (k === 'place' || k === 'warm') return;
+    const okS = x => !D.quizHeld(x);
+    const okJ = x => x === stage.v || x === stage.c || !(D.VROW[x] && D.SHAKY.has(D.VROW[x]));   /* vowels are said by their sy_ clip */
+    const okW = x => !D.heldW(x);
+    const cho = x => { const p = D.split(x); return p ? p.cho : x; };
+    const thin = (c, ok) => {
+      const pool = c.pool.filter(ok);
+      if (pool.length < Math.min(3, c.pool.length)) return;
+      const want = Math.min(c.n || 4, c.targets.length);
+      const tg = c.targets.filter(ok);
+      if (tg.length >= want || pool.length >= 3) {
+        /* refill with the same first consonant as the targets that went out, so the stage keeps its letter */
+        const gone = new Set(c.targets.filter(x => !ok(x)).map(cho));
+        const rest = shuffle(pool.filter(x => !tg.includes(x)));
+        const more = rest.filter(x => gone.has(cho(x))).concat(rest.filter(x => !gone.has(cho(x))));
         c.pool = pool;
-        const want = Math.min(c.n || 4, c.targets.length);
-        const tg = c.targets.filter(ok);
-        c.targets = tg.concat(shuffle(pool.filter(x => !tg.includes(x)))).slice(0, Math.max(want, tg.length));
+        c.targets = tg.concat(more).slice(0, Math.max(want, tg.length));
+      }
+    };
+    plays.forEach(({ t, cfg: c }) => {
+      if ((t === 'pop' || t === 'fish') && c.pool && c.targets) thin(c, c.jamo ? okJ : okS);
+      if (['pick', 'shop', 'memory', 'train', 'clap'].includes(t) && c.words) {
+        const need = Math.min(t === 'memory' ? (c.pairs || 3) : (c.n || 3), c.words.length);
+        let ws = c.words.filter(okW);
+        /* too few left: refill from the play's own pool (same reading level), words sharing a syllable sound first */
+        if (ws.length < need && c.pool && t !== 'train') {
+          const gone = c.words.filter(x => !okW(x)).flatMap(x => (D.WORDS[x] ? D.WORDS[x].syl : []).map(cho));
+          const rest = shuffle(Array.from(new Set(c.pool.filter(x => okW(x) && !ws.includes(x) && D.WORDS[x]))));
+          ws = ws.concat(rest.filter(x => D.WORDS[x].syl.some(y => gone.includes(cho(y)))).concat(rest.filter(x => !D.WORDS[x].syl.some(y => gone.includes(cho(y))))).slice(0, need - ws.length));
+        }
+        if (ws.length >= need) c.words = ws;
+        if (c.pool) { const pl = c.pool.filter(okW); if (pl.length >= Math.min(3, c.pool.length)) c.pool = pl; }
       }
     });
   }

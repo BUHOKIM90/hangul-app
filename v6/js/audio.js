@@ -14,28 +14,80 @@
   A.url = key => 'audio/' + key + '.mp3';
   A.ctx = () => ctx;
 
+  /* R4 iOS audio (learn_20261118_ios_audio/ios_audio_findings.md):
+     1 a context that came back from the background "running" but silent, or whose resume() never settles, is a zombie:
+       it is rebuilt on the NEXT user gesture (never from visibilitychange alone — only a gesture may start audio on iOS);
+     2 unlock on pointerdown AND touchend (listeners are never removed); A.unlock() waits for resume (max 1.5 s);
+     3 no navigator.audioSession (iOS < 16.4): a looping silent media element keeps the ring/silent switch from muting us. */
+  const SILENT_MP3 = 'data:audio/mpeg;base64,SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjcuMTAzAAAAAAAAAAAAAAD/83DAAAAAAAAAAAAASW5mbwAAAA8AAAAMAAAB8ABra2tra2tra3l5eXl5eXl5hoaGhoaGhoaUlJSUlJSUlJShoaGhoaGhoa6urq6urq6uvLy8vLy8vLy8ycnJycnJycnX19fX19fX1+Xl5eXl5eXl5fLy8vLy8vLy//////////8AAAAATGF2YzYxLjE5AAAAAAAAAAAAAAAAJAM3AAAAAAAAAfCBoaoqAAAAAAAAAAAAAAAAAP/zEMQAAAADSAAAAABMQU1FMy4xMDBVVVVV//MSxA0AAANIAAAAAFVVVVVVVVVVVVVVVVVV//MQxBsAAANIAAAAAFVVVVVVVVVVVVVVVVX/8xDEKAAAA0gAAAAAVVVVVVVVVVVVVVVVVf/zEMQ1AAADSAAAAABVVVVVVVVVVVVVVVVV//MQxEIAAANIAAAAAFVVVVVVVVVVVVVVVVX/8xDETwAAA0gAAAAAVVVVVVVVVVVVVVVVVf/zEMRcAAADSAAAAABVVVVVVVVVVVVVVVVV//MQxGkAAANIAAAAAFVVVVVVVVVVVVVVVVX/8xLEdgAAA0gAAAAAVVVVVVVVVVVVVVVVVVX/8xDEhAAAA0gAAAAAVVVVVVVVVVVVVVVVVf/zEMSRAAADSAAAAABVVVVVVVVVVVVVVVVV';
+  let resumeTimer = 0, probe = null;
+  function wire() {
+    const AC = G.AudioContext || G.webkitAudioContext;
+    try { ctx = new AC({ latencyHint: 'interactive' }); } catch (e) { ctx = new AC(); }
+    master = ctx.createGain(); master.connect(ctx.destination);
+    voiceBus = ctx.createGain(); voiceBus.gain.value = settings.voice; voiceBus.connect(master);
+    sfxBus = ctx.createGain(); sfxBus.gain.value = settings.sfx; sfxBus.connect(master);
+    /* music goes through `duck`, which drops while a voice speaks and comes back after */
+    duck = ctx.createGain(); duck.connect(master);
+    musicBus = ctx.createGain(); musicBus.gain.value = settings.music * Math.min(1, settings.sfx * 1.6); musicBus.connect(duck);
+    probe = null;
+  }
+  function rebuild() {
+    const old = ctx, music = bgmOn;
+    A.stop();
+    try { old.close(); } catch (e) { /* already closed */ }
+    bufs.clear(); pending.clear();            /* decoded buffers belong to the old context */
+    wire();
+    A._zombie = false; A.rebuilds = (A.rebuilds || 0) + 1;
+    if (music) A.bgm(true);
+  }
+  function silentBlip() { const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(master); s.start(0); }
+  /* a running clock that does not move is a zombie too (checked on gestures, cheap) */
+  function stalled() {
+    if (ctx.state !== 'running') return false;
+    const now = performance.now(), t = ctx.currentTime;
+    const p = probe; probe = { now, t };
+    return !!p && now - p.now > 1200 && t - p.t < 0.05;
+  }
+  function kick(gesture) {
+    if (!ctx) return;
+    if (gesture && (A._zombie || stalled())) { rebuild(); silentBlip(); }
+    if (ctx.state !== 'running') {
+      const p = ctx.resume(); if (p && p.catch) p.catch(() => {});
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => { if (ctx && ctx.state !== 'running' && !document.hidden) A._zombie = true; }, 1500);
+    }
+  }
   A.init = function () {
     const AC = G.AudioContext || G.webkitAudioContext;
     if (!AC) return;
     /* Safari 16.4+: play even when the ring/silent switch is on. */
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
-    if (!ctx) {
-      try { ctx = new AC({ latencyHint: 'interactive' }); } catch (e) { ctx = new AC(); }
-      master = ctx.createGain(); master.connect(ctx.destination);
-      voiceBus = ctx.createGain(); voiceBus.gain.value = settings.voice; voiceBus.connect(master);
-      sfxBus = ctx.createGain(); sfxBus.gain.value = settings.sfx; sfxBus.connect(master);
-      /* music goes through `duck`, which drops while a voice speaks and comes back after */
-      duck = ctx.createGain(); duck.connect(master);
-      musicBus = ctx.createGain(); musicBus.gain.value = settings.music * Math.min(1, settings.sfx * 1.6); musicBus.connect(duck);
-      const kick = () => { if (ctx.state !== 'running') ctx.resume().catch(() => {}); };
-      ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, kick, true));
-      document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
+    if (!navigator.audioSession && !A._silentEl && G.Audio) {
+      try { const a = new Audio(SILENT_MP3); a.loop = true; a.volume = 0.01; a.setAttribute('playsinline', ''); const p = a.play(); if (p && p.catch) p.catch(() => {}); A._silentEl = a; } catch (e) { /* no media element */ }
     }
+    if (!ctx) {
+      wire();
+      const onGesture = () => kick(true);
+      ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, onGesture, true));
+      document.addEventListener('visibilitychange', () => { probe = null; if (!document.hidden) kick(false); });
+      /* back from the back/forward cache (iPad split view, home-screen app): rebuild on the next tap */
+      G.addEventListener('pageshow', ev => { if (ev.persisted) A._zombie = true; });
+    } else if (A._zombie || stalled()) rebuild();
     /* iOS unlock: a 1-sample silent buffer started inside the user gesture. */
-    const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource();
-    s.buffer = b; s.connect(master); s.start(0);
-    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    silentBlip();
+    kick(false);
     A.ready = true;
+  };
+  /* For the first gesture: init + wait until the clock really runs (≤ 1.5 s) so the first sound is not dumped late. */
+  A.unlock = function () {
+    A.init();
+    if (!ctx) return Promise.resolve(false);
+    if (ctx.state === 'running') return Promise.resolve(true);
+    return Promise.race([
+      Promise.resolve(ctx.resume()).then(() => ctx.state === 'running', () => false),
+      new Promise(r => setTimeout(() => r(ctx.state === 'running'), 1500))
+    ]);
   };
   A.setVolume = function (voice, sfx) {
     settings.voice = voice; settings.sfx = sfx;
@@ -294,7 +346,12 @@
   const N = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1568 };
   A.sfx = function (name) {
     if (!ctx) return;
-    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    /* R4: never schedule on a suspended clock (it would be dumped later, out of place): resume, then play if it runs soon */
+    if (ctx.state !== 'running') {
+      const c = ctx;
+      Promise.race([Promise.resolve(c.resume()).catch(() => {}), sleep(400)]).then(() => { if (ctx === c && c.state === 'running') A.sfx(name); });
+      return;
+    }
     const t = ctx.currentTime + 0.003;
     switch (name) {
       case 'correct': tone(N.G5, t, 0.12, 'triangle', 0.35); tone(N.C6, t + 0.08, 0.28, 'triangle', 0.35); break;

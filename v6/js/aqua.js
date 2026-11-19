@@ -48,13 +48,15 @@
     const L = Plan.learnedAt(Math.max(0, St.s.learn.stage - 1));
     const vs = Array.from(L.v).filter(v => D.BASIC_V.includes(v));
     const cs = Array.from(L.c).filter(c => c !== 'ㅇ' && !D.TWINS[c]);
-    const calm = x => !D.SHAKY.has(x);
+    const calm = x => !D.quizHeld(x);   /* R4: the fish say fy_/dy_ lines; none of them may be an old voice */
     if (cs.length && vs.length >= 3) {
       const sy = cs.flatMap(c => vs.map(v => D.join(c, v, ''))).filter(x => D.has.sy(x) && calm(x));
       if (sy.length >= 4) return { mode: 'sy', items: sy };
     }
-    if (vs.length >= 3) return { mode: 'jamo', items: vs };
-    return { mode: 'pic', items: ['nabi', 'ori', 'so', 'hama', 'banana', 'tokki', 'gom', 'podo', 'oi', 'uyu', 'sagwa', 'gicha'].filter(k => D.WORDS[k]) };
+    /* R4: vowels whose clip is an old voice (우·으 …) and old-voice picture words stay out too (v6/tools/voice/old_voice_hold.txt) */
+    const vsCalm = vs.filter(v => !(D.VROW[v] && D.SHAKY.has(D.VROW[v])));
+    if (vsCalm.length >= 3) return { mode: 'jamo', items: vsCalm };
+    return { mode: 'pic', items: ['nabi', 'ori', 'so', 'hama', 'banana', 'tokki', 'gom', 'podo', 'oi', 'uyu', 'sagwa', 'gicha'].filter(k => D.WORDS[k] && !D.heldW(k)) };
   };
 
   G.App.aqua = async function () {
@@ -127,7 +129,7 @@
       const pool = C.items.filter(x => x !== last);
       const t = target = shuffle(pool)[0];
       last = t;
-      const opts = shuffle([t].concat(shuffle(C.items.filter(x => x !== t && (C.mode !== 'pic' || !D.clash(x, t)))).slice(0, 2)));
+      const opts = shuffle([t].concat(shuffle(C.items.filter(x => x !== t && !D.alike(x, t) && (C.mode !== 'pic' || !D.clash(x, t)))).slice(0, 2)));
       pond.innerHTML = '';
       const nodes = opts.map((o, i) => {
         const lane = el('div', 'lane');

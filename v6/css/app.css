@@ -1332,3 +1332,88 @@ body:not(.singing) .song-pal { animation-play-state: paused; }
 
 /* UPDATE 3: closing line hidden behind the #5 screens */
 .closing.wait .closing-say { visibility: hidden; }
+
+/* ===================== R4 (2026-11-18) ===================== */
+:root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px); }
+/* #1 sticker name bubble: JS places its top-left corner (measured, clamped to the screen); the tail points at the sticker */
+.stk-name { transform: translateX(-50%); animation: namepop4 1.8s ease forwards; max-width: calc(100vw - 20px); box-sizing: border-box; }
+.stk-name b { overflow: hidden; text-overflow: ellipsis; }
+.stk-name::after { left: calc(50% + var(--tx, 0px)); }
+.stk-name.below::after { bottom: auto; top: -2vmin; transform: translateX(-50%) rotate(225deg); }
+@keyframes namepop4 { 0% { transform: translateX(-50%) scale(.4); opacity: 0; } 12% { transform: translateX(-50%) scale(1.06); opacity: 1; } 20%, 85% { transform: translateX(-50%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) scale(.96); opacity: 0; } }
+/* #3 the buddy never covers a choice (App.guardBuddy) */
+.buddy { transition: opacity .25s; }
+.buddy.tuck { width: 11vmin !important; }
+.buddy.away { opacity: 0; visibility: hidden; }
+/* R4 device QA (phones + iPads, WebKit + Chromium) */
+[hidden] { display: none !important; }                       /* e.g. the aquarium toast showed as an empty white pill */
+.hud-lock { width: 48px; height: 48px; min-width: 48px; min-height: 48px; }
+.book-tab small { font-size: max(13px, 2.6vmin); }
+.ctab small { font-size: max(13px, 2.8vmin); }
+.slot-name { font-size: clamp(13px, 2.6vmin, 15px); }
+.aq-grow i { font-size: clamp(13px, 2.8vmin, 18px); }
+.pg-item b small { font-size: max(13px, .62em); }
+@media (orientation: portrait) {
+  .book-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.2vmin; width: 100%; max-width: 760px; margin: 0 auto; }
+  .book-tab { min-width: 0; padding: 1vmin .4vmin; }
+}
+/* phones (either side ≤ 540 px): child-facing labels never under 13 px; iPad sizes unchanged */
+@media (max-width: 540px), (max-height: 540px) {
+  .home-tile b, .world-tag small, .citem b, .citem small, .aq-badge, .cnt, .deco-tray .cnt, .deco-tray i { font-size: 13px; }
+  .badge { font-size: 13px; min-width: 22px; height: 22px; }
+}
+/* parent menu: every button ≥ 44 px (Apple HIG), rows wrap instead of overlapping on phones */
+.pm-btn.sm { min-height: 44px; padding: 8px 14px; }
+.vrow { row-gap: 10px; }
+.vrow > * { flex: none; }
+/* phones held sideways (height ≤ 540 px): the sticker book scrolls instead of squashing 4 rows into 120 px,
+   tabs/fish keep a ≥ 48 px target */
+.ctab { min-width: 48px; }
+@media (orientation: landscape) and (max-height: 540px) {
+  .book-page { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; grid-auto-rows: 96px; align-content: start; }
+  .book-tab { min-height: 52px; padding: .4vmin 1.6vmin; }
+  .book { gap: 1.2vmin; }
+  .pond .fishy { height: max(52px, min(19vmin, 90%)); }
+}
+@media (max-width: 540px), (max-height: 540px) {
+  .play-go small, .eraser span { font-size: 13px; }
+}
+#parent small, #parent .pm-small, .hm-row small { font-size: max(13px, 1em * .8); }
+/* playground: titles are never cut to "복습 …" (iPad landscape had 5 narrow columns + one-line ellipsis) */
+.pg { grid-template-columns: repeat(auto-fill, minmax(min(230px, 44vw), 1fr)); }
+.pg-item b { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-overflow: clip; font-size: clamp(16px, 3.4vmin, 26px); line-height: 1.12; }
+.pg-item b small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: max(13px, .62em); }
+@media (orientation: portrait) { .pg { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pg-item span { font-size: clamp(30px, 5vmin, 46px); flex: none; }
+.pg-item b { -webkit-line-clamp: 3; }
+.pg { grid-template-columns: repeat(auto-fill, minmax(min(250px, 44vw), 1fr)); }
+@media (orientation: portrait) { .pg { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px), (max-height: 540px) { .book-count, .deco-back span, .deco-go span { font-size: 14px; } }
+/* R4 (Lily device QA): the splash 「시작」 is always fully visible with ≥ 24 px clearance, notch/home bar included.
+   Short landscape phones (iPhone SE 568×320 … Galaxy S24 780×360): mascot left, title + button right, sized by the small
+   viewport height (svh, with vh fallback) instead of a 140 px minimum that pushed the button below the screen. */
+#splash { height: 100vh; height: 100dvh; inset: 0 auto auto 0; width: 100%;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); box-sizing: border-box; }
+.splash-in { max-height: 100%; }
+@media (orientation: landscape) and (max-height: 600px) {
+  #splash { padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); }
+  .splash-in { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; grid-template-areas: 'm t' 'm g'; align-items: center; justify-items: center; column-gap: 6vw; row-gap: 3vh; row-gap: 3svh; padding: 0; }
+  .splash-mascot { grid-area: m; width: 30vh; width: min(30vw, 42svh); }
+  .splash-title { grid-area: t; font-size: 9vh; font-size: min(7vw, 10svh); align-self: end; }
+  .splash-go { grid-area: g; align-self: start; min-width: 72px; min-height: 72px; width: 40vh; height: 40vh; width: min(160px, 44svh); height: min(160px, 44svh); font-size: 14vh; font-size: min(52px, 15svh); }
+  .splash-go span { font-size: 6vh; font-size: min(22px, 6.5svh); }
+}
+/* the parent screen keeps its buttons out of the notch / home-indicator bands (#fx stays full-bleed on purpose: confetti only, no pointer events) */
+#parent { padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing: border-box; }
+/* Code 2026-11-18 (a): instruction subtitle readable on phones */
+.play-sub { font-size: max(14px, 3.8vmin); }
+/* Code 2026-11-18 (b): modal text, phone-landscape world tag, heat-map keys, parent stage title */
+.modal-card p { font-size: max(14px, min(4.6vmin, 3.8vh)); }
+@media (orientation: landscape) and (max-height: 540px) { .world-tag { font-size: max(13px, 4vmin); } }
+.hm-key { font-size: 13px; }
+.pm-stage-title { white-space: nowrap; }
+/* Lily R4 B1: at 320 px portrait (iPhone SE 1st gen) six tabs in a row were 47 px wide → 3 × 2 */
+@media (orientation: portrait) and (max-width: 320px) {
+  .book-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .book-tab { min-height: 52px; padding: 2px 4px; }
+}

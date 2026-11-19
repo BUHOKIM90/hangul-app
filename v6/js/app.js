@@ -91,10 +91,10 @@
     inner.appendChild(el('div', 'splash-mascot', UI.mascot('joy')));
     inner.appendChild(el('h1', 'splash-title', '려원이 <span>한글 놀이</span>'));
     const go = btn('splash-go', '▶<span>시작</span>', async () => {
-      A.init();
+      const unlocked = A.unlock();             /* R4 iOS: wait for the clock before the first sound */
       A.setVolume(St.s.settings.voice, St.s.settings.sfx);
       if (G.Rec) G.Rec.loadAll();
-      A.sfx('yay1');
+      unlocked.then(() => A.sfx('yay1'));
       s.classList.add('out');
       setTimeout(() => s.remove(), 450);
       A.preload(Object.values(D.PRAISE_VOICE).map(p => p[1]).concat(['ui_hiname', 'ui_same']));
@@ -105,7 +105,7 @@
   }
 
   /* ---------- home ---------- */
-  function leave() { if (App._abort) { App._abort(); App._abort = null; } if (G.Rec) G.Rec.close(); }
+  function leave() { if (App._abort) { App._abort(); App._abort = null; } if (G.Rec) G.Rec.close(); document.querySelectorAll('.stk-name').forEach(n => n.remove()); }
   App.home = async function (first) {
     leave();
     App.sess++;
@@ -314,9 +314,22 @@
     document.querySelectorAll('.stk-name').forEach(n => n.remove());
     const r = from ? from.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
     const n = el('div', 'stk-name', `<span>${UI.em(s.e)}</span><b>${esc(s.name)}</b>`);
-    n.style.left = Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px';
-    n.style.top = Math.max(70, r.top) + 'px';
+    /* R4: measured clamp — the whole bubble stays on screen (safe area included); no room above the sticker → it opens below */
+    n.style.visibility = 'hidden';
     document.body.appendChild(n);
+    const w = n.offsetWidth, h = n.offsetHeight, pad = 10, cs = getComputedStyle(document.documentElement);
+    const safe = v => parseFloat(cs.getPropertyValue(v)) || 0;
+    const L0 = pad + safe('--sal'), R0 = innerWidth - pad - safe('--sar'), T0 = pad + safe('--sat'), B0 = innerHeight - pad - safe('--sab');
+    const cx = Math.max(L0 + w / 2, Math.min(R0 - w / 2, r.left + r.width / 2));
+    const tail = h * 0.25;
+    let below = r.top - h - tail < T0;
+    let top = below ? Math.min(B0 - h, r.top + r.height + tail) : r.top - h - tail;
+    if (below && top < T0) top = T0;
+    n.classList.toggle('below', below);
+    n.style.left = cx + 'px';
+    n.style.top = top + 'px';
+    n.style.setProperty('--tx', Math.max(-w / 2 + 24, Math.min(w / 2 - 24, r.left + r.width / 2 - cx)) + 'px');
+    n.style.visibility = '';
     setTimeout(() => n.remove(), 1800);
     if (D.ready(s.clip)) A.play(s.clip);
     UI.live(s.name);
@@ -346,6 +359,29 @@
   }
 
   /* ---------- stage ---------- */
+  /* R4 (Lily: the friend covered the 4th train car): after every layout change the buddy is checked against everything the
+     child can tap in the play area; overlapping → it shrinks, still overlapping → it steps out until the next play. */
+  App.guardBuddy = function (area, buddy, my) {
+    let raf = 0, playNow = null;
+    const hit = (a, b) => !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+    const check = () => {
+      raf = 0;
+      if (App.sess !== my || !buddy.isConnected) { mo.disconnect(); removeEventListener('resize', soon); return; }
+      if (area.dataset.play !== playNow) { playNow = area.dataset.play; buddy.classList.remove('tuck', 'away'); }
+      if (buddy.classList.contains('away') || getComputedStyle(buddy).display === 'none') return;
+      const targets = Array.from(area.querySelectorAll('.tap, .car, .cell, .word-big, .train-pic, .mcard, .drum, .write-board')).filter(e => e.offsetWidth);
+      const over = () => { const br = buddy.getBoundingClientRect(); return targets.some(t => hit(t.getBoundingClientRect(), br)); };
+      if (!over()) return;
+      if (!buddy.classList.contains('tuck')) { buddy.classList.add('tuck'); if (!over()) return; }
+      buddy.classList.add('away');
+    };
+    let late = 0;
+    const soon = () => { if (!raf) raf = requestAnimationFrame(() => setTimeout(check, 40)); clearTimeout(late); late = setTimeout(check, 800); };   /* again once entry animations have settled */
+    const mo = new MutationObserver(soon);
+    mo.observe(area, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-play'] });
+    addEventListener('resize', soon);
+    soon();
+  };
   App.runStage = async function (stage, replay, from) {
     const my = ++App.sess;
     const fromHome = !!(from && from.home);
@@ -382,6 +418,7 @@
     const buddy = el('div', 'buddy', UI.mascot('happy'));
     buddy.id = 'buddy';
     m.appendChild(buddy);
+    App.guardBuddy(area, buddy, my);
     let abort;
     const ctx = {
       right: 0, wrong: 0, giftUsed: false, help, helpMs: 1100,
@@ -637,7 +674,7 @@
     const ch = btn('chest', '<span class="lid"></span><span class="box"></span><span class="lock">⭐</span>', null, '보물 상자');
     wrap.appendChild(ch);
     /* UPDATE 3: with calm rewards the child sees effort praise, never a count (the count is in the parent menu) */
-    if (F.calmRewards) { wrap.appendChild(el('p', 'chest-score effort', '끝까지 해 냈구나!')); if (D.ready('ui_effort')) setTimeout(() => { if (ctx.alive()) A.play('ui_effort'); }, 1600); }
+    if (F.calmRewards) { wrap.appendChild(el('p', 'chest-score effort', '끝까지 해냈구나!')); if (D.ready('ui_effort')) setTimeout(() => { if (ctx.alive()) A.play('ui_effort'); }, 1600); }
     else if (!ctx.noScore) wrap.appendChild(el('p', 'chest-score', `⭐ ${ctx.right}개 맞혔어!`));
     area.appendChild(wrap);
     A.play('ui4_treasure');
@@ -679,7 +716,7 @@
   /* Nihon #5 (Nihon's spec, 2026-11-15 23:03): only after the day's LAST stage (quota reached, or the time cap).
      1 「엄마·아빠한테 보여 줄까?」 보여 줄래! / 다음에 (다음에 = no penalty: the day's sticker, then the calm closing screen)
      2 show-off: today's 2–3 syllables/words as big cards (tap = her recorded sound, if any) + 「려원이가 읽어 줄래?」
-     3 parent taps 「끝까지 해 냈구나!」 → she picks the day's ONE sticker (#1 choice; never a second one the same day)
+     3 parent taps 「끝까지 해냈구나!」 → she picks the day's ONE sticker (#1 choice; never a second one the same day)
      4 last line 「오늘 궁금한 거 있었어?」 (parent hint: the paper question note)
      No score, %, streak, timer or "more play". Text + pictures, so it works with the sound off. New lines are text only
      until recorded (nihon/needed_voice_lines_nihon.md). The whole-app clock is paused. */
@@ -712,7 +749,7 @@
       if (yes) {
         const cards = todayCards(ctx, stage);
         const p = UI.modal(`<div class="showp off"><div class="showp-cards">${cards.map((c, i) => `<button type="button" class="tap showp-c" data-i="${i}">${c.word ? UI.pic(c.word) : ''}<b>${esc(c.text)}</b></button>`).join('')}</div>
-          <p class="showp-ask">려원이가 읽어 줄래?</p></div>`, [['끝까지 해 냈구나!', 1, 'go parent']], 'showp-m off-m');
+          <p class="showp-ask">려원이가 읽어 줄래?</p></div>`, [['끝까지 해냈구나!', 1, 'go parent']], 'showp-m off-m');
         document.querySelectorAll('.showp-c').forEach(n => UI.tap(n, () => {
           const c = cards[+n.dataset.i];
           n.classList.remove('yay'); void n.offsetWidth; n.classList.add('yay');
@@ -1071,7 +1108,7 @@
         ${checkpointHtml()}
         <p class="pm-note">이 화면에서는 두 손가락으로 확대할 수 있습니다. 닫으면 아이 화면은 다시 확대가 막힙니다.</p>
         <section><h3>진도</h3>
-          <p>현재 단계: <b>${stage.id} / ${D.STAGES.length}</b> · ${esc(D.WORLDS[stage.w].name)} · ${esc(stage.title)}</p>
+          <p>현재 단계: <b>${stage.id} / ${D.STAGES.length}</b> · ${esc(D.WORLDS[stage.w].name)} · <span class="pm-stage-title">${esc(stage.title)}</span></p>
           <p>끝낸 단계 ${Object.keys(L.done).length}개 · 오늘 ${St.todayCount()}개 · 별 ${R.stars}개 · 레벨 ${R.level} · 연속 ${R.streak.count}일(최고 ${R.streak.best}일) · 스티커 ${St.stickerCount()}/120</p>
           ${practising.length ? `<p class="pm-practice-note"><b>아직 연습 중</b> ${practising.map(([id, v]) => id + '. ' + esc(D.STAGES[id - 1].title) + (v.notYet ? ` (${v.tries || 1}번 해 봄)` : ' (도움 받아 통과)')).join(', ')}<br><span class="pm-small">혼자서 첫 번에 70% 이상 맞혀야 통과입니다(아무거나 눌러서는 통과할 수 없습니다). 두 번 안 되면 다음 번에는 정답이 반짝이며 도와줍니다. 이런 단계는 옆에서 같이 해 주세요.</span></p>` : ''}
           ${redo.length ? `<p class="pm-warn">다시 하면 좋은 단계: ${redo.map(([id]) => id + '. ' + esc(D.STAGES[id - 1].title)).join(', ')}</p>` : ''}
@@ -1134,7 +1171,7 @@
             <li>따라 쓰기가 끝나면 종이에 같은 글자를 한 번 같이 써 보세요. 손으로 직접 쓰는 경험이 글자 알아보기에 도움이 된다는 연구가 있습니다.</li>
             <li>아이가 틀려도 앱이 "그건 나야"처럼 들은 글자를 알려 줍니다. 정답을 대신 눌러 주기보다 스피커 버튼을 다시 눌러 주세요.</li>
             <li>${F.dailyStop ? '하루 1단계, 15분 안팎이 적당합니다.' : '하루 1~2단계(8~15분)가 적당합니다.'}</li>
-            <li>처음 한 문제는 아이 옆에 앉아 같이 해 주세요. 그날 마지막 모험이 끝나면 "엄마·아빠한테 보여 줄까?" 화면이 나옵니다. 오늘 배운 글자 카드를 아이가 읽어 주면 "끝까지 해 냈구나!"를 눌러 주세요.</li>
+            <li>처음 한 문제는 아이 옆에 앉아 같이 해 주세요. 그날 마지막 모험이 끝나면 "엄마·아빠한테 보여 줄까?" 화면이 나옵니다. 오늘 배운 글자 카드를 아이가 읽어 주면 "끝까지 해냈구나!"를 눌러 주세요.</li>
           </ul>
         </section>
         <section><h3>정보</h3><p id="pmInfo">버전 v6.3 · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
