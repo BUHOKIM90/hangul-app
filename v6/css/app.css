@@ -1370,9 +1370,14 @@ body:not(.singing) .song-pal { animation-play-state: paused; }
    tabs/fish keep a ≥ 48 px target */
 .ctab { min-width: 48px; }
 @media (orientation: landscape) and (max-height: 540px) {
-  .book-page { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; grid-auto-rows: 96px; align-content: start; }
+  .book-page { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; grid-auto-rows: 40%; align-content: start; grid-column: 1 / -1; }
+  .book-page, .closet-grid, .pg { background: #FFFCF8; border-radius: var(--r); box-shadow: var(--soft); }
+  .closet-grid { padding-bottom: 3vmin; }
+  .pg { margin: 0 3vmin max(3vmin, env(safe-area-inset-bottom)); padding: 2vmin 2vmin 3vmin; }
   .book-tab { min-height: 52px; padding: .4vmin 1.6vmin; }
-  .book { gap: 1.2vmin; }
+  .book { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); gap: 1.2vmin 3vmin; }
+  .book-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .book-foot { grid-row: 1; grid-column: 2; }
   .pond .fishy { height: max(52px, min(19vmin, 90%)); }
 }
 @media (max-width: 540px), (max-height: 540px) {
