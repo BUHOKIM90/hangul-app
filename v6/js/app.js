@@ -220,17 +220,20 @@
   }, 1000);
 
   /* The adventure road: 7 stepping stones on a winding path; the buddy stands on today's stone. */
-  /* The road is drawn to fit its box: wide boxes get a left-to-right road with as many stones as fit,
-     tall boxes get a road climbing upwards. */
+  /* Portrait screens get a road climbing upwards, landscape screens a left-to-right one. The orientation comes from the
+     viewport, not the road box: a browser toolbar can make the box in a portrait phone almost square (Chrome iOS ~0.94).
+     The drawing is then fitted to the box: the climbing road is as tall as the box allows (3-6 stones, the top 240 units
+     kept free for the flag and the friend waiting there), the wide road gets as many stones as fit. */
   function roadSvg(stage, bw, bh) {
     const a = bw && bh ? bw / bh : 2.6;
-    const tall = a < 0.9;
-    const n = tall ? 6 : Math.max(3, Math.min(7, Math.round((360 * a - 100) / 150)));
-    const W = tall ? 600 : Math.max(560, 360 * a), H = tall ? 900 : 360;
-    const step = tall ? 140 : (W - 160) / (n - 1);
+    const tall = G.innerHeight > G.innerWidth;
+    const H = tall ? Math.round(Math.min(900, Math.max(520, 600 / a))) : 360;
+    const n = tall ? Math.max(3, Math.min(6, Math.floor((H - 310) / 140) + 1)) : Math.max(3, Math.min(7, Math.round((360 * a - 100) / 150)));
+    const W = tall ? 600 : Math.max(560, 360 * a);
+    const step = tall ? Math.min(140, (H - 310) / (n - 1)) : (W - 160) / (n - 1);
     const from = Math.max(1, Math.min(stage.id - Math.floor((n - 1) / 3), D.STAGES.length - n + 1));
     const pts = [];
-    for (let k = 0; k < n; k++) pts.push(tall ? [300 + Math.sin(k * 1.25 + 0.4) * 170, 830 - k * 140] : [80 + k * step, 240 + Math.sin(k * 1.15 + 0.6) * 55]);
+    for (let k = 0; k < n; k++) pts.push(tall ? [300 + Math.sin(k * 1.25 + 0.4) * 170, H - 70 - k * step] : [80 + k * step, 240 + Math.sin(k * 1.15 + 0.6) * 55]);
     const start = tall ? [pts[0][0] - 40, H + 60] : [pts[0][0] - 90, pts[0][1] + 30];
     let d = `M${start[0]} ${start[1]}`;
     pts.forEach((p, k) => {
