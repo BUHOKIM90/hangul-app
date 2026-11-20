@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>새 버전으로 바꾸는 중</title>
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fdf6e9;color:#3d2a3a;font:600 22px/1.5 -apple-system,sans-serif;text-align:center;padding:24px}</style>
+</head><body><p id="m">새 버전으로 바꾸는 중이에요…</p>
+<script>
+/* Old app versions (before 2026-11-20) served every page from their own cache and never checked for updates.
+   Their service worker lets /review/ pages through to the network, so this page can reach the device:
+   it removes the old worker and its file cache (progress in localStorage is kept), then opens the app fresh. */
+(async () => {
+  const m = document.getElementById('m');
+  try {
+    if ('serviceWorker' in navigator) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+    if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+    try { sessionStorage.clear(); } catch (e) {}
+  } catch (e) { m.textContent = '다시 한 번 열어 주세요.'; }
+  location.replace('../../?fresh=' + Date.now());
+})();
+</script></body></html>
