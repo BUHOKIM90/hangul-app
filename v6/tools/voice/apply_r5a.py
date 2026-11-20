@@ -25,7 +25,7 @@ B2, A2 = [1.0, -2.0, 1.0], [1.0, -1.99004745483398, 0.99007225036621]
 
 
 def decode(path, sr):
-    raw = subprocess.run(['flock', '/tmp/pizza_render.lock', 'nice', '-n', '19', 'ffmpeg', '-v', 'quiet', '-i', path, '-ac', '1', '-ar', str(sr), '-f', 'f32le', '-'], capture_output=True).stdout
+    raw = subprocess.run(['/workspace/team/bin/ffmpeg_safe', '-v', 'quiet', '-i', path, '-ac', '1', '-ar', str(sr), '-f', 'f32le', '-'], capture_output=True).stdout
     return np.frombuffer(raw, dtype=np.float32).astype(np.float64)
 
 

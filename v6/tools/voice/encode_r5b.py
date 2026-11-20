@@ -12,7 +12,7 @@ usage: python3 encode_r5b.py <app-root> <listen_result.txt> <sulafat_full> <out-
 import sys, os, re, json, hashlib, subprocess, wave
 import numpy as np
 root, result, base, out = sys.argv[1:5]
-FF = ['flock', '/tmp/pizza_render.lock', 'nice', '-n', '19', 'ffmpeg']
+FF = ['/workspace/team/bin/ffmpeg_safe']
 md5 = lambda p: hashlib.md5(open(p, 'rb').read()).hexdigest()
 
 

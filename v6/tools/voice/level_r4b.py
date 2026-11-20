@@ -7,7 +7,7 @@ audit_r4.py --fix can only raise the playback gain up to 0.97/peak; for a few cl
 The original mp3 is copied to <backup>/<key>.mp3 first (never overwritten there). Then the trim window is re-measured
 exactly like trim.py and trim.json gets new [start, end, length, gain] for these keys only (backup of trim.json kept).
 
-usage: python3 level_r4b.py <app-root> --backup DIR --keys k1,k2,...   (ffmpeg calls run under flock /tmp/pizza_render.lock)
+usage: python3 level_r4b.py <app-root> --backup DIR --keys k1,k2,...   (ffmpeg calls run via /workspace/team/bin/ffmpeg_safe)
 """
 import sys, os, json, shutil, subprocess, tempfile
 import numpy as np
@@ -22,11 +22,10 @@ TGT = dict((kv.split('=')[0], float(kv.split('=')[1])) for kv in (args[args.inde
 SR = 48000; TARGET = -16.0; CEIL_DB = -3.0   # mp3 encoding overshoots the ceiling by ~1-2 dB; -3 keeps the playback gain free
 B1, A1 = [1.53512485958697, -2.69169618940638, 1.19839281085285], [1.0, -1.69065929318241, 0.73248077421585]
 B2, A2 = [1.0, -2.0, 1.0], [1.0, -1.99004745483398, 0.99007225036621]
-LOCK = '/tmp/pizza_render.lock'
 
 
 def ff(*a, out=False):
-    cmd = ['flock', LOCK, 'nice', '-n', '19', 'ffmpeg', '-v', 'error', '-y'] + list(a)
+    cmd = ['/workspace/team/bin/ffmpeg_safe', '-v', 'error', '-y'] + list(a)
     r = subprocess.run(cmd, capture_output=True)
     if r.returncode: raise SystemExit('ffmpeg failed: ' + r.stderr.decode()[:400])
     return r.stdout
