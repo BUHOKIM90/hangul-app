@@ -67,7 +67,7 @@ button { font-family: inherit; color: inherit; border: 0; background: none; padd
 .splash-mascot { width: 42vmin; animation: float 3s ease-in-out infinite; }
 .splash-title { margin: 0; font-size: 9vmin; font-weight: 400; color: var(--ink); text-shadow: 0 .6vmin 0 #fff; }
 .splash-title span { color: var(--hot); }
-.splash-go { width: 30vmin; height: 30vmin; min-width: 140px; min-height: 140px; border-radius: 50%; background: var(--green); color: #fff; font-size: 11vmin; box-shadow: 0 1.4vmin 0 #24965f; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: pulse 1.6s infinite; }
+.splash-go { width: 30vmin; height: 30vmin; min-width: 140px; min-height: 140px; border-radius: 50%; background: var(--green); color: var(--ink); font-size: 11vmin; box-shadow: 0 1.4vmin 0 #24965f; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: pulse 1.6s infinite; }
 .splash-go span { font-size: 5vmin; }
 @keyframes pulse { 50% { transform: scale(1.06); } }
 @keyframes float { 50% { transform: translateY(-2.4vmin); } }
@@ -305,7 +305,7 @@ button { font-family: inherit; color: inherit; border: 0; background: none; padd
 /* closet */
 .closet { flex: 1; min-height: 0; display: grid; grid-template-columns: .9fr 1.4fr; gap: 3vmin; padding: 0 3vmin 3vmin; }
 .closet-model { display: grid; place-items: center; min-height: 0; }
-.closet-model svg { max-height: 62vmin; }
+.closet-model svg { max-height: 62vmin; pointer-events: none; }
 .closet-side { display: flex; flex-direction: column; gap: 2vmin; min-height: 0; }
 .closet-tabs { display: flex; gap: 1.4vmin; }
 .ctab { flex: 1; background: #fff; border-radius: 2.4vmin; box-shadow: var(--shadow); padding: 1vmin; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: max(64px, var(--tap)); min-width: 0; }
@@ -320,7 +320,8 @@ button { font-family: inherit; color: inherit; border: 0; background: none; padd
 .cprev svg { width: 100%; height: 100%; overflow: visible; }
 .cprev.big { width: 30vmin; margin: 0 auto; }
 .citem b { font-weight: 400; font-size: 3.2vmin; }
-.citem small { font-size: 2.8vmin; color: var(--hot); }
+.citem small { font-size: 2.8vmin; color: var(--glyph); }
+.citem.on small { color: var(--ink); }
 
 /* playground */
 .pg { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(140px, 26vmin), 1fr)); gap: 2.4vmin; padding: 1vmin 3vmin 4vmin; align-content: start; }
@@ -711,7 +712,7 @@ img.em, .pic img.em { filter: none; }
 .home-tile.t-book { background: var(--bu2); }
 .home-tile.t-closet { background: var(--st2); }
 .home-tile.t-park { background: var(--sk2); }
-.badge { background: var(--st3); border: .45vmin solid var(--ink); box-shadow: none; color: #fff; }
+.badge { background: var(--glyph); border: .45vmin solid var(--ink); box-shadow: none; color: #fff; }
 
 /* play */
 .play-title { background: rgba(255, 255, 255, .9); box-shadow: none; border: .4vmin solid rgba(75, 54, 66, .14); }
@@ -927,7 +928,7 @@ img.em, .pic img.em { filter: none; }
 .hm { width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--ink); background: #F6F1EE; color: #B6A7AF; }
 .hm b { font-weight: 400; font-size: 22px; line-height: 1; } .hm small { font-size: 10px; }
 .hm.g { background: var(--mi2); color: var(--ink); } .hm.m { background: var(--bu1); color: var(--ink); } .hm.l { background: var(--st2); color: var(--ink); } .hm.k { background: #fff; color: var(--ink); }
-.hm-key { display: inline-block; padding: 1px 8px; border-radius: 8px; border: 1px solid var(--ink); font-size: 12px; }
+.hm-key { display: inline-block; padding: 1px 8px; border-radius: 8px; border: 1px solid var(--ink); font-size: 12px; color: var(--ink); }
 .hm-key.g { background: var(--mi2); } .hm-key.m { background: var(--bu1); } .hm-key.l { background: var(--st2); } .hm-key.n { background: #F6F1EE; }
 .pm-tip { font-size: 18px; background: var(--cream); border: 2px dashed var(--bu3); border-radius: 12px; padding: 12px 16px; }
 .vrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #F1E7E2; }
