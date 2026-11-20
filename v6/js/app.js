@@ -111,7 +111,7 @@
     App.sess++;
     A.stop();
     App.screen = 'home';
-    if (App._reload) { location.reload(); return; }
+    if (App._reload && App._reload()) return;
     A.bgm(St.s.settings.bgm);
     const m = main();
     m.innerHTML = '';
@@ -1182,7 +1182,7 @@
             <li>처음 한 문제는 아이 옆에 앉아 같이 해 주세요. 그날 마지막 모험이 끝나면 "엄마·아빠한테 보여 줄까?" 화면이 나옵니다. 오늘 배운 글자 카드를 아이가 읽어 주면 "끝까지 해냈구나!"를 눌러 주세요.</li>
           </ul>
         </section>
-        <section><h3>정보</h3><p id="pmInfo">버전 v6.3 · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
+        <section><h3>정보</h3><p id="pmInfo">${STAMP} · 인터넷 없이 쓸 준비를 확인하는 중…</p></section>
       </div>`;
     $('#pmClose').addEventListener('click', closeParent);
     $('#pmGo').addEventListener('click', () => { St.setStage(+$('#pmStage').value); msg('단계를 바꿨습니다.'); });
@@ -1453,18 +1453,18 @@
     setAdult(false);
     if (stay !== true) App.home();
   }
+  const STAMP = '버전 ' + G.BUILD.cache.slice('hangul-v6-'.length, 'hangul-v6-'.length + 8) + ' · ' + G.BUILD.at;
   async function offlineInfo() {
     const info = $('#pmInfo');
     try {
-      if (!('caches' in G)) { info.textContent = '버전 v6.3 · 이 브라우저는 오프라인 저장을 지원하지 않습니다.'; return; }
-      const keys = await caches.keys();
-      const k = keys.find(x => x.startsWith('hangul-v6'));
-      if (!k) { info.textContent = '버전 v6.3 · 오프라인 저장 준비 중(처음 한 번은 인터넷이 필요합니다).'; return; }
+      if (!('caches' in G)) { info.textContent = STAMP + ' · 이 브라우저는 오프라인 저장을 지원하지 않습니다.'; return; }
+      const k = G.BUILD.cache;
+      if (!(await caches.has(k))) { info.textContent = STAMP + ' · 오프라인 저장 준비 중(처음 한 번은 인터넷이 필요합니다).'; return; }
       const c = await caches.open(k);
       const n = (await c.keys()).length;
       const want = G.SW_FILES_COUNT || n;
-      info.textContent = `버전 v6.3 · 오프라인 저장 ${n}/${want}개 파일${n >= want ? ' · 인터넷 없이 쓸 수 있습니다' : ''}`;
-    } catch (e) { info.textContent = '버전 v6.3'; }
+      info.textContent = `${STAMP} · 오프라인 저장 ${n}/${want}개 파일${n >= want ? ' · 인터넷 없이 쓸 수 있습니다' : ''}`;
+    } catch (e) { info.textContent = STAMP; }
   }
 
   /* ---------- helper hand: if nothing is touched for a while, show what to press ---------- */
@@ -1511,19 +1511,42 @@
   }, 1000);
 
   /* ---------- service worker ---------- */
+  /* iOS home-screen apps resume without a navigation, so the browser never re-checks sw.js by itself. */
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    const register = () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+    const reg = register().catch(() => null);
+    const checkUpdate = () => reg.then(r => r && r.update()).catch(() => {});
     let had = !!navigator.serviceWorker.controller;
+    let newCache = null;
+    const reloadForUpdate = () => {
+      try {
+        if (sessionStorage.getItem('sw-reloaded-for') === newCache) return false;
+        sessionStorage.setItem('sw-reloaded-for', newCache);
+      } catch (e) {}
+      location.reload();
+      return true;
+    };
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !(App._reload && App._reload())) checkUpdate();
+    });
+    addEventListener('focus', checkUpdate);
+    addEventListener('pageshow', checkUpdate);
+    setInterval(checkUpdate, 30 * 60 * 1000);
     /* P1: first visit — show how far the offline copy is (small pill, bottom-left); after a failed install try again in 30 s */
     navigator.serviceWorker.addEventListener('message', e => {
       const m = e.data || {};
+      if (m.type === 'cache') {
+        newCache = m.cache;
+        if (!App.adult && (App.screen === 'home' || App.screen === '')) reloadForUpdate(); else App._reload = reloadForUpdate;
+        return;
+      }
       if (m.type !== 'precache' && m.type !== 'precache-failed') return;
       if (had && m.type === 'precache') return;              /* updates of an installed app stay silent */
       let p = $('#cachebar');
       if (!p) { p = el('div', 'cachebar'); p.id = 'cachebar'; p.setAttribute('role', 'status'); document.body.appendChild(p); }
       if (m.type === 'precache-failed') {
         p.textContent = '인터넷 없이 놀 준비를 다 못 했어요. 곧 다시 할게요.';
-        setTimeout(() => { navigator.serviceWorker.register('sw.js').catch(() => {}); }, 30000);
+        setTimeout(() => { register().catch(() => {}); }, 30000);
         return;
       }
       const pct = Math.floor(m.done / m.total * 100);
@@ -1532,7 +1555,7 @@
     });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!had) { had = true; return; }
-      if (App.screen === 'home' || App.screen === '') location.reload(); else App._reload = true;
+      navigator.serviceWorker.controller.postMessage({ type: 'cache?' });
     });
   }
 
