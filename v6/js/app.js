@@ -1517,7 +1517,10 @@
     const reg = register().catch(() => null);
     const checkUpdate = () => reg.then(r => r && r.update()).catch(() => {});
     let had = !!navigator.serviceWorker.controller;
+    const firstVisit = !had;
+    const askFill = () => { if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type: 'fill' }); };
     let newCache = null;
+    const canReloadNow = () => !App.adult && (App.screen === 'home' || App.screen === '');
     const reloadForUpdate = () => {
       try {
         if (sessionStorage.getItem('sw-reloaded-for') === newCache) return false;
@@ -1527,21 +1530,25 @@
       return true;
     };
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !(App._reload && App._reload())) checkUpdate();
+      if (document.hidden) return;
+      if (App._reload && canReloadNow() && App._reload()) return;
+      checkUpdate();
+      askFill();
     });
     addEventListener('focus', checkUpdate);
     addEventListener('pageshow', checkUpdate);
     setInterval(checkUpdate, 30 * 60 * 1000);
-    /* P1: first visit — show how far the offline copy is (small pill, bottom-left); after a failed install try again in 30 s */
+    askFill();
+    /* P1: first visit — show how far the offline copy is (small pill, bottom-left); after a failed shell install try again in 30 s */
     navigator.serviceWorker.addEventListener('message', e => {
       const m = e.data || {};
       if (m.type === 'cache') {
         newCache = m.cache;
-        if (!App.adult && (App.screen === 'home' || App.screen === '')) reloadForUpdate(); else App._reload = reloadForUpdate;
+        if (canReloadNow()) reloadForUpdate(); else App._reload = reloadForUpdate;
         return;
       }
       if (m.type !== 'precache' && m.type !== 'precache-failed') return;
-      if (had && m.type === 'precache') return;              /* updates of an installed app stay silent */
+      if (!firstVisit && m.type === 'precache') return;      /* updates of an installed app stay silent */
       let p = $('#cachebar');
       if (!p) { p = el('div', 'cachebar'); p.id = 'cachebar'; p.setAttribute('role', 'status'); document.body.appendChild(p); }
       if (m.type === 'precache-failed') {
@@ -1551,7 +1558,8 @@
       }
       const pct = Math.floor(m.done / m.total * 100);
       p.innerHTML = `<span>인터넷 없이 놀 준비 ${pct}%</span><i><b style="width:${pct}%"></b></i>`;
-      if (m.done >= m.total) { p.innerHTML = '<span>준비 끝! 이제 인터넷 없이도 놀 수 있어요</span>'; setTimeout(() => p.remove(), 3500); }
+      if (m.done >= m.total) p.innerHTML = '<span>준비 끝! 이제 인터넷 없이도 놀 수 있어요</span>';
+      if (m.done >= m.total || m.final) setTimeout(() => p.remove(), 3500);
     });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!had) { had = true; return; }
