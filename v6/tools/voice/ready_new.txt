@@ -42,3 +42,13 @@ w_teuraekteo
 w_teureok
 w_tteokguk
 w_yunikon
+w_bogeo
+w_gominhyeong
+w_haema
+w_jjigae
+w_kiwi
+w_koalla
+w_mujigae
+w_teuropi
+w_yeoldaeeo
+w_yosulbong

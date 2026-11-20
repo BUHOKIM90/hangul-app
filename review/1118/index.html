@@ -6,135 +6,29 @@
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<title>새 목소리 듣기 확인</title>
+<title>새 목소리 듣기 확인 — 완료</title>
 <link rel="icon" href="data:,">
 <style>
-:root { --bg: #FFF8EC; --card: #fff; --ink: #2B2D5C; --sub: #6B6A92; --line: #E9E1D6; --ok: #1F9D63; --okbg: #E3F6EC; --re: #D2465F; --rebg: #FDE7EC; --btn: #EEF1F7; --pri: #5B47C9; }
-@media (prefers-color-scheme: dark) { :root { --bg: #1C1B26; --card: #26253A; --ink: #F1EEFF; --sub: #B6B3D6; --line: #3A3854; --ok: #5FD39C; --okbg: #1E3A2E; --re: #FF8FA3; --rebg: #45222C; --btn: #34324D; --pri: #A89BFF; } }
+:root { --bg: #FFF8EC; --card: #fff; --ink: #2B2D5C; --sub: #6B6A92; --line: #E9E1D6; }
+@media (prefers-color-scheme: dark) { :root { --bg: #1C1B26; --card: #26253A; --ink: #F1EEFF; --sub: #B6B3D6; --line: #3A3854; } }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.45 -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
-  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
-main { max-width: 680px; margin: 0 auto; padding-bottom: 210px; }
-h1 { font-size: 24px; margin: 8px 0 6px; }
-.lead { color: var(--sub); margin: 0 0 6px; }
-.lead b { color: var(--ink); }
-.count { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 10px 0; font-weight: 700; border-bottom: 1px solid var(--line); }
-.row { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin: 12px 0; }
-.row.done-ok { border-color: var(--ok); }
-.row.done-re { border-color: var(--re); }
-.top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.txt { font-size: 24px; font-weight: 700; word-break: keep-all; }
-.tag { flex: none; font-size: 13px; color: var(--sub); border: 1px solid var(--line); border-radius: 99px; padding: 2px 10px; }
-.take { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; align-items: stretch; }
-.take .lbl { grid-column: 1 / -1; font-size: 14px; color: var(--sub); margin-bottom: -4px; }
-button { font: inherit; border: 0; border-radius: 14px; min-height: 56px; padding: 8px 10px; background: var(--btn); color: var(--ink); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-button:active { transform: scale(.97); }
-button:focus-visible { outline: 3px solid var(--pri); outline-offset: 2px; }
-.play { font-weight: 700; }
-.play.on { background: var(--pri); color: #fff; }
-.ok[aria-pressed="true"] { background: var(--ok); color: #fff; font-weight: 700; }
-.re[aria-pressed="true"] { background: var(--re); color: #fff; font-weight: 700; }
-.old { margin-top: 8px; width: 100%; min-height: 48px; font-size: 15px; color: var(--sub); background: transparent; border: 1px dashed var(--line); }
-footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; background: var(--card); border-top: 1px solid var(--line); padding: 12px max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
-footer .in { max-width: 680px; margin: 0 auto; }
-footer label { font-size: 14px; color: var(--sub); }
-textarea { width: 100%; height: 64px; margin: 4px 0 8px; font: 14px/1.35 ui-monospace, Menlo, monospace; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px; resize: none; }
-.copy { width: 100%; background: var(--pri); color: #fff; font-weight: 700; }
-.msg { min-height: 1.2em; text-align: center; font-size: 14px; color: var(--ok); margin-top: 4px; }
+body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
+  font: 18px/1.6 -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+main { max-width: 480px; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px 22px; text-align: center; }
+.big { font-size: 44px; line-height: 1; margin: 0 0 12px; }
+h1 { font-size: 24px; margin: 0 0 10px; }
+p { margin: 0 0 8px; color: var(--sub); }
 </style>
 </head>
 <body>
 <main>
-<h1>새 목소리 듣기 확인</h1>
-<p class="lead">기계 받아쓰기가 한 글자·짧은 낱말을 잘 못 알아들어서, 사람 귀로 확인이 필요한 소리 <b>94개</b>입니다.</p>
-<p class="lead"><b>새 소리 ▶</b>를 듣고 적힌 글자 그대로 들리면 <b>「좋아요」</b>, 다르게 들리거나 끝이 묻는 말처럼 올라가면 <b>「다시」</b>를 눌러 주세요. (예: 디 ≠ 티·드, 머 ≠ 모·뭐, 짜 ≠ 자·차. 내와 네는 같게 들려도 괜찮아요.) 소리가 두 개인 줄은 마음에 드는 쪽 하나만 「좋아요」를 누르면 됩니다.</p>
-<p class="lead">다 고르면 맨 아래 <b>「결과 복사」</b>를 눌러 채팅에 붙여 주세요. 고른 것은 이 휴대폰에 저장돼서, 나갔다 와도 그대로 있어요.</p>
-<div class="count" id="count" aria-live="polite"></div>
-<div id="list"></div>
+  <p class="big" aria-hidden="true">🎧</p>
+  <h1>완료, 감사합니다!</h1>
+  <p>들어 주신 소리 94개를 모두 정리했어요.</p>
+  <p>좋아요 48개는 앱에 넣었고, 다시 46개는 새로 녹음할게요.</p>
 </main>
-<footer><div class="in">
-<label for="code">결과 (채팅에 붙여 주세요)</label>
-<textarea id="code" readonly></textarea>
-<button type="button" class="copy" id="copy">결과 복사</button>
-<div class="msg" id="msg" aria-live="polite"></div>
-</div></footer>
-<script>
-'use strict';
-const DATA = [{"k": "fy_C720", "text": "유 글자를 찾아볼까?", "g": "다시 녹음", "old": "clips/fy_C720__old.mp3", "takes": [{"id": "t6", "src": "clips/fy_C720__t6.wav"}, {"id": "t7", "src": "clips/fy_C720__t7.wav"}]}, {"k": "j_3137", "text": "디귿, 다리 할 때 디귿.", "g": "다시 녹음", "old": "clips/j_3137__old.mp3", "takes": [{"id": "t3", "src": "clips/j_3137__t3.wav"}]}, {"k": "j_3139", "text": "리을, 라디오 할 때 리을.", "g": "다시 녹음", "old": "clips/j_3139__old.mp3", "takes": [{"id": "t3", "src": "clips/j_3139__t3.wav"}]}, {"k": "j_3149", "text": "쌍지읒.", "g": "다시 녹음", "old": "clips/j_3149__old.mp3", "takes": [{"id": "t3", "src": "clips/j_3149__t3.wav"}]}, {"k": "j_314B", "text": "키읔, 코끼리 할 때 키읔.", "g": "다시 녹음", "old": "clips/j_314B__old.mp3", "takes": [{"id": "t3", "src": "clips/j_314B__t3.wav"}]}, {"k": "j_314D", "text": "피읖, 포도 할 때 피읖.", "g": "다시 녹음", "old": "clips/j_314D__old.mp3", "takes": [{"id": "t3", "src": "clips/j_314D__t3.wav"}]}, {"k": "j_314E", "text": "히읗, 하마 할 때 히읗.", "g": "다시 녹음", "old": "clips/j_314E__old.mp3", "takes": [{"id": "t3", "src": "clips/j_314E__t3.wav"}]}, {"k": "j_315A", "text": "외.", "g": "다시 녹음", "old": "clips/j_315A__old.mp3", "takes": [{"id": "t3", "src": "clips/j_315A__t3.wav"}]}, {"k": "sy_AC1C", "text": "개.", "g": "다시 녹음", "old": "clips/sy_AC1C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AC1C__t3.wav"}]}, {"k": "sy_AC38", "text": "갸.", "g": "다시 녹음", "old": "clips/sy_AC38__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AC38__t3.wav"}]}, {"k": "sy_AC70", "text": "거.", "g": "다시 녹음", "old": "clips/sy_AC70__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AC70__t3.wav"}]}, {"k": "sy_AC8C", "text": "게.", "g": "다시 녹음", "old": "clips/sy_AC8C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AC8C__t3.wav"}]}, {"k": "sy_ACE0", "text": "고.", "g": "다시 녹음", "old": "clips/sy_ACE0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_ACE0__t3.wav"}]}, {"k": "sy_AD6C", "text": "구.", "g": "다시 녹음", "old": "clips/sy_AD6C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AD6C__t3.wav"}]}, {"k": "sy_ADDC", "text": "규.", "g": "다시 녹음", "old": "clips/sy_ADDC__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_ADDC__t3.wav"}]}, {"k": "sy_AE30", "text": "기.", "g": "다시 녹음", "old": "clips/sy_AE30__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AE30__t3.wav"}]}, {"k": "sy_AF2C", "text": "꼬.", "g": "다시 녹음", "old": "clips/sy_AF2C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AF2C__t3.wav"}]}, {"k": "sy_AF43", "text": "꽃.", "g": "다시 녹음", "old": "clips/sy_AF43__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AF43__t3.wav"}]}, {"k": "sy_AFB8", "text": "꾸.", "g": "다시 녹음", "old": "clips/sy_AFB8__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_AFB8__t3.wav"}]}, {"k": "sy_B07C", "text": "끼.", "g": "다시 녹음", "old": "clips/sy_B07C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B07C__t3.wav"}]}, {"k": "sy_B0B4", "text": "내.", "g": "다시 녹음", "old": "clips/sy_B0B4__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B0B4__t3.wav"}]}, {"k": "sy_B0D0", "text": "냐.", "g": "다시 녹음", "old": "clips/sy_B0D0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B0D0__t3.wav"}]}, {"k": "sy_B178", "text": "노.", "g": "다시 녹음", "old": "clips/sy_B178__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B178__t3.wav"}]}, {"k": "sy_B1E8", "text": "뇨.", "g": "다시 녹음", "old": "clips/sy_B1E8__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B1E8__t3.wav"}]}, {"k": "sy_B204", "text": "누.", "g": "다시 녹음", "old": "clips/sy_B204__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B204__t3.wav"}]}, {"k": "sy_B290", "text": "느.", "g": "다시 녹음", "old": "clips/sy_B290__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B290__t3.wav"}]}, {"k": "sy_B4DC", "text": "드.", "g": "다시 녹음", "old": "clips/sy_B4DC__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B4DC__t3.wav"}]}, {"k": "sy_B514", "text": "디.", "g": "다시 녹음", "old": "clips/sy_B514__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B514__t3.wav"}]}, {"k": "sy_B5A0", "text": "떠.", "g": "다시 녹음", "old": "clips/sy_B5A0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B5A0__t3.wav"}]}, {"k": "sy_B5A1", "text": "떡.", "g": "다시 녹음", "old": "clips/sy_B5A1__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B5A1__t3.wav"}]}, {"k": "sy_B69C", "text": "뚜.", "g": "다시 녹음", "old": "clips/sy_B69C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B69C__t3.wav"}]}, {"k": "sy_B78C", "text": "람.", "g": "다시 녹음", "old": "clips/sy_B78C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B78C__t3.wav"}]}, {"k": "sy_B798", "text": "래.", "g": "다시 녹음", "old": "clips/sy_B798__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_B798__t3.wav"}]}, {"k": "sy_C090", "text": "삐.", "g": "다시 녹음", "old": "clips/sy_C090__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C090__t3.wav"}]}, {"k": "sy_C314", "text": "쌔.", "g": "다시 녹음", "old": "clips/sy_C314__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C314__t3.wav"}]}, {"k": "sy_C464", "text": "쑤.", "g": "다시 녹음", "old": "clips/sy_C464__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C464__t3.wav"}]}, {"k": "sy_C545", "text": "악.", "g": "다시 녹음", "old": "clips/sy_C545__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C545__t3.wav"}]}, {"k": "sy_C560", "text": "애.", "g": "다시 녹음", "old": "clips/sy_C560__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C560__t3.wav"}]}, {"k": "sy_C5D0", "text": "에.", "g": "다시 녹음", "old": "clips/sy_C5D0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C5D0__t3.wav"}]}, {"k": "sy_C637", "text": "옷.", "g": "다시 녹음", "old": "clips/sy_C637__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C637__t3.wav"}]}, {"k": "sy_C678", "text": "외.", "g": "다시 녹음", "old": "clips/sy_C678__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C678__t3.wav"}]}, {"k": "sy_C6B0", "text": "우.", "g": "다시 녹음", "old": "clips/sy_C6B0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C6B0__t3.wav"}]}, {"k": "sy_C6CC", "text": "워.", "g": "다시 녹음", "old": "clips/sy_C6CC__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C6CC__t3.wav"}]}, {"k": "sy_C758", "text": "의.", "g": "다시 녹음", "old": "clips/sy_C758__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C758__t3.wav"}]}, {"k": "sy_C988", "text": "즈.", "g": "다시 녹음", "old": "clips/sy_C988__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C988__t3.wav"}]}, {"k": "sy_C9D1", "text": "집.", "g": "다시 녹음", "old": "clips/sy_C9D1__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C9D1__t3.wav"}]}, {"k": "sy_C9DC", "text": "짜.", "g": "다시 녹음", "old": "clips/sy_C9DC__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_C9DC__t3.wav"}]}, {"k": "sy_CABC", "text": "쪼.", "g": "다시 녹음", "old": "clips/sy_CABC__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CABC__t3.wav"}]}, {"k": "sy_CC0C", "text": "찌.", "g": "다시 녹음", "old": "clips/sy_CC0C__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CC0C__t3.wav"}]}, {"k": "sy_CC98", "text": "처.", "g": "다시 녹음", "old": "clips/sy_CC98__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CC98__t3.wav"}]}, {"k": "sy_CE20", "text": "츠.", "g": "다시 녹음", "old": "clips/sy_CE20__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CE20__t3.wav"}]}, {"k": "sy_CF00", "text": "케.", "g": "다시 녹음", "old": "clips/sy_CF00__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CF00__t3.wav"}]}, {"k": "sy_CFE0", "text": "쿠.", "g": "다시 녹음", "old": "clips/sy_CFE0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_CFE0__t3.wav"}]}, {"k": "sy_D0C0", "text": "타.", "g": "다시 녹음", "old": "clips/sy_D0C0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D0C0__t3.wav"}]}, {"k": "sy_D130", "text": "터.", "g": "다시 녹음", "old": "clips/sy_D130__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D130__t3.wav"}]}, {"k": "sy_D1A0", "text": "토.", "g": "다시 녹음", "old": "clips/sy_D1A0__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D1A0__t3.wav"}]}, {"k": "sy_D504", "text": "프.", "g": "다시 녹음", "old": "clips/sy_D504__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D504__t3.wav"}]}, {"k": "sy_D590", "text": "햐.", "g": "다시 녹음", "old": "clips/sy_D590__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D590__t3.wav"}]}, {"k": "sy_D5E4", "text": "헤.", "g": "다시 녹음", "old": "clips/sy_D5E4__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D5E4__t3.wav"}]}, {"k": "sy_D638", "text": "호.", "g": "다시 녹음", "old": "clips/sy_D638__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D638__t3.wav"}]}, {"k": "sy_D654", "text": "화.", "g": "다시 녹음", "old": "clips/sy_D654__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D654__t3.wav"}]}, {"k": "sy_D750", "text": "흐.", "g": "다시 녹음", "old": "clips/sy_D750__old.mp3", "takes": [{"id": "t3", "src": "clips/sy_D750__t3.wav"}]}, {"k": "ui4_block", "text": "블록으로 글자 만들자!", "g": "다시 녹음", "old": "clips/ui4_block__old.mp3", "takes": [{"id": "t5", "src": "clips/ui4_block__t5.wav"}, {"id": "t6", "src": "clips/ui4_block__t6.wav"}]}, {"k": "v_wd4", "text": "삐약이를 만났어!", "g": "다시 녹음", "old": "clips/v_wd4__old.mp3", "takes": [{"id": "t5", "src": "clips/v_wd4__t5.wav"}, {"id": "t6", "src": "clips/v_wd4__t6.wav"}]}, {"k": "v_wd5", "text": "유니를 만났어! 무지개를 다 건넜어!", "g": "다시 녹음", "old": "clips/v_wd5__old.mp3", "takes": [{"id": "t5", "src": "clips/v_wd5__t5.wav"}, {"id": "t6", "src": "clips/v_wd5__t6.wav"}]}, {"k": "w_ageo", "text": "악어.", "g": "다시 녹음", "old": "clips/w_ageo__old.mp3", "takes": [{"id": "t3", "src": "clips/w_ageo__t3.wav"}]}, {"k": "w_ai", "text": "아이.", "g": "다시 녹음", "old": "clips/w_ai__old.mp3", "takes": [{"id": "t3", "src": "clips/w_ai__t3.wav"}]}, {"k": "w_eureureong", "text": "으르렁.", "g": "다시 녹음", "old": "clips/w_eureureong__old.mp3", "takes": [{"id": "t3", "src": "clips/w_eureureong__t3.wav"}, {"id": "t4", "src": "clips/w_eureureong__t4.wav"}]}, {"k": "w_ge", "text": "게.", "g": "다시 녹음", "old": "clips/w_ge__old.mp3", "takes": [{"id": "t3", "src": "clips/w_ge__t3.wav"}]}, {"k": "w_geobuk", "text": "거북.", "g": "다시 녹음", "old": "clips/w_geobuk__old.mp3", "takes": [{"id": "t3", "src": "clips/w_geobuk__t3.wav"}]}, {"k": "w_gom", "text": "곰.", "g": "다시 녹음", "old": "clips/w_gom__old.mp3", "takes": [{"id": "t3", "src": "clips/w_gom__t3.wav"}]}, {"k": "w_guk", "text": "국.", "g": "다시 녹음", "old": "clips/w_guk__old.mp3", "takes": [{"id": "t3", "src": "clips/w_guk__t3.wav"}]}, {"k": "w_ip", "text": "입.", "g": "다시 녹음", "old": "clips/w_ip__old.mp3", "takes": [{"id": "t3", "src": "clips/w_ip__t3.wav"}]}, {"k": "w_kkot", "text": "꽃.", "g": "다시 녹음", "old": "clips/w_kkot__old.mp3", "takes": [{"id": "t3", "src": "clips/w_kkot__t3.wav"}]}, {"k": "w_ot", "text": "옷.", "g": "다시 녹음", "old": "clips/w_ot__old.mp3", "takes": [{"id": "t3", "src": "clips/w_ot__t3.wav"}]}, {"k": "w_tteok", "text": "떡.", "g": "다시 녹음", "old": "clips/w_tteok__old.mp3", "takes": [{"id": "t3", "src": "clips/w_tteok__t3.wav"}]}, {"k": "w_bam", "text": "밤.", "g": "새 낱말", "old": "clips/w_bam__old.mp3", "takes": [{"id": "t1", "src": "clips/w_bam__t1.wav"}]}, {"k": "w_bogeo", "text": "복어.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_bogeo__t1.wav"}]}, {"k": "w_bul", "text": "불.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_bul__t1.wav"}]}, {"k": "w_doneot", "text": "도넛.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_doneot__t1.wav"}]}, {"k": "w_gam", "text": "감.", "g": "새 낱말", "old": "clips/w_gam__old.mp3", "takes": [{"id": "t1", "src": "clips/w_gam__t1.wav"}]}, {"k": "w_gominhyeong", "text": "곰인형.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_gominhyeong__t1.wav"}]}, {"k": "w_hae", "text": "해.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_hae__t1.wav"}]}, {"k": "w_haema", "text": "해마.", "g": "새 낱말", "old": "clips/w_haema__old.mp3", "takes": [{"id": "t1", "src": "clips/w_haema__t1.wav"}]}, {"k": "w_jigu", "text": "지구.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_jigu__t1.wav"}]}, {"k": "w_jjigae", "text": "찌개.", "g": "새 낱말", "old": "clips/w_jjigae__old.mp3", "takes": [{"id": "t1", "src": "clips/w_jjigae__t1.wav"}]}, {"k": "w_kiwi", "text": "키위.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_kiwi__t1.wav"}]}, {"k": "w_koalla", "text": "코알라.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_koalla__t1.wav"}, {"id": "t2", "src": "clips/w_koalla__t2.wav"}]}, {"k": "w_mujigae", "text": "무지개.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_mujigae__t1.wav"}]}, {"k": "w_nun", "text": "눈.", "g": "새 낱말", "old": "clips/w_nun__old.mp3", "takes": [{"id": "t1", "src": "clips/w_nun__t1.wav"}]}, {"k": "w_teuropi", "text": "트로피.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_teuropi__t1.wav"}]}, {"k": "w_toseong", "text": "토성.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_toseong__t1.wav"}]}, {"k": "w_yeoldaeeo", "text": "열대어.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_yeoldaeeo__t1.wav"}]}, {"k": "w_yosulbong", "text": "요술봉.", "g": "새 낱말", "old": null, "takes": [{"id": "t1", "src": "clips/w_yosulbong__t1.wav"}]}];
-const STORE = 'listen-1118-v1';
-let pick = {};
-try { pick = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { pick = {}; }
-const save = () => { try { localStorage.setItem(STORE, JSON.stringify(pick)); } catch (e) { /* private mode: still works for this visit */ } };
-const audio = new Audio();
-audio.preload = 'none';
-let playing = null;
-function play(btn, src) {
-  if (playing === btn && !audio.paused) { audio.pause(); btn.classList.remove('on'); playing = null; return; }
-  if (playing) playing.classList.remove('on');
-  audio.src = src; audio.currentTime = 0;
-  const p = audio.play(); if (p && p.catch) p.catch(() => {});
-  btn.classList.add('on'); playing = btn;
-}
-audio.addEventListener('ended', () => { if (playing) playing.classList.remove('on'); playing = null; });
-const el = (t, cls, txt) => { const n = document.createElement(t); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
-const list = document.getElementById('list');
-DATA.forEach(d => {
-  const row = el('section', 'row'); row.dataset.k = d.k;
-  const top = el('div', 'top');
-  top.append(el('div', 'txt', d.text), el('span', 'tag', d.g));
-  row.append(top);
-  d.takes.forEach((t, i) => {
-    const id = d.takes.length > 1 ? d.k + '~' + t.id : d.k;
-    const box = el('div', 'take');
-    if (d.takes.length > 1) box.append(el('div', 'lbl', '새 소리 ' + (i + 1)));
-    const pb = el('button', 'play', d.takes.length > 1 ? '새 소리 ' + (i + 1) + ' ▶' : '새 소리 ▶');
-    pb.type = 'button'; pb.addEventListener('click', () => play(pb, t.src));
-    const ok = el('button', 'ok', '좋아요'); ok.type = 'button';
-    const re = el('button', 're', '다시'); re.type = 'button';
-    const set = v => {
-      if (pick[id] === v) delete pick[id];
-      else {
-        pick[id] = v;
-        /* one good take per line: choosing 「좋아요」 here takes it away from the other take */
-        if (v === 'ok') d.takes.forEach(o => { const oid = d.k + '~' + o.id; if (oid !== id && pick[oid] === 'ok') delete pick[oid]; });
-      }
-      save(); paint();
-    };
-    ok.addEventListener('click', () => set('ok')); re.addEventListener('click', () => set('re'));
-    ok.dataset.id = re.dataset.id = id;
-    box.append(pb, ok, re);
-    row.append(box);
-  });
-  if (d.old) { const ob = el('button', 'old', '지금 앱에서 나는 소리 ▶ (비교용)'); ob.type = 'button'; ob.addEventListener('click', () => play(ob, d.old)); row.append(ob); }
-  list.append(row);
-});
-function verdict(d) {
-  const ids = d.takes.map(t => (d.takes.length > 1 ? d.k + '~' + t.id : d.k));
-  const ok = ids.filter(i => pick[i] === 'ok');
-  if (ok.length) return { v: 'ok', id: ok[0] };
-  if (ids.every(i => pick[i] === 're')) return { v: 're', id: d.k };
-  return null;
-}
-function paint() {
-  document.querySelectorAll('.ok, .re').forEach(b => b.setAttribute('aria-pressed', String(pick[b.dataset.id] === (b.classList.contains('ok') ? 'ok' : 're'))));
-  const OK = [], RE = []; let left = 0;
-  DATA.forEach(d => {
-    const r = verdict(d), row = list.querySelector('[data-k="' + d.k + '"]');
-    row.classList.toggle('done-ok', !!r && r.v === 'ok'); row.classList.toggle('done-re', !!r && r.v === 're');
-    if (!r) left++; else if (r.v === 'ok') OK.push(r.id); else RE.push(r.id);
-  });
-  document.getElementById('count').textContent = '좋아요 ' + OK.length + ' · 다시 ' + RE.length + ' · 남음 ' + left + ' / ' + DATA.length;
-  document.getElementById('code').value = '듣기1118 OK:' + OK.join(',') + ' / RE:' + RE.join(',') + (left ? ' / 남음 ' + left : '');
-}
-document.getElementById('copy').addEventListener('click', async () => {
-  const ta = document.getElementById('code'), msg = document.getElementById('msg');
-  let done = false;
-  try { await navigator.clipboard.writeText(ta.value); done = true; } catch (e) { /* fall back below */ }
-  if (!done) { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); try { done = document.execCommand('copy'); } catch (e) { done = false; } }
-  msg.textContent = done ? '복사했어요. 채팅에 붙여 넣어 주세요.' : '복사가 안 됐어요. 위 글자를 길게 눌러 복사해 주세요.';
-});
-paint();
-</script>
+<script>try { localStorage.removeItem('listen-1118-v1'); } catch (e) {}</script>
 </body>
 </html>

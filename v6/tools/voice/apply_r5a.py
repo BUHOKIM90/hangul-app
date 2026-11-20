@@ -9,7 +9,7 @@ For every row of the manifest (asr_1118/manifest_1118.json):
   - newword83 / nihon5: add the key to v6/tools/voice/ready_new.txt (so data.js shows the word / app.js says the line).
 Peak-limited clips that still miss -16 +-1.5 are reported; level them afterwards with level_r4b.py.
 
-usage: python3 apply_r5a.py <app-root> <manifest.json> <sulafat_full dir> --backup DIR
+usage: python3 apply_r5a.py <app-root> <manifest.json> <dir the manifest 'file' paths are relative to> --backup DIR [--tag r5b]
 """
 import sys, os, json, shutil, subprocess
 import numpy as np
@@ -17,6 +17,7 @@ from scipy.signal import lfilter
 
 root, manifest, base = sys.argv[1:4]
 backup = sys.argv[sys.argv.index('--backup') + 1]
+TAG = sys.argv[sys.argv.index('--tag') + 1] if '--tag' in sys.argv else 'r5a'  # R5b: same tool, own backup names
 os.makedirs(backup, exist_ok=True)
 SR = 48000; TARGET = -16.0
 B1, A1 = [1.53512485958697, -2.69169618940638, 1.19839281085285], [1.0, -1.69065929318241, 0.73248077421585]
@@ -64,7 +65,7 @@ def keep(path, name):
 
 M = json.load(open(manifest))
 tp = os.path.join(root, 'v6/tools/trim.json'); hp = os.path.join(root, 'v6/tools/voice/old_voice_hold.txt'); rp = os.path.join(root, 'v6/tools/voice/ready_new.txt')
-keep(tp, 'trim.json.before_r5a'); keep(hp, 'old_voice_hold.txt.before_r5a'); keep(rp, 'ready_new.txt.before_r5a')
+keep(tp, 'trim.json.before_' + TAG); keep(hp, 'old_voice_hold.txt.before_' + TAG); keep(rp, 'ready_new.txt.before_' + TAG)
 TRIM = json.load(open(tp))
 rows = []
 for m in M:
@@ -92,5 +93,5 @@ ready = [l.strip() for l in open(rp).read().split('\n') if l.strip()]
 for m in M:
     if m['group'] != 'retake112' and m['key'] not in ready: ready.append(m['key'])
 open(rp, 'w').write('\n'.join(ready) + '\n')
-json.dump(rows, open(os.path.join(backup, 'apply_r5a_report.json'), 'w'), ensure_ascii=False, indent=1)
+json.dump(rows, open(os.path.join(backup, 'apply_' + TAG + '_report.json'), 'w'), ensure_ascii=False, indent=1)
 print('applied', len(rows), 'not ok', [r['key'] for r in rows if not r['ok']], 'clipped', [r['key'] for r in rows if r['clip_runs']])
